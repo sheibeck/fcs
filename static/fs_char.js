@@ -49,111 +49,6 @@
       }
     };
 
-    function getCharacterInfo(id) {
-      // Create DynamoDB document client
-      var docClient = getDBClient();
-
-      var params = {
-          TableName: fs_char.config.charactertable,
-          Select: 'ALL_ATTRIBUTES',
-          ExpressionAttributeValues: {':character_id' : id },
-          FilterExpression: 'character_id = :character_id'
-      }
-
-      docClient.scan(params, function (err, data) {
-          if (err) {
-              console.log("Error", err);
-          } else {
-              var characterData = data.Items[0];
-              console.log("Success", characterData);
-
-              fatesheet.setTitle(characterData.name + ' (Character)')
-
-              //if the viewer isn't the character owner then don't let them save it
-              // it would just copy it to their account, but for now we'll just
-              // remove the option
-              if (characterData.character_owner_id !== fatesheet.config.userId)
-              {
-                $('.js-save-character').remove();
-              }
-
-              $('form').populate(characterData);
-
-              //check if there is an autocalc function and runit
-              if (typeof autocalc !== "undefined") {
-                  autocalc();
-              }
-          }
-      });
-    }
-
-    fs_char.listCharacters = function ($contentElem) {
-
-        // Create DynamoDB document client
-        var docClient = getDBClient();
-
-        var params = {
-            TableName: fs_char.config.charactertable,
-            Select: 'ALL_ATTRIBUTES',
-            ExpressionAttributeValues: {':owner_id' : fatesheet.config.userId },
-            FilterExpression: 'character_owner_id = :owner_id'
-        }
-
-        docClient.scan(params, function (err, data) {
-            if (err) {
-                console.log("Error", err);
-            } else {
-                console.log("Success", data.Items);
-
-                return data.Items;
-            }
-        });
-    }
-
-    fs_char.saveCharacter = function () {
-        if (fatesheet.config.isAuthenticated) {
-            /// save a character
-            var data = $('form').serializeJSON();
-            var characterData = JSON.parse(data);
-
-            // make sure we have a proper user id key
-            characterData.character_owner_id = fatesheet.config.userId;
-
-            //create a new characterId if we don't have one
-            var isNew = false;
-            if (!fs_char.config.characterId) {
-                isNew = true;
-                fs_char.config.characterId = fatesheet.generateUUID();
-                fatesheet.logAnalyticEvent('createdACharacter' + characterData.sheetname);
-            }
-            characterData.character_id = fs_char.config.characterId;
-
-            //dynamodb won't let us have empty attributes
-            fatesheet.removeEmptyObjects(characterData);
-
-            var docClient = getDBClient();
-
-            // create/update a  character
-            // we always use the put operation because the data can change depending on your character sheet
-            var params = {
-                TableName: fs_char.config.charactertable,
-                Item: characterData
-            };
-
-            docClient.put(params, function (err, data) {
-                if (err) {
-                    fatesheet.notify(err.message || JSON.stringify(err));
-                    console.error("Unable to save item. Error JSON:", JSON.stringify(err, null, 2));
-                } else {
-                    fatesheet.notify('Character saved.', 'success', 2000);
-                    console.log("Added item:", JSON.stringify(data, null, 2));
-                }
-            });
-        }
-        else {
-            window.print();
-        }
-    }
 
     fs_char.deleteCharacter = function (characterId) {
       var docClient = getDBClient();
@@ -208,16 +103,6 @@
 
             var key = $(this).data('id');
             fs_char.deleteCharacter(key);
-        });
-
-        $(document).on('click', '.js-create-character', function (e) {
-            e.preventDefault();
-            fs_char.saveCharacter();
-        });
-
-        $(document).on('click', '.js-save-character', function (e) {
-            e.preventDefault();
-            fs_char.saveCharacter();
         });
 
         $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {

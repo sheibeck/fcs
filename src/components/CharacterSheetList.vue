@@ -2,7 +2,7 @@
   <div class="container mt-2">
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
-          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="'sheets/'+sheet.charactersheetname+'/logo.png'" v-bind:alt="sheet.charactersheetname + ' Logo'" />
+          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="'/static/sheets/'+sheet.charactersheetname+'/logo.png'" v-bind:alt="sheet.charactersheetname + ' Logo'" />
           <div class='card-body'>
             <h5 class='card-title charactersheet-name'>{{sheet.charactersheetdisplayname}}</h5>
             <a v-bind:href="'charactersheet/'+sheet.charactersheetname" class='btn btn-success' v-bind:data-id='sheet.charactersheetid' role="button">Create Character <i class='fa fa-user'></i></a>

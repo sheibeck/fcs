@@ -2,7 +2,7 @@
   <div class="container mt-2">
 
     <form>
-      <div class='row' v-html="sheet">
+      <div class='' v-html="sheet">
       </div>
     </form>
 
@@ -11,7 +11,7 @@
     <div class='row'>
       <div class='col'>
          <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character d-print-none'>Save Character <i class='fa fa-user'></i></button>
-         <a href="/charactersheet" role='button' class='btn btn-secondary'>Close <i class='fa fa-times-circle'></i></a>
+         <a href="/character" role='button' class='btn btn-secondary'>Close <i class='fa fa-times-circle'></i></a>
          <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
       </div>
     </div>
@@ -108,6 +108,7 @@ export default {
                 $('form').populate(characterData);
 
                 //check if there is an autocalc function and runit
+                debugger;
                 if (typeof autocalc !== "undefined") {
                     autocalc();
                 }
@@ -115,13 +116,14 @@ export default {
         });
       },
       save : function() {
+      debugger;
         if (this.isAuthenticated) {
             /// save a character
             var data = $('form').serializeJSON();
             var characterData = JSON.parse(data);
 
             // make sure we have a proper user id key
-            characterData.character_owner_id = fatesheet.config.userId;
+            characterData.character_owner_id = this.userId;
 
             //create a new characterId if we don't have one
             var isNew = false;
