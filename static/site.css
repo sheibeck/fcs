@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css?family=Bowlby+One+SC');
+
+.brand-name {
+    font-size: 1.5em;
+    background-color: black;
+    color: white;
+    font-family: 'Bowlby One SC', cursive;
+}
+
+@media only screen and (max-width: 640px) {
+    .brand-name {
+        font-size: 1.00em;
+    }
+}
+
+@font-face {
+    font-family: 'fate_core_glyphsregular';
+    src: url('fate_core_font-webfont.woff2') format('woff2'), url('fate_core_font-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.navbar-brand img {
+    max-height: 40px;
+}
+
+input::-webkit-input-placeholder {
+    color: #C0C0C0 !important;
+}
+
+input::-moz-placeholder {
+    color: #C0C0C0 !important;
+}
+
+input:-moz-placeholder { /* Older versions of Firefox */
+    color: #C0C0C0 !important;
+}
+
+input:-ms-input-placeholder {
+    color: #C0C0C0 !important;
+}
+
+textarea::-webkit-input-placeholder {
+    color: #C0C0C0 !important;
+}
+
+textarea::-moz-placeholder {
+    color: #C0C0C0 !important;
+}
+
+textarea:-moz-placeholder { /* Older versions of Firefox */
+    color: #C0C0C0 !important;
+}
+
+textarea:-ms-input-placeholder {
+    color: #C0C0C0 !important;
+}
+
+.roll-modifier {
+    background-color: lightgray;
+}
+
+.dice {
+    font-family: 'fate_core_glyphsregular';
+}
+
+.hidden {
+    display: none !important; /* override flex stuff */
+}
+
+.current-roll {
+    background-color: #ffc107;
+}
+
+.modal-header {
+    background-color: darkgrey;
+}
+
+.modal-title {
+    text-transform: uppercase;
+    color: white;
+}
+
+.roll-20 {
+    height: 20px;
+}
+
+.js-adversary-tag {
+  cursor: pointer;
+}
+
+.adversary-name,
+.character-name,
+.charactersheet-name {
+  font-family: 'Bowlby One SC', cursive;
+}
+
+.js-adversary-list h5.card-header {
+  font-style: italic;
+}
+
+.error {
+    text-align:center;
+    font-size: 35px;
+    margin-top: 100px;
+}
+
+.container {
+  margin-bottom: 120px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  line-height: 60px;
+  background-color: #f5f5f5;
+}
+
+/* print styles */
+@media print {
+    div.sheet:last-child {
+      height: 11in;
+      page-break-after: auto !important;
+    }
+
+    footer, .footer,
+    button,
+    .addthis-smartlayers,
+    hr, .no-print {
+      display: none !important;
+    }
+
+    input::-webkit-input-placeholder,
+    input::-moz-placeholder,
+    input:-moz-placeholder,
+    input:-ms-input-placeholder,
+    input:-ms-input-placeholder,
+    textarea::-webkit-input-placeholder,
+    textarea::-moz-placeholder,
+    textarea:-moz-placeholder,
+    textarea:-ms-input-placeholder,
+    textarea:-ms-input-placeholder {
+        color: transparent !important;
+    }
+}

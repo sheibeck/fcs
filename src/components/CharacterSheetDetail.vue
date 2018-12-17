@@ -1,0 +1,114 @@
+<template>
+  <div class="container mt-2">
+
+    <form>
+      <div class='row' v-html="sheet">
+      </div>
+    </form>
+
+    <hr/>
+
+    <div class='row'>
+      <div class='col'>
+         <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character d-print-none'>Save Character <i class='fa fa-user'></i></button>
+         <a href="/charactersheet" role='button' class='btn btn-secondary'>Close <i class='fa fa-times-circle'></i></a>
+         <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'CharacterSheetDetail',
+  created(){
+    fs_char.init();
+    this.show();
+  },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated',
+    ])
+  },
+  data () {
+    return {
+      sheet: "",
+      id: this.$route.params.id
+    }
+  },
+  methods : {
+       show : function (id) {
+          //reference this component so we can get/set data
+          var $component = this;
+
+          //$('.hide-on-detail').addClass('hidden');
+
+          // Create DynamoDB document client
+          var docClient = fatesheet.getDBClient();
+
+          var params = {
+              TableName: fs_char.config.charactersheettable,
+              Key: {
+               'charactersheetname': $component.id
+              },
+          }
+
+          docClient.get(params, function (err, data) {
+              if (err) {
+                  console.log("Error", err);
+              } else {
+                  console.log("Success", data.Item);
+                  $component.sheet = data.Item.charactersheetcontent;
+              }
+          });
+      },
+      save : function() {
+        if (this.isAuthenticated) {
+            /// save a character
+            var data = $('form').serializeJSON();
+            var characterData = JSON.parse(data);
+
+            // make sure we have a proper user id key
+            characterData.character_owner_id = fatesheet.config.userId;
+
+            //create a new characterId if we don't have one
+            var isNew = false;
+            if (!this.id) {
+                isNew = true;
+                this.id = fatesheet.generateUUID();
+                fatesheet.logAnalyticEvent('createdACharacter' + characterData.sheetname);
+            }
+            characterData.character_id = this.id;
+            fs_char.config.characterId = this.id;
+
+            //dynamodb won't let us have empty attributes
+            fatesheet.removeEmptyObjects(characterData);
+
+            var docClient = fatesheet.getDBClient();
+
+            // create/update a  character
+            // we always use the put operation because the data can change depending on your character sheet
+            var params = {
+                TableName: fs_char.config.charactertable,
+                Item: characterData
+            };
+
+            docClient.put(params, function (err, data) {
+                if (err) {
+                    fatesheet.notify(err.message || JSON.stringify(err));
+                    console.error("Unable to save item. Error JSON:", JSON.stringify(err, null, 2));
+                } else {
+                    fatesheet.notify('Character saved.', 'success', 2000);
+                    console.log("Added item:", JSON.stringify(data, null, 2));
+                }
+            });
+        }
+        else {
+            window.print();
+        }
+      }
+  }
+}
+</script>

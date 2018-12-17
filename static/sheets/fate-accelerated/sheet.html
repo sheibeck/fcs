@@ -1,0 +1,257 @@
+<!-- css libraries -->
+<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Archivo+Black');
+
+	.sheet {
+		margin: 20px;
+		margin-top: 40px;
+		max-width: 1024px;
+	}
+
+	.fate-logo {
+		margin-top: -27px;
+		max-height: 130px;
+	}
+
+	.fate-header {
+        font-family: 'Archivo Black', sans-serif;
+        text-transform: uppercase;
+		background-color: #000;
+		color: white;
+		font-weight: 700;
+		padding: 3px;
+		margin-top: 5px;
+		font-size: 22px;
+	}
+
+	.col-form-label {
+        font-family: 'Archivo Black', sans-serif;
+        text-transform: uppercase;
+		font-size: 22px;
+		font-weigth: 700;
+	}
+
+	.fate-approaches .form-group {
+		margin-bottom: 3px;
+		margin-top: 3px;
+	}
+
+	.fate-aspects .form-group {
+		margin-bottom: 12px;
+		margin-top: 0px;
+	}
+
+	.fate-consequences .form-group {
+		margin-bottom: 0px;
+		margin-top: 1px;
+	}
+
+	input[type=checkbox] {
+		height: 50px;
+		width: 50px;
+	}
+
+	.fate-consequences label {
+        font-family: 'Archivo Black', sans-serif;
+        text-transform: uppercase;
+		font-weight: 700;
+		font-size: 28px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		padding-left: 25px;
+	}
+
+	.fate-stress label {
+        font-family: 'Archivo Black', sans-serif;
+        text-transform: uppercase;
+		font-size: 30px;
+		font-weight: 700;
+		margin-left: -5px;
+		margin-right: -5px;
+	}
+
+</style>
+
+<div class="sheet">
+    <input type="hidden" id="sheetname" name="sheetname" value="fate-accelerated" />
+    <input type="hidden" id="system" name="system" value="accelerated" />
+	<div class="row">
+		<div class="col-sm-6 col-md-4 order-md-2">
+			<div class="row">
+				<div class="col text-center">
+					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" src="sheets/fate-accelerated/logo.png" />
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-6 text-center">
+					<div for="refresh" class="fate-header">Refresh</div>
+					<input type="text" class="form-control text-center" id="refresh" name="refresh" placeholder="Refresh" />
+				</div>
+				<div class="col-6 text-center ">
+					<div for="fatepoints" class="fate-header">FP</div>
+					<input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" placeholder="Fate Points" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-sm-6 col-md-8 order-md-1">
+			<div class="form-group">
+				<div for="name" class="fate-header">ID</div>
+				<input type="text" class="form-control" id="name" name="name" placeholder="Name" />
+			</div>
+
+			<div class="form-group">
+				<textarea class="form-control" id="description" name="description" rows="3" placeholder="Description"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<!-- aspects -->
+		<div class="col-sm-6 col-md-8 fate-aspects">
+			<div class="form-group">
+				<div for="" class="fate-header">Aspects</div>
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" value="" id="aspect[highconcept]" name="aspect[highconcept]" placeholder="High Concept" />
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" value="" id="aspect[trouble]" name="aspect[trouble]" placeholder="Trouble" />
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" value="" id="aspect[other1]" name="aspect[other1]" placeholder="Aspect" />
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" value="" id="aspect[other2]" name="aspect[other2]" placeholder="Aspect" />
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" value="" id="aspect[other3]" name="aspect[other3]" placeholder="Aspect" />
+			</div>
+			<div class="form-group">
+				<input type="text" class="form-control" value="" id="aspect[other4]" name="aspect[other4]" placeholder="Aspect" />
+			</div>
+		</div>
+
+		<!-- aspects -->
+		<div class="col-sm-6 col-md-4 fate-approaches">
+			<div class="form-group">
+				<div class="fate-header col-12">Approaches</div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-9 col-form-label">Careful</label>
+			  <div class="col-3">
+				<input class="form-control text-center" type="text" value="" id="approach[careful]" name="approach[careful]" placeholder="+">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-9 col-form-label">Clever</label>
+			  <div class="col-3">
+				<input class="form-control text-center" type="text" value="" id="approach[clever]" name="approach[clever]" placeholder="+">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-9 col-form-label">Flashy</label>
+			  <div class="col-3">
+				<input class="form-control text-center" type="text" value="" id="approach[flashy]" name="approach[flashy]" placeholder="+">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-9 col-form-label">Forceful</label>
+			  <div class="col-3">
+				<input class="form-control text-center" type="text" value="" id="approach[forceful]" name="approach[forceful]" placeholder="+">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-9 col-form-label">Quick</label>
+			  <div class="col-3">
+				<input class="form-control text-center" type="text" value="" id="approach[quick]" name="approach[quick]" placeholder="+">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-9 col-form-label">Sneaky</label>
+			  <div class="col-3">
+				<input class="form-control text-center" type="text" value="" id="approach[sneaky]" name="approach[sneaky]" placeholder="+">
+			  </div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<div for="stunts" class="fate-header">Stunts & Extras</div>
+				<textarea class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts & Extras"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<!-- stress -->
+		<div class="col-sm-6 col-md-4 fate-stress">
+			<div class="form-group">
+				<div for="" class="fate-header">Stress</div>
+			</div>
+			<div class="row">
+				<div class="col">
+				  <label for="stress">
+					1
+				  </label>
+				  <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]">
+				</div>
+
+				<div class="col">
+				  <label for="stress">
+					2
+				  </label>
+				  <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]">
+				</div>
+
+				<div class="col">
+				  <label class="" for="stress">
+					3
+				  </label>
+				  <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]">
+				</div>
+			</div>
+		</div>
+
+		<div class="col-sm-6 col-md-8 fate-consequences">
+			<div class="form-group">
+				<div class="fate-header col-12">Consequences</div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">2</label>
+			  <div class="col-10">
+				<input class="form-control" type="text" value="" id="consequence[mild]" name="consequence[mild]" placeholder="Mild">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">4</label>
+			  <div class="col-10">
+				<input class="form-control" type="text" value="" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">6</label>
+			  <div class="col-10">
+				<input class="form-control" type="text" value="" id="consequence[severe]" name="consequence[severe]" placeholder="Severe">
+			  </div>
+			</div>
+		</div>
+	</div>
+
+</div>

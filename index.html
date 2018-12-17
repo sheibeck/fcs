@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Create and manage all your characters for the Fate Roleplaying Game. We have character sheets for Fate Core, Fate Accelerated and additional custom character sheets for the Fate Roleplaying Game. You can roll Fate dice and create and find adversaries for your Fate Roleplaying game.">
+    <meta name="author" content="Sterling Heibeck">
+
+    <!-- css libraries -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"
+            integrity="sha256-soW/iAENd5uEBh0+aUIS1m2dK4K6qTcB9MLuOnWEQhw="
+            crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/static/site.css" />
+
+    <!-- core js libraries -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/js-signals/1.0.0/js-signals.min.js"
+            integrity="sha256-0dCtv3yeJAF9JFjWFykgsLSIf57eXOivm6g0IXU7G7U="
+            crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/crossroads/0.12.2/crossroads.min.js"
+            integrity="sha256-XCCM82PbbcarXv6mA8f/h3hpRTqkRHtp8NsARui+F80="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hasher/1.2.0/hasher.min.js"
+            integrity="sha256-WCd2CSrQrQ8oL0A3k1Umk+rEBBKywafaWMcb6sIHK5U="
+            crossorigin="anonymous"></script>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.190.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"
+            integrity="sha256-ITwLtH5uF4UlWjZ0mdHOhPwDpLoqxzfFCZXn1wE56Ps="
+            crossorigin="anonymous"></script>
+
+    <!-- third party -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
+    <script src="https://cdn.rawgit.com/GreenImp/rpg-dice-roller/aba8ad5f/dice-roller.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js"></script>
+    <script src="/static/amazon-cognito-identity.min.js"></script>
+
+    <script src="https://unpkg.com/vuex@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+
+    <!-- Go to www.addthis.com/dashboard to customize your tools -->
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5aba8fd219ea6151"></script>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PW959XK');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- CORE FateCharacterSheet -->
+    <script src="/static/fatesheet.js" type="text/javascript"></script>
+    <script src="/static/fs_dicetray.js" type="text/javascript"></script>
+    <script src="/static/fs_char.js" type="text/javascript"></script>
+
+
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+
+    <title>Fate Character Sheet</title>
+  </head>
+  <body>
+
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+
+  </body>
+</html>
