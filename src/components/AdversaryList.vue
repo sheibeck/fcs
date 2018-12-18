@@ -2,27 +2,24 @@
   <div class="container mt-2">
     <!-- list of adversaries -->
     <div class='js-adversary-list'>
-      <div v-if="!isAuthenticated" class="row d-print-none mb-2">
-        <div class="col col-sm-12 col-md-3">
+
+      <div v-if="!id" class="row d-print-none mb-2">
+        <div v-if="!isAuthenticated" class="col col-sm-12 col-md-3">
           <a href='login.htm' type="button" class="btn btn-primary">
               Login to Create an Adversary <span class='dice'>A</span>
           </a>
         </div>
-        <div class="col col-md-3 fs-tools hidden">
-          <span class="badge badge-warning js-clear-search" style="cursor:pointer;">x Clear Filter</span>
-        </div>
-      </div>
 
-      <div v-if="isAuthenticated" class="row d-print-none mb-2">
-        <div class="col col-sm-7 col-md-4">
-          <button type="button" class="btn btn-success js-create-adversary">Create Adversary <i class='fa fa-plus'></i></button>
+        <div v-if="isAuthenticated" class="col col-sm-7 col-md-4">
+          <a role="button" href="/adversary/edit" class="btn btn-success js-create-adversary">Create Adversary <i class='fa fa-plus'></i></a>
         </div>
-        <div class="col col-sm-3 col-md-3">
-          <input type="checkbox" class="form-check-input" id="my_adversaries" />
+        <div v-if="isAuthenticated" class="col col-sm-3 col-md-3">
+          <input type="checkbox" class="form-check-input" id="my_adversaries" v-on:change="list()" />
           <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
         </div>
-        <div class="col col-sm-3 col-md-3 fs-tools hidden">
-          <span class="badge badge-warning js-clear-search" style="cursor:pointer;">x Clear Filter</span>
+
+        <div class="col col-md-3 fs-tools adversaryFilter hidden">
+          <span class="badge badge-warning " style="cursor:pointer;" v-on:click="clearFilter()">x Clear Filter</span>
         </div>
       </div>
 
@@ -32,7 +29,57 @@
 
           <h4 class='card-header adversary-name bg-light'>
             <a v-bind:href="'/adversary/' + item.adversary_slug" style="text-decoration:none;">{{item.adversary_name}}</a>
+            <small v-if="isOwner(item.adversary_owner_id)">
+              <a v-if="isOwner(item.adversary_owner_id)" v-bind:href="'/adversary/edit/' + item.adversary_slug" class='d-print-none' style="color: #888 !important;"><i class='fa fa-edit'></i></a>
+            </small>
           </h4>
+
+          <div v-if="!isEmpty(item.adversary_aspects)">
+            <h5 class='card-header py-0'>Aspects</h5>
+            <p class='card-text px-4 my-0' v-for="aspect in item.adversary_aspects">
+              <strong>{{fixLabel(aspect)}}</strong>
+            </p>
+          </div>
+
+          <div v-if="!isEmpty(item.adversary_skills)">
+            <h5 class='card-header py-0'>Skills</h5>
+
+            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.adversary_skills">
+                <strong>{{skillIndex}} {{fixLabel(skill)}}</strong>
+            </p>
+          </div>
+
+          <div v-if="!isEmpty(item.adversary_stunts)">
+            <h5 class='card-header py-0'>Stunts & Extras</h5>
+
+            <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.adversary_stunts">
+                <strong>{{stuntIndex}} {{fixLabel(stunt)}}</strong>
+            </p>
+          </div>
+
+          <div v-if="!isEmpty(item.adversary_stress)">
+            <h5 class='card-header py-0'>Stress</h5>
+
+            <p class='card-text px-4 my-0' v-for="stress in item.adversary_stress">
+                <strong v-for="(stressValue, stressIndex) in stress">
+                  <input type='checkbox' v-bind:value='stressValue'>{{stressIndex}}
+                </strong>
+            </p>
+          </div>
+
+          <div v-if="!isEmpty(item.adversary_consequences)">
+            <h5 class='card-header py-0'>Consequences</h5>
+
+            <p class='card-text px-4 my-0' v-for="(con, conIndex) in item.adversary_consequences">
+                <strong>{{conIndex}} {{fixLabel(con)}}</strong>
+            </p>
+          </div>
+
+          <div class='card-footer'>
+              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_system'>{{item.adversary_system}}</span>
+              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_genre'>{{item.adversary_genre}}</span>
+              <span v-bind:class="badgeColor(item.adversary_type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.adversary_type' v-on:click="searchByTag(this)">{{item.adversary_type}}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -48,33 +95,41 @@ export default {
     fs_adversary.init();
   },
   computed: {
-    slugify: function() {
-      return this.adversaries.map(function(item) {
-          //return '/adversary/' + item.adver + '/' + item.adver + '/' + fatesheet.slugify(item.name);
-          return item;
-      });
-    },
     ...mapGetters([
       'isAuthenticated',
       'userId',
     ]),
   },
   watch: {
-    userId () {
-      //wait for our authenticated user id
+    isAuthenticated () {
+      //wait for our authentication
       this.list();
     }
   },
   data () {
     return {
       title: "Adversary List",
+      id: this.$route.params.id,
       adversaries: {}
     }
   },
   methods : {
     list : function (searchText) {
-      //reference this component so we can get/set data
-      var $component = this;
+        //reference this component so we can get/set data
+        var $component = this;
+
+        if (searchText)
+        {
+          $(".adversaryFilter").removeClass("hidden");
+        }
+        else {
+          $(".adversaryFilter").addClass("hidden");
+        }
+
+        //if we have a specified slug then we want just this one entry
+        if ($component.id) {
+          searchText = $component.id;
+        }
 
         // Create DynamoDB document client
         var docClient = fatesheet.getDBClient();
@@ -194,7 +249,50 @@ export default {
                 $component.adversaries = adversaries;
             }
         });
+    },
+    fixLabel: function (val) {
+        return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
+    },
+    isEmpty: function(obj) {
+      for(var key in obj) {
+          if(obj.hasOwnProperty(key))
+              return false;
+      }
+      return true;
+    },
+    badgeColor: function(type) {
+      var badge;
+
+      switch(type) {
+        case "Enemy":
+          badge = "badge-danger";
+          break;
+        case 'Obstacle':
+          badge = "badge-warning";
+          break;
+        case "Constraint":
+          badge = "badge-info";
+          break;
+        default:
+          badge = "badge-dark";
+          break;
+      }
+
+      return badge;
+    },
+    searchByTag : function(elem) {
+      var tag = $(elem).data('search-text');
+      $('#search-text').val(tag);
+      this.list(tag);
+    },
+    clearFilter : function() {
+      $('#search-text').val("");
+      this.list("");
+    },
+    isOwner : function(ownerId) {
+      return this.userId === ownerId;
     }
+
   }
 }
 </script>

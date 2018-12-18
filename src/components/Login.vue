@@ -33,9 +33,11 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Login',
-  created(){    
+  created(){
   },
   udpated() {
 
@@ -44,6 +46,12 @@ export default {
     return {
       title: "Login"
     }
-  }
+  },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated',
+      'userId',
+    ]),
+  },
 }
 </script>

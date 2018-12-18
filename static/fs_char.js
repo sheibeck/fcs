@@ -129,59 +129,9 @@
       }
     }
 
-    function configureRoutes() {
-        //String rule with param:
-        //match '/news/123' passing "123" as param to handler
-
-        if (location.pathname === '/charactersheets.htm') {
-            var csRoute1 = crossroads.addRoute('/{id}', function (id) {
-                var title = id.replace(/-/g,' ').toTitleCase();
-                fatesheet.setTitle(title);
-
-                // update metadata based on the sheet
-                var ogImage = 'https://fatecharactersheet.com/' + id + '/sheets/logo.png';
-
-                $('meta[property="og:title"]').attr('content', title);
-                $('meta[property="og:image"]').attr('content', ogImage);
-                $('meta[property="og:url"]').attr('content', window.location.href);
-
-
-                fs_char.showSheet(id, null, fatesheet.config.content);
-            });
-
-            var csRoute2 = crossroads.addRoute('/', function () {
-                fatesheet.setTitle('Character Sheets');
-
-                // update metadata based on the sheet
-                var ogImage = "https://fatecharactersheet.com/big-logo.png";
-
-                $('meta[property="og:title"]').attr('content', 'Character Sheets');
-                $('meta[property="og:image"]').attr('content', ogImage);
-                $('meta[property="og:url"]').attr('content', window.location.href);
-
-                fs_char.listSheets(fatesheet.config.content);
-            });
-        }
-
-        if (location.pathname === '/characters.htm') {
-            var charRoute1 = crossroads.addRoute('/{sheetid}/{id}/{name}', function (sheetid, id) {
-                fs_char.showSheet(sheetid, id, fatesheet.config.content)
-            });
-
-            var charRoute1 = crossroads.addRoute('/{sheetid}/{id}', function (sheetid, id) {
-                fs_char.showSheet(sheetid, id, fatesheet.config.content)
-            });
-
-            var charRoute2 = crossroads.addRoute('/', function () {
-                fs_char.listCharacters(fatesheet.config.content);
-            });
-        }
-    }
-
     fs_char.init = function () {
         domEvents();
         configEnvironment(fatesheet.config.environment);
-        configureRoutes();
     }
 
 })(window.fs_char = window.fs_char || {}, jQuery);

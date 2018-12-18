@@ -51,11 +51,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Home',
   data () {
     return {
     }
-  }
+  },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated',
+      'userId',
+    ]),
+  },
 }
 </script>

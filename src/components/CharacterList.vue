@@ -1,7 +1,5 @@
 <template>
   <div class="container mt-2">
-    <h1>{{ title }}</h1>
-
     <div v-if="isAuthenticated" class="row d-print-none mb-2 hide-on-detail">
       <div class="col-sm-12 col-md-3">
         <a href='/charactersheet' class='btn btn-success'>Create a Character <i class='fa fa-user'></i></a>
@@ -50,6 +48,7 @@ export default {
       });
     },
     ...mapGetters([
+      'isAuthenticated',
       'userId',
     ]),
   },

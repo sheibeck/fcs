@@ -10,13 +10,13 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
+              <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
                   <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
               </li>
-              <li class="hidden nav-item requires-auth">
+              <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('character')}" ref="el">
                   <a class="nav-link" href="/character"><span class="dice">C</span>My Characters</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>
               <li class="nav-item dropdown">
@@ -30,15 +30,29 @@
                    <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Roll Dice</a>
                  </div>
               </li>
+              <li class="nav-item dropdown">
+                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   <span class="dice">+</span>Fate
+                 </a>
+                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+                   <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">O</span> Fate SRD</a>
+                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="./assets/roll20logo.png" alt="Roll20 logo" class="roll-20"> Play Fate</a>
+                   <div class="dropdown-divider"></div>
+                   <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Roll Dice</a>
+                 </div>
+              </li>
+              <li class="nav-item" v-bind:class="{active : isActive('character')}">
+                  <a class="nav-link" href="https://github.com/sheibeck/fatecharactersheet/issues"><i class="fa fa-bug"></i> Support</a>
+              </li>
           </ul>
 
-          <div class="form-inline login-button requires-noauth hidden">
+          <div v-if="!isAuthenticated" class="form-inline login-button">
               <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0 js-login">
                   Login <i class="fas fa-sign-in-alt"></i>
               </button>
           </div>
-          <div class="form-inline logout-button mx-1 mb-sm-1 requires-auth hidden">
-              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" onclick="fatesheet.logout()">Logout</button>
+          <div v-if="isAuthenticated" class="form-inline logout-button mx-1 mb-sm-1">
+              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="fatesheet.logout()">Logout</button>
           </div>
           <div class="form-inline my-2 my-sm-0">
               <div class="input-group">
@@ -57,14 +71,12 @@
     <footer class='footer'>
       <div class="container">
         <div class='row'>
-            <div class='col text-muted'>
-              <a href='https://github.com/sheibeck/fatecharactersheet/issues' target='_blank'>Report an issue <i class="fa fa-bug"></i></a>
-            </div>
-            <div class='col text-right text-muted'>
-              <a href='https://www.facebook.com/fatecharactersheet' target='_blank'><i class="fab fa-facebook"></i></a>
-              <a href='https://plus.google.com/communities/110751336085208780937' target='_blank'><i class="fab fa-google-plus-square"></i></a>
-              <a href='https://github.com/sheibeck/fatecharactersheet' target='_blank'><i class="fab fa-github-square"></i></a>
-            </div>
+          <div class="col text-right">
+            <span class="dice">C</span> Built by Darktier Studios, LLC.
+          </div>
+          <div class="col">
+            <span class="dice">A</span> Powered by Fate
+          </div>
         </div>
       </div>
     </footer>
@@ -96,14 +108,26 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'App',
   created(){
     fatesheet.init();
   },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated',
+    ]),
+  },
   data () {
     return {
       title: "Fate Character Sheet"
+    }
+  },
+  methods: {
+    isActive : function(val) {
+      return val === document.location.pathname.split('/')[1];
     }
   }
 }

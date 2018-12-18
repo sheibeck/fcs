@@ -8,11 +8,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Error',
   data () {
     return {
     }
-  }
+  },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated',
+      'userId',
+    ]),
+  },
 }
 </script>

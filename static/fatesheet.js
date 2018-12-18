@@ -148,11 +148,7 @@ String.prototype.toTitleCase = function () {
     fatesheet.logAnalyticEvent = function(event) {
     }
 
-    fatesheet.search = function(searchText) {
-      // clear the hash so we don't show a false id/name getCharacterInfo
-      hasher.setHash('');
-
-      //character and sheet search
+    fatesheet.search = function(searchText) {    
     	if (location.pathname.indexOf('charactersheets') > -1 || location.pathname.indexOf('character') > -1)
     	{
     		$('.card').hide();
@@ -171,7 +167,7 @@ String.prototype.toTitleCase = function () {
     	}
     	else if (location.pathname.indexOf('adversary') > -1)
     	{
-        fs_adversary.listAdversaries(searchText); //adversary search
+        fcs.$children[0].$children[0].list(searchText); //adversary search
     	}
 
     }

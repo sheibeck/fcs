@@ -16,11 +16,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'CharacterSheetList',
   created(){
     fs_char.init();
     this.list();
+  },
+  computed: {
+    ...mapGetters([
+      'isAuthenticated',
+      'userId',
+    ]),
   },
   data () {
     return {

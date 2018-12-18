@@ -2,10 +2,13 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueAppend from 'vue-append'
 import App from './App'
 import router from './router'
 
 Vue.use(Vuex)
+Vue.use(VueAppend)
+
 window.Vue = Vue;
 
 Vue.config.productionTip = false

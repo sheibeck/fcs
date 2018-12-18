@@ -24,37 +24,9 @@
     max-height: 40px;
 }
 
-input::-webkit-input-placeholder {
-    color: #C0C0C0 !important;
-}
-
-input::-moz-placeholder {
-    color: #C0C0C0 !important;
-}
-
-input:-moz-placeholder { /* Older versions of Firefox */
-    color: #C0C0C0 !important;
-}
-
-input:-ms-input-placeholder {
-    color: #C0C0C0 !important;
-}
-
-textarea::-webkit-input-placeholder {
-    color: #C0C0C0 !important;
-}
-
-textarea::-moz-placeholder {
-    color: #C0C0C0 !important;
-}
-
-textarea:-moz-placeholder { /* Older versions of Firefox */
-    color: #C0C0C0 !important;
-}
-
-textarea:-ms-input-placeholder {
-    color: #C0C0C0 !important;
-}
+.form-control::placeholder { color: #C0C0C0 !important;} /* Chrome, Firefox, Opera*/
+:-ms-input-placeholder.form-control { color: #C0C0C0 !important; }  /* Internet Explorer*/
+.form-control::-ms-input-placeholder { color: #C0C0C0 !important; }  /* Microsoft Edge*/
 
 .roll-modifier {
     background-color: lightgray;
@@ -113,7 +85,7 @@ textarea:-ms-input-placeholder {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: 100px;
+  height: 60px;
   line-height: 60px;
   background-color: #f5f5f5;
 }
@@ -132,16 +104,7 @@ textarea:-ms-input-placeholder {
       display: none !important;
     }
 
-    input::-webkit-input-placeholder,
-    input::-moz-placeholder,
-    input:-moz-placeholder,
-    input:-ms-input-placeholder,
-    input:-ms-input-placeholder,
-    textarea::-webkit-input-placeholder,
-    textarea::-moz-placeholder,
-    textarea:-moz-placeholder,
-    textarea:-ms-input-placeholder,
-    textarea:-ms-input-placeholder {
-        color: transparent !important;
-    }
+    .form-control::placeholder { color: transparent !important;} /* Chrome, Firefox, Opera*/
+    :-ms-input-placeholder.form-control { color: transparent !important; }  /* Internet Explorer*/
+    .form-control::-ms-input-placeholder { color: transparent !important; }  /* Microsoft Edge*/
 }

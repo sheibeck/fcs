@@ -22,9 +22,8 @@ export default new Router({
     { path: '/character/:sheetname/:id/:name?', name: 'Character Detail', component: CharacterDetail, props: true },
     { path: '/charactersheet', component: CharacterSheetList },
     { path: '/charactersheet/:id', name: 'Character Sheet Detail', component: CharacterSheetDetail, props: true },
-    { path: '/adversary', component: AdversaryList, props: true },
-    { path: '/adversary/:id', component: AdversaryDetail, props: true },
-    //{ path: '/adversary/edit/:id', component: AdversaryEdit, props: true },
+    { path: '/adversary/edit/:id?', component: AdversaryDetail, props: true },
+    { path: '/adversary/:id?', component: AdversaryList, props: true },
     { path: '*', component: Error }
   ]
 })

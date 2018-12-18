@@ -2,7 +2,7 @@
   <div class="container mt-2">
 
     <form>
-      <div class='' v-html="sheet">
+      <div class='' v-append="sheet">
       </div>
     </form>
 
@@ -11,7 +11,7 @@
     <div class='row'>
       <div class='col'>
          <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
-         <a href="/charactersheet" role='button' class='btn btn-secondary'>Close <i class='fa fa-times-circle'></i></a>
+         <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
          <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
       </div>
     </div>
