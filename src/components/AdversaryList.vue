@@ -45,7 +45,7 @@
             <h5 class='card-header py-0'>Skills</h5>
 
             <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.adversary_skills">
-                <strong>{{skillIndex}} {{fixLabel(skill)}}</strong>
+                <strong>{{skillIndex}}</strong> {{fixLabel(skill)}}
             </p>
           </div>
 
@@ -53,7 +53,7 @@
             <h5 class='card-header py-0'>Stunts & Extras</h5>
 
             <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.adversary_stunts">
-                <strong>{{stuntIndex}} {{fixLabel(stunt)}}</strong>
+                <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
             </p>
           </div>
 
@@ -71,7 +71,7 @@
             <h5 class='card-header py-0'>Consequences</h5>
 
             <p class='card-text px-4 my-0' v-for="(con, conIndex) in item.adversary_consequences">
-                <strong>{{conIndex}} {{fixLabel(con)}}</strong>
+                <strong>{{conIndex}}</strong> {{fixLabel(con)}}
             </p>
           </div>
 
