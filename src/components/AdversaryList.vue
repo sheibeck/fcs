@@ -63,7 +63,7 @@
             <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.adversary_stress">
                 <strong>{{stressMainIndex}}</strong>
                 <span v-for="(stressValue, stressIndex) in stressMain">
-                  <input type='checkbox' v-bind:value='stressValue'>{{stressIndex}}
+                  <input type='checkbox' v-bind:value='stressValue'>{{stressValue}}
                 </span>
             </p>
           </div>
