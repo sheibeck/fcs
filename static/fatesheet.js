@@ -148,7 +148,7 @@ String.prototype.toTitleCase = function () {
     fatesheet.logAnalyticEvent = function(event) {
     }
 
-    fatesheet.search = function(searchText) {    
+    fatesheet.search = function(searchText) {
     	if (location.pathname.indexOf('charactersheets') > -1 || location.pathname.indexOf('character') > -1)
     	{
     		$('.card').hide();
@@ -297,7 +297,7 @@ String.prototype.toTitleCase = function () {
                     }
                 });
 
-                fatesheet.config.credentials.refresh((error) => {
+                fatesheet.config.credentials.refresh(function(error){
                   if (error) {
                       console.error(error);
                   } else {
@@ -316,7 +316,7 @@ String.prototype.toTitleCase = function () {
                 IdentityPoolId : fatesheet.config.cognito.identityPool, // your identity pool id here
             });
 
-            fatesheet.config.credentials.refresh((error) => {
+            fatesheet.config.credentials.refresh(function(error) {
               if (error) {
                   console.error(error);
               } else {
@@ -413,11 +413,6 @@ String.prototype.toTitleCase = function () {
         $(document).on('click', '.js-login', function (e) {
             document.location = '/login';
         });
-
-        $(document).on('click', '#LoginCognito', function() {
-          fatesheet.login($('#email').val(), $('#password').val());
-        });
-
     }
 
     fatesheet.init = function () {

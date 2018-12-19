@@ -4,17 +4,24 @@
     <form>
       <div class='' v-append="sheet">
       </div>
-    </form>
 
-    <hr/>
+      <hr/>
 
-    <div class='row'>
-      <div class='col'>
-         <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character d-print-none'>Save Character <i class='fa fa-user'></i></button>
-         <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-         <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+      <div class='row'>
+        <div class='col'>
+           <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character d-print-none'>Save Character <i class='fa fa-user'></i></button>
+           <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
+           <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+        </div>
+        <div class='col' v-if="isAuthenticated">
+          <div class='row'>
+            <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='character_image_url'>Portrait Url:</label>
+            <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+          </div>
+        </div>
       </div>
-    </div>
+
+    </form>
   </div>
 </template>
 
@@ -23,6 +30,14 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'CharacterDetail',
+  metaInfo() {
+    return {
+       title: this.title,
+       meta: [
+         { vmid: 'description', name: 'description', content: this.description }
+       ]
+     }
+  },
   created(){
     fs_char.init();
   },
@@ -33,7 +48,7 @@ export default {
     ])
   },
   watch: {
-    isAuthenticated () {
+    userId() {
       //wait for our authenticated user id
       this.show(this.sheetname);
     }
@@ -43,6 +58,8 @@ export default {
       sheet: "",
       id: this.$route.params.id,
       sheetname: this.$route.params.sheetname,
+      title: "",
+      description: "",
     }
   },
   methods : {
@@ -95,7 +112,8 @@ export default {
                 var characterData = data.Items[0];
                 console.log("Success", characterData);
 
-                fatesheet.setTitle(characterData.name + ' (Character)')
+                $component.title = characterData.name + ' (Character)';
+                $component.description = characterData.system;
 
                 //if the viewer isn't the character owner then don't let them save it
                 // it would just copy it to their account, but for now we'll just

@@ -5,7 +5,7 @@
 
       <div v-if="!id" class="row d-print-none mb-2">
         <div v-if="!isAuthenticated" class="col col-sm-12 col-md-3">
-          <a href='login.htm' type="button" class="btn btn-primary">
+          <a href='/login' type="button" class="btn btn-primary">
               Login to Create an Adversary <span class='dice'>A</span>
           </a>
         </div>
@@ -76,9 +76,9 @@
           </div>
 
           <div class='card-footer'>
-              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_system'>{{item.adversary_system}}</span>
-              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_genre'>{{item.adversary_genre}}</span>
-              <span v-bind:class="badgeColor(item.adversary_type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.adversary_type' v-on:click="searchByTag(this)">{{item.adversary_type}}</span>
+              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_system' v-on:click="searchByTag">{{item.adversary_system}}</span>
+              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_genre' v-on:click="searchByTag">{{item.adversary_genre}}</span>
+              <span v-bind:class="badgeColor(item.adversary_type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.adversary_type' v-on:click="searchByTag">{{item.adversary_type}}</span>
           </div>
         </div>
       </div>
@@ -94,6 +94,14 @@ export default {
   created(){
     fs_adversary.init();
   },
+  metaInfo() {
+    return {
+       title: this.title,
+       meta: [
+         { vmid: 'description', name: 'description', content: this.description }
+       ]
+     }
+  },
   computed: {
     ...mapGetters([
       'isAuthenticated',
@@ -101,7 +109,7 @@ export default {
     ]),
   },
   watch: {
-    isAuthenticated () {
+    userId() {
       //wait for our authentication
       this.list();
     }
@@ -110,7 +118,9 @@ export default {
     return {
       title: "Adversary List",
       id: this.$route.params.id,
-      adversaries: {}
+      adversaries: {},
+      title: "Adversary List",
+      description: "Fate Adversaries",
     }
   },
   methods : {
@@ -241,9 +251,15 @@ export default {
                 if (adversaries.length === 1)
                 {
                   $('#adversaryDetail').removeClass('card-columns');
+
+                  $component.title = adversaries[0].adversary_name + ' (Adversary)';
+                  $component.description = adversaries[0].adversary_type;
                 }
                 else {
                   $('#adversaryDetail').addClass('card-columns');
+
+                  $component.title = "Adversary List";
+                  $component.description = "Fate Adversaries";
                 }
 
                 $component.adversaries = adversaries;
@@ -280,8 +296,8 @@ export default {
 
       return badge;
     },
-    searchByTag : function(elem) {
-      var tag = $(elem).data('search-text');
+    searchByTag : function(event) {
+      var tag = $(event.currentTarget).data('search-text');
       $('#search-text').val(tag);
       this.list(tag);
     },

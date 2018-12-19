@@ -1,9 +1,9 @@
 <!-- css libraries -->
-<link rel="stylesheet" 
-		href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
 		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-<style>	
+<style>
     @import url('https://fonts.googleapis.com/css?family=Trade+Winds');
 
 	.sheet {
@@ -11,11 +11,11 @@
 		margin-top: 40px;
 		max-width: 1024px;
 	}
-	
-	.fate-logo {		
+
+	.fate-logo {
 		max-height: 130px;
 	}
-	
+
 	.fate-header {
         font-family: 'Trade Winds', sans-serif;
         text-transform: uppercase;
@@ -26,44 +26,44 @@
 		margin-top: 5px;
 		font-size: 22px;
 	}
-	
+
 	.col-form-label {
         font-family: 'Trade Winds', sans-serif;
         text-transform: uppercase;
 		font-size: 22px;
 		font-weigth: 700;
 	}
-	
+
 	.fate-approaches .form-group {
 		margin-bottom: 3px;
 		margin-top: 3px;
 	}
-	
+
 	.fate-aspects .form-group {
 		margin-bottom: 12px;
 		margin-top: 0px;
 	}
-		
+
 	.fate-consequences .form-group {
 		margin-bottom: 0px;
 		margin-top: 1px;
 	}
-	
+
 	input[type=checkbox] {
 		height: 50px;
 		width: 50px;
 	}
-	
+
 	.fate-consequences label {
         font-family: 'Trade Winds', sans-serif;
         text-transform: uppercase;
 		font-weight: 700;
-		font-size: 28px;		
+		font-size: 28px;
 		padding-top: 0px;
 		padding-bottom: 0px;
 		padding-left: 25px;
 	}
-	
+
 	.fate-stress label {
         font-family: 'Trade Winds', sans-serif;
         text-transform: uppercase;
@@ -72,11 +72,11 @@
 		margin-left: -5px;
 		margin-right: -5px;
 	}
-	
+
 	.stat-requirement {
 		color: #ccc
 	}
-	
+
 </style>
 
 <div class="sheet">
@@ -84,12 +84,12 @@
     <input type="hidden" id="system" name="system" value="freeport" />
 	<div class="row">
 		<div class="col-sm-6 col-md-4 order-md-2">
-			<div class="row">	
+			<div class="row">
 				<div class="col text-center">
-					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" src="sheets/fate-freeport/logo.png" />						
+					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" src="/static/sheets/fate-freeport/logo.png" />						
 				</div>
 			</div>
-			
+
 			<div class="row">
 				<div class="col-6 text-center">
 					<div for="refresh" class="fate-header">Refresh</div>
@@ -101,19 +101,19 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="col-sm-6 col-md-8 order-md-1">
 			<div class="form-group">
 				<div for="name" class="fate-header">ID</div>
 				<input type="text" class="form-control" id="name" name="name" placeholder="Name" />
 			</div>
-		  
+
 			<div class="form-group">
 				<textarea class="form-control" id="description" name="description" rows="3" placeholder="Description"></textarea>
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="row">
 		<!-- aspects -->
 		<div class="col-sm-6 col-md-8 fate-aspects">
@@ -139,47 +139,47 @@
 				<input type="text" class="form-control" value="" id="aspect[other4]" name="aspect[other4]" placeholder="Aspect" />
 			</div>
 		</div>
-		
+
 		<div class="col-sm-6 col-md-4 fate-approaches">
 			<div class="form-group">
 				<div class="fate-header col-12">Approaches</div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-9 col-form-label">Strength</label>
 			  <div class="col-3">
 				<input class="form-control text-center" type="text" value="" id="approach[strength]" name="approach[strength]" placeholder="+">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-9 col-form-label">Dexterity</label>
 			  <div class="col-3">
 				<input class="form-control text-center" type="text" value="" id="approach[dexterity]" name="approach[dexterity]" placeholder="+">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-9 col-form-label">Constitution</label>
 			  <div class="col-3">
 				<input class="form-control text-center" type="text" value="" id="approach[constitution]" name="approach[constitution]" placeholder="+">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-9 col-form-label">Intelligence</label>
 			  <div class="col-3">
 				<input class="form-control text-center" type="text" value="" id="approach[intelligence]" name="approach[intelligence]" placeholder="+">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-9 col-form-label">Wisdom</label>
 			  <div class="col-3">
 				<input class="form-control text-center" type="text" value="" id="approach[wisdom]" name="approach[wisdom]" placeholder="+">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-9 col-form-label">Charisma</label>
 			  <div class="col-3">
@@ -188,25 +188,25 @@
 			</div>
 		</div>
 	</div>
-	
-	<div class="row">		
+
+	<div class="row">
 		<div class="col-sm-12 col-md-6">
 			<div class="form-group">
 				<div for="stunts" class="fate-header">Stunts & Gear</div>
 				<textarea class="form-control" id="stunts" name="stunts" rows="15" placeholder="Stunts & Gear"></textarea>
-			</div>			
+			</div>
 		</div>
 		<div class="col-sm-12 col-md-6">
 			<div class="form-group">
 				<div for="stunts" class="fate-header">Spells</div>
 				<textarea class="form-control" id="spells" name="spells" rows="15" placeholder="Spells"></textarea>
-			</div>			
+			</div>
 		</div>
 	</div>
-	
+
 	<div class="row">
 		<div class="col-sm-12 col-md-6 fate-stress">
-				<!-- physical stress -->			
+				<!-- physical stress -->
 				<div class="form-group">
 					<div for="" class="fate-header">Physical Stress</div>
 				</div>
@@ -217,29 +217,29 @@
 					  </label>
 					  <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]">
 					</div>
-					
+
 					<div class="col">
 					  <label for="stress">
 						2
 					  </label>
-					  <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]">			 
+					  <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]">
 					</div>
-					
+
 					<div class="col">
 					  <label class="stat-requirement" for="stress">
 						3
 					  </label>
-					  <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" disabled data-required='constitution' data-required-value='1'>			 
+					  <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" disabled data-required='constitution' data-required-value='1'>
 					</div>
-					
+
 					<div class="col">
 					  <label class="stat-requirement" for="stress">
 						4
 					  </label>
-					  <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" disabled data-required='constitution' data-required-value='3'>			 
+					  <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" disabled data-required='constitution' data-required-value='3'>
 					</div>
 				</div>
-			
+
 				<!-- mental stress -->
 				<div class="form-group">
 					<div for="" class="fate-header">Mental Stress</div>
@@ -251,29 +251,29 @@
 					  </label>
 					  <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]">
 					</div>
-					
+
 					<div class="col">
 					  <label for="stress">
 						2
 					  </label>
-					  <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]">			 
+					  <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]">
 					</div>
-					
+
 					<div class="col">
 					  <label class="stat-requirement" for="stress">
 						3
 					  </label>
-					  <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" disabled data-required='wisdom' data-required-value='1'>			 
+					  <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" disabled data-required='wisdom' data-required-value='1'>
 					</div>
-					
+
 					<div class="col">
 					  <label class="stat-requirement" for="stress">
 						4
 					  </label>
-					  <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]" disabled data-required='wisdom' data-required-value='3'>			 
+					  <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]" disabled data-required='wisdom' data-required-value='3'>
 					</div>
 				</div>
-				
+
 				<!-- corruption -->
 				<div class="form-group">
 					<div for="" class="fate-header">Corruption</div>
@@ -285,90 +285,90 @@
 					  </label>
 					  <input type="checkbox" value="1" id="corruption[corruption1]" name="corruption[corruption1]">
 					</div>
-					
+
 					<div class="col">
 					  <label for="stress">
 						&nbsp;&nbsp;
 					  </label>
-					  <input type="checkbox" value="2" id="corruption[corruption2]" name="corruption[corruption2]">			 
+					  <input type="checkbox" value="2" id="corruption[corruption2]" name="corruption[corruption2]">
 					</div>
-					
+
 					<div class="col">
 					  <label class="" for="stress">
 						&nbsp;&nbsp;
 					  </label>
-					  <input type="checkbox" value="3" id="corruption[corruption3]" name="corruption[corruption3]">			 
+					  <input type="checkbox" value="3" id="corruption[corruption3]" name="corruption[corruption3]">
 					</div>
-					
+
 					<div class="col">
 					  <label class="" for="stress">
 						&nbsp;&nbsp;
 					  </label>
-					  <input type="checkbox" value="4" id="corruption[corruption4]" name="corruption[corruption4]">			 
+					  <input type="checkbox" value="4" id="corruption[corruption4]" name="corruption[corruption4]">
 					</div>
 				</div>
-			
+
 		</div>
 		<div class="col-md-6 col-sm-12 fate-consequences">
 			<div class="form-group">
 				<div class="fate-header col-12">Consequences</div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-2 col-form-label">2</label>
 			  <div class="col-10">
 				<input class="form-control" type="text" value="" id="consequence[mild]" name="consequence[mild]" placeholder="Mild">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-2 col-form-label">4</label>
 			  <div class="col-10">
 				<input class="form-control" type="text" value="" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-2 col-form-label">6</label>
 			  <div class="col-10">
 				<input class="form-control" type="text" value="" id="consequence[severe]" name="consequence[severe]" placeholder="Severe">
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-2 col-form-label stat-requirement">2</label>
 			  <div class="col-10">
 				<input class="form-control" type="text" value="" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" disabled data-required='constitutionOrWisdom' data-required-value='5'>
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-2 col-form-label stat-requirement">4</label>
 			  <div class="col-10">
 				<input class="form-control" type="text" value="" id="consequence[moderate2]" name="consequence[moderate2]" placeholder="Moderate" disabled data-required='constitutionOrWisdom' data-required-value='6'>
 			  </div>
 			</div>
-			
+
 			<div class="form-group row">
 			  <label class="col-2 col-form-label stat-requirement">6</label>
 			  <div class="col-10">
 				<input class="form-control" type="text" value="" id="consequence[severe2]" name="consequence[severe2]" placeholder="Severe" disabled data-required='constitutionOrWisdom' data-required-value='7'>
 			  </div>
 			</div>
-			
+
 			<div class="form-group">
 				<div class="fate-header col-12">Insanity</div>
 			</div>
-			
+
 			<div class="form-group row">
-				<div class="col">			
+				<div class="col">
 					<textarea class="form-control" id="spells" name="insanity" rows="2" placeholder="insanity"></textarea>
 				</div>
-			</div>	
+			</div>
 		</div>
-		
+
 	</div>
-	
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -380,26 +380,26 @@
 	function autocalc() {
 		var constitution = $('input[name="approach[constitution]"]').val();
 		var wisdom = $('input[name="approach[wisdom]"]').val();
-		
+
 		$("input[data-required='constitution']").each(function(){
-			var $this = $(this);							
-			var qualifies = parseInt(constitution) >= parseInt($this.data('required-value'));	
-			showQualified(qualifies, $this);			
+			var $this = $(this);
+			var qualifies = parseInt(constitution) >= parseInt($this.data('required-value'));
+			showQualified(qualifies, $this);
 		});
-		
+
 		$("input[data-required='wisdom']").each(function(){
-			var $this = $(this);							
+			var $this = $(this);
 			var qualifies = parseInt(wisdom) >= parseInt($this.data('required-value'));
-			showQualified(qualifies, $this);			
+			showQualified(qualifies, $this);
 		});
-		
+
 		$("input[data-required='constitutionOrWisdom']").each(function(){
-			var $this = $(this);							
-			var qualifies = parseInt(constitution) >= parseInt($this.data('required-value')) || parseInt(wisdom) >= parseInt($this.data('required-value'));	
-			showQualified(qualifies, $this);			
+			var $this = $(this);
+			var qualifies = parseInt(constitution) >= parseInt($this.data('required-value')) || parseInt(wisdom) >= parseInt($this.data('required-value'));
+			showQualified(qualifies, $this);
 		});
 	}
-	
+
 	function showQualified(isQualified, $elem) {
 		if (isQualified)
 		{
@@ -413,10 +413,10 @@
 			$elem.parent().prev('label').addClass('stat-requirement');
 		}
 	}
-	
-	$(function() {			
+
+	$(function() {
 		$(document).on('change', 'input[name="approach[constitution]"], input[name="approach[wisdom]"]', function(){
 			autocalc();
-		});		
+		});
 	});
 </script>

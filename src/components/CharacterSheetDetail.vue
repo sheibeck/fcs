@@ -23,9 +23,21 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'CharacterSheetDetail',
+  metaInfo() {
+    return {
+       title: this.title,
+       meta: [
+         { vmid: 'description', name: 'description', content: this.description }
+       ]
+     }
+  },
   created(){
     fs_char.init();
-    this.show();
+  },
+  watch: {
+    userId() {
+      this.show();
+    }
   },
   computed: {
     ...mapGetters([
@@ -38,6 +50,8 @@ export default {
       sheet: "",
       id: this.$route.params.id,
       characterId: "",
+      title: "",
+      description: "",
     }
   },
   methods : {
@@ -63,6 +77,9 @@ export default {
               } else {
                   console.log("Success", data.Item);
                   $component.sheet = data.Item.charactersheetcontent;
+
+                  $component.title = data.Item.charactersheetdisplayname + ' (Character Sheet)';
+                  $component.description = data.Item.charactersheetdescription;
               }
           });
       },

@@ -30,19 +30,8 @@
                    <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Roll Dice</a>
                  </div>
               </li>
-              <li class="nav-item dropdown">
-                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <span class="dice">+</span>Fate
-                 </a>
-                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                   <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">O</span> Fate SRD</a>
-                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="./assets/roll20logo.png" alt="Roll20 logo" class="roll-20"> Play Fate</a>
-                   <div class="dropdown-divider"></div>
-                   <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Roll Dice</a>
-                 </div>
-              </li>
-              <li class="nav-item" v-bind:class="{active : isActive('character')}">
-                  <a class="nav-link" href="https://github.com/sheibeck/fatecharactersheet/issues"><i class="fa fa-bug"></i> Support</a>
+              <li class="nav-item">
+                  <a class="nav-link" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Support</a>
               </li>
           </ul>
 
@@ -52,7 +41,7 @@
               </button>
           </div>
           <div v-if="isAuthenticated" class="form-inline logout-button mx-1 mb-sm-1">
-              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="fatesheet.logout()">Logout</button>
+              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="logout">Logout</button>
           </div>
           <div class="form-inline my-2 my-sm-0">
               <div class="input-group">
@@ -112,6 +101,15 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'App',
+  metaInfo() {
+    return {
+       title: "Fate Character Sheet",
+       titleTemplate: '%s | Fate Character Sheet',
+       meta: [
+         { vmid: 'description', name: 'description', content: "Create and manage all your characters for the Fate Roleplaying Game. We have character sheets for Fate Core, Fate Accelerated and additional custom character sheets for the Fate Roleplaying Game. You can roll Fate dice and create and find adversaries for your Fate Roleplaying game." }
+       ]
+     }
+  },
   created(){
     fatesheet.init();
   },
@@ -126,6 +124,9 @@ export default {
     }
   },
   methods: {
+    logout: function() {
+      fatesheet.logout();
+    },
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
     }

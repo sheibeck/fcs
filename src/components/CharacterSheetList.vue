@@ -20,9 +20,17 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'CharacterSheetList',
+  metaInfo: {
+      // if no subcomponents specify a metaInfo.title, this title will be used
+      title: 'Character Sheets',      
+  },
   created(){
     fs_char.init();
-    this.list();
+  },
+  watch: {
+    userId() {
+      this.list();
+    }
   },
   computed: {
     ...mapGetters([

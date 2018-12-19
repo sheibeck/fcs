@@ -12,6 +12,10 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'Error',
+  metaInfo: {
+      // if no subcomponents specify a metaInfo.title, this title will be used
+      title: 'Error',      
+  },
   data () {
     return {
     }

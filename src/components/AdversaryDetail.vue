@@ -8,7 +8,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Name</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="text" value="" id="adversary_name" name="adversary_name">
+                        <input class="form-control" type="text" value="" id="adversary_name" v-on:change="slugifyName" name="adversary_name">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -148,12 +148,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label for="adversary_type" class="col-sm-12 col-md-2 col-form-label">Other Tags</label>
-                    <div class="col-sm-12 col-md-10">
-                      <div class="form-control" id="adversary_tags"></div>
-                    </div>
-                </div>
             </div>
         </div>
         <button class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>
@@ -191,12 +185,28 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'AdversaryDetail',
+  metaInfo() {
+    return {
+       title: this.title,
+       meta: [
+         { vmid: 'description', name: 'description', content: this.description }
+       ]
+     }
+  },
   created(){
     fs_adversary.init();
   },
+  watch: {
+    userId() {
+      //wait for our authenticated user id
+      this.editAdversary(this.userId, fcs.$route.params.id);
+    }
+  },
   data () {
     return {
-      adversary: {}
+      adversary: {},
+      title: "",
+      description: "",
     }
   },
   computed: {
@@ -204,12 +214,6 @@ export default {
       'isAuthenticated',
       'userId',
     ]),
-  },
-  watch: {
-    isAuthenticated () {
-      //wait for our authenticated user id
-      this.editAdversary(this.userId, fcs.$route.params.id);
-    }
   },
   methods: {
     editAdversary : function(ownerid, slug) {
@@ -246,6 +250,9 @@ export default {
               $component.adversary = data.Items[0];
               $component.clearAdversaryForm();
               $component.populateAdversaryForm($component.adversary);
+
+              $component.title = $component.adversary.adversary_name + ' (Adversary)';
+              $component.description = $component.adversary.adversary_type;
             }
           }
       });
@@ -363,31 +370,38 @@ export default {
         });
     },
 
-    deleteAdversary : function(key) {
-        $component = this;
+    deleteAdversary : function() {
+        if (!this.isOwner($(adversary_owner_id).val())) {
+          fatesheet.notify('Permission Denied.', 'error', 2000);
+        }
+        else {
+          var $component = this;
+          var docClient = fatesheet.getDBClient();
 
-        var docClient = fatesheet.getDBClient();
+          var params = {
+              TableName: fs_adversary.config.adversarytable,
+              Key: {
+               'adversary_owner_id': $component.userId,
+               'adversary_name': $('#adversary_name').val()
+              }
+          };
 
-        var params = {
-            TableName: fs_adversary.config.adversarytable,
-            Key: key
-        };
+          console.log("Deleting an adversary...");
+          docClient.delete(params, function (err, data) {
+              if (err) {
+                  fatesheet.notify(err.message || JSON.stringify(err));
+                  console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+              } else {
+                  $component.clearAdversaryForm();
+                  $('#modalDeleteAdversaryConfirm').modal('hide');
+                  console.log("Deleted item:", JSON.stringify(data, null, 2));
 
-        console.log("Deleting an adversary...");
-        docClient.delete(params, function (err, data) {
-            if (err) {
-                fatesheet.notify(err.message || JSON.stringify(err));
-                console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                $component.clearAdversaryForm();
-                $('#modalDeleteAdversaryConfirm').modal('hide');
-                console.log("Deleted item:", JSON.stringify(data, null, 2));
-
-                fatesheet.notify('Adversary deleted.', 'success', 2000, function() {
-                  location.href = '/adversary'
-                });
-            }
-        });
+                  fatesheet.notify('Adversary deleted.', 'success', 2000, function() {
+                    location.href = '/adversary'
+                  });
+              }
+          });
+      }
     },
 
     updateAdversary : function(data) {
@@ -562,7 +576,14 @@ export default {
         var aConsequences = [["Mild","-2"],["Moderate","-4"],["Severe","-6"]]
         this.adversaryAddConsequences(aConsequences);
     },
-
+    isOwner : function(ownerId) {
+      return this.userId === ownerId;
+    },
+    slugifyName : function(event) {
+      var $elem = $(event.currentTarget);
+      var slug = fatesheet.slugify($elem.val());
+      $('#adversary_slug').val(slug);
+    }
   }
 }
 </script>
