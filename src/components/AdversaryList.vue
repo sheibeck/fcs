@@ -60,10 +60,11 @@
           <div v-if="!isEmpty(item.adversary_stress)">
             <h5 class='card-header py-0'>Stress</h5>
 
-            <p class='card-text px-4 my-0' v-for="stress in item.adversary_stress">
-                <strong v-for="(stressValue, stressIndex) in stress">
+            <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.adversary_stress">
+                <strong>{{stressMainIndex}}</strong>
+                <span v-for="(stressValue, stressIndex) in stressMain">
                   <input type='checkbox' v-bind:value='stressValue'>{{stressIndex}}
-                </strong>
+                </span>
             </p>
           </div>
 
