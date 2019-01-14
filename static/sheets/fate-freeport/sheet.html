@@ -86,7 +86,7 @@
 		<div class="col-sm-6 col-md-4 order-md-2">
 			<div class="row">
 				<div class="col text-center">
-					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" src="/static/sheets/fate-freeport/logo.png" />						
+					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" src="/static/sheets/fate-freeport/logo.png" />
 				</div>
 			</div>
 
@@ -414,9 +414,9 @@
 		}
 	}
 
-	$(function() {
+	window.initSheet = function() {
 		$(document).on('change', 'input[name="approach[constitution]"], input[name="approach[wisdom]"]', function(){
 			autocalc();
 		});
-	});
+	}
 </script>

@@ -120,15 +120,20 @@ export default {
                 // remove the option
                 if (characterData.character_owner_id !== $component.userId)
                 {
-                  $('.js-save-character').remove();
+                  $('.js-create-character').remove();
+                }
+
+                //check if there is an initSheet function and run it
+                if (typeof initSheet !== "undefined") {
+                    initSheet();
                 }
 
                 $('form').populate(characterData);
 
-                //check if there is an autocalc function and run it
                 if (typeof autocalc !== "undefined") {
                     autocalc();
                 }
+
             }
         });
       },

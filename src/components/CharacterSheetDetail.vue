@@ -2,7 +2,7 @@
   <div class="container mt-2">
 
     <form>
-      <div class='' v-append="sheet">
+      <div class='' v-append="sheet" @appended="appended">
       </div>
     </form>
 
@@ -55,6 +55,14 @@ export default {
     }
   },
   methods : {
+       appended: function() {
+         //check if there is an initSheet function and run it
+         setTimeout(function() {
+           if (typeof initSheet !== "undefined") {
+               initSheet();
+           }
+         }, 1000);
+       },
        show : function (id) {
           //reference this component so we can get/set data
           var $component = this;
@@ -84,12 +92,16 @@ export default {
           });
       },
       save : function() {
-      debugger;
         var $component = this;
         if (this.isAuthenticated) {
             /// save a character
             var data = $('form').serializeJSON();
             var characterData = JSON.parse(data);
+
+            if (!characterData.name) {
+              fatesheet.notify('You must specify a name');
+              return;
+            }
 
             // make sure we have a proper user id key
             characterData.character_owner_id = $component.userId;

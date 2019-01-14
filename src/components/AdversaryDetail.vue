@@ -543,7 +543,6 @@ export default {
     },
 
     addSkillCore : function() {
-      debugger;
         var aSkills = ['(+1) Average','(+2) Fair','(+3) Good','(+4) Great','(+5) Superb', '(+6) Fantastic'];
         this.adversaryAddSkills(aSkills);
     },

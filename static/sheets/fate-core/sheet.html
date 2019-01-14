@@ -460,10 +460,10 @@
 		});
 	}
 
-	$(function() {
+	window.initSheet = function() {
 		$(document).on('change', 'select', function(){
 			autocalc();
 		});
 		populateSkillList();
-	});
+	}
 </script>
