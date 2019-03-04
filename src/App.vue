@@ -30,6 +30,9 @@
                    <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Roll Dice</a>
                  </div>
               </li>
+			  <li class="nav-item">
+                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fab fa-wordpress"></i> Blog</a>
+              </li>			  
               <li class="nav-item">
                   <a class="nav-link" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Support</a>
               </li>
