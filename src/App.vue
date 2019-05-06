@@ -14,28 +14,34 @@
                   <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
               </li>
               <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('character')}" ref="el">
-                  <a class="nav-link" href="/character"><span class="dice">C</span>My Characters</a>
+                  <a class="nav-link" href="/character"><span class="dice">+</span>My Characters</a>
               </li>
               <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>
               <li class="nav-item dropdown">
                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <span class="dice">+</span>Fate
+                   <span class="dice">C</span>Tools
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                   <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">O</span> Fate SRD</a>
-                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="./assets/roll20logo.png" alt="Roll20 logo" class="roll-20"> Play Fate</a>
+                   <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
                    <div class="dropdown-divider"></div>
-                   <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Roll Dice</a>
+                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="./assets/roll20logo.png" alt="Roll20 logo" class="roll-20"> Roll20.net</a>
+                   <a class="nav-link" target="_blank" href="https://chrome.google.com/webstore/detail/solo-roleplay-tools/ihkaageibnflklkfegijfcjmkebmgbnl/reviews"><span class="dice">+</span> Solo Roleplay Tools</a>
+                   <a class="nav-link" target="_blank" href="https://www.rpgsolo.com/"><span class="dice">+</span> RPG Solo</a>
+                   <div class="dropdown-divider"></div>
+                   <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Fate Dice Roller</a>
                  </div>
               </li>
-			  <li class="nav-item">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="dice">O</span> Support
+                </a>
+                <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                   <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fab fa-wordpress"></i> Blog</a>
-              </li>			  
-              <li class="nav-item">
-                  <a class="nav-link" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Support</a>
-              </li>
+                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
+                </div>
+              </li>			              
           </ul>
 
           <div v-if="!isAuthenticated" class="form-inline login-button">
