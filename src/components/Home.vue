@@ -12,7 +12,7 @@
             <div class="card-body">
               <h5 class="card-title">View Your Fate Characters</h5>
               <p class="card-text">Create and manage all of your fate characters online. You can store and edit as many characters as you want using any of our Fate Character Sheets.</p>
-              <a href="characters" class="btn btn-primary requires-auth hidden">Play a Fate Character <span class='dice'>C</span></a>
+              <a href="character" class="btn btn-primary requires-auth hidden">Play a Fate Character <span class='dice'>C</span></a>
               <a href="login" type="button" class="btn btn-primary requires-noauth">
                   Login to View Your Characters <span class='dice'>C</span>
               </a>
