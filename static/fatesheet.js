@@ -149,10 +149,6 @@ String.prototype.toTitleCase = function () {
     }
 
     fatesheet.search = function(searchText) {
-      // clear the hash so we don't show a false id/name getCharacterInfo
-      hasher.setHash('');
-
-      //character and sheet search
     	if (location.pathname.indexOf('charactersheets') > -1 || location.pathname.indexOf('character') > -1)
     	{
     		$('.card').hide();
@@ -171,7 +167,7 @@ String.prototype.toTitleCase = function () {
     	}
     	else if (location.pathname.indexOf('adversary') > -1)
     	{
-        fs_adversary.listAdversaries(searchText); //adversary search
+        fcs.$children[0].$children[0].list(searchText); //adversary search
     	}
 
     }
@@ -301,7 +297,7 @@ String.prototype.toTitleCase = function () {
                     }
                 });
 
-                fatesheet.config.credentials.refresh((error) => {
+                fatesheet.config.credentials.refresh(function(error){
                   if (error) {
                       console.error(error);
                   } else {
@@ -320,7 +316,7 @@ String.prototype.toTitleCase = function () {
                 IdentityPoolId : fatesheet.config.cognito.identityPool, // your identity pool id here
             });
 
-            fatesheet.config.credentials.refresh((error) => {
+            fatesheet.config.credentials.refresh(function(error) {
               if (error) {
                   console.error(error);
               } else {
@@ -417,11 +413,6 @@ String.prototype.toTitleCase = function () {
         $(document).on('click', '.js-login', function (e) {
             document.location = '/login';
         });
-
-        $(document).on('click', '#LoginCognito', function() {
-          fatesheet.login($('#email').val(), $('#password').val());
-        });
-
     }
 
     fatesheet.init = function () {

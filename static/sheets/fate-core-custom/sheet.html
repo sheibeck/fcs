@@ -100,7 +100,7 @@
 		<div class="col-sm-6 col-md-4 order-md-2">
 			<div class="row">
 				<div class="col text-center">
-					<img alt="FATE CORE" class="img-fluid fate-logo" src="sheets/fate-core-custom/logo.png" />						
+					<img alt="FATE CORE" class="img-fluid fate-logo" src="/static/sheets/fate-core-custom/logo.png" />
 				</div>
 			</div>
 
@@ -379,36 +379,3 @@
 
 	</div>
 </div>
-
-
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-		crossorigin="anonymous"></script>
-
-<script type="text/javascript">
-	// autocalculate stuff
-	function getSkillValue(name) {
-		if (name.indexOf('average') > -1)
-			return 1;
-
-		if (name.indexOf('fair') > -1)
-			return 2;
-
-		if (name.indexOf('good') > -1)
-			return 3;
-
-		if (name.indexOf('great') > -1)
-			return 4;
-
-		if (name.indexOf('superb') > -1)
-			return 5;
-
-		return 0;
-	}
-
-	function autocalc() {
-	}
-
-	$(function() {
-	});
-</script>
