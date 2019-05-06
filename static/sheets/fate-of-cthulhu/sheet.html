@@ -1,0 +1,499 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- css libraries -->
+<link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
+
+    .sheet {
+        margin: 20px;
+        margin-top: 40px;
+        max-width: 1024px;
+    }
+
+    .fate-logo {
+        margin-top: -27px;
+        max-height: 130px;
+    }
+
+    .fate-header {
+        font-family: 'Open Sans', sans-serif;
+        text-transform: uppercase;
+        background-color: #3A5224;
+        color: white;
+        font-weight: 700;
+        padding-bottom: 0px;
+        margin-bottom: 0px;
+        font-size: 40px;
+        height: 44px;
+    }
+
+
+    .col-form-label {
+        font-family: 'Open Sans', sans-serif;
+        text-transform: uppercase;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .fate-skills .form-group {
+        margin-top: 1px;
+        margin-bottom: 1px;
+    }
+
+    .fate-skills label {
+        padding-bottom: 2px;
+    }
+
+    .fate-aspects .form-group {
+        margin-bottom: 12px;
+        margin-top: 0px;
+    }
+
+    input[type=checkbox] {
+        height: 50px;
+        width: 50px;
+    }
+
+    .fate-conditions label {
+        font-family: 'IM Fell English', sans-serif;
+        text-transform: uppercase;
+        font-size: 30px;
+        font-weight: 700;
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .portrait {
+        max-height: 450px;
+        padding-top: 10px;
+    }
+
+    .small {
+        color: #888;
+    }
+
+    /* HIDE CHECKBOX */
+    .corrupted-checkbox {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        cursor: pointer;
+    }
+
+        /* IMAGE STYLES */
+        .corrupted-checkbox + div {
+            min-width: 50px;
+            min-height: 50px;
+            background-repeat: no-repeat;
+            background-position: center center;
+            cursor: pointer;
+            background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox.png');
+        }
+
+        /* CHECKED STYLES */
+        .corrupted-checkbox:checked + div {
+            background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox-checked.png');
+        }
+
+    textarea {
+        border: 0 !important;
+    }
+</style>
+
+<div class="sheet">
+    <input type="hidden" id="sheetname" name="sheetname" value="fate-of-cthulhu" />
+    <input type="hidden" id="system" name="system" value="fate-of-cthulhu" />
+    <div class="row">
+        <div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
+            <img alt="Fate of Cthulhu" class="img-fluid fate-logo" src="/static/sheets/fate-of-cthulhu/logo.png" />
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <input type="text" class="form-control" id="name" name="name" placeholder="Name" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- aspects -->
+        <div class="col-sm-6 col-md-8 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
+            <div for="" class="fate-header">Aspects</div>
+            <div class="px-3">
+                <div class="form-group mb-0">
+                    <div class="row">
+                        <div class="col-8 col-md-10">
+                            <label>High Concept</label>
+                            <input type="text" class="form-control" value="" id="aspect[highconcept]" name="aspect[highconcept]" placeholder="High Concept" />
+                        </div>
+                        <div class="col-4 col-md-2 text-center">
+                            <label>Corrupted?</label>
+                            <div class="text-center">
+                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[highconcept]" name="aspect_corrupted[highconcept]" />
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-8 col-md-10">
+                            <label>Trouble</label>
+                            <input type="text" class="form-control" value="" id="aspect[trouble]" name="aspect[trouble]" placeholder="Trouble" />
+                        </div>
+                        <div class="col-4 col-md-2 text-center pt-4">
+                            <div class="text-center">
+                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[trouble]" name="aspect_corrupted[trouble]" />
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-8 col-md-10">
+                            <label>Relationship</label>
+                            <input type="text" class="form-control" value="" id="aspect[relationship]" name="aspect[relationship]" placeholder="Relationship" />
+                        </div>
+                        <div class="col-4 col-md-2 text-center pt-4">
+                            <div class="text-center">
+                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[relationship]" name="aspect_corrupted[relationship]" />
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-8 col-md-10">
+                            <label>Other Aspect</label>
+                            <input type="text" class="form-control" value="" id="aspect[other1]" name="aspect[other1]" placeholder="Other Aspect" />
+                        </div>
+                        <div class="col-4 col-md-2 text-center pt-4">
+                            <div class="text-center">
+                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[other1]" name="aspect_corrupted[other1]" />
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-8 col-md-10">
+                            <label>Other Aspect</label>
+                            <input type="text" class="form-control" value="" id="aspect[other2]" name="aspect[other2]" placeholder="Other Aspect" />
+                        </div>
+                        <div class="col-4 col-md-2 text-center pt-4">
+                            <div class="text-center">
+                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[other2]" name="aspect_corrupted[other2]" />
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div for="" class="fate-header">Regular Stunts</div>
+
+            <div class="px-3">
+                <div class="form-group mb-0">
+                    <div class="small text-muted font-italic">Start with two stunts for free. You may buy additional stunts for 1 Refresh each, so long as your Refresh remains at or above 1.</div>
+                    <textarea class="form-control" id="stunts" name="stunts" rows="17" placeholder="Regular Stunts"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div for="" class="fate-header">Corrupted Stunts</div>
+                </div>
+
+                <div class="form-group mb-0">
+                    <div class="small text-muted font-italic">Whenever one of your aspects becomes corrupted, you also gain a corruption stunt at the next minor milestone.</div>
+                    <textarea class="form-control" id="stunts_corrupted" name="stunts_corrupted" rows="17" placeholder="Corrupted Stunts"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vitals and Skills -->
+
+        <div class="col-sm-6 col-md-4 fate-skills px-0">
+            <div class="fate-header col-12">Vitals</div>
+
+            <div class="px-3">
+                <!-- Stress -->
+                <div class="form-group text-center font-weight-bold d-flex flex-row">
+                    <div class="col-6">REFRESH</div>
+                    <div class="col-6">CORRUPTION</div>
+                </div>
+
+                <div class="form-group text-center font-weight-bold d-flex flex-row">
+                    <div class="form-group">
+                        <input type="text" class="form-control-sm text-center" id="refresh" name="refresh" placeholder="Refresh" />
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" value="1" id="corruption[corruption1]" name="corruption[corruption1]">
+                        <input type="checkbox" value="1" id="corruption[corruption2]" name="corruption[corruption1]">
+                        <input type="checkbox" value="1" id="corruption[corruption3]" name="corruption[corruption1]">
+                        <input type="checkbox" value="1" id="corruption[corruption4]" name="corruption[corruption1]">
+                    </div>
+                </div>
+
+                <!-- Stress -->
+                <div class="form-group text-center font-weight-bold">
+                    <div class="col-12">STRESS</div>
+                </div>
+
+                <!-- physical stress -->
+                <div class="d-flex flex-row">
+                    <div class="form-group font-weight-bold  pr-2 pt-2">
+                        PHYSICAL
+                    </div>
+                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]">
+                    <input type="checkbox" value="1" id="stress[stress2]" name="stress[stress2]">
+                    <input type="checkbox" value="1" id="stress[stress3]" name="stress[stress3]">
+                    <input type="checkbox" value="1" id="stress[stress4]" name="stress[stress4]" disabled data-required='physique' data-required-value='1'>
+                    <input type="checkbox" value="1" id="stress[stress5]" name="stress[stress5]" disabled data-required='physique' data-required-value='3'>
+                    <input type="checkbox" value="1" id="stress[stress6]" name="stress[stress6]" disabled>
+                </div>
+
+                <!-- mental stress -->
+                <div class="d-flex flex-row">
+                    <div class="form-group font-weight-bold pr-3 pt-2">
+                        MENTAL
+                    </div>
+                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]">
+                    <input type="checkbox" value="1" id="stress[mental2]" name="stress[mental2]">
+                    <input type="checkbox" value="1" id="stress[mental3]" name="stress[mental3]">
+                    <input type="checkbox" value="1" id="stress[mental4]" name="stress[mental4]" disabled data-required='will' data-required-value='1'>
+                    <input type="checkbox" value="1" id="stress[mental5]" name="stress[mental5]" disabled data-required='will' data-required-value='3'>
+                    <input type="checkbox" value="1" id="stress[mental6]" name="stress[mental6]" disabled>
+                </div>
+
+                <!-- consequences -->
+                <div class="form-group text-center font-weight-bold">
+                    <div class="col-12">CONSEQUENCES</div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">2</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="" id="consequence[mild]" name="consequence[mild]" placeholder="Mild">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">4</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">6</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="" id="consequence[severe]" name="consequence[severe]" placeholder="Severe">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label stat-requirement">2</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" disabled data-required='physiqueOrWill' data-required-value='5'>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="fate-header col-12">Skills</div>
+
+            <div class="px-3">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[academics]" name="skill[academics]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Academics</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[athletics]" name="skill[athletics]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Athletics</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[burglary]" name="skill[burglary]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Burglary</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[contacts]" name="skill[contacts]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Contacts</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[crafts]" name="skill[crafts]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Crafts</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[deceive]" name="skill[deceive]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Deceive</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[drive]" name="skill[drive]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Drive</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[empathy]" name="skill[empathy]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Empathy</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[fight]" name="skill[fight]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Fight</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[investigate]" name="skill[investigate]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Investigate</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[lore]" name="skill[lore]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Lore</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[notice]" name="skill[notice]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Notice</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[physique]" name="skill[physique]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Physique</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[provoke]" name="skill[provoke]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Provoke</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[rapport]" name="skill[rapport]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Rapport</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[resources]" name="skill[resources]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Resources</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[shoot]" name="skill[shoot]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Shoot</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[stealth]" name="skill[stealth]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Stealth</label>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <input class="form-control text-center" type="text" value="" id="skill[will]" name="skill[will]" placeholder="+">
+                    </div>
+                    <label class="col-9 col-form-label">Will</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+	// autocalculate stuff	
+    function autocalc() {        
+	    var physique = $('input[name="skill[physique]"]').val() || 0;
+	    var will = $('input[name="skill[will]"]').val() || 0;
+			
+		$("input[data-required='physique']").each(function(){
+			var $this = $(this);
+			var qualifies = physique >= parseInt($this.data('required-value'));
+			showQualified(qualifies, $this);
+		});
+
+		$("input[data-required='will']").each(function(){
+			var $this = $(this);
+			var qualifies = will >= parseInt($this.data('required-value'));
+			showQualified(qualifies, $this);
+		});
+
+		$("input[data-required='physiqueOrWill']").each(function(){
+			var $this = $(this);
+			var qualifies = physique >= parseInt($this.data('required-value')) || will >= parseInt($this.data('required-value'));
+			showQualified(qualifies, $this);
+		});
+	}
+
+	function showQualified(isQualified, $elem) {
+		if (isQualified)
+		{
+			$elem.attr('disabled', false);
+			$elem.prev('label').removeClass('stat-requirement');
+			$elem.parent().prev('label').removeClass('stat-requirement');
+		}
+		else {
+			$elem.attr('disabled', true);
+			$elem.prev('label').addClass('stat-requirement');
+			$elem.parent().prev('label').addClass('stat-requirement');
+		}
+	}
+
+
+	window.initSheet = function () {	    
+	    $(document).on('change', 'input[name="skill[physique]"], input[name="skill[will]"]', function () {
+			autocalc();
+	    });
+	    autocalc();
+	}
+</script>
