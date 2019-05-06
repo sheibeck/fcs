@@ -26,8 +26,8 @@
         font-weight: 700;
         padding-bottom: 0px;
         margin-bottom: 0px;
-        font-size: 40px;
-        height: 44px;
+        font-size: 36px;
+        height: 40px;
     }
 
 
@@ -199,9 +199,9 @@
             <div for="" class="fate-header">Regular Stunts</div>
 
             <div class="px-3">
-                <div class="form-group mb-0">
+                <div class="form-group mb-0 pb-4">
                     <div class="small text-muted font-italic">Start with two stunts for free. You may buy additional stunts for 1 Refresh each, so long as your Refresh remains at or above 1.</div>
-                    <textarea class="form-control" id="stunts" name="stunts" rows="17" placeholder="Regular Stunts"></textarea>
+                    <textarea class="form-control" id="stunts" name="stunts" rows="14" placeholder="Regular Stunts"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -210,7 +210,7 @@
 
                 <div class="form-group mb-0">
                     <div class="small text-muted font-italic">Whenever one of your aspects becomes corrupted, you also gain a corruption stunt at the next minor milestone.</div>
-                    <textarea class="form-control" id="stunts_corrupted" name="stunts_corrupted" rows="17" placeholder="Corrupted Stunts"></textarea>
+                    <textarea class="form-control" id="stunts_corrupted" name="stunts_corrupted" rows="14" placeholder="Corrupted Stunts"></textarea>
                 </div>
             </div>
         </div>
@@ -443,57 +443,54 @@
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        // autocalculate stuff
+        function autocalc() {
+            var physique = $('input[name="skill[physique]"]').val() || 0;
+            var will = $('input[name="skill[will]"]').val() || 0;
+
+            $("input[data-required='physique']").each(function () {
+                var $this = $(this);
+                var qualifies = physique >= parseInt($this.data('required-value'));
+                showQualified(qualifies, $this);
+            });
+
+            $("input[data-required='will']").each(function () {
+                var $this = $(this);
+                var qualifies = will >= parseInt($this.data('required-value'));
+                showQualified(qualifies, $this);
+            });
+
+            $("input[data-required='physiqueOrWill']").each(function () {
+                var $this = $(this);
+                var qualifies = physique >= parseInt($this.data('required-value')) || will >= parseInt($this.data('required-value'));
+                showQualified(qualifies, $this);
+            });
+        }
+
+        function showQualified(isQualified, $elem) {
+            if (isQualified) {
+                $elem.attr('disabled', false);
+                $elem.prev('label').removeClass('stat-requirement');
+                $elem.parent().prev('label').removeClass('stat-requirement');
+            }
+            else {
+                $elem.attr('disabled', true);
+                $elem.prev('label').addClass('stat-requirement');
+                $elem.parent().prev('label').addClass('stat-requirement');
+            }
+        }
+
+
+        window.initSheet = function () {
+            $(document).on('change', 'input[name="skill[physique]"], input[name="skill[will]"]', function () {
+                autocalc();
+            });
+            autocalc();
+        }
+    </script>
 </div>
-
-
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-
-<script type="text/javascript">
-	// autocalculate stuff	
-    function autocalc() {        
-	    var physique = $('input[name="skill[physique]"]').val() || 0;
-	    var will = $('input[name="skill[will]"]').val() || 0;
-			
-		$("input[data-required='physique']").each(function(){
-			var $this = $(this);
-			var qualifies = physique >= parseInt($this.data('required-value'));
-			showQualified(qualifies, $this);
-		});
-
-		$("input[data-required='will']").each(function(){
-			var $this = $(this);
-			var qualifies = will >= parseInt($this.data('required-value'));
-			showQualified(qualifies, $this);
-		});
-
-		$("input[data-required='physiqueOrWill']").each(function(){
-			var $this = $(this);
-			var qualifies = physique >= parseInt($this.data('required-value')) || will >= parseInt($this.data('required-value'));
-			showQualified(qualifies, $this);
-		});
-	}
-
-	function showQualified(isQualified, $elem) {
-		if (isQualified)
-		{
-			$elem.attr('disabled', false);
-			$elem.prev('label').removeClass('stat-requirement');
-			$elem.parent().prev('label').removeClass('stat-requirement');
-		}
-		else {
-			$elem.attr('disabled', true);
-			$elem.prev('label').addClass('stat-requirement');
-			$elem.parent().prev('label').addClass('stat-requirement');
-		}
-	}
-
-
-	window.initSheet = function () {	    
-	    $(document).on('change', 'input[name="skill[physique]"], input[name="skill[will]"]', function () {
-			autocalc();
-	    });
-	    autocalc();
-	}
-</script>
