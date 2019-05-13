@@ -1,0 +1,4 @@
+User-Agent: *
+Disallow: /error
+
+Sitemap: https://www.fatecharactersheet.com/sitemap.xml
