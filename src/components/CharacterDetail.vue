@@ -133,6 +133,13 @@ export default {
                 if (typeof autocalc !== "undefined") {
                     autocalc();
                 }
+								 
+				setTimeout(function() {					
+					//update the portrait
+					if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
+						$("img.portrait").prop("src", $("#character_image_url").val());
+					}
+				}, 100);
 
             }
         });
@@ -177,6 +184,14 @@ export default {
                     console.log("Added item:", JSON.stringify(data, null, 2));
                 }
             });
+			
+			setTimeout(function() {					
+				//update the portrait
+				if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
+					$("img.portrait").prop("src", $("#character_image_url").val());
+				}
+			}, 100);
+			
         }
         else {
             window.print();
