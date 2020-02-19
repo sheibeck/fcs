@@ -22,6 +22,15 @@
         <div class="col-sm-6">
           <div class="card card m-2">
             <div class="card-body">
+              <h5 class="card-title">View Your Campaigns</h5>
+              <p class="card-text">Create and manage a campaign setting. Build your world and start playing!</p>
+              <a href="campaign" class="btn btn-primary">Play a Campaign <i class="fas fa-globe"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card card m-2">
+            <div class="card-body">
               <h5 class="card-title">Find a Fate Character Sheet</h5>
               <p class="card-text">Find and print a character sheet for the setting you want. We have form-fillable Fate Core, Fate Accelerated and other setting character sheets.</p>
               <a href="charactersheet" class="btn btn-primary">Find a Character Sheet <span class='dice'>D</span></a>

@@ -16,6 +16,9 @@
               <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('character')}" ref="el">
                   <a class="nav-link" href="/character"><span class="dice">+</span>My Characters</a>
               </li>
+              <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('campaign')}" ref="el">
+                  <a class="nav-link" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>
+              </li>
               <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>
