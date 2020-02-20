@@ -27,8 +27,9 @@
       <div class="col-12 col-md-8 col-lg-6">
         <div class="small">
           <strong class="text-danger">#</strong>Character, <strong class="text-danger">@</strong>FaceOrPlace,
-          <strong class="text-danger">~</strong>Aspect, <strong class="text-danger">^</strong>Resolve an Issue or Aspect,
-          <strong class="text-danger">!</strong>IssueDescription<strong class="text-danger">!</strong>
+          <strong class="text-danger">~</strong>Aspect, <strong class="text-danger">^</strong>Resolve an Issue or Aspect
+          <strong class="text-danger">!</strong>IssueDescription
+          <br /> !issuename <strong class="text-danger">[</strong>add extra info after any tag<strong class="text-danger">]</strong>
         </div>
         <h2>Session Log</h2>
         <div>
@@ -36,7 +37,7 @@
         </div>
         <p v-for="session of campaign.sessions" :key="session.id">
           <label>{{session.date}}</label><br />
-          <textarea class="sessionLog form-control" id="session-1" :value="session.description" @change="parseSession($event, session)"></textarea>
+          <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" :value="session.description" @change="parseSession($event, session)"></textarea>
         </p>
       </div>
       <div class="col-12 col-md-4 col-lg-6">
@@ -97,8 +98,8 @@ export default {
     return {
       campaign: { 
         sessions: [
-          {id: fatesheet.generateUUID(), date:new Date("2/19/2020 10:00:00").toString(), description:"#Fell_Stone was running from @The_Kingdom_Of_Carmon where !@The_King was a tyrant and trying to take over the world! ~CurelWorld"},
-          {id: fatesheet.generateUUID(), date:new Date("2/19/2020 9:00:00").toString(), description:"#Fell_Stone jumped across @River"} 
+          {id: fatesheet.generateUUID(), date:new Date("2/19/2020 10:00:00").toString(), description:`#"Fell Stone" was running from @"The Kingdom of Carmon" because @"The Tyrant King" [Who rules with an iron fist] was !"Trying to take over the world by military force" it is a ~"A cruel, cruel world"`},
+          {id: fatesheet.generateUUID(), date:new Date("2/19/2020 9:00:00").toString(), description:`#"Fell Stone" [Has a bad leg injury] from jumping across @"The Big River"`} 
         ]
       },
       tags: ["#","@","!","~"],
@@ -119,6 +120,8 @@ export default {
   },
   methods: {
     parseSessionAll: function() {
+      this.campaign.sessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
+
       for(var i = 0; i < this.campaign.sessions.length; i++) {
         var session = this.campaign.sessions[i];
         this.parseThings(session.description, session.id);
@@ -140,7 +143,7 @@ export default {
     },
     parseThings: function(stringToParse, sessionId, removeThing){
       let $component = this;      
-      let regexString = `([${$component.tags.join("")}].[\\S]+)(?:\\s?\\[(.*?)\\])?`;
+      let regexString = `(?<thing>[#@!~]"(?<display>.+?)")(?:\\s?\\[(?<description>.*?)\\])?`;
       let regex = new RegExp(regexString, "g");
       let match = regex.exec(stringToParse);
 
@@ -167,6 +170,7 @@ export default {
       }
       //this.updateResolvedItems();
     },    
+    /*
     updateResolvedItems : function(unresolveThing) {
       //TODO: implement this a better way
       return;
@@ -197,7 +201,7 @@ export default {
           } 
         }       
       });           
-    },
+    },*/
     findThing: function(list, value) { 
       //find a thing in the things lists     
       if (list) {
@@ -221,8 +225,9 @@ export default {
       return -1;
     },    
     updateThing : function(list, sessionId, match, removeThing) {
-      let thing = match[1];      
-      let description = match[2] || "";
+      let thing = match.groups.thing;
+      let display = match.groups.display;
+      let description = match.groups.description || null;
 
       //crud functions on a thing in the things list
       let thingIdx = this.findThing(list, thing)
@@ -232,11 +237,10 @@ export default {
       if (!removeThing) { 
 
         //if the thing does not exist at all, add it and associate it with this session
-        if (thingIdx === -1) {
-          let replacX = new RegExp(`[${this.tags.join("")}]`, "g");
-          let niceText =  `${thing.replace(replacX, "").replace(/_/g, " ")} [ ${description} ]`;
+        if (thingIdx === -1) {         
+          let displayText =  `${display} ${description ? "[" + description + "]" : ""}`;
 
-          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: [description], display: niceText, resolved: false } 
+          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: description || null, display: displayText } 
           list.push(newThing);
         }
         
@@ -245,9 +249,9 @@ export default {
           if (thingInSessionIdx === -1) {
             list[thingIdx].sessionids.push(sessionId);
           }
-          if (description && list[thingIdx].description.indexOf(description) === -1) {
-            list[thingIdx].description.push(sessionId);
-            list[thingIdx].display = list[thingIdx].description.join(", ");
+          if (description && list[thingIdx].description && list[thingIdx].description.indexOf(description) === -1) {
+            list[thingIdx].description.push(description);
+            list[thingIdx].display = `${display} ${description.length > 0 ? "[" + list[thingIdx].description.join(", ") + "]" : ""}`;
           }
         }
       } 
@@ -270,8 +274,8 @@ export default {
     },    
     addSession : function() {
         let sid = fatesheet.generateUUID();
-        let session = {id: sid, date: new Date().toString(), description: sid};
-        this.campaign.sessions.push(session);     
+        let session = {id: sid, date: new Date().toString(), description: ""};
+        this.campaign.sessions.unshift(session);    
     },
     listSessions : function(ownerid, id) {      
       //we only edit if we have a valid slug for an id
