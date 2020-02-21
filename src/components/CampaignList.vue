@@ -12,7 +12,7 @@
     <div class='card-columns'>
       <div v-for="(item, index) in campaigns" class='card'>
         <div class='card-body'>
-          <h5 class='card-title campaign-name'>{{item.name}}</h5>
+          <h5 class='card-title campaign-name'>{{item.title}}</h5>
           <div class='row'>
             <p v-if="item.campaign_image_url" class='col-12 col-md-5 text-center'>
               <img v-bind:src="item.campaign_image_url" class='img-fluid' />
@@ -72,7 +72,7 @@ export default {
   computed: {
     slugify: function() {
       return this.campaigns.map(function(item) {
-          return '/campaign/' + item.id + '/' + fatesheet.slugify(item.name);
+          return '/campaign/' + item.id + '/' + fatesheet.slugify(item.title);
       });
     },
     ...mapGetters([

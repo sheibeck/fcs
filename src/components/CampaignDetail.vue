@@ -8,65 +8,107 @@
 <template>
   <div class="container mt-2">
     <input type="hidden" name="id" id="id" v-model="campaign.id" />
-    <input type="hidden" name="owner_id" v-model="campaign.owner_id" id="owner_id" />
-    
-    <div class="form-group row">
-        <label for="name" class="col-sm-12 col-md-2 col-form-label">Name</label>
-        <div class="col-sm-12 col-md-10">
-            <input class="form-control" type="text" value="" id="name" name="name" v-model="campaign.name" v-on:change="slugifyName">
-        </div>
+    <input type="hidden" name="owner_id" v-model="campaign.owner_id" id="owner_id" />    
+    <div class="form-group">
+      <label for="name">Name</label>        
+      <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
+      <!--<small id="titleHelp" class="form-text text-muted">https://fatecharactersheet.com/campaign/{{campaign.id}}/{{campaign.slug}}</small> -->
+    </div>    
+    <div id="metadata">
+      <div class="form-group">
+        <label for="scale">Scale</label>
+        <select class="form-control" id="scale" name="scale" v-model="campaign.scale" @change="save">
+          <option>None</option>
+          <option>Mundane</option>
+          <option>Supernatural</option>
+          <option>Otherworldly</option>
+          <option>Legendary </option>
+          <option>Godlike</option>
+        </select>
+      </div>
+      <div class="form-group">
+          <label for="description">Description</label>
+          <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="save"></textarea>
+      </div>
     </div>
-    <div class="form-group row">
-        <label for="name" class="col-sm-12 col-md-2 col-form-label">Slug</label>
-        <div class="col-sm-12 col-md-10">
-            <input class="form-control" type="text" value="" id="slug" name="slug" v-model="campaign.slug" readonly>
-        </div>
-    </div>
-
     <div class="row">
-      <div class="col-12 col-md-8 col-lg-6">
-        <div class="small">
-          <strong class="text-danger">#</strong>Character, <strong class="text-danger">@</strong>FaceOrPlace,
-          <strong class="text-danger">~</strong>Aspect, <strong class="text-danger">^</strong>Resolve an Issue or Aspect
-          <strong class="text-danger">!</strong>IssueDescription
-          <br /> !issuename <strong class="text-danger">[</strong>add extra info after any tag<strong class="text-danger">]</strong>
-        </div>
-        <h2>Session Log</h2>
+      <div class="col-12 col-md-8 col-lg-6">        
         <div>
-          <button type="button" @click="addSession()">Add Session</button>
+          <span class="h4">Session Log</span> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
         </div>
         <p v-for="session of campaign.sessions" :key="session.id">
-          <label>{{session.date}}</label><br />
-          <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" :value="session.description" @change="parseSession($event, session)"></textarea>
+          <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span><br />
+          <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" 
+            :value="session.description" @change="parseSession($event, session); save()"></textarea>
         </p>
       </div>
+
       <div class="col-12 col-md-4 col-lg-6">
-        <h2>Issues</h2>
-        <ul>
-          <li v-for="thing in things.issues" :key="thing.id">            
-            {{thing.display}}
-          </li>
-        </ul>
-
-        <h2>Characters</h2>
-        <ul>
-           <li v-for="thing in things.characters" :key="thing.id">{{thing.display}}</li>
-        </ul>
-
-        <h2>Faces &amp; Places</h2>
-        <ul>
-           <li v-for="thing in things.faceplaces" :key="thing.id">{{thing.display}}</li>
-        </ul> 
-
-        <h2>Aspects</h2>
-        <ul>
-           <li v-for="thing in things.aspects" :key="thing.id">
+        <div data-toggle="modal" data-target="#modalInstructions">
+          <span class="h4">Summary</span> <i class="fas fa-question-circle"></i>
+        </div>
+        <div class="">
+          <h5>Issues</h5>
+          <ul>
+            <li v-for="thing in things.issues" :key="thing.id">            
               {{thing.display}}
-           </li>
-        </ul>        
+            </li>
+          </ul>
+
+          <h5>Characters</h5>
+          <ul>
+            <li v-for="thing in things.characters" :key="thing.id">
+              {{thing.display}} <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+            </li>
+          </ul>
+
+          <h5>Faces &amp; Places</h5>
+          <ul>
+            <li v-for="thing in things.faceplaces" :key="thing.id">
+              {{thing.display}} <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+            </li>
+          </ul> 
+
+          <h5>Aspects</h5>
+          <ul>
+            <li v-for="thing in things.aspects" :key="thing.id">
+                {{thing.display}} <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+            </li>
+          </ul>        
+        </div>
       </div>
-    </div>    
-  </div> 
+    </div>
+
+    <!-- instruction modal -->     
+    <div class="modal fade" id="modalInstructions" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Instructions</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <p>When entering data in your session log you can tag items to have them show up in the summary listing. Currently supported tags are:</p>
+              <ul>
+                <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
+                <li><strong class="text-danger">~"</strong>Campaign Aspect<strong class="text-danger">"</strong></li>
+                <li><strong class="text-danger">!"</strong>Issue Description<strong class="text-danger">"</strong></li>
+                <li><strong class="text-danger">@"</strong>Face or Place Name<strong class="text-danger">"</strong></li>
+              </ul>
+              <p>Additionally, you can add extra details to any tag by enclosing descriptions in square brackets and making sure they come right 
+                after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>                                          
+              <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
+          </div>
+          <div class="modal-footer">            
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>  
 </template>
 
 <script>
@@ -91,24 +133,25 @@ export default {
   watch: {
     userId() {
       //wait for our authenticated user id
-      //this.listSessions(this.userId, fcs.$route.params.id);           
+      this.getCampaign(this.userId, fcs.$route.params.id);           
     }
   },
   data () {
     return {
-      campaign: { 
+      /*campaign: { 
         sessions: [
           {id: fatesheet.generateUUID(), date:new Date("2/19/2020 10:00:00").toString(), description:`#"Fell Stone" was running from @"The Kingdom of Carmon" because @"The Tyrant King" [Who rules with an iron fist] was !"Trying to take over the world by military force" it is a ~"A cruel, cruel world"`},
           {id: fatesheet.generateUUID(), date:new Date("2/19/2020 9:00:00").toString(), description:`#"Fell Stone" [Has a bad leg injury] from jumping across @"The Big River"`} 
         ]
-      },
+      },*/
+      campaign : {},
+      id: this.$route.params.id,      
       tags: ["#","@","!","~"],
       things: {
         characters: [],
         faceplaces: [],
         issues: [],
         aspects: [],
-        resolved: [],
       },
     }
   },
@@ -120,11 +163,13 @@ export default {
   },
   methods: {
     parseSessionAll: function() {
-      this.campaign.sessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
+      if (this.campaign.sessions && this.campaign.sessions.length > 0) {
+        this.campaign.sessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
 
-      for(var i = 0; i < this.campaign.sessions.length; i++) {
-        var session = this.campaign.sessions[i];
-        this.parseThings(session.description, session.id);
+        for(var i = 0; i < this.campaign.sessions.length; i++) {
+          var session = this.campaign.sessions[i];
+          this.parseThings(session.description, session.id);
+        }
       }
     },
     parseSession: function(event, session) {
@@ -139,7 +184,7 @@ export default {
       }          
       
       //then add in anything that is from the new text
-      this.parseThings(newDescription, session.id);
+      this.parseThings(newDescription, session.id);      
     },
     parseThings: function(stringToParse, sessionId, removeThing){
       let $component = this;      
@@ -167,45 +212,12 @@ export default {
         }         
         $component.updateThing(listToUpdate, sessionId, match, removeThing);         
         match = regex.exec(stringToParse);
-      }
-      //this.updateResolvedItems();
+      }      
     },    
-    /*
-    updateResolvedItems : function(unresolveThing) {
-      //TODO: implement this a better way
-      return;
-      
-      let $component = this;
-      let resolvableTags = ["!", "~"];
-      
-      resolvableTags.forEach(function(tag) {
-        if (!unresolveThing) {
-          //now look for resolved items by iterating over the resolved array and then marking
-          // items in the other thing bins with True when an item in them has been resolved          
-          $component.things.resolved.forEach(function(res) {        
-            let listToSearch = tag === "!" ? $component.things.issues : $component.things.aspects;
-            let thingToFind = res.thing.replace(/\^/g, tag);
-            let thingIdx =  $component.findThing(listToSearch, thingToFind);
-            if (thingIdx > -1) {
-              listToSearch[thingIdx].resolved = true;
-            }        
-          });
-          
-        } else {
-          //we have a specific item that we are unresolving
-          let listToSearch = tag === "!" ? $component.things.issues : $component.things.aspects;
-          let thingToFind = new String(unresolveThing).replace(/\^/g, tag);          
-          let thingIdx = $component.findThing(listToSearch, thingToFind);
-          if (thingIdx > -1) {
-              listToSearch[thingIdx].resolved = false;
-          } 
-        }       
-      });           
-    },*/
     findThing: function(list, value) { 
       //find a thing in the things lists     
       if (list) {
-        for(var i = 0; i < list.length; i += 1) {
+        for(var i = 0; i < list.length; i++) {
             if(list[i]["thing"] === value) {
                 return i;
             }
@@ -216,9 +228,9 @@ export default {
     findThingForSession: function(list, value, sessionId) { 
       //find a thing in the things list that is associated with a specific sessionId 
       if (list) {    
-        for(var i = 0; i < list.length; i += 1) {
+        for(var i = 0; i < list.length; i++) {
             if(list[i]["thing"] === value && list[i].sessionids.indexOf(sessionId) > -1) {
-                return i;
+                return list[i].sessionids.indexOf(sessionId);
             }
         }
       }
@@ -240,17 +252,17 @@ export default {
         if (thingIdx === -1) {         
           let displayText =  `${display} ${description ? "[" + description + "]" : ""}`;
 
-          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: description || null, display: displayText } 
-          list.push(newThing);
+          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: [description] || null, display: displayText } 
+          list.unshift(newThing);
         }
         
         //if the thing exists but not for this session, associate it with this session
         if(thingIdx > -1) {
           if (thingInSessionIdx === -1) {
-            list[thingIdx].sessionids.push(sessionId);
+            list[thingIdx].sessionids.unshift(sessionId);
           }
           if (description && list[thingIdx].description && list[thingIdx].description.indexOf(description) === -1) {
-            list[thingIdx].description.push(description);
+            list[thingIdx].description.unshift(description);
             list[thingIdx].display = `${display} ${description.length > 0 ? "[" + list[thingIdx].description.join(", ") + "]" : ""}`;
           }
         }
@@ -258,18 +270,24 @@ export default {
       
       //if we are removing, remove the association of this thing to this session
       if (removeThing && thingIdx > -1) {
-        if (list[thingIdx].sessionids.length > 1) {          
+        if (thingInSessionIdx > -1) {          
           list[thingIdx].sessionids.splice(thingInSessionIdx, 1);
         }
-        else {
-          //if there are no more sessions associated with this thing, then remove it entirely
-          list.splice(thingIdx, 1);
         
-          //if this item was removed AND it was a resolved item, then go mark the related items as not resolved anymore
-          //if (tag === "\\^") {
-          //  this.updateResolvedItems(thing);
-          //}
-        }        
+        //if there are no more sessions associated with this thing, then remove it entirely
+        if (list[thingIdx].sessionids.length === 0) {        
+          list.splice(thingIdx, 1);
+        }
+
+        //remove any descriptions that went with thi item
+        if (description && list[thingIdx].description) {
+          let descIdx = list[thingIdx].description.indexOf(description);
+          if (descIdx > -1) {
+            list[thingIdx].description.splice(descIdx, 1);
+            //update the display
+            list[thingIdx].display = `${display} ${description.length > 0 ? "[" + list[thingIdx].description.join(", ") + "]" : ""}`;
+          }
+        }
       }
     },    
     addSession : function() {
@@ -277,10 +295,7 @@ export default {
         let session = {id: sid, date: new Date().toString(), description: ""};
         this.campaign.sessions.unshift(session);    
     },
-    listSessions : function(ownerid, id) {      
-      //we only edit if we have a valid slug for an id
-      if (!slug) return;
-
+    getCampaign : function(ownerid, id) {      
       var $component = this;
       
       // Create DynamoDB document client
@@ -307,129 +322,70 @@ export default {
             }
             else {
               console.log("Success", data.Items[0]);
-              $component.campaign = data.Items[0];
-              
-              //BEGIN DEV
-               $component.campaign.sessions = [
-                  {session:"2/18/20", description:"#Fell_Stone was running from @The_Kingdom_Of_Carmon where !The_King[was a tyrant and trying to take over the world]"},
-                  {session:"2/17/20", description:"#Fell_Stone jumped across @River"} 
-                ];
+              let c = data.Items[0];
 
+              if (!c.sessions) {
+                c.sessions = [];          
+              }
+
+              $component.$set($component, 'campaign', c);             
               $component.parseSessionAll();
-              //END DEV
+              
             }
           }
       });
     },
-    upsert : function() {
-        var $component = this;
+    save : function() {      
+        let $component = this;
+        let campaignData = $component.campaign;
+      
+        // make sure we have a proper user id key
+        campaignData.owner_id = this.userId;
 
-        var data = $component.campaign;
-
-        var isNew = false;
-        if (!result.id)
-        {
-          // add a uniqueid
-          result['id'] = fatesheet.generateUUID();
-          result['owner_id'] = fatesheet.config.userId;
-          isNew = true;
-        }        
-
-        if (isNew)
-        {
-          //create the campaign
-          $component.insert(result);
+        //create a new campaign Id if we don't have one
+        let isNew = false;
+        if (!this.id) {
+            isNew = true;
+            this.id = fatesheet.generateUUID();
+            fatesheet.logAnalyticEvent('createdACampaign' + campaignData.sheetname);
         }
-        else {
-          $component.update(result);
-        }
-    },
+        campaignData.id = this.id;
+        fs_camp.config.campaignId = this.id;
 
-    insert: function(campaignData) {
+        //dynamodb won't let us have empty attributes
+        fatesheet.removeEmptyObjects(campaignData);
 
         var docClient = fatesheet.getDBClient();
 
+        // create/update a  campaign
+        // we always use the put operation because the data can change depending on your campaign
         var params = {
             TableName: fs_camp.config.campaigntable,
-            Key: {
-             'owner_id': campaignData.owner_id,
-             'id': campaignData.id
-            },
-        }
-
-        // if this campaign already exists then warn and don't overwrite
-        docClient.get(params, function(err, data) {
-            if (err) {
-              console.log("Error", err);
-            } else {
-              if (data.Item)
-              {
-                fatesheet.notify('You already have an campaign with this name.', 'info', '2000');
-              }
-              else {
-                  // create a new creature
-                  var params = {
-                      TableName: fs_camp.config.campaigntable,
-                      Item: campaignData
-                  };
-
-                  console.log("Adding a new campaign...");
-                  docClient.put(params, function (err, data) {
-                      if (err) {
-                          fatesheet.notify(err.message || JSON.stringify(err));
-                          console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-                      } else {
-                          console.log("Added item:", JSON.stringify(data, null, 2));
-                          fatesheet.notify('Campaign added.', 'success', 2000, function() {
-                            location.href = '/campaign/' + campaignData.slug;
-                          } );
-
-                      }
-                  });
-              }
-            }
-        });
-    },
-
-    update : function(data) {
-        var docClient = fatesheet.getDBClient();
-
-        var params = {
-            TableName: fs_camp.config.campaigntable,
-            Key: {
-             'owner_id': data.owner_id,
-             'name': $('#name').val().toTitleCase() // it's disabled when we update so they don't try to change it.
-            },
-            UpdateExpression: "set campaign_issues = :i, campaign_slug =:slg, campaign_faces=:f, campaign_places=:p, campaign_scale=:s",
-            ExpressionAttributeValues:{
-                ":i":data.campaign_issues,
-                ":slg": data.campaign_slug,
-                ":f":data.campaign_faces,
-                ":p":data.campaign_places,
-                ":s": data.campaign_scale                
-            },
-            ReturnValues:"UPDATED_NEW"
+            Item: campaignData
         };
 
-        console.log("Updating campaign...");
-        docClient.update(params, function (err, data) {
+        docClient.put(params, function (err, data) {
             if (err) {
                 fatesheet.notify(err.message || JSON.stringify(err));
-                console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+                console.error("Unable to save campaign. Error JSON:", JSON.stringify(err, null, 2));
             } else {
-                console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
-                fatesheet.notify('Campaign updated.', 'success', 2000);
+                fatesheet.notify('Campaign saved.', 'success', 2000);
+                console.log("Added item:", JSON.stringify(data, null, 2));
             }
         });
+      
     },
-  
+    toLocaleDateString : function(dateString) {
+      return(new Date(dateString).toLocaleString());
+    },  
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },
-    slugifyName : function(event) {
+    slugify : function(event) {
       var $elem = $(event.currentTarget);
       var slug = fatesheet.slugify($elem.val());
-      $('#campaign_slug').val(slug);
+      this.$set(this.campaign, "slug", slug);
+      this.save();
     }
   }
 }
