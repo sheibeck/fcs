@@ -2,7 +2,7 @@
   <div class="container mt-2">
     <div v-if="isAuthenticated" class="row d-print-none mb-2 hide-on-detail">
       <div class="col-sm-12 col-md-3">
-        <a href='/campaign' class='btn btn-success'>Create a Campaign <i class='fa fa-globe-americas'></i></a>
+        <a href='/campaign/create' class='btn btn-success'>Create a Campaign <i class='fa fa-globe-americas'></i></a>
       </div>
 
       <div class="col col-md-3 fs-tools filter hidden">
@@ -18,13 +18,13 @@
               <img v-bind:src="item.campaign_image_url" class='img-fluid' />
             </p>
             <p class='card-text col-12'>                            
-              {{getValue(index, 'description')}}              
+              {{item.title}}
             </p>
           </div>
           <hr />
           <a v-bind:href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
           <a href='#' class='btn btn-secondary js-share'>Share <i class='fa fa-share-square'></i></a>
-          <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteCofirm'><i class='fa fa-trash'></i></a>
+          <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
 
         </div>
         <div class='card-footer text-muted'>
@@ -35,7 +35,7 @@
     <input id='copyUrl' class='hidden' />
 
     <!-- delete confirmation modal-->
-    <div class="modal fade" id="modalDeleteCofirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal fade" id="modalDeleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -48,8 +48,8 @@
                     <p>Are you sure you want to delete this campaign?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger js-delete" v-on:click="deleteCampaign">Delete</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger js-delete" v-on:click="deleteCampaign" data-dismiss="modal">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -122,19 +122,18 @@ export default {
     },
 
     deleteCampaign : function (event) {
-      var characterId = $(event.currentTarget).data('id');
+      var campaignId = $(event.currentTarget).data('id');
 
       //reference this component so we can get/set data
       var $component = this;
 
-
       var docClient = fatesheet.getDBClient();
 
       var params = {
-          TableName: fs_char.config.charactertable,
+          TableName: fs_camp.config.campaigntable,
           Key: {
             'owner_id': $component.userId,
-            'id': characterId
+            'id': campaignId
           }
       };
 

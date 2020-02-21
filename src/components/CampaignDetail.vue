@@ -137,13 +137,7 @@ export default {
     }
   },
   data () {
-    return {
-      /*campaign: { 
-        sessions: [
-          {id: fatesheet.generateUUID(), date:new Date("2/19/2020 10:00:00").toString(), description:`#"Fell Stone" was running from @"The Kingdom of Carmon" because @"The Tyrant King" [Who rules with an iron fist] was !"Trying to take over the world by military force" it is a ~"A cruel, cruel world"`},
-          {id: fatesheet.generateUUID(), date:new Date("2/19/2020 9:00:00").toString(), description:`#"Fell Stone" [Has a bad leg injury] from jumping across @"The Big River"`} 
-        ]
-      },*/
+    return {    
       campaign : {},
       id: this.$route.params.id,      
       tags: ["#","@","!","~"],
@@ -181,6 +175,7 @@ export default {
       let idx = this.campaign.sessions.indexOf(session);
       if (idx > -1) {        
         this.campaign.sessions[idx].description = newDescription;
+        //this.$set(this.campaign.sessions[idx], description, newDescription);
       }          
       
       //then add in anything that is from the new text
@@ -297,6 +292,11 @@ export default {
     },
     getCampaign : function(ownerid, id) {      
       var $component = this;
+
+      if (id === "create") {
+        this.create();
+        return;
+      }
       
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
@@ -318,7 +318,7 @@ export default {
 
             if (data.Items.length === 0)
             {
-              //location.href = '/error';
+              location.href = '/error';
             }
             else {
               console.log("Success", data.Items[0]);
@@ -328,32 +328,41 @@ export default {
                 c.sessions = [];          
               }
 
-              $component.$set($component, 'campaign', c);             
+              $component.$set($component, 'campaign', c);
               $component.parseSessionAll();
               
             }
           }
       });
     },
+    create : function() {
+      let c = {
+        "description": "",
+        "id": null,
+        "owner_id": this.userId,
+        "scale": "",
+        "slug": "new-campaign",
+        "title": "New Campaign"
+      };
+      this.$set(this, 'campaign', c);
+      this.save();
+    },
     save : function() {      
         let $component = this;
-        let campaignData = $component.campaign;
-      
+              
         // make sure we have a proper user id key
-        campaignData.owner_id = this.userId;
-
+        $component.$set($component.campaign, "owner_id", this.userId);
+        
         //create a new campaign Id if we don't have one
         let isNew = false;
-        if (!this.id) {
+        if (!$component.campaign.id) {
             isNew = true;
-            this.id = fatesheet.generateUUID();
-            fatesheet.logAnalyticEvent('createdACampaign' + campaignData.sheetname);
-        }
-        campaignData.id = this.id;
-        fs_camp.config.campaignId = this.id;
-
+            $component.$set($component.campaign, "id", fatesheet.generateUUID());
+            fatesheet.logAnalyticEvent('createdACampaign' + $component.campaign.title);
+        }        
+        
         //dynamodb won't let us have empty attributes
-        fatesheet.removeEmptyObjects(campaignData);
+        fatesheet.removeEmptyObjects($component.campaign);
 
         var docClient = fatesheet.getDBClient();
 
@@ -361,7 +370,7 @@ export default {
         // we always use the put operation because the data can change depending on your campaign
         var params = {
             TableName: fs_camp.config.campaigntable,
-            Item: campaignData
+            Item: $component.campaign
         };
 
         docClient.put(params, function (err, data) {
@@ -371,6 +380,8 @@ export default {
             } else {
                 fatesheet.notify('Campaign saved.', 'success', 2000);
                 console.log("Added item:", JSON.stringify(data, null, 2));
+
+                location.href = '/campaign/' + $component.campaign.id + '/' + $component.campaign.slug;
             }
         });
       
