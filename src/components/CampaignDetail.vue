@@ -3,6 +3,9 @@
         cursor: default;
         text-decoration: line-through;
     }
+    label {
+      font-weight: 700;
+    }
 </style>
 
 <template>
@@ -11,26 +14,38 @@
     <input type="hidden" name="owner_id" v-model="campaign.owner_id" id="owner_id" />
     <input type="hidden" name="date" v-model="campaign.date" id="date" />
     <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
-    <div class="form-group">
-      <label for="name">Name</label>        
-      <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
-      <!--<small id="titleHelp" class="form-text text-muted">https://fatecharactersheet.com/campaign/{{campaign.id}}/{{campaign.slug}}</small> -->
-    </div>    
-    <div id="metadata">
-      <div class="form-group">
-        <label for="scale">Scale</label>
-        <select class="form-control" id="scale" name="scale" v-model="campaign.scale" @change="saveCampaign">
-          <option>None</option>
-          <option>Mundane</option>
-          <option>Supernatural</option>
-          <option>Otherworldly</option>
-          <option>Legendary </option>
-          <option>Godlike</option>
-        </select>
+
+    <h5>{{campaign.title}} - Campaign</h5>
+
+    <div id="accordion">
+      <div class="card-header" id="campaignProperties">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
+          Campaign Properties
+        </button>
       </div>
-      <div class="form-group">
-          <label for="description">Description</label>
-          <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="saveCampaign"></textarea>
+      <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
+        <div class="card-body">
+          <div class="form-group">
+            <label for="name">Name</label>        
+            <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
+            <!--<small id="titleHelp" class="form-text text-muted">https://fatecharactersheet.com/campaign/{{campaign.id}}/{{campaign.slug}}</small> -->
+          </div>        
+          <div class="form-group">
+            <label for="scale">Scale</label>
+            <select class="form-control" id="scale" name="scale" v-model="campaign.scale" @change="saveCampaign">
+              <option>None</option>
+              <option>Mundane</option>
+              <option>Supernatural</option>
+              <option>Otherworldly</option>
+              <option>Legendary </option>
+              <option>Godlike</option>
+            </select>
+          </div>
+          <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="saveCampaign"></textarea>
+          </div>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -72,31 +87,31 @@
           <span class="h4">Summary</span> <i class="fas fa-question-circle"></i>
         </div>
         <div class="">
-          <h5>Issues</h5>
+          <h5>!Issues</h5>
           <ul>
             <li v-for="thing in things.issues" :key="thing.id">            
-              {{thing.display}}
+              <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul>
 
-          <h5>Characters</h5>
+          <h5>#Characters</h5>
           <ul>
             <li v-for="thing in things.characters" :key="thing.id">
-              {{thing.display}} <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul>
 
-          <h5>Faces &amp; Places</h5>
+          <h5>@Faces &amp; Places</h5>
           <ul>
-            <li v-for="thing in things.faceplaces" :key="thing.id">
-              {{thing.display}} <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+            <li v-for="thing in things.faceplaces" :key="thing.id">              
+              <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul> 
 
-          <h5>Aspects</h5>
+          <h5>~Campaign Aspects</h5>
           <ul>
             <li v-for="thing in things.aspects" :key="thing.id">
-                {{thing.display}} <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+                <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul>        
         </div>
@@ -180,6 +195,9 @@ export default {
       'isAuthenticated',
       'userId',
     ]),
+    isNewCampaign() {      
+      return fcs.$route.params.id === "create";
+    }
   },
   methods: {
     parseSessionAll: function() {
@@ -312,7 +330,20 @@ export default {
           }
         }
       }
-    },    
+    }, 
+    copyThingToClipboard : function(text) {  
+      var tempInput = document.createElement("input");
+      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
+      tempInput.value = text;
+      console.log(text);
+
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+
+      fatesheet.notify('Copied thing to clipboard', 'info', 2000);      
+    },
     addSession : function() {        
         let session = {id: fatesheet.generateUUID(), date: new Date().toString(), description: "", parent_id: this.campaign.id, owner_id: this.userId};
         this.sessions.unshift(session);    
