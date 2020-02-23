@@ -26,7 +26,7 @@
               <p class="card-text">Create and manage a campaign setting. Build your world and start playing!</p>
               <a href="campaign" class="btn btn-primary requires-auth hidden">Play a Campaign <i class="fas fa-globe"></i></a>
               <a href="login" type="button" class="btn btn-primary requires-noauth">
-                  Login to View Your Campaigns <span class='dice'>C</span>
+                  Login to View Your Campaigns <i class="fas fa-globe"></i>
               </a>
             </div>
           </div>
