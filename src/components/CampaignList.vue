@@ -107,8 +107,8 @@ export default {
       var params = {
           TableName: fs_camp.config.campaigntable,
           Select: 'ALL_ATTRIBUTES',
-          ExpressionAttributeValues: {':owner_id' : $component.userId },
-          FilterExpression: 'owner_id = :owner_id'
+          ExpressionAttributeValues: {':owner_id' : $component.userId, ':parent_id' :  fatesheet.emptyGuid()},
+          FilterExpression: 'owner_id = :owner_id AND parent_id = :parent_id'
       }
 
       docClient.scan(params, function (err, data) {
@@ -142,8 +142,7 @@ export default {
           if (err) {
               fatesheet.notify(err.message || JSON.stringify(err));
               console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              $('#modalDeleteCofirm').modal('hide');
+          } else {              
               console.log("Deleted item:", JSON.stringify(data, null, 2));
               fatesheet.notify('Campaign deleted.', 'success', 2000);
               $component.list();

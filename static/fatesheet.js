@@ -119,6 +119,10 @@ String.prototype.toTitleCase = function () {
         });
     }
 
+    fatesheet.emptyGuid = function() {
+        return "00000000-0000-0000-0000-000000000000";
+    }
+
     fatesheet.generateShortUID = function() {
         // I generate the UID from two parts here
         // to ensure the random number provide enough bits.
