@@ -6,6 +6,22 @@
     label {
       font-weight: 700;
     }
+
+    .fa-question-circle {
+      cursor: pointer;
+    }
+
+    .header {
+      border-bottom: solid 1px black;
+    }
+
+    h1 {
+      font-size: 1.5em;
+    }
+
+    h4, .h4 {
+      font-size: 1.25em;
+    }
 </style>
 
 <template>
@@ -15,13 +31,14 @@
     <input type="hidden" name="date" v-model="campaign.date" id="date" />
     <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
 
-    <h5>{{campaign.title}} - Campaign</h5>
+    <h1>{{campaign.title}} - Campaign</h1>
 
     <div id="accordion">
       <div class="card-header" id="campaignProperties">
         <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
           Campaign Properties
-        </button>
+        </button>        
+        <i class="fas fa-question-circle" data-toggle="modal" data-target="#modalInstructions"></i>        
       </div>
       <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
         <div class="card-body">
@@ -48,10 +65,10 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row mt-2">
       <div class="col-12 col-md-8 col-lg-6">        
-        <div>
-          <span class="h4">Session Log</span> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
+        <div class="header d-flex">
+          <span class="h4 mr-auto">Session Log</span> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
         </div>
         <p v-for="session of sessions" :key="session.id">
           <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
@@ -82,10 +99,8 @@
           </div>
       </div>
 
-      <div class="col-12 col-md-4 col-lg-6">
-        <div data-toggle="modal" data-target="#modalInstructions">
-          <span class="h4">Summary</span> <i class="fas fa-question-circle"></i>
-        </div>
+      <div class="col-12 col-md-4 col-lg-6">        
+        <h4 class="header pt-1 pb-1">Campaign Summary</h4>        
         <div class="">
           <h5>!Issues</h5>
           <ul>
