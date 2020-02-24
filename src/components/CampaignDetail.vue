@@ -7,8 +7,10 @@
       font-weight: 700;
     }
 
-    .fa-question-circle {
+    .fa-question-circle,
+    .fa-filter {
       cursor: pointer;
+      color: #ccc;
     }
 
     .header {
@@ -16,11 +18,15 @@
     }
 
     h1 {
-      font-size: 1.5em;
+      font-size: 1.3em;
     }
 
     h4, .h4 {
-      font-size: 1.25em;
+      font-size: 1.2em;
+    }
+    
+    textarea {
+      height: 150px;
     }
 </style>
 
@@ -31,14 +37,16 @@
     <input type="hidden" name="date" v-model="campaign.date" id="date" />
     <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
 
-    <h1>{{campaign.title}} - Campaign</h1>
+    
+    <div class="d-flex">
+      <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <span class="badge badge-warning pt-1 mt-1 mb-2" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span>
+    </div>
 
     <div id="accordion">
       <div class="card-header" id="campaignProperties">
         <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
           Campaign Properties
         </button>        
-        <i class="fas fa-question-circle" data-toggle="modal" data-target="#modalInstructions"></i>        
       </div>
       <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
         <div class="card-body">
@@ -68,9 +76,9 @@
     <div class="row mt-2">
       <div class="col-12 col-md-8 col-lg-6">        
         <div class="header d-flex">
-          <span class="h4 mr-auto">Session Log</span> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
+          <span class="h4">Session Log</span>&nbsp;<i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
         </div>
-        <p v-for="session of sessions" :key="session.id">
+        <p v-for="session in filteredSessions" :key="session.id">
           <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
             <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
           <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" 
@@ -105,28 +113,28 @@
           <h5>!Issues</h5>
           <ul>
             <li v-for="thing in things.issues" :key="thing.id">            
-              <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul>
 
           <h5>#Characters</h5>
           <ul>
             <li v-for="thing in things.characters" :key="thing.id">
-              <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul>
 
           <h5>@Faces &amp; Places</h5>
           <ul>
             <li v-for="thing in things.faceplaces" :key="thing.id">              
-              <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul> 
 
           <h5>~Campaign Aspects</h5>
           <ul>
             <li v-for="thing in things.aspects" :key="thing.id">
-                <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
             </li>
           </ul>        
         </div>
@@ -135,7 +143,7 @@
 
     <!-- instruction modal -->     
     <div class="modal fade" id="modalInstructions" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Instructions</h5>
@@ -144,6 +152,7 @@
             </button>
           </div>
           <div class="modal-body">
+              <h5>Session Logs</h5>
               <p>When entering data in your session log you can tag items to have them show up in the summary listing. Currently supported tags are:</p>
               <ul>
                 <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
@@ -151,9 +160,17 @@
                 <li><strong class="text-danger">!"</strong>Issue Description<strong class="text-danger">"</strong></li>
                 <li><strong class="text-danger">@"</strong>Face or Place Name<strong class="text-danger">"</strong></li>
               </ul>
-              <p>Additionally, you can add extra details to any tag by enclosing descriptions in square brackets and making sure they come right 
+              <p>Additionally, you can add <b>extra details</b> to any tag by enclosing descriptions in square brackets and making sure they come right 
                 after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>                                          
               <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
+
+              <h5>Campaign Summary</h5>
+              <ul>
+                <li>Copy a tag to your clipboard by clicking on it</li>
+                <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
+                <li>The badge with the number (<span class="badge badge-dark">x3</span>) is how many times this tag has been used in your session logs</li>
+                <li>Hilighted items (<mark>a highlighted item</mark>) are a list of all the extra details that have been added to this tag</li>
+              </ul>
           </div>
           <div class="modal-footer">            
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -194,7 +211,7 @@ export default {
   data () {
     return {    
       campaign : {},
-      sessions : [],
+      //sessions : [],
       id: this.$route.params.id,      
       tags: ["#","@","!","~"],
       things: {
@@ -209,9 +226,23 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'sessions',
+      'filteredSessions',
+      'searchText'
     ]),
-    isNewCampaign() {      
-      return fcs.$route.params.id === "create";
+    isNewCampaign : function() {
+      return this.$route.params.id === "create";
+    },
+    sessions : {
+      get : function() {
+        return this.$store.state.sessions;
+      },
+      set : function(value) {        
+        this.$store.commit('updateSessions', value);
+      }
+    },
+    isFiltered : function() {
+      return this.$store.state.searchText;
     }
   },
   methods: {
@@ -360,6 +391,7 @@ export default {
       fatesheet.notify('Copied thing to clipboard', 'info', 2000);      
     },
     addSession : function() {        
+        $('.js-clear-search').trigger("click");
         let session = {id: fatesheet.generateUUID(), date: new Date().toString(), description: "", parent_id: this.campaign.id, owner_id: this.userId};
         this.sessions.unshift(session);    
     },
@@ -394,6 +426,9 @@ export default {
               $component.parseThings(session.description, session.id, true);
               let sessionIdx = $component.sessions.map(function(e) { return e.id; }).indexOf(sessionId);
               $component.sessions.splice(sessionIdx, 1);
+
+              //clear out any search filters so we get the fresh view of the data
+              $('.js-clear-search').trigger("click");
           }
       });
     },
@@ -459,7 +494,7 @@ export default {
             let s = data.Items;
 
             if (s && s.length > 0) {
-              $component.$set($component, 'sessions', s);
+              $component.sessions = s;
               $component.parseSessionAll();
             }        
           }
@@ -545,11 +580,19 @@ export default {
         });
       
     },
+    filterBy : function(thing) {        
+      this.$store.commit('updateSearchText', thing);
+      fcs.$options.filters.filterSession();      
+    },
     toLocaleDateString : function(dateString) {
       return(new Date(dateString).toLocaleString());
     },  
     isOwner : function(ownerId) {
       return this.userId === ownerId;
+    },
+    clearFilter : function() {
+      this.$store.commit('updateSearchText', "");
+      fcs.$options.filters.filterSession();
     },
     slugify : function(event) {
       let $elem = $(event.currentTarget);

@@ -18,6 +18,9 @@ const store = new Vuex.Store({
   state: {
     isAuthenticated: false,
     userId: "",
+    sessions: [],
+    filteredSessions: [],
+    searchText: "",
   },
   mutations: {
     authenticate (state, bAuth) {
@@ -25,17 +28,45 @@ const store = new Vuex.Store({
     },
     userInfo (state, userId) {
       this.state.userId = userId;
+    },
+    updateSessions (state, value) {
+      this.state.sessions = value; 
+      this.state.filteredSessions = value;
+    },
+    updateFilteredSessions (state, value) {     
+      this.state.filteredSessions = value;      
+    },
+    updateSearchText (state, value) {
+      this.state.searchText = value;
     }
   },
   getters: {
     isAuthenticated: state => {
       return state.isAuthenticated;
     },
+    sessions: state => {
+      this.state.sessions = value;      
+    },
     userId: state => {
       return state.userId;
+    },
+    filteredSessions: state => {      
+      return state.filteredSessions;
+    },
+    searchText: state => {
+      return state.searchText;
     }
   }
 })
+
+Vue.filter('filterSession', function () {
+  let searchText = fcs.$store.state.searchText;
+  let sessions = fcs.$store.state.sessions;
+  if (searchText.length > 0) {
+    sessions = fcs.$store.state.sessions.filter(item => item.description.includes(searchText));    
+  }      
+  fcs.$store.commit('updateFilteredSessions', sessions);  
+});
 
 /* eslint-disable no-new */
 window.fcs = new Vue({
@@ -44,4 +75,4 @@ window.fcs = new Vue({
   router,
   components: { App },
   template: '<App/>'
-})
+});

@@ -24,7 +24,7 @@
       </div>
 
       <div class='card-columns' id="adversaryDetail">
-        <div class='card' v-for="(item, index) in adversaries">
+        <div class='card' v-for="item in adversaries" v-bind:key="item.adversary_id">
           <img v-if="item.adversary_image" class="card-img-top img-fluid img-thumbnail" style="object-fit: cover; object-position:top; max-height: 180px;" v-bind:src="item.adversary_image" v-bind:alt="item.adversary_name + 'Image'">
 
           <h4 class='card-header adversary-name bg-light'>

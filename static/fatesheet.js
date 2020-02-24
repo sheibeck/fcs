@@ -171,9 +171,11 @@ String.prototype.toTitleCase = function () {
     	}
     	else if (location.pathname.indexOf('adversary') > -1)
     	{
-        fcs.$children[0].$children[0].list(searchText); //adversary search
-    	}
-
+            fcs.$children[0].$children[0].list(searchText); //adversary search
+        }
+        else {
+            fcs.$options.filters.filterSession();
+        }
     }
 
     fatesheet.notify = function(message, type, timeout, callback) {

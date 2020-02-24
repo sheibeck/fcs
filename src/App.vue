@@ -57,7 +57,7 @@
           </div>
           <div class="form-inline my-2 my-sm-0">
               <div class="input-group">
-                <input id="search-text" class="form-control" type="text" placeholder="Search"></input>
+                <input id="search-text" class="form-control" type="text" placeholder="Search" v-model="$store.state.searchText" />
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary js-clear-search" type="button"><i class="fa fa-times-circle"></i></button>
                   <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
