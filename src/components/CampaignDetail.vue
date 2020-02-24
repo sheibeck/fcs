@@ -32,153 +32,158 @@
 
 <template>
   <div class="container mt-2">
-    <input type="hidden" name="id" id="id" v-model="campaign.id" />
-    <input type="hidden" name="owner_id" v-model="campaign.owner_id" id="owner_id" />
-    <input type="hidden" name="date" v-model="campaign.date" id="date" />
-    <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
 
-    
-    <div class="d-flex">
-      <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <span class="badge badge-warning pt-1 mt-1 mb-2" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span>
+    <div class="d-flex justify-content-center" v-if="isLoading">
+      <div class="p-5 h2">Loading your campaign...</div>
     </div>
 
-    <div id="accordion">
-      <div class="card-header" id="campaignProperties">
-        <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
-          Campaign Properties
-        </button>        
+    <div v-else>
+      <input type="hidden" name="id" id="id" v-model="campaign.id" />
+      <input type="hidden" name="owner_id" v-model="campaign.owner_id" id="owner_id" />
+      <input type="hidden" name="date" v-model="campaign.date" id="date" />
+      <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
+      
+      <div class="d-flex">
+        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <span class="badge badge-warning pt-1 mt-1 mb-2" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span>
       </div>
-      <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
-        <div class="card-body">
-          <div class="form-group">
-            <label for="name">Name</label>        
-            <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
-            <!--<small id="titleHelp" class="form-text text-muted">https://fatecharactersheet.com/campaign/{{campaign.id}}/{{campaign.slug}}</small> -->
-          </div>        
-          <div class="form-group">
-            <label for="scale">Scale</label>
-            <select class="form-control" id="scale" name="scale" v-model="campaign.scale" @change="saveCampaign">
-              <option>None</option>
-              <option>Mundane</option>
-              <option>Supernatural</option>
-              <option>Otherworldly</option>
-              <option>Legendary </option>
-              <option>Godlike</option>
-            </select>
-          </div>
-          <div class="form-group">
-              <label for="description">Description</label>
-              <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="saveCampaign"></textarea>
+
+      <div id="accordion">
+        <div class="card-header" id="campaignProperties">
+          <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
+            Campaign Properties
+          </button>        
+        </div>
+        <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
+          <div class="card-body">
+            <div class="form-group">
+              <label for="name">Name</label>        
+              <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
+              <!--<small id="titleHelp" class="form-text text-muted">https://fatecharactersheet.com/campaign/{{campaign.id}}/{{campaign.slug}}</small> -->
+            </div>        
+            <div class="form-group">
+              <label for="scale">Scale</label>
+              <select class="form-control" id="scale" name="scale" v-model="campaign.scale" @change="saveCampaign">
+                <option>None</option>
+                <option>Mundane</option>
+                <option>Supernatural</option>
+                <option>Otherworldly</option>
+                <option>Legendary </option>
+                <option>Godlike</option>
+              </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="saveCampaign"></textarea>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="row mt-2">
-      <div class="col-12 col-md-8 col-lg-6">        
-        <div class="header d-flex">
-          <span class="h4">Session Log</span>&nbsp;<i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
+      <div class="row mt-2">
+        <div class="col-12 col-md-8 col-lg-6">        
+          <div class="header d-flex">
+            <span class="h4">Session Log</span>&nbsp;<i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
+          </div>
+          <p v-for="session in filteredSessions" :key="session.id">
+            <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
+              <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
+            <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" 
+              :value="session.description" @change="parseSession($event, session);"></textarea>
+          </p>
         </div>
-        <p v-for="session in filteredSessions" :key="session.id">
-          <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
-            <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
-          <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" 
-            :value="session.description" @change="parseSession($event, session);"></textarea>
-        </p>
-      </div>
 
-      <!-- delete confirmation modal-->
-      <div class="modal fade" id="modalDeleteSessionConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title" id="deleteLabel">Confirm Character Delete</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                      </button>
-                  </div>
-                  <div class="modal-body">
-                      <p>Are you sure you want to delete this session?</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-danger js-delete" v-on:click="deleteSession" data-dismiss="modal">Delete</button>
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <div class="col-12 col-md-4 col-lg-6">        
-        <h4 class="header pt-1 pb-1">Campaign Summary</h4>        
-        <div class="">
-          <h5>!Issues</h5>
-          <ul>
-            <li v-for="thing in things.issues" :key="thing.id">            
-              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
-            </li>
-          </ul>
-
-          <h5>#Characters</h5>
-          <ul>
-            <li v-for="thing in things.characters" :key="thing.id">
-              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
-            </li>
-          </ul>
-
-          <h5>@Faces &amp; Places</h5>
-          <ul>
-            <li v-for="thing in things.faceplaces" :key="thing.id">              
-              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
-            </li>
-          </ul> 
-
-          <h5>~Campaign Aspects</h5>
-          <ul>
-            <li v-for="thing in things.aspects" :key="thing.id">
-              <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
-            </li>
-          </ul>        
+        <!-- delete confirmation modal-->
+        <div class="modal fade" id="modalDeleteSessionConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteLabel">Confirm Character Delete</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this session?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger js-delete" v-on:click="deleteSession" data-dismiss="modal">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- instruction modal -->     
-    <div class="modal fade" id="modalInstructions" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Instructions</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              <h5>Session Logs</h5>
-              <p>When entering data in your session log you can tag items to have them show up in the summary listing. Currently supported tags are:</p>
-              <ul>
-                <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
-                <li><strong class="text-danger">~"</strong>Campaign Aspect<strong class="text-danger">"</strong></li>
-                <li><strong class="text-danger">!"</strong>Issue Description<strong class="text-danger">"</strong></li>
-                <li><strong class="text-danger">@"</strong>Face or Place Name<strong class="text-danger">"</strong></li>
-              </ul>
-              <p>Additionally, you can add <b>extra details</b> to any tag by enclosing descriptions in square brackets and making sure they come right 
-                after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>                                          
-              <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
+        <div class="col-12 col-md-4 col-lg-6">        
+          <h4 class="header pt-1 pb-1">Campaign Summary</h4>        
+          <div class="">
+            <h5>!Issues</h5>
+            <ul>
+              <li v-for="thing in things.issues" :key="thing.id">            
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              </li>
+            </ul>
 
-              <h5>Campaign Summary</h5>
-              <ul>
-                <li>Copy a tag to your clipboard by clicking on it</li>
-                <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
-                <li>The badge with the number (<span class="badge badge-dark">x3</span>) is how many times this tag has been used in your session logs</li>
-                <li>Hilighted items (<mark>a highlighted item</mark>) are a list of all the extra details that have been added to this tag</li>
-              </ul>
-          </div>
-          <div class="modal-footer">            
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <h5>#Characters</h5>
+            <ul>
+              <li v-for="thing in things.characters" :key="thing.id">
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              </li>
+            </ul>
+
+            <h5>@Faces &amp; Places</h5>
+            <ul>
+              <li v-for="thing in things.faceplaces" :key="thing.id">              
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              </li>
+            </ul> 
+
+            <h5>~Campaign Aspects</h5>
+            <ul>
+              <li v-for="thing in things.aspects" :key="thing.id">
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              </li>
+            </ul>        
           </div>
         </div>
       </div>
-    </div>
-    
+
+      <!-- instruction modal -->     
+      <div class="modal fade" id="modalInstructions" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Instructions</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <h5>Session Logs</h5>
+                <p>When entering data in your session log you can tag items to have them show up in the summary listing. Currently supported tags are:</p>
+                <ul>
+                  <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
+                  <li><strong class="text-danger">~"</strong>Campaign Aspect<strong class="text-danger">"</strong></li>
+                  <li><strong class="text-danger">!"</strong>Issue Description<strong class="text-danger">"</strong></li>
+                  <li><strong class="text-danger">@"</strong>Face or Place Name<strong class="text-danger">"</strong></li>
+                </ul>
+                <p>Additionally, you can add <b>extra details</b> to any tag by enclosing descriptions in square brackets and making sure they come right 
+                  after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>                                          
+                <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
+
+                <h5>Campaign Summary</h5>
+                <ul>
+                  <li>Copy a tag to your clipboard by clicking on it</li>
+                  <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
+                  <li>The badge with the number (<span class="badge badge-dark">x3</span>) is how many times this tag has been used in your session logs</li>
+                  <li>Hilighted items (<mark>a highlighted item</mark>) are a list of all the extra details that have been added to this tag</li>
+                </ul>
+            </div>
+            <div class="modal-footer">            
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>  
   </div>  
 </template>
 
@@ -205,11 +210,12 @@ export default {
     userId() {
       //wait for our authenticated user id
       this.getCampaign(this.userId, fcs.$route.params.id);
-      this.listSessions(this.userId, fcs.$route.params.id);
+      this.listSessions(this.userId, fcs.$route.params.id);      
     }
   },
   data () {
-    return {    
+    return {
+      loading: true,    
       campaign : {},
       //sessions : [],
       id: this.$route.params.id,      
@@ -243,6 +249,9 @@ export default {
     },
     isFiltered : function() {
       return this.$store.state.searchText;
+    },
+    isLoading : function() {
+      return this.loading;
     }
   },
   methods: {
@@ -255,6 +264,8 @@ export default {
           this.parseThings(session.description, session.id);
         }
       }
+
+      this.loading = false;
     },
     parseSession: function(event, session) {
       let newDescription = event.target.value;
@@ -470,7 +481,7 @@ export default {
           }
       });
     },
-    listSessions : async function(ownerid, id) {      
+    listSessions : function(ownerid, id) {      
       var $component = this;
 
       // Create DynamoDB document client
