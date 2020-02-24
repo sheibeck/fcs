@@ -8,7 +8,9 @@
     }
 
     .fa-question-circle,
-    .fa-filter {
+    .fa-filter,
+    .fa-arrow-circle-down,
+    .fa-arrow-circle-up {
       cursor: pointer;
       color: #ccc;
     }
@@ -44,7 +46,7 @@
       <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
       
       <div class="d-flex">
-        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <span class="badge badge-warning pt-1 mt-1 mb-2" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span>
+        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1>
       </div>
 
       <div id="accordion">
@@ -75,15 +77,24 @@
                 <label for="description">Description</label>
                 <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="saveCampaign"></textarea>
             </div>
+            <div class="form-group">
+                <label for="imageUrl">Description</label>
+                <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="campaign.image_url" @change="saveCampaign" />
+            </div>
           </div>
         </div>
       </div>
       <div class="row mt-2">
-        <div class="col-12 col-md-8 col-lg-6">        
+
+        <!-- session logs -->
+        <div class="col-12 col-md-8 col-lg-6 order-2 order-md-1" id="logs">        
           <div class="header d-flex">
-            <span class="h4">Session Log</span>&nbsp;<i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button>          
+            <span class="h4">Session Log</span>&nbsp;<i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> 
+            <span class="badge badge-warning pt-2 mr-1" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span> 
+            <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button> 
+            <i class="fas fa-arrow-circle-up d-md-none d-lg-none d-xl-none pt-2 ml-2" v-on:click="jumpTo('#summary')"></i>
           </div>
-          <p v-for="session in filteredSessions" :key="session.id">
+          <p v-for="session in filteredSessions" :key="session.id">            
             <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
             <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" 
@@ -91,34 +102,18 @@
           </p>
         </div>
 
-        <!-- delete confirmation modal-->
-        <div class="modal fade" id="modalDeleteSessionConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteLabel">Confirm Character Delete</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this session?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger js-delete" v-on:click="deleteSession" data-dismiss="modal">Delete</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4 col-lg-6">        
-          <h4 class="header pt-1 pb-1">Campaign Summary</h4>        
+        <!-- campaign summary -->      
+        <div class="col-12 col-md-4 col-lg-6 order-1 order-md-2" id="summary">
+          <div class="d-flex header">
+            <h4 class="mr-auto">Campaign Summary</h4> <i class="fas fa-arrow-circle-down d-md-none d-lg-none d-xl-none pt-2" v-on:click="jumpTo('#logs')"></i>
+          </div>
           <div class="">
             <h5>!Issues</h5>
             <ul>
               <li v-for="thing in things.issues" :key="thing.id">            
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> 
+                <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> 
+                <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
               </li>
             </ul>
 
@@ -144,6 +139,27 @@
             </ul>        
           </div>
         </div>
+      </div>
+
+      <!-- delete confirmation modal-->
+      <div class="modal fade" id="modalDeleteSessionConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="deleteLabel">Confirm Character Delete</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <p>Are you sure you want to delete this session?</p>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-danger js-delete" v-on:click="deleteSession" data-dismiss="modal">Delete</button>
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+              </div>
+          </div>
       </div>
 
       <!-- instruction modal -->     
@@ -401,8 +417,8 @@ export default {
 
       fatesheet.notify('Copied thing to clipboard', 'info', 2000);      
     },
-    addSession : function() {        
-        $('.js-clear-search').trigger("click");
+    addSession : function() {
+        this.clearFilter();        
         let session = {id: fatesheet.generateUUID(), date: new Date().toString(), description: "", parent_id: this.campaign.id, owner_id: this.userId};
         this.sessions.unshift(session);    
     },
@@ -439,7 +455,7 @@ export default {
               $component.sessions.splice(sessionIdx, 1);
 
               //clear out any search filters so we get the fresh view of the data
-              $('.js-clear-search').trigger("click");
+              $component.clearFilter()
           }
       });
     },
@@ -591,9 +607,10 @@ export default {
         });
       
     },
-    filterBy : function(thing) {        
+    filterBy : function(thing) {
       this.$store.commit('updateSearchText', thing);
-      fcs.$options.filters.filterSession();      
+      fcs.$options.filters.filterSessions();
+      this.jumpTo("#logs");
     },
     toLocaleDateString : function(dateString) {
       return(new Date(dateString).toLocaleString());
@@ -603,7 +620,11 @@ export default {
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fcs.$options.filters.filterSession();
+      fcs.$options.filters.filterSessions();
+      this.jumpTo("#summary");
+    },
+    jumpTo : function(section) {
+      $("html, body").animate({ scrollTop: $(section).offset().top }, 500);
     },
     slugify : function(event) {
       let $elem = $(event.currentTarget);

@@ -152,8 +152,10 @@ String.prototype.toTitleCase = function () {
     fatesheet.logAnalyticEvent = function(event) {
     }
 
+    //TODO: we need a better way to do filtering on the header search, this is messy
     fatesheet.search = function(searchText) {
-    	if (location.pathname.indexOf('charactersheets') > -1 || location.pathname.indexOf('character') > -1)
+        let pathname = location.pathname.toLowerCase();
+    	if (pathname.includes('charactersheets') || pathname.includes('character'))
     	{
     		$('.card').hide();
 
@@ -169,12 +171,16 @@ String.prototype.toTitleCase = function () {
     		$(".card-footer:contains('" + searchText + "')")
     			.parent().show();
     	}
-    	else if (location.pathname.indexOf('adversary') > -1)
+    	else if (pathname.includes('adversary'))
     	{
             fcs.$children[0].$children[0].list(searchText); //adversary search
         }
-        else {
-            fcs.$options.filters.filterSession();
+        else if (pathname.includes("campaign")) {
+            if (pathname.endsWith("campaign")) {
+                fcs.$options.filters.filterCampaigns();
+            } else {
+                fcs.$options.filters.filterSessions();
+            }            
         }
     }
 
@@ -404,16 +410,6 @@ String.prototype.toTitleCase = function () {
             if (event.keyCode === 13) {
                 $("#search-button").click();
             }
-        });
-
-        $(document).on('click', '.js-clear-search', function (e) {
-            $("#search-text").val('');
-            $("#search-button").click();
-        });
-
-        $(document).on('click', '#search-button', function () {
-          var searchText = $('#search-text').val(); // get the value of the input, which we filter on
-          fatesheet.search(searchText);
         });
 
         $(document).on('click', '.js-login', function (e) {

@@ -59,8 +59,8 @@
               <div class="input-group">
                 <input id="search-text" class="form-control" type="text" placeholder="Search" v-model="$store.state.searchText" />
                 <div class="input-group-append">
-                  <button class="btn btn-outline-secondary js-clear-search" type="button"><i class="fa fa-times-circle"></i></button>
-                  <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
+                  <button class="btn btn-outline-secondary" type="button" v-on:click="clearSearch"><i class="fa fa-times-circle"></i></button>
+                  <button id="search-button" class="btn btn-outline-success" type="button" v-on:click="search">Search</button>
                 </div>
               </div>
           </div>
@@ -128,6 +128,7 @@ export default {
   computed: {
     ...mapGetters([
       'isAuthenticated',
+      'searchText'
     ]),
   },
   data () {
@@ -141,6 +142,14 @@ export default {
     },
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
+    },
+    clearSearch : function() {      
+      this.$store.commit("updateSearchText", "");
+      $("#search-button").trigger("click");
+    },
+    search : function() {
+      let searchText = this.$store.state.searchText;
+      fatesheet.search(searchText);
     }
   }
 }

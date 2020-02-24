@@ -3,24 +3,18 @@
     <!-- list of adversaries -->
     <div class='js-adversary-list'>
 
-      <div v-if="!id" class="row d-print-none mb-2">
-        <div v-if="!isAuthenticated" class="col col-sm-12 col-md-3">
-          <a href='/login' type="button" class="btn btn-primary">
-              Login to Create an Adversary <span class='dice'>A</span>
-          </a>
-        </div>
-
-        <div v-if="isAuthenticated" class="col col-sm-7 col-md-4">
-          <a role="button" href="/adversary/edit" class="btn btn-success js-create-adversary">Create Adversary <i class='fa fa-plus'></i></a>
-        </div>
-        <div v-if="isAuthenticated" class="col col-sm-3 col-md-3">
-          <input type="checkbox" class="form-check-input" id="my_adversaries" v-on:change="list()" />
+      <div v-if="!id" class="d-print-none mb-2 d-flex">
+        <a v-if="!isAuthenticated" href='/login' type="button" class="btn btn-primary mr-auto">
+            Login to Create an Adversary <span class='dice'>A</span>
+        </a>
+            
+        <a v-if="isAuthenticated" role="button" href="/adversary/edit" class="btn btn-success js-create-adversary">Create Adversary <i class='fa fa-plus'></i></a>        
+        <span v-if="isAuthenticated" class="pt-2 pl-2 mr-auto">
+          <input type="checkbox" class="" id="my_adversaries" v-on:change="list()" />
           <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
-        </div>
-
-        <div class="col col-md-3 fs-tools adversaryFilter hidden">
-          <span class="badge badge-warning " style="cursor:pointer;" v-on:click="clearFilter()">x Clear Filter</span>
-        </div>
+        </span>
+                
+        <span class="badge badge-warning pt-1 mt-1 mb-2 fs-tools adversaryFilter hidden" style="cursor:pointer;" v-on:click="clearFilter()">x Clear Filter</span>        
       </div>
 
       <div class='card-columns' id="adversaryDetail">
@@ -107,6 +101,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'searchText'  
     ]),
   },
   watch: {
@@ -298,13 +293,13 @@ export default {
       return badge;
     },
     searchByTag : function(event) {
-      var tag = $(event.currentTarget).data('search-text');
-      $('#search-text').val(tag);
-      this.list(tag);
+      var tag = $(event.currentTarget).data('search-text');      
+      this.$store.commit('updateSearchText', tag)
+      fatesheet.search(tag);      
     },
     clearFilter : function() {
-      $('#search-text').val("");
-      this.list("");
+      this.$store.commit('updateSearchText', "");
+      fatesheet.search("");      
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
