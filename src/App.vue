@@ -16,6 +16,9 @@
               <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('character')}" ref="el">
                   <a class="nav-link" href="/character"><span class="dice">+</span>My Characters</a>
               </li>
+              <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('campaign')}" ref="el">
+                  <a class="nav-link" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>
+              </li>
               <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>
@@ -54,10 +57,10 @@
           </div>
           <div class="form-inline my-2 my-sm-0">
               <div class="input-group">
-                <input id="search-text" class="form-control" type="text" placeholder="Search"></input>
+                <input id="search-text" class="form-control" type="text" placeholder="Search" v-model="$store.state.searchText" />
                 <div class="input-group-append">
-                  <button class="btn btn-outline-secondary js-clear-search" type="button"><i class="fa fa-times-circle"></i></button>
-                  <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
+                  <button class="btn btn-outline-secondary" type="button" v-on:click="clearSearch"><i class="fa fa-times-circle"></i></button>
+                  <button id="search-button" class="btn btn-outline-success" type="button" v-on:click="search">Search</button>
                 </div>
               </div>
           </div>
@@ -125,6 +128,7 @@ export default {
   computed: {
     ...mapGetters([
       'isAuthenticated',
+      'searchText'
     ]),
   },
   data () {
@@ -138,6 +142,14 @@ export default {
     },
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
+    },
+    clearSearch : function() {      
+      this.$store.commit("updateSearchText", "");
+      $("#search-button").trigger("click");
+    },
+    search : function() {
+      let searchText = this.$store.state.searchText;
+      fatesheet.search(searchText);
     }
   }
 }

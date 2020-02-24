@@ -1,16 +1,11 @@
 <template>
   <div class="container mt-2">
-    <div v-if="isAuthenticated" class="row d-print-none mb-2 hide-on-detail">
-      <div class="col-sm-12 col-md-3">
-        <a href='/charactersheet' class='btn btn-success'>Create a Character <i class='fa fa-user'></i></a>
-      </div>
-
-      <div class="col col-md-3 fs-tools characterFilter hidden">
-        <span class="badge badge-warning " style="cursor:pointer;" v-on:click="clearFilter()">x Clear Filter</span>
-      </div>
+    <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-flex">      
+      <a href='/charactersheet' class='btn btn-success mr-auto'>Create a Character <i class='fa fa-user'></i></a>      
+      <span class="badge badge-warning pt-1 mt-1 mb-2" v-show="$store.state.searchText" style="cursor:pointer;" v-on:click="clearFilter">x Clear Filter</span>
     </div>
     <div class='card-columns'>
-      <div v-for="(item, index) in characters" class='card'>
+      <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
         <div class='card-body'>
           <h5 class='card-title character-name'>{{item.name}}</h5>
           <div class='row'>
@@ -23,10 +18,11 @@
             </p>
           </div>
           <hr />
-          <a v-bind:href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
-          <a href='#' class='btn btn-secondary js-share-character'>Share <i class='fa fa-share-square'></i></a>
-          <a href='#' class='btn' style='color:red' v-bind:data-id='item.character_id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
-
+          <div class="d-flex">
+            <a v-bind:href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
+            <a href='#' class='btn btn-secondary js-share-character mr-auto'>Share <i class='fa fa-share-square'></i></a>
+            <a href='#' class='btn' style='color:red' v-bind:data-id='item.character_id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
+          </div>
         </div>
         <div class='card-footer text-muted'>
           <span class='small' v-html="item.description"></span> <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.sheetname' v-on:click="searchByTag">{{item.sheetname}}</span>
@@ -79,6 +75,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'searchText'
     ]),
   },
   watch: {
@@ -152,19 +149,15 @@ export default {
           }
       });
     },
-
-    clearFilter : function() {
-      $('#search-text').val("");
-      $('#search-button').click();
-      $('.characterFilter').addClass('hidden');
-    },
-
+    
     searchByTag : function(event) {
-      var $elem = $(event.currentTarget);
-      var tag = $elem.data('search-text');
-      $('#search-text').val(tag);
-      $('.characterFilter').removeClass('hidden');
-      $('#search-button').click();
+      var tag = $(event.currentTarget).data('search-text');      
+      this.$store.commit('updateSearchText', tag)
+      fatesheet.search(tag);      
+    },
+    clearFilter : function() {
+      this.$store.commit('updateSearchText', "");
+      fatesheet.search("");      
     },
 
   }
