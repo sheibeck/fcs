@@ -173,7 +173,7 @@
               </button>
             </div>
             <div class="modal-body">
-                <h5>Session Logs</h5>
+                <h5>Sessions</h5>
                 <p>When entering data in your session log you can tag items to have them show up in the summary listing. Currently supported tags are:</p>
                 <ul>
                   <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
@@ -418,9 +418,12 @@ export default {
       fatesheet.notify('Copied thing to clipboard', 'info', 2000);      
     },
     addSession : function() {
-        this.clearFilter();        
+        //clear the filter without jumping
+        this.$store.commit('updateSearchText', "");
+        fcs.$options.filters.filterSessions();
+
         let session = {id: fatesheet.generateUUID(), date: new Date().toString(), description: "", parent_id: this.campaign.id, owner_id: this.userId};
-        this.sessions.unshift(session);    
+        this.sessions.unshift(session);        
     },
     deleteSession : function (event) {
       var sessionId = $(event.currentTarget).data('id');
