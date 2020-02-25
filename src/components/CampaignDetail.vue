@@ -64,7 +64,7 @@
             </div>        
             <div class="form-group">
               <label for="scale">Scale</label>
-              <select class="form-control" id="scale" name="scale" v-model="campaign.scale" @change="saveCampaign">
+              <select class="form-control" id="scale" name="scale" v-model="campaign.scale">
                 <option>None</option>
                 <option>Mundane</option>
                 <option>Supernatural</option>
@@ -75,16 +75,18 @@
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description" @change="saveCampaign"></textarea>
+                <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description"></textarea>
             </div>
             <div class="form-group">
                 <label for="imageUrl">Description</label>
-                <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="campaign.image_url" @change="saveCampaign" />
+                <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="campaign.image_url" />
             </div>
+
+            <button type="button" class="btn btn-primary" v-on:click="saveCampaign">Save Campaign</button>
           </div>
         </div>
       </div>
-      <div class="row mt-2">
+      <div class="row mt-2" v-if="!isNewCampaign">
 
         <!-- session logs -->
         <div class="col-12 col-md-8 col-lg-6 order-2 order-md-1" id="logs">        
@@ -632,8 +634,7 @@ export default {
     slugify : function(event) {
       let $elem = $(event.currentTarget);
       let slug = fatesheet.slugify($elem.val());
-      this.$set(this.campaign, "slug", slug);
-      this.saveCampaign();
+      this.$set(this.campaign, "slug", slug);      
     }
   }
 }
