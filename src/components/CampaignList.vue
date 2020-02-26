@@ -133,6 +133,64 @@ export default {
 
       var docClient = fatesheet.getDBClient();
 
+      $component.deleteCampaignLogs(campaignId);  
+    },
+
+    deleteCampaignLogs : function (campaignId) {
+      //reference this component so we can get/set data
+      var $component = this;
+
+      // Create DynamoDB document client
+      let docClient = fatesheet.getDBClient();
+
+      //get a list of all the logs for this campaign
+      let params = {
+          TableName: fs_camp.config.campaigntable,
+          Select: 'ALL_ATTRIBUTES',
+          FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id)',
+          ExpressionAttributeValues: {            
+            ':owner_id': $component.userId,
+            ':parent_id': campaignId
+          }
+      }
+
+      docClient.scan(params, function(err, data) {
+          if (err) {
+            console.log("Error", err);
+          } else {           
+            console.log("Success", data.Items[0]);
+            let sessions = data.Items;
+
+            var hasErrors = "";
+            try {
+              sessions.forEach(function(item) {          
+                docClient.delete({Key:{owner_id: $component.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
+                    if (error) {                        
+                        throw error;                        
+                    }
+                });
+              });
+            } catch(error) {
+              hasErrors = error;
+            }
+
+            if (hasErrors) {
+                fatesheet.notify(err.message || JSON.stringify(err));
+                console.error("Unable to delete campaign logs.");
+            } else {              
+                console.log("Campaign logs deleted.", JSON.stringify(data, null, 2));
+                               
+                //now that the logs are gone, delete the campaign itself
+                $component.deleteCampaignActual(campaignId);
+            }   
+          }
+      });
+    },
+
+    deleteCampaignActual(campaignId) {
+      var $component = this;
+      var docClient = fatesheet.getDBClient();
+
       var params = {
           TableName: fs_camp.config.campaigntable,
           Key: {

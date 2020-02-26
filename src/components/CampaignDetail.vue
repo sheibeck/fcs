@@ -15,6 +15,10 @@
       color: #ccc;
     }
 
+    .badge-secondary {
+      background-color: #ccc;
+    }
+
     .header {
       border-bottom: solid 1px black;
     }
@@ -25,6 +29,10 @@
 
     h4, .h4 {
       font-size: 1.2em;
+    }
+
+    h5 {
+      font-style: italic;
     }
     
     textarea {
@@ -99,8 +107,7 @@
           <p v-for="session in filteredSessions" :key="session.id">            
             <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
-            <textarea placeholder="Session Information..." class="sessionLog form-control" id="session-1" 
-              :value="session.description" @change="parseSession($event, session);"></textarea>
+            <textarea placeholder="Session Information..." class="sessionLog form-control" :value="session.description" @change="parseSession($event, session);"></textarea>
           </p>
         </div>
 
@@ -110,33 +117,39 @@
             <h4 class="mr-auto">Campaign Summary</h4> <i class="fas fa-arrow-circle-down d-md-none d-lg-none d-xl-none pt-2" v-on:click="jumpTo('#logs')"></i>
           </div>
           <div class="">
-            <h5>!Issues</h5>
+            <h5><span class="text-danger">!</span>Issues</h5>
             <ul>
-              <li v-for="thing in things.issues" :key="thing.id">            
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> 
-                <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> 
-                <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <li v-for="thing in sortedAlphaSessions" :key="thing.id">
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
+                <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button> 
+                <small class="mark" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
-            <h5>#Characters</h5>
+            <h5><span class="text-success">#</span>Characters</h5>
             <ul>
-              <li v-for="thing in things.characters" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <li v-for="thing in sortedAlphaCharacters" :key="thing.id">
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
+                <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+                <small class="mark" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
-            <h5>@Faces &amp; Places</h5>
+            <h5><span class="text-primary">@</span>Faces &amp; Places</h5>
             <ul>
-              <li v-for="thing in things.faceplaces" :key="thing.id">              
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id">              
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
+                <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+                <small class="mark" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul> 
 
-            <h5>~Campaign Aspects</h5>
+            <h5><span class="text-muted">~</span>Campaign Aspects</h5>
             <ul>
-              <li v-for="thing in things.aspects" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{thing.thing}}</button> <small class="mark">{{thing.description.join(",")}}</small> <span class="badge badge-dark">x{{thing.sessionids.length}}</span>
+              <li v-for="thing in sortedAlphaAspects" :key="thing.id">
+                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span> 
+                <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+                <small class="mark" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>        
           </div>
@@ -191,7 +204,7 @@
                 <ul>
                   <li>Copy a tag to your clipboard by clicking on it</li>
                   <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
-                  <li>The badge with the number (<span class="badge badge-dark">x3</span>) is how many times this tag has been used in your session logs</li>
+                  <li>The badge with the number (<span class="badge badge-secondary">x3</span>) is how many times this tag has been used in your session logs (not including extra info mentions)</li>
                   <li>Hilighted items (<mark>a highlighted item</mark>) are a list of all the extra details that have been added to this tag</li>
                 </ul>
             </div>
@@ -270,9 +283,40 @@ export default {
     },
     isLoading : function() {
       return this.loading;
-    }
+    },
+    sortedAlphaSessions : function() {
+      return this.things.issues.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
+    sortedAlphaCharacters : function() {
+      return this.things.characters.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
+    sortedAlphaFacePlaces : function() {
+      return this.things.faceplaces.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
+    sortedAlphaAspects : function() {
+      return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
   },
-  methods: {
+  methods: {    
+    niceDescription(description) {
+      if (description !== null) {
+        var displayText = description.join(", ");
+        if (/[#~!@]/.test(displayText)) {
+          //add some html formatting so if we reference another thing in the description it looks nice
+          displayText = displayText.replace(/[#]"(.+?)"/g,"<span class=\"text-success\">$1</span>");
+          displayText = displayText.replace(/[!]"(.+?)"/g,"<span class=\"text-danger\">$1</span>");
+          displayText = displayText.replace(/[@]"(.+?)"/g,"<span class=\"text-primary\">$1</span>");
+          displayText = displayText.replace(/[~]"(.+?)"/g,"<span class=\"text-muted\">$1</span>");
+        }
+        return displayText;
+      } else {
+        return "";
+      }
+    },
+    niceThingDisplay(thing) {
+      //cut out the special characters when displaying the thing names
+      return thing.replace(/[#~!@]"(.+?)"/g,"$1");
+    },
     parseSessionAll: function() {
       if (this.sessions && this.sessions.length > 0) {
         this.sessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
@@ -310,23 +354,28 @@ export default {
 
       let listToUpdate = null;
       while (match != null) {
-                
-        if (match[0].indexOf("#") > -1) {
-          listToUpdate = $component.things.characters;
+        //we only are looking at the primary tag, this way we can put 
+        // tags into the descriptors as well, but really we are only tagging
+        // the primary thing
+        let thingToMatch = match[1];
+        
+        if (thingToMatch.includes("#")) {
+          listToUpdate = $component.things.characters;          
         }
 
-        if (match[0].indexOf("@") > -1) {
+        if (thingToMatch.includes("@")) {
           listToUpdate = $component.things.faceplaces;
         }
 
-        if (match[0].indexOf("!") > -1) {
+        if (thingToMatch.includes("!")) {
           listToUpdate = $component.things.issues;
         }
 
-        if (match[0].indexOf("~") > -1) {
-          listToUpdate = $component.things.aspects;
+        if (thingToMatch.includes("~")) {
+          listToUpdate = $component.things.aspects;          
         }         
-        $component.updateThing(listToUpdate, sessionId, match, removeThing);         
+                
+        $component.updateThing(listToUpdate, sessionId, match, removeThing);
         match = regex.exec(stringToParse);
       }      
     },    
@@ -356,7 +405,7 @@ export default {
       let thing = match.groups.thing;
       let display = match.groups.display;
       let description = match.groups.description || null;
-
+      
       //crud functions on a thing in the things list
       let thingIdx = this.findThing(list, thing)
       let thingInSessionIdx = this.findThingForSession(list, thing, sessionId)
@@ -368,7 +417,7 @@ export default {
         if (thingIdx === -1) {         
           let displayText =  `${display} ${description ? "[" + description + "]" : ""}`;
 
-          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: [description] || null, display: displayText } 
+          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: [description] || null} 
           list.unshift(newThing);
         }
         
@@ -395,7 +444,7 @@ export default {
           list.splice(thingIdx, 1);
         }
 
-        //remove any descriptions that went with thi item
+        //remove any descriptions that went with this item
         if (description && list[thingIdx] && list[thingIdx].description) {
           let descIdx = list[thingIdx].description.indexOf(description);
           if (descIdx > -1) {
