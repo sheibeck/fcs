@@ -113,7 +113,8 @@
           </div>
           <div v-for="session in filteredSessions" :key="session.id">
             <span class="d-flex">            
-              <span class="badge badge-secondary mr-auto">{{toLocaleDateString(session.date)}}</span> 
+              <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span>
+              <span class="mr-auto"><i class="fas fa-arrow-circle-up mt-1 pt-2 ml-2" v-on:click="jumpTo('#logs')"></i></span>
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
             </span>
             <!--<textarea placeholder="Session Information..." class="sessionLog form-control" :value="session.description" @change="parseSession($event, session)"></textarea>-->
