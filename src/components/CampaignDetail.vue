@@ -17,6 +17,8 @@
 
     .badge-secondary {
       background-color: #ccc;
+      height: 50%;
+      margin-top: 10px;
     }
 
     .header {
@@ -37,6 +39,11 @@
     
     textarea {
       height: 150px;
+    }
+
+    .sessionLog {
+      max-height: 500px;
+      overflow-y: scroll;
     }
 </style>
 
@@ -104,11 +111,14 @@
             <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button> 
             <i class="fas fa-arrow-circle-up d-md-none d-lg-none d-xl-none pt-2 ml-2" v-on:click="jumpTo('#summary')"></i>
           </div>
-          <p v-for="session in filteredSessions" :key="session.id">            
-            <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span> 
+          <div v-for="session in filteredSessions" :key="session.id">
+            <span class="d-flex">            
+              <span class="badge badge-secondary mr-auto">{{toLocaleDateString(session.date)}}</span> 
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
-            <textarea placeholder="Session Information..." class="sessionLog form-control" :value="session.description" @change="parseSession($event, session);"></textarea>
-          </p>
+            </span>
+            <!--<textarea placeholder="Session Information..." class="sessionLog form-control" :value="session.description" @change="parseSession($event, session)"></textarea>-->
+            <div contenteditable="true" class="sessionLog form-control" v-html="session.description" @focusout="parseSession($event, session)"></div>
+          </div>
         </div>
 
         <!-- campaign summary -->      
@@ -329,8 +339,8 @@ export default {
 
       this.loading = false;
     },
-    parseSession: function(event, session) {
-      let newDescription = event.target.value;
+    parseSession: function(event, session) {      
+      let newDescription = event.target.innerHTML;
       //find any thing that was added from this session and remove it
       this.parseThings(session.description, session.id, true);
 
