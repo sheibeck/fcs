@@ -11,35 +11,6 @@ import 'whatwg-fetch'
 Vue.use(Vuex)
 Vue.use(VueAppend)
 
-showdown.extension('fcsCampaign', () => [ 
-  {
-    type: 'lang',
-    regex: /([#@!~])"(.+?)"(?:\s?\[(.*?)\])?/g,
-    replace: function (wm, type, thing, description) { 
-      let color = "success";
-      switch(type) {
-        case "#":
-          color = "success";
-          break;
-        case "!":
-          color = "danger";
-          break;
-        case "@":
-          color = "info";
-          break;
-        case "~":
-          color = "muted";
-          break;
-      }
-
-      let displayDesc = description ? ` <mark>${description}</mark>` : "";
-
-      return `<span class="text-${color}">${thing}</span>${displayDesc}`;
-    }  
-  },
-  
-])
-
 Vue.use(VueShowdown, {
   // set default flavor of showdown
   flavor: 'github',

@@ -50,6 +50,10 @@
     .card-body {
       padding: .5em;
     }
+
+    #summary ul li {
+      list-style: none;
+    }
 </style>
 
 <template>
@@ -66,7 +70,7 @@
       <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
       
       <div class="d-flex">
-        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1>
+        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <a :href="'/campaign/'+ campaign.id + '/summary'" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
 
       <div id="accordion">
@@ -116,13 +120,19 @@
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
           <div v-for="session in filteredSessions" :key="session.id">
-            <span class="d-flex">            
+            <div class="d-flex">            
               <span class="badge badge-secondary mr-2">{{toLocaleDateString(session.date)}}</span>
+            </div>
+            <div class="d-flex">              
+              <span class="mt-2 mr-1 cursor">
+                <input type="checkbox" :id="'public-'+session.id" v-model="session.ispublic" @change="saveSession(session)">
+                <label class="cursor" style="font-weight: 400;" :for="'public-'+session.id">public?</label>
+              </span>
               <span class="mr-1 cursor" v-if="currentSession !== session.id" @click="editSession(session.id, session.description)"><i class="fas fa-edit pt-2 mt-1"></i> edit</span>
               <span class="mr-2 cursor" v-if="currentSession === session.id" @click="editSession('', '')"><i class="fas fa-save pt-2 mt-1"></i> save</span>
               <span class="mr-auto cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
-            </span>
+            </div>
             <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="editSessionText($event)" @change="parseSession($event, session)"></textarea>
             <!--<div contenteditable="true" class="sessionLog form-control" v-html="session.description" @focusout="parseSession($event, session)"></div>-->
             <div class="card">
@@ -132,10 +142,10 @@
           </div>
         </div>
 
-        <!-- campaign summary -->      
+        <!-- important things -->      
         <div class="col-12 col-md-4 col-lg-6 order-1 order-md-2" id="summary">
           <div class="d-flex header">
-            <h4 class="mr-auto">Campaign Summary</h4> <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
+            <h4 class="mr-auto">Important Things</h4> <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
           </div>
           <div class="">
             <h5><span class="text-danger">!</span>Issues</h5>
@@ -229,7 +239,7 @@
                   after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>                                          
                 <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
 
-                <h5>Campaign Summary</h5>
+                <h5>Important Things</h5>
                 <ul>
                   <li>Copy a tag to your clipboard by clicking on it</li>
                   <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
@@ -249,7 +259,36 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import VueShowdown from 'vue-showdown'
+import VueShowdown, { showdown } from 'vue-showdown'
+
+showdown.extension('fcsCampaign', () => [ 
+  {
+    type: 'lang',
+    regex: /([#@!~])"(.+?)"(?:\s?\[(.*?)\])?/g,
+    replace: function (wm, type, thing, description) { 
+      let color = "success";
+      switch(type) {
+        case "#":
+          color = "success";
+          break;
+        case "!":
+          color = "danger";
+          break;
+        case "@":
+          color = "info";
+          break;
+        case "~":
+          color = "muted";
+          break;
+      }
+
+      let displayDesc = description ? ` <mark>${description}</mark>` : "";
+
+      return `<span class="text-${color}">${thing}</span>${displayDesc}`;
+    }  
+  },
+  
+])
 
 export default {
   name: 'CampaignDetail',

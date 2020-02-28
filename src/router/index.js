@@ -12,6 +12,7 @@ import CharacterDetail from '@/components/CharacterDetail'
 import CharacterList from '@/components/CharacterList'
 import CampaignList from '@/components/CampaignList'
 import CampaignDetail from '@/components/CampaignDetail'
+import CampaignSummary from '@/components/CampaignSummary'
 import CharacterSheetDetail from '@/components/CharacterSheetDetail'
 import CharacterSheetList from '@/components/CharacterSheetList'
 import AdversaryDetail from '@/components/AdversaryDetail'
@@ -32,6 +33,7 @@ export default new Router({
     { path: '/character/:sheetname/:id/:name?', name: 'Character Detail', component: CharacterDetail, props: true },
     { path: '/campaign', component: CampaignList },
     { path: '/campaign/:id/:name?', name: 'Campaign Detail', component: CampaignDetail, props: true },
+    { path: '/campaign-summary/:id/:name?', name: 'Campaign Summary', component: CampaignSummary, props: true },
     { path: '/charactersheet', component: CharacterSheetList },    
     { path: '/charactersheet/:id', name: 'Character Sheet Detail', component: CharacterSheetDetail, props: true },
     { path: '/adversary/edit/:id?', component: AdversaryDetail, props: true },
