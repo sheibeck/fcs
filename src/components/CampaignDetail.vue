@@ -10,10 +10,11 @@
     .fa-question-circle,
     .fa-filter,
     .fa-arrow-circle-down,
-    .fa-arrow-circle-up {
+    .fa-arrow-circle-up,
+    .cursor {
       cursor: pointer;
-      color: #ccc;
-    }
+      color: #888;
+    }     
 
     .badge-secondary {
       background-color: #ccc;
@@ -45,6 +46,10 @@
       max-height: 500px;
       overflow-y: scroll;
     }
+
+    .card-body {
+      padding: .5em;
+    }
 </style>
 
 <template>
@@ -74,8 +79,7 @@
           <div class="card-body">
             <div class="form-group">
               <label for="name">Name</label>        
-              <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
-              <!--<small id="titleHelp" class="form-text text-muted">https://fatecharactersheet.com/campaign/{{campaign.id}}/{{campaign.slug}}</small> -->
+              <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">              
             </div>        
             <div class="form-group">
               <label for="scale">Scale</label>
@@ -101,31 +105,37 @@
           </div>
         </div>
       </div>
-      <div class="row mt-2" v-if="!isNewCampaign">
-
+      <div class="row mt-2" v-if="!isNewCampaign">        
         <!-- session logs -->
         <div class="col-12 col-md-8 col-lg-6 order-2 order-md-1" id="logs">        
           <div class="header d-flex">
-            <span class="h4">Session Log</span>&nbsp;<i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> 
+            <span class="h4">Session Log</span>               
+              <i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> 
             <span class="badge badge-warning pt-2 mr-1" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span> 
             <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button> 
-            <i class="fas fa-arrow-circle-up d-md-none d-lg-none d-xl-none pt-2 ml-2" v-on:click="jumpTo('#summary')"></i>
+            <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
           <div v-for="session in filteredSessions" :key="session.id">
             <span class="d-flex">            
-              <span class="badge badge-secondary">{{toLocaleDateString(session.date)}}</span>
-              <span class="mr-auto"><i class="fas fa-arrow-circle-up mt-1 pt-2 ml-2" v-on:click="jumpTo('#logs')"></i></span>
+              <span class="badge badge-secondary mr-2">{{toLocaleDateString(session.date)}}</span>
+              <span class="mr-1 cursor" v-if="currentSession !== session.id" @click="editSession(session.id, session.description)"><i class="fas fa-edit pt-2 mt-1"></i> edit</span>
+              <span class="mr-2 cursor" v-if="currentSession === session.id" @click="editSession('', '')"><i class="fas fa-save pt-2 mt-1"></i> save</span>
+              <span class="mr-auto cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
             </span>
-            <!--<textarea placeholder="Session Information..." class="sessionLog form-control" :value="session.description" @change="parseSession($event, session)"></textarea>-->
-            <div contenteditable="true" class="sessionLog form-control" v-html="session.description" @focusout="parseSession($event, session)"></div>
+            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="editSessionText($event)" @change="parseSession($event, session)"></textarea>
+            <!--<div contenteditable="true" class="sessionLog form-control" v-html="session.description" @focusout="parseSession($event, session)"></div>-->
+            <div class="card">
+              <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession === session.id" class="card-body" :markdown="currentSessionText"/>
+              <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession !== session.id" class="card-body" :markdown="session.description"/>
+            </div>
           </div>
         </div>
 
         <!-- campaign summary -->      
         <div class="col-12 col-md-4 col-lg-6 order-1 order-md-2" id="summary">
           <div class="d-flex header">
-            <h4 class="mr-auto">Campaign Summary</h4> <i class="fas fa-arrow-circle-down d-md-none d-lg-none d-xl-none pt-2" v-on:click="jumpTo('#logs')"></i>
+            <h4 class="mr-auto">Campaign Summary</h4> <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
           </div>
           <div class="">
             <h5><span class="text-danger">!</span>Issues</h5>
@@ -133,7 +143,7 @@
               <li v-for="thing in sortedAlphaSessions" :key="thing.id">
                 <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
                 <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button> 
-                <small class="mark" v-html="niceDescription(thing.description)"></small>
+                <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
@@ -142,16 +152,16 @@
               <li v-for="thing in sortedAlphaCharacters" :key="thing.id">
                 <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
                 <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
-                <small class="mark" v-html="niceDescription(thing.description)"></small>
+                <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
-            <h5><span class="text-primary">@</span>Faces &amp; Places</h5>
+            <h5><span class="text-info">@</span>Faces &amp; Places</h5>
             <ul>
               <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id">              
                 <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
-                <button class="btn btn-link p-0 text-primary" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
-                <small class="mark" v-html="niceDescription(thing.description)"></small>
+                <button class="btn btn-link p-0 text-info" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+                <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul> 
 
@@ -160,7 +170,7 @@
               <li v-for="thing in sortedAlphaAspects" :key="thing.id">
                 <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span> 
                 <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
-                <small class="mark" v-html="niceDescription(thing.description)"></small>
+                <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>        
           </div>
@@ -200,14 +210,22 @@
             </div>
             <div class="modal-body">
                 <h5>Sessions</h5>
-                <p>When entering data in your session log you can tag items to have them show up in the summary listing. Currently supported tags are:</p>
+                <p>
+                  The sessions can use markdown to format the text you type. This website uses ShodownJs for rendering markdown. To see the list
+                  of supported markdown goto <a href="https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax" target="_blank">ShowdownJs</a>To see the supported
+                </p>
+                <p>
+                  Additionally, we have added some custom tags to that are specific to Fate Character Sheet. These tags will automatically populate
+                  the summary window when you use them. This allows you to see important things about your campaign at a glance.
+                  Currently supported tags are:
+                </p>
                 <ul>
                   <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
                   <li><strong class="text-danger">~"</strong>Campaign Aspect<strong class="text-danger">"</strong></li>
                   <li><strong class="text-danger">!"</strong>Issue Description<strong class="text-danger">"</strong></li>
                   <li><strong class="text-danger">@"</strong>Face or Place Name<strong class="text-danger">"</strong></li>
                 </ul>
-                <p>Additionally, you can add <b>extra details</b> to any tag by enclosing descriptions in square brackets and making sure they come right 
+                <p>Additionally, you can associate <b>extra details</b> to any tag by enclosing the text in square brackets and making sure it come right 
                   after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>                                          
                 <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
 
@@ -231,6 +249,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import VueShowdown from 'vue-showdown'
 
 export default {
   name: 'CampaignDetail',
@@ -260,6 +279,8 @@ export default {
       loading: true,    
       campaign : {},
       //sessions : [],
+      currentSessionId: "",
+      currentSessionValue: "",
       id: this.$route.params.id,      
       tags: ["#","@","!","~"],
       things: {
@@ -280,13 +301,29 @@ export default {
     ]),
     isNewCampaign : function() {
       return this.$route.params.id === "create";
-    },
+    },    
     sessions : {
       get : function() {
         return this.$store.state.sessions;
       },
       set : function(value) {        
         this.$store.commit('updateSessions', value);
+      }
+    },
+    currentSession : {
+      get : function() {
+        return this.currentSessionId
+      },
+      set : function(value) {
+        this.$set(this, 'currentSessionId', value); 
+      }
+    },   
+    currentSessionText : {
+      get : function() {
+        return this.currentSessionValue;
+      },
+      set : function(value) {
+        this.$set(this, 'currentSessionValue', value);  
       }
     },
     isFiltered : function() {
@@ -308,7 +345,15 @@ export default {
       return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
     },
   },
-  methods: {    
+  methods: { 
+    editSession(value, description) {        
+      this.currentSession = value;
+      this.currentSessionText = description || "";
+    },
+    editSessionText(event) {
+      //account for add session
+      this.currentSessionText = event.target.value || "";
+    },
     niceDescription(description) {
       if (description !== null) {
         var displayText = description.join(", ");
@@ -316,7 +361,7 @@ export default {
           //add some html formatting so if we reference another thing in the description it looks nice
           displayText = displayText.replace(/[#]"(.+?)"/g,"<span class=\"text-success\">$1</span>");
           displayText = displayText.replace(/[!]"(.+?)"/g,"<span class=\"text-danger\">$1</span>");
-          displayText = displayText.replace(/[@]"(.+?)"/g,"<span class=\"text-primary\">$1</span>");
+          displayText = displayText.replace(/[@]"(.+?)"/g,"<span class=\"text-info\">$1</span>");
           displayText = displayText.replace(/[~]"(.+?)"/g,"<span class=\"text-muted\">$1</span>");
         }
         return displayText;
@@ -341,15 +386,16 @@ export default {
       this.loading = false;
     },
     parseSession: function(event, session) {      
-      let newDescription = event.target.innerHTML;
+      //let newDescription = event.target.innerHTML;
+      let newDescription = event.target.value;
+      
       //find any thing that was added from this session and remove it
       this.parseThings(session.description, session.id, true);
 
       //then update the data
       let idx = this.sessions.indexOf(session);
       if (idx > -1) {        
-        this.sessions[idx].description = newDescription;
-        //this.$set(this.campaign.sessions[idx], description, newDescription);
+        this.sessions[idx].description = newDescription;        
       }          
       
       //then add in anything that is from the new text
@@ -389,7 +435,7 @@ export default {
         $component.updateThing(listToUpdate, sessionId, match, removeThing);
         match = regex.exec(stringToParse);
       }      
-    },    
+    },
     findThing: function(list, value) { 
       //find a thing in the things lists     
       if (list) {
@@ -485,7 +531,9 @@ export default {
         fcs.$options.filters.filterSessions();
 
         let session = {id: fatesheet.generateUUID(), date: new Date().toString(), description: "", parent_id: this.campaign.id, owner_id: this.userId};
-        this.sessions.unshift(session);        
+        this.sessions.unshift(session);
+
+        this.editSession(session.id);        
     },
     deleteSession : function (event) {
       var sessionId = $(event.currentTarget).data('id');

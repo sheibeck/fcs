@@ -3,12 +3,51 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueAppend from 'vue-append'
+import VueShowdown, { showdown } from 'vue-showdown'
 import App from './App'
 import router from './router'
 import 'whatwg-fetch'
 
 Vue.use(Vuex)
 Vue.use(VueAppend)
+
+showdown.extension('fcsCampaign', () => [ 
+  {
+    type: 'lang',
+    regex: /([#@!~])"(.+?)"(?:\s?\[(.*?)\])?/g,
+    replace: function (wm, type, thing, description) { 
+      let color = "success";
+      switch(type) {
+        case "#":
+          color = "success";
+          break;
+        case "!":
+          color = "danger";
+          break;
+        case "@":
+          color = "info";
+          break;
+        case "~":
+          color = "muted";
+          break;
+      }
+
+      let displayDesc = description ? ` <mark>${description}</mark>` : "";
+
+      return `<span class="text-${color}">${thing}</span>${displayDesc}`;
+    }  
+  },
+  
+])
+
+Vue.use(VueShowdown, {
+  // set default flavor of showdown
+  flavor: 'github',
+  // set default options of showdown (will override the flavor options)
+  options: {
+    emoji: false,
+  },
+})
 
 window.Vue = Vue;
 

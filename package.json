@@ -17,6 +17,7 @@
     "vue-append": "^1.1.4",
     "vue-meta": "^1.6.0",
     "vue-router": "^3.1.3",
+    "vue-showdown": "^2.4.1",
     "vuex": "^3.1.1",
     "whatwg-fetch": "^3.0.0"
   },
