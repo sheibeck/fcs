@@ -52,7 +52,7 @@
   <div class="container mt-2">
 
     <div class="d-flex justify-content-center" v-if="isLoading">
-      <div class="p-5 h2">Loading campaign... <i class="fas fa-cog fa-spin"></i></div>
+      <div class="p-5 h2">Loading ... <i class="fas fa-cog fa-spin"></i></div>
     </div>
 
     <div v-else>     
