@@ -54,6 +54,10 @@
     #summary ul li {
       list-style: none;
     }
+
+    #summary ul {
+      padding-left: 10px;
+    }
 </style>
 
 <template>
@@ -63,14 +67,9 @@
       <div class="p-5 h2">Loading your campaign...</div>
     </div>
 
-    <div v-else>
-      <input type="hidden" name="id" id="id" v-model="campaign.id" />
-      <input type="hidden" name="owner_id" v-model="campaign.owner_id" id="owner_id" />
-      <input type="hidden" name="date" v-model="campaign.date" id="date" />
-      <input type="hidden" name="parent_id" v-model="campaign.parent_id" id="parent_id" />
-      
-      <div class="d-flex">
-        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <a :href="'/campaign/'+ campaign.id + '/summary'" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
+    <div v-else>      
+      <div class="d-flex flex-column flex-sm-row">
+        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <a class="" :href="'/campaign-summary/'+ campaign.id" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
 
       <div id="accordion">
@@ -111,17 +110,18 @@
       </div>
       <div class="row mt-2" v-if="!isNewCampaign">        
         <!-- session logs -->
-        <div class="col-12 col-md-8 col-lg-6 order-2 order-md-1" id="logs">        
+        <div class="col-12 col-md-7 col-lg-8 order-2 order-md-1" id="logs">        
           <div class="header d-flex">
             <span class="h4">Session Log</span>               
-              <i class="fas fa-question-circle pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> 
+              <i class="fas fa-question-circle pl-1 pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i> 
             <span class="badge badge-warning pt-2 mr-1" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span> 
             <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button> 
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
-          <div v-for="session in filteredSessions" :key="session.id">
-            <div class="d-flex">            
-              <span class="badge badge-secondary mr-2">{{toLocaleDateString(session.date)}}</span>
+          <div v-for="session in filteredSessions" :key="session.id">            
+            <div class="d-flex" :id="'#'+session.id">
+              <span v-if="currentSession !== session.id" class="badge badge-secondary mr-2">{{session.date}}</span>
+              <input v-if="currentSession === session.id" type="date" class="form-control" v-bind:value="session.date" @blur="session.date = $event.target.value;editSession('', '')" />
             </div>
             <div class="d-flex">              
               <span class="mt-2 mr-1 cursor">
@@ -133,8 +133,7 @@
               <span class="mr-auto cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>
               <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
             </div>
-            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="editSessionText($event)" @change="parseSession($event, session)"></textarea>
-            <!--<div contenteditable="true" class="sessionLog form-control" v-html="session.description" @focusout="parseSession($event, session)"></div>-->
+            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="editSessionText($event)" @change="parseSession($event, session)"></textarea>            
             <div class="card">
               <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession === session.id" class="card-body" :markdown="currentSessionText"/>
               <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession !== session.id" class="card-body" :markdown="session.description"/>
@@ -143,7 +142,7 @@
         </div>
 
         <!-- important things -->      
-        <div class="col-12 col-md-4 col-lg-6 order-1 order-md-2" id="summary">
+        <div class="col-12 col-md-5 col-lg-4 order-1 order-md-2" id="summary">
           <div class="d-flex header">
             <h4 class="mr-auto">Important Things</h4> <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
           </div>
@@ -222,7 +221,7 @@
                 <h5>Sessions</h5>
                 <p>
                   The sessions can use markdown to format the text you type. This website uses ShodownJs for rendering markdown. To see the list
-                  of supported markdown goto <a href="https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax" target="_blank">ShowdownJs</a>To see the supported
+                  of supported markdown navigate to <a href="https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax" target="_blank">ShowdownJs</a> to see the supported
                 </p>
                 <p>
                   Additionally, we have added some custom tags to that are specific to Fate Character Sheet. These tags will automatically populate
@@ -343,7 +342,8 @@ export default {
     },    
     sessions : {
       get : function() {
-        return this.$store.state.sessions;
+        //return this.$store.state.sessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);        
+        return this.$store.state.sessions;        
       },
       set : function(value) {        
         this.$store.commit('updateSessions', value);
@@ -370,7 +370,7 @@ export default {
     },
     isLoading : function() {
       return this.loading;
-    },
+    },    
     sortedAlphaSessions : function() {
       return this.things.issues.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
     },
@@ -384,7 +384,7 @@ export default {
       return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
     },
   },
-  methods: { 
+  methods: {     
     editSession(value, description) {        
       this.currentSession = value;
       this.currentSessionText = description || "";
@@ -414,8 +414,6 @@ export default {
     },
     parseSessionAll: function() {
       if (this.sessions && this.sessions.length > 0) {
-        this.sessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
-
         for(let i = 0; i < this.sessions.length; i++) {
           let session = this.sessions[i];
           this.parseThings(session.description, session.id);
@@ -568,11 +566,22 @@ export default {
         //clear the filter without jumping
         this.$store.commit('updateSearchText', "");
         fcs.$options.filters.filterSessions();
-
-        let session = {id: fatesheet.generateUUID(), date: new Date().toString(), description: "", parent_id: this.campaign.id, owner_id: this.userId};
+        
+        let session = {id: fatesheet.generateUUID(), date: this.getFormattedDate(new Date()), description: "", parent_id: this.campaign.id, owner_id: this.userId};
         this.sessions.unshift(session);
 
         this.editSession(session.id);        
+    },
+    getFormattedDate : function(date) {
+      var year = date.getFullYear();
+
+      var month = (1 + date.getMonth()).toString();
+      month = month.length > 1 ? month : '0' + month;
+
+      var day = date.getDate().toString();
+      day = day.length > 1 ? day : '0' + day;
+      
+      return year + '-' + month + '-' + day;
     },
     deleteSession : function (event) {
       var sessionId = $(event.currentTarget).data('id');
@@ -688,7 +697,7 @@ export default {
         "scale": "",
         "slug": "new-campaign",
         "title": "New Campaign",
-        "date": new Date().toString(),
+        "date": "",
       };
       this.$set(this, 'campaign', c);      
     },    
@@ -734,11 +743,7 @@ export default {
       
     },
     saveSession : function(session) {
-        var $component = this;
-                            
-        //dynamodb won't let us have empty attributes
-        fatesheet.removeEmptyObjects($component.session);
-
+        var $component = this;                            
         let docClient = fatesheet.getDBClient();
 
         // create/update a  campaign
@@ -763,10 +768,7 @@ export default {
       this.$store.commit('updateSearchText', thing);
       fcs.$options.filters.filterSessions();
       this.jumpTo("#logs");
-    },
-    toLocaleDateString : function(dateString) {
-      return(new Date(dateString).toLocaleString());
-    },  
+    },    
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },

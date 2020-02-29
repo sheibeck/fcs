@@ -70,7 +70,7 @@ const store = new Vuex.Store({
       return state.userId;
     },
     filteredSessions: state => {      
-      return state.filteredSessions;
+      return state.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);      
     },
     filteredCampaigns: state => {      
       return state.filteredCampaigns;

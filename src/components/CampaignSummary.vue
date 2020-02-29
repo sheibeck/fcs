@@ -54,6 +54,10 @@
     #summary ul li {
       list-style: none;
     }
+
+    #summary ul {
+      padding-left: 10px;
+    }
 </style>
 
 <template>
@@ -78,7 +82,7 @@
           </div>
           <div v-for="session in filteredSessions" :key="session.id">
             <div class="d-flex">            
-              <span class="badge badge-secondary mr-2">{{toLocaleDateString(session.date)}}</span>            
+              <span class="badge badge-secondary mr-2">{{session.date}}</span>            
               <span class="mr-auto cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>              
             </div>            
             <div class="card">              
@@ -452,13 +456,7 @@ export default {
       this.$store.commit('updateSearchText', thing);
       fcs.$options.filters.filterSessions();
       this.jumpTo("#logs");
-    },
-    toLocaleDateString : function(dateString) {
-      return(new Date(dateString).toLocaleString());
-    },  
-    isOwner : function(ownerId) {
-      return this.userId === ownerId;
-    },
+    },    
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
       fcs.$options.filters.filterSessions();
