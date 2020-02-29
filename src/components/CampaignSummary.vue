@@ -52,7 +52,7 @@
   <div class="container mt-2">
 
     <div class="d-flex justify-content-center" v-if="isLoading">
-      <div class="p-5 h2">Loading your campaign...</div>
+      <div class="p-5 h2">Loading campaign... <i class="fas fa-cog fa-spin"></i></div>
     </div>
 
     <div v-else>     
@@ -65,10 +65,13 @@
         <div class="col-12 col-md-8 order-2 order-md-1" id="logs">        
           <div class="header d-flex">
             <span class="h4 mr-auto">Session Log</span>              
-            <span class="badge badge-warning pt-2 mr-1" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span> 
+            <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button> 
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
-          <div v-for="session in filteredSessions" :key="session.id" class="mt-1">
+          <div v-if="filteredSessions.length === 0">
+            <div class="p-5 h4 text-info"><i>There are no public sessions for this campaign. Contact the storyteller and ask them to share some sessions!</i></div>
+          </div>
+          <div v-else v-for="session in filteredSessions" :key="session.id" class="mt-1">
             <div class="d-flex p-1 pt-0 bg-light">            
               <span class="badge badge-secondary mt-1 mr-2 mr-auto">{{session.date}}</span>            
               <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up"></i> scroll up</span>              
@@ -168,14 +171,13 @@ export default {
   created(){
     fs_camp.init();        
   },
-  mounted() {    
-    //this.parseSessionAll();
+  mounted(){
+    this.parseSessionAll();
   },
   watch: {
     userId() {
       //wait for our authenticated user id
-      this.getCampaign(this.userId, fcs.$route.params.id);
-      this.listSessions(this.userId, fcs.$route.params.id);      
+      this.getCampaign(fcs.$route.params.id);      
     }
   },
   data () {
@@ -274,8 +276,7 @@ export default {
           let session = this.sessions[i];
           this.parseThings(session.description, session.id);
         }
-      }
-      this.loading = false;
+      }      
     },    
     parseThings: function(stringToParse, sessionId, removeThing){
       var $component = this;      
@@ -374,7 +375,7 @@ export default {
 
       fatesheet.notify('Copied thing to clipboard', 'info', 2000);      
     },
-    getCampaign : async function(ownerid, id) {
+    getCampaign : async function(id) {
       var $component = this;
       
       // Create DynamoDB document client
@@ -401,12 +402,13 @@ export default {
             else {
               console.log("Success", data.Items[0]);
               let c = data.Items[0];
-              $component.$set($component, 'campaign', c);                           
+              $component.$set($component, 'campaign', c);              
+              $component.listSessions(c.id);
             }
           }
       });
     },
-    listSessions : function(ownerid, id) {      
+    listSessions : function(id) {        
       var $component = this;
 
       // Create DynamoDB document client
@@ -417,7 +419,7 @@ export default {
           Select: 'ALL_ATTRIBUTES',
           FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id) AND (ispublic = :is_public)',
           ExpressionAttributeValues: {            
-            ':owner_id': ownerid,
+            ':owner_id': this.campaign.owner_id,
             ':parent_id': id,
             ':is_public': true,
           }
@@ -435,6 +437,7 @@ export default {
               $component.parseSessionAll();
             }        
           }
+          $component.loading = false;
       });
     },    
     filterBy : function(thing) {
