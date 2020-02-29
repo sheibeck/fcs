@@ -24,19 +24,7 @@
 
     .header {
       border-bottom: solid 1px black;
-    }
-
-    h1 {
-      font-size: 1.3em;
-    }
-
-    h4, .h4 {
-      font-size: 1.2em;
-    }
-
-    h5 {
-      font-style: italic;
-    }
+    }  
     
     textarea {
       height: 150px;
@@ -69,7 +57,7 @@
 
     <div v-else>     
       <div class="d-flex">
-        <h1 class="mr-auto">{{campaign.title}} - Campaign Summary</h1>
+        <h3 class="mr-auto">{{campaign.title}} - Campaign Summary</h3>
       </div>
 
       <div class="row mt-2">
@@ -80,10 +68,10 @@
             <span class="badge badge-warning pt-2 mr-1" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter()">x Clear Filter</span> 
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
-          <div v-for="session in filteredSessions" :key="session.id">
-            <div class="d-flex">            
-              <span class="badge badge-secondary mr-2">{{session.date}}</span>            
-              <span class="mr-auto cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>              
+          <div v-for="session in filteredSessions" :key="session.id" class="mt-1">
+            <div class="d-flex p-1 pt-0 bg-light">            
+              <span class="badge badge-secondary mt-1 mr-2 mr-auto">{{session.date}}</span>            
+              <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up"></i> scroll up</span>              
             </div>            
             <div class="card">              
               <VueShowdown :extensions="['fcsCampaignHidden']" class="card-body" :markdown="session.description"/>
@@ -181,7 +169,7 @@ export default {
     fs_camp.init();        
   },
   mounted() {    
-    this.parseSessionAll();
+    //this.parseSessionAll();
   },
   watch: {
     userId() {
@@ -219,7 +207,7 @@ export default {
     },    
     sessions : {
       get : function() {
-        return this.$store.state.sessions;
+        return this.$store.state.sessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);
       },
       set : function(value) {        
         this.$store.commit('updateSessions', value);
@@ -281,15 +269,12 @@ export default {
       return thing.replace(/[#~!@]"(.+?)"/g,"$1");
     },
     parseSessionAll: function() {
-      if (this.sessions && this.sessions.length > 0) {
-        this.sessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
-
+      if (this.sessions && this.sessions.length > 0) {        
         for(let i = 0; i < this.sessions.length; i++) {
           let session = this.sessions[i];
           this.parseThings(session.description, session.id);
         }
       }
-
       this.loading = false;
     },    
     parseThings: function(stringToParse, sessionId, removeThing){

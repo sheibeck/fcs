@@ -24,19 +24,7 @@
 
     .header {
       border-bottom: solid 1px black;
-    }
-
-    h1 {
-      font-size: 1.3em;
-    }
-
-    h4, .h4 {
-      font-size: 1.2em;
-    }
-
-    h5 {
-      font-style: italic;
-    }
+    }   
     
     textarea {
       height: 150px;
@@ -69,7 +57,7 @@
 
     <div v-else>      
       <div class="d-flex flex-column flex-sm-row">
-        <h1 class="mr-auto">{{campaign.title}} - Campaign</h1> <a class="" :href="'/campaign-summary/'+ campaign.id" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
+        <h3 class="mr-auto">{{campaign.title}} - Campaign</h3> <a class="" :href="'/campaign-summary/'+ campaign.id" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
 
       <div id="accordion">
@@ -118,22 +106,22 @@
             <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fab fa-leanpub"></i> Add Session</button> 
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
-          <div v-for="session in filteredSessions" :key="session.id">            
-            <div class="d-flex" :id="'#'+session.id">
+          <div v-for="session in filteredSessions" :key="session.id" class="mt-1" v-bind:class="{ 'mark': currentSession === session.id }">
+            <div class="d-flex px-1 bg-light" :id="'#'+session.id">
               <span v-if="currentSession !== session.id" class="badge badge-secondary mr-2">{{session.date}}</span>
-              <input v-if="currentSession === session.id" type="date" class="form-control" v-bind:value="session.date" @blur="session.date = $event.target.value;editSession('', '')" />
-            </div>
-            <div class="d-flex">              
-              <span class="mt-2 mr-1 cursor">
+              <span v-if="currentSession === session.id" class="input-group-sm mr-2 mt-1">
+                <input placeholder="Session Date" type="datetime-local" class="form-control" v-model="session.date" />
+              </span>                       
+              <span class="mt-2 mr-2 cursor">
                 <input type="checkbox" :id="'public-'+session.id" v-model="session.ispublic" @change="saveSession(session)">
                 <label class="cursor" style="font-weight: 400;" :for="'public-'+session.id">public?</label>
               </span>
-              <span class="mr-1 cursor" v-if="currentSession !== session.id" @click="editSession(session.id, session.description)"><i class="fas fa-edit pt-2 mt-1"></i> edit</span>
-              <span class="mr-2 cursor" v-if="currentSession === session.id" @click="editSession('', '')"><i class="fas fa-save pt-2 mt-1"></i> save</span>
-              <span class="mr-auto cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>
-              <a href='#' class='btn' style='color:red' v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash'></i></a><br />
+              <span class="mx-2 cursor" v-if="currentSession !== session.id" @click="setCurrentSession(session.id, session.description)"><i class="fas fa-edit pt-2 mt-1"></i> edit</span>
+              <span class="mx-2 cursor" v-if="currentSession === session.id" @click="setCurrentSession('', '')"><i class="fas fa-save pt-2 mt-1"></i> save</span>
+              <span class="mx-2 mr-auto cursor" v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash pt-2 mt-1'></i> delete</span>
+              <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>              
             </div>
-            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="editSessionText($event)" @change="parseSession($event, session)"></textarea>            
+            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="setCurrentSessionText($event)" @change="parseSession($event, session)"></textarea>            
             <div class="card">
               <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession === session.id" class="card-body" :markdown="currentSessionText"/>
               <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession !== session.id" class="card-body" :markdown="session.description"/>
@@ -308,7 +296,7 @@ export default {
     fs_camp.init();        
   },
   mounted() {    
-    this.parseSessionAll();
+    //this.parseSessionAll();
   },
   watch: {
     userId() {
@@ -347,8 +335,8 @@ export default {
     },    
     sessions : {
       get : function() {
-        //return this.$store.state.sessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);        
-        return this.$store.state.sessions;        
+        return this.$store.state.sessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);
+        //return this.$store.state.sessions;
       },
       set : function(value) {        
         this.$store.commit('updateSessions', value);
@@ -390,14 +378,14 @@ export default {
     },
   },
   methods: {     
-    editSession(value, description) {        
+    setCurrentSession(value, description) {        
       this.currentSession = value;
-      this.currentSessionText = description || "";
+      this.currentSessionText = description || "";      
     },
-    editSessionText(event) {
+    setCurrentSessionText(event) {
       //account for add session
       this.currentSessionText = event.target.value || "";
-    },
+    },    
     niceDescription(description) {
       if (description !== null) {
         var displayText = description.join(", ");
@@ -575,7 +563,7 @@ export default {
         let session = {id: fatesheet.generateUUID(), date: this.getFormattedDate(new Date()), description: "", parent_id: this.campaign.id, owner_id: this.userId};
         this.sessions.unshift(session);
 
-        this.editSession(session.id);        
+        this.setCurrentSession(session.id);        
     },
     getFormattedDate : function(date) {
       var year = date.getFullYear();
@@ -585,8 +573,12 @@ export default {
 
       var day = date.getDate().toString();
       day = day.length > 1 ? day : '0' + day;
+
+      var time = date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: false, minute: 'numeric' });
       
-      return year + '-' + month + '-' + day;
+      let dateString =  year + '-' + month + '-' + day + 'T' + time;
+
+      return dateString;
     },
     deleteSession : function (event) {
       var sessionId = $(event.currentTarget).data('id');
