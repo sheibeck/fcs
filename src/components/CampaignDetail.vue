@@ -218,14 +218,19 @@
               </button>
             </div>
             <div class="modal-body">
-                <h5>Sessions</h5>
+                <h5>Public Sessions</h5>
                 <p>
-                  The sessions can use markdown to format the text you type. This website uses ShodownJs for rendering markdown. To see the list
-                  of supported markdown navigate to <a href="https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax" target="_blank">ShowdownJs</a> to see the supported
+                  Marking a session as public will make the session show up on the Public Campaign Summary page. Any <b>extra details</b> (see below) will not
+                  show up in the campaign summary which will allow you to add these details but keep them for the GM's eyes only.
+                </p>
+                <h5>Session Editing</h5>
+                <p>
+                  The sessions can use markdown to format the text you type. This website uses ShodownJs for rendering markdown. The full list of supported
+                  markdown can be found at <a href="https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax" target="_blank">ShowdownJs</a>.
                 </p>
                 <p>
-                  Additionally, we have added some custom tags to that are specific to Fate Character Sheet. These tags will automatically populate
-                  the summary window when you use them. This allows you to see important things about your campaign at a glance.
+                  Additionally, there are custom tags specific to Fate Character Sheet. These tags will automatically populate
+                  the Important Things section when you use them. This allows you to see important things about your campaign at a glance.
                   Currently supported tags are:
                 </p>
                 <ul>
@@ -240,10 +245,10 @@
 
                 <h5>Important Things</h5>
                 <ul>
-                  <li>Copy a tag to your clipboard by clicking on it</li>
+                  <li>Copy a tag to your clipboard by clicking on the tagged item</li>
                   <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
-                  <li>The badge with the number (<span class="badge badge-secondary">x3</span>) is how many times this tag has been used in your session logs (not including extra info mentions)</li>
-                  <li>Hilighted items (<mark>a highlighted item</mark>) are a list of all the extra details that have been added to this tag</li>
+                  <li>The badge with the number (<span class="badge badge-secondary">x3</span>) is how many times this tag has been used in your session logs (this does not include tags used inside extra info)</li>
+                  <li>Hilighted items (<mark>that look like this</mark>) are a list of all the extra details that have been added to this tag. These items will not show up in the public campaign summary</li>
                 </ul>
             </div>
             <div class="modal-footer">            
