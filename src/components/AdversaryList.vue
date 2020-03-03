@@ -13,8 +13,8 @@
           <input type="checkbox" class="" id="my_adversaries" v-on:change="list()" />
           <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
         </span>
-                
-        <span class="badge badge-warning pt-1 mt-1 mb-2 fs-tools adversaryFilter hidden" style="cursor:pointer;" v-on:click="clearFilter()">x Clear Filter</span>        
+                                
+        <button type="button" class="btn btn-warning btn-sm mr-1" v-show="$store.state.searchText" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
       </div>
 
       <div class='card-columns' id="adversaryDetail">

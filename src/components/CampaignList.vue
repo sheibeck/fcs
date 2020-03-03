@@ -1,8 +1,9 @@
 <template>
   <div class="container mt-2">
     <div v-if="isAuthenticated" class="d-print-none mb-2 d-flex">      
-      <a href='/campaign/create' class='btn btn-success mr-auto'>Create a Campaign <i class='fa fa-globe-americas'></i></a>                  
-      <span class="badge badge-warning pt-1 mt-1 mb-2" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter">x Clear Filter</span>      
+      <a href='/campaign/create' class='btn btn-success mr-auto'>Create a Campaign <i class='fa fa-globe-americas'></i></a>
+            
+      <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>      
     </div>
     <div class='card-columns'>
       <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
