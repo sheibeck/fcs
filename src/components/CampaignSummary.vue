@@ -153,7 +153,7 @@ showdown.extension('fcsCampaignHidden', () => [
           break;
       }      
 
-      return `<span class="text-${color}">${thing}</span>`;
+      return `<span class="text-${color}">${type}${thing}</span>`;
     }  
   },
 ])

@@ -122,7 +122,7 @@
               <span class="mx-2 mr-auto cursor" v-bind:data-id='session.id' data-toggle='modal' data-target='#modalDeleteSessionConfirm'><i class='fa fa-trash pt-2 mt-1'></i> delete</span>
               <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up mt-1 pt-2"></i> scroll up</span>              
             </div>
-            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @input="setCurrentSessionText($event)" @change="parseSession($event, session)"></textarea>            
+            <textarea :id="session.id" v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @focus="setOldSessionText($event)" @input="setCurrentSessionText($event)" @change="parseSession($event, session)"></textarea>            
             <div class="card">
               <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession === session.id" class="card-body" :markdown="currentSessionText"/>
               <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession !== session.id" class="card-body" :markdown="session.description"/>
@@ -277,7 +277,7 @@ showdown.extension('fcsCampaign', () => [
 
       let displayDesc = description ? ` <mark>${description}</mark>` : "";
 
-      return `<span class="text-${color}">${thing}</span>${displayDesc}`;
+      return `<span class="text-${color}">${type}${thing}</span>${displayDesc}`;
     }  
   },
   
@@ -312,6 +312,7 @@ export default {
       //sessions : [],
       currentSessionId: "",
       currentSessionValue: "",
+      oldSessionValue: "",
       id: this.$route.params.id,      
       tags: ["#","@","!","~"],
       things: {
@@ -358,6 +359,14 @@ export default {
         this.$set(this, 'currentSessionValue', value);  
       }
     },
+    oldSessionText : {
+      get : function() {
+        return this.oldSessionValue;
+      },
+      set : function(value) {
+        this.$set(this, 'oldSessionValue', value);  
+      }
+    },
     isFiltered : function() {
       return this.$store.state.searchText;
     },
@@ -385,6 +394,10 @@ export default {
     setCurrentSessionText(event) {
       //account for add session
       this.currentSessionText = event.target.value || "";
+    },    
+    setOldSessionText(event) {
+      //account for add session
+      this.oldSessionText = event.target.value || "";
     },    
     niceDescription(description) {
       if (description !== null) {
@@ -418,7 +431,7 @@ export default {
       let newDescription = event.target.value;
       
       //find any thing that was added from this session and remove it
-      this.parseThings(session.description, session.id, true);
+      this.parseThings(this.oldSessionText, session.id, true);
 
       //then update the data
       let idx = this.sessions.indexOf(session);
@@ -679,7 +692,7 @@ export default {
 
             if (s && s.length > 0) {
               $component.sessions = s;
-              $component.parseSessionAll();              
+              $component.parseSessionAll();
             }        
           }
           $component.loading = false;
