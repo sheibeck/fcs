@@ -707,9 +707,10 @@ export default {
         "scale": "",
         "slug": "new-campaign",
         "title": "New Campaign",
-        "date": "",
+        "date": this.getFormattedDate(new Date()),
       };
-      this.$set(this, 'campaign', c);      
+      this.$set(this, 'campaign', c);
+      this.loading = false;      
     },    
     saveCampaign : function() {      
         var $component = this;

@@ -26,7 +26,7 @@
         </div>
         <div class='card-footer text-muted'>
           <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
-          @ <span class=''>{{new Date(item.date).toLocaleString()}}</span>
+          @ <span class=''>{{item.date}}</span>
         </div>
       </div>
     </div>
