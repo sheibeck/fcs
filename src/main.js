@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueAppend from 'vue-append'
+import { Datetime } from 'vue-datetime'
+// You need a specific loader for CSS files
+import 'vue-datetime/dist/vue-datetime.css'
 import VueShowdown, { showdown } from 'vue-showdown'
 import App from './App'
 import router from './router'
@@ -10,7 +13,7 @@ import 'whatwg-fetch'
 
 Vue.use(Vuex)
 Vue.use(VueAppend)
-
+Vue.use(Datetime)
 Vue.use(VueShowdown, {
   // set default flavor of showdown
   flavor: 'github',
@@ -70,8 +73,8 @@ const store = new Vuex.Store({
       return state.userId;
     },
     filteredSessions: state => {      
-      //return state.filteredSessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
-      return state.filteredSessions;
+      return state.filteredSessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
+      //return state.filteredSessions;
     },
     filteredCampaigns: state => {      
       return state.filteredCampaigns;

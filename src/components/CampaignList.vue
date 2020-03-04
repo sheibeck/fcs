@@ -26,7 +26,7 @@
         </div>
         <div class='card-footer text-muted'>
           <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
-          @ <span class=''>{{item.date}}</span>
+          @ <span class=''>{{getNiceDate(item.date)}}</span>
         </div>
       </div>
     </div>
@@ -124,8 +124,7 @@ export default {
               $component.campaigns = data.Items;
           }
       });
-    },
-
+    },  
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
 
@@ -224,7 +223,10 @@ export default {
       this.$store.commit('updateSearchText', tag);      
       fcs.$options.filters.filterCampaigns();
     },
-
+  
+    getNiceDate : function(date) {
+        return new Date(date).toLocaleString();
+    },
   }
 }
 </script>
