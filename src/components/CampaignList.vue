@@ -1,8 +1,9 @@
 <template>
   <div class="container mt-2">
     <div v-if="isAuthenticated" class="d-print-none mb-2 d-flex">      
-      <a href='/campaign/create' class='btn btn-success mr-auto'>Create a Campaign <i class='fa fa-globe-americas'></i></a>                  
-      <span class="badge badge-warning pt-1 mt-1 mb-2" style="cursor:pointer;" v-show="isFiltered" v-on:click="clearFilter">x Clear Filter</span>      
+      <a href='/campaign/create' class='btn btn-success mr-auto'>Create a Campaign <i class='fa fa-globe-americas'></i></a>
+            
+      <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>      
     </div>
     <div class='card-columns'>
       <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
@@ -25,7 +26,7 @@
         </div>
         <div class='card-footer text-muted'>
           <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
-          @ <span class=''>{{new Date(item.date).toLocaleString()}}</span>
+          @ <span class=''>{{getNiceDate(item.date)}}</span>
         </div>
       </div>
     </div>
@@ -123,14 +124,71 @@ export default {
               $component.campaigns = data.Items;
           }
       });
-    },
-
+    },  
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
 
       //reference this component so we can get/set data
       var $component = this;
 
+      var docClient = fatesheet.getDBClient();
+
+      $component.deleteCampaignLogs(campaignId);  
+    },
+
+    deleteCampaignLogs : function (campaignId) {
+      //reference this component so we can get/set data
+      var $component = this;
+
+      // Create DynamoDB document client
+      let docClient = fatesheet.getDBClient();
+
+      //get a list of all the logs for this campaign
+      let params = {
+          TableName: fs_camp.config.campaigntable,
+          Select: 'ALL_ATTRIBUTES',
+          FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id)',
+          ExpressionAttributeValues: {            
+            ':owner_id': $component.userId,
+            ':parent_id': campaignId
+          }
+      }
+
+      docClient.scan(params, function(err, data) {
+          if (err) {
+            console.log("Error", err);
+          } else {           
+            console.log("Success", data.Items[0]);
+            let sessions = data.Items;
+
+            var hasErrors = "";
+            try {
+              sessions.forEach(function(item) {          
+                docClient.delete({Key:{owner_id: $component.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
+                    if (error) {                        
+                        throw error;                        
+                    }
+                });
+              });
+            } catch(error) {
+              hasErrors = error;
+            }
+
+            if (hasErrors) {
+                fatesheet.notify(err.message || JSON.stringify(err));
+                console.error("Unable to delete campaign logs.");
+            } else {              
+                console.log("Campaign logs deleted.", JSON.stringify(data, null, 2));
+                               
+                //now that the logs are gone, delete the campaign itself
+                $component.deleteCampaignActual(campaignId);
+            }   
+          }
+      });
+    },
+
+    deleteCampaignActual(campaignId) {
+      var $component = this;
       var docClient = fatesheet.getDBClient();
 
       var params = {
@@ -165,7 +223,10 @@ export default {
       this.$store.commit('updateSearchText', tag);      
       fcs.$options.filters.filterCampaigns();
     },
-
+  
+    getNiceDate : function(date) {
+        return new Date(date).toLocaleString();
+    },
   }
 }
 </script>

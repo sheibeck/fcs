@@ -2,7 +2,7 @@
   <div class="container mt-2">
     <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-flex">      
       <a href='/charactersheet' class='btn btn-success mr-auto'>Create a Character <i class='fa fa-user'></i></a>      
-      <span class="badge badge-warning pt-1 mt-1 mb-2" v-show="$store.state.searchText" style="cursor:pointer;" v-on:click="clearFilter">x Clear Filter</span>
+      <button type="button" class="btn btn-warning btn-sm mr-1" v-show="$store.state.searchText" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
     </div>
     <div class='card-columns'>
       <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>

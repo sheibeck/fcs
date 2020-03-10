@@ -63,33 +63,33 @@ export default {
     }
   },
   methods : {
-      show : function (sheetname) {
-        //reference this component so we can get/set data
-        var $component = this;
+    show : function (sheetname) {
+      //reference this component so we can get/set data
+      var $component = this;
 
-        //$('.hide-on-detail').addClass('hidden');
+      //$('.hide-on-detail').addClass('hidden');
 
-        // Create DynamoDB document client
-        var docClient = fatesheet.getDBClient();
+      // Create DynamoDB document client
+      var docClient = fatesheet.getDBClient();
 
-        var params = {
-            TableName: fs_char.config.charactersheettable,
-            Key: {
-              'charactersheetname': sheetname
-            },
-        }
+      var params = {
+          TableName: fs_char.config.charactersheettable,
+          Key: {
+            'charactersheetname': sheetname
+          },
+      }
 
-        docClient.get(params, function (err, data) {
-            if (err) {
-                console.log("Error", err);
-            } else {
-                console.log("Success", data.Item);
-                $component.sheet = data.Item.charactersheetcontent;
+      docClient.get(params, function (err, data) {
+          if (err) {
+              console.log("Error", err);
+          } else {
+              console.log("Success", data.Item);
+              $component.sheet = data.Item.charactersheetcontent;
 
-                //fetch the character data and populate it
-                $component.getCharacterInfo($component.id);
-            }
-        });
+              //fetch the character data and populate it
+              $component.getCharacterInfo($component.id);
+          }
+      });
     },
     getCharacterInfo(id) {
       //reference this component so we can get/set data
