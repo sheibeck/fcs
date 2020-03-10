@@ -676,7 +676,10 @@ export default {
               console.log("Success", data.Items[0]);
               let c = data.Items[0];
               $component.$set($component, 'campaign', c);
-              $component.listSessions($component.userId, c.id);              
+              $component.listSessions($component.userId, c.id);  
+              
+              $component.title = c.title + ' (Campaign)';
+              $component.description = c.description || "";
             }
           }
       });

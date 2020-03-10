@@ -404,6 +404,9 @@ export default {
               let c = data.Items[0];
               $component.$set($component, 'campaign', c);              
               $component.listSessions(c.id);
+
+              $component.title = c.title + ' (Campaign)';
+              $component.description = c.description || "";
             }
           }
       });
