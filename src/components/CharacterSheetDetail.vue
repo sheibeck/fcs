@@ -4,17 +4,23 @@
     <form>
       <div class='' v-append="sheet" @appended="appended">
       </div>
-    </form>
+      
+      <hr/>
 
-    <hr/>
-
-    <div class='row'>
-      <div class='col'>
-         <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
-         <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-         <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+      <div class='row'>
+        <div class='col'>
+          <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
+          <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
+          <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+        </div>
+        <div class='col' v-if="isAuthenticated">
+            <div class='row'>
+              <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='character_image_url'>Portrait Url:</label>
+              <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+            </div>
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 

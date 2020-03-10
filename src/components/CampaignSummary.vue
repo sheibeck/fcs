@@ -73,7 +73,7 @@
           </div>
           <div v-else v-for="session in filteredSessions" :key="session.id" class="mt-1">
             <div class="d-flex p-1 pt-0 bg-light">            
-              <span class="badge badge-secondary mt-1 mr-2 mr-auto">{{session.date}}</span>            
+              <span class="badge badge-secondary mt-1 mr-2 mr-auto">{{getNiceDate(session.date)}}</span>            
               <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up"></i> scroll up</span>              
             </div>            
             <div class="card">              
@@ -182,6 +182,8 @@ export default {
   },
   data () {
     return {
+      title: "",
+      description: "",
       loading: true,    
       campaign : {},    
       currentSessionId: "",
@@ -452,6 +454,9 @@ export default {
       this.$store.commit('updateSearchText', "");
       fcs.$options.filters.filterSessions();
       this.jumpTo("#summary");
+    },
+    getNiceDate : function(date) {
+        return new Date(date).toLocaleString();
     },
     jumpTo : function(section) {
       $("html, body").animate({ scrollTop: $(section).offset().top }, 500);

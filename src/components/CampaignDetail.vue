@@ -316,9 +316,10 @@ export default {
   },
   data () {
     return {
+      title: "",
+      description: "",
       loading: true,    
       campaign : {},
-      //sessions : [],
       currentSessionId: "",
       currentSessionValue: "",
       oldSessionValue: "",
