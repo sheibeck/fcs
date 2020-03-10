@@ -13,15 +13,21 @@
               <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
                   <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
               </li>
-              <li v-if="isAuthenticated" class="nav-item" v-bind:class="{active : isActive('character')}" ref="el">
-                  <a class="nav-link" href="/character"><span class="dice">+</span>My Characters</a>
-              </li>
+              <li class="nav-item dropdown" v-if="isAuthenticated" v-bind:class="{active : isActive('character') || isActive('campaign')}">
+                 <a class="nav-link dropdown-toggle" href="#" id="myStuffDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   <span class="dice">C</span>My Stuff
+                 </a>
+                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+                    <a class="nav-link" v-bind:class="{active : isActive('character')}" href="/character"><i class="fas fa-user"></i> My Characters</a>
+                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>                        
+                 </div>
+              </li>             
               <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>
               <li class="nav-item dropdown">
                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <span class="dice">C</span>Tools
+                   <i class="fas fa-microchip"></i> Tools
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                    <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
@@ -54,10 +60,10 @@
           </div>
           <div class="form-inline my-2 my-sm-0">
               <div class="input-group">
-                <input id="search-text" class="form-control" type="text" placeholder="Search"></input>
+                <input id="search-text" class="form-control" type="text" placeholder="Search" v-model="$store.state.searchText" @input="search" />
                 <div class="input-group-append">
-                  <button class="btn btn-outline-secondary js-clear-search" type="button"><i class="fa fa-times-circle"></i></button>
-                  <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
+                  <button class="btn btn-outline-secondary" type="button" v-on:click="clearSearch"><i class="fa fa-times-circle"></i></button>
+                  <button id="search-button" class="btn btn-outline-success" type="button" v-on:click="search">Search</button>
                 </div>
               </div>
           </div>
@@ -125,6 +131,7 @@ export default {
   computed: {
     ...mapGetters([
       'isAuthenticated',
+      'searchText'
     ]),
   },
   data () {
@@ -138,6 +145,14 @@ export default {
     },
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
+    },
+    clearSearch : function() {      
+      this.$store.commit("updateSearchText", "");
+      $("#search-button").trigger("click");
+    },
+    search : function() {
+      let searchText = this.$store.state.searchText;
+      fatesheet.search(searchText);
     }
   }
 }

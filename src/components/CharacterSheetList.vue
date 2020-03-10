@@ -1,5 +1,9 @@
-<template>
+<template> 
   <div class="container mt-2">
+      <div class="d-flex">
+        <h1 class="mr-auto">Character Sheets</h1>
+        <button type="button" class="btn btn-warning btn-sm mr-1 mt-2" style="max-height:40px;" v-show="$store.state.searchText" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
+      </div>
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
           <img class='card-img-top img-thumbnail img-fluid' v-bind:src="'/static/sheets/'+sheet.charactersheetname+'/logo.png'" v-bind:alt="sheet.charactersheetname + ' Logo'" />
@@ -45,30 +49,34 @@ export default {
     }
   },
   methods : {
-        list : function(){
-          //reference this component so we can get/set data
-          var $component = this;
+    list : function(){
+      //reference this component so we can get/set data
+      var $component = this;
 
-          // Create DynamoDB document client
-          var docClient = fatesheet.getDBClient();
+      // Create DynamoDB document client
+      var docClient = fatesheet.getDBClient();
 
-          var params = {
-              TableName: fs_char.config.charactersheettable,
-              Select: 'ALL_ATTRIBUTES'
+      var params = {
+          TableName: fs_char.config.charactersheettable,
+          Select: 'ALL_ATTRIBUTES'
+      }
+
+      docClient.scan(params, function (err, data) {
+          if (err) {
+              console.log("Error", err);
+
+              return {};
+
+          } else {
+              console.log("Success", data.Items);
+              $component.sheets = data.Items;
           }
-
-          docClient.scan(params, function (err, data) {
-              if (err) {
-                  console.log("Error", err);
-
-                  return {};
-
-              } else {
-                  console.log("Success", data.Items);
-                  $component.sheets = data.Items;
-              }
-          });
-        }
-    }
+      });
+    },
+    clearFilter : function() {
+      this.$store.commit('updateSearchText', "");
+      fatesheet.search("");      
+    },
+  }
 }
 </script>
