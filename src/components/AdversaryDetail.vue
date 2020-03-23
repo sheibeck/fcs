@@ -221,6 +221,8 @@ export default {
       if (!slug) return;
 
       var $component = this;
+      let adversaryList = [];
+
       $('#adversary_name').attr('disabled', true);
 
       // Create DynamoDB document client
@@ -236,18 +238,28 @@ export default {
           }
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
+      docClient.scan(params, onScan);
+      function onScan(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } else {
 
-            if (data.Items.length === 0)
+          Array.prototype.push.apply(adversaryList,data.Items);              
+
+          if (typeof data.LastEvaluatedKey != "undefined") {
+              console.log("Scanning for more...");                  
+              params.ExclusiveStartKey = data.LastEvaluatedKey;
+              docClient.scan(params, onScan);
+          }
+          else {
+
+            if (adversaryList.length === 0)
             {
               location.href = '/error';
             }
             else {
-              console.log("Success", data.Items[0]);
-              $component.adversary = data.Items[0];
+              console.log("Success", adversaryList);
+              $component.adversary = adversaryList[0];
               $component.clearAdversaryForm();
               $component.populateAdversaryForm($component.adversary);
 
@@ -255,7 +267,8 @@ export default {
               $component.description = $component.adversary.adversary_type;
             }
           }
-      });
+        }
+      }
     },
     upsertAdversary : function() {
         var $component = this;

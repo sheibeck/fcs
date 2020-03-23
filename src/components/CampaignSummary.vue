@@ -379,7 +379,8 @@ export default {
     },
     getCampaign : async function(id) {
       var $component = this;
-      
+      let campaignList = [];
+
       // Create DynamoDB document client
       let docClient = fatesheet.getDBClient();
 
@@ -392,18 +393,28 @@ export default {
           }
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
-
-            if (data.Items.length === 0)
+      docClient.scan(params, onScan);
+      
+      function onScan(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } 
+        else {
+          Array.prototype.push.apply(campaignList,data.Items);
+          
+          if (typeof data.LastEvaluatedKey != "undefined") {
+            console.log("Scanning for more...");
+            params.ExclusiveStartKey = data.LastEvaluatedKey;
+            docClient.scan(params, onScan);
+          }
+          else {
+            if (campaignList.length === 0)
             {
               location.href = '/error';
             }
             else {
               console.log("Success", data.Items[0]);
-              let c = data.Items[0];
+              let c = campaignList[0];
               $component.$set($component, 'campaign', c);              
               $component.listSessions(c.id);
 
@@ -411,10 +422,12 @@ export default {
               $component.description = c.description || "";
             }
           }
-      });
+        }
+      }
     },
     listSessions : function(id) {        
       var $component = this;
+      let sessionList = [];
 
       // Create DynamoDB document client
       let docClient = fatesheet.getDBClient();
@@ -430,20 +443,32 @@ export default {
           }
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {           
-            console.log("Success", data.Items[0]);
-            let s = data.Items;
+      docClient.scan(params, onScan);
+      
+      function onScan(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } 
+        else {           
+          Array.prototype.push.apply(sessionList,data.Items);
 
-            if (s && s.length > 0) {
-              $component.sessions = s;
-              $component.parseSessionAll();
-            }        
+          if (typeof data.LastEvaluatedKey != "undefined") {
+            console.log("Scanning for more...");                  
+            params.ExclusiveStartKey = data.LastEvaluatedKey;
+            docClient.scan(params, onScan);
           }
-          $component.loading = false;
-      });
+          else {
+            console.log("Success", sessionList);              
+
+            if (sessionList && sessionList.length > 0) {
+              $component.sessions = sessionList;
+              $component.parseSessionAll();
+            }
+
+            $component.loading = false;
+          }
+        }        
+      }
     },    
     filterBy : function(thing) {
       this.$store.commit('updateSearchText', thing);

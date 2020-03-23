@@ -98,50 +98,60 @@ export default {
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
 
-      var params = {
+      const params = {
           TableName: fs_char.config.charactertable,
           Select: 'ALL_ATTRIBUTES',
           ExpressionAttributeValues: {':character_id' : $component.id },
           FilterExpression: 'character_id = :character_id'
       }
 
-      docClient.scan(params, function (err, data) {
+      docClient.scan(params, onScan);
+
+      function onScan(err, data) {
           if (err) {
               console.log("Error", err);
           } else {
-            var characterData = data.Items[0];
-            console.log("Success", characterData);
 
-            $component.title = characterData.name + ' (Character)';
-            $component.description = characterData.system;
-
-            //if the viewer isn't the character owner then don't let them save it
-            // it would just copy it to their account, but for now we'll just
-            // remove the option
-            if (characterData.character_owner_id !== $component.userId)
-            {
-              $('.js-create-character').remove();
+            if (typeof data.LastEvaluatedKey != "undefined") {
+                console.log("Scanning for more...");
+                params.ExclusiveStartKey = data.LastEvaluatedKey;
+                docClient.scan(params, onScan);
             }
+            else {
+              var characterData = data.Items[0];
+              console.log("Success", characterData);
 
-            //check if there is an initSheet function and run it
-            if (typeof initSheet !== "undefined") {
-                initSheet();
-            }
+              $component.title = characterData.name + ' (Character)';
+              $component.description = characterData.system;
 
-            $('form').populate(characterData);
-
-            if (typeof autocalc !== "undefined") {
-                autocalc();
-            }
-              
-            setTimeout(function() {					
-              //update the portrait
-              if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
-                $("img.portrait").prop("src", $("#character_image_url").val());
+              //if the viewer isn't the character owner then don't let them save it
+              // it would just copy it to their account, but for now we'll just
+              // remove the option
+              if (characterData.character_owner_id !== $component.userId)
+              {
+                $('.js-create-character').remove();
               }
-            }, 100);
+
+              //check if there is an initSheet function and run it
+              if (typeof initSheet !== "undefined") {
+                  initSheet();
+              }
+
+              $('form').populate(characterData);
+
+              if (typeof autocalc !== "undefined") {
+                  autocalc();
+              }
+                
+              setTimeout(function() {					
+                //update the portrait
+                if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
+                  $("img.portrait").prop("src", $("#character_image_url").val());
+                }
+              }, 100);
+            }
           }
-      });
+      }     
     },
     save : function() {
       if (this.isAuthenticated) {

@@ -13,8 +13,8 @@
               <img v-bind:src="item.character_image_url" class='img-fluid' />
             </p>
             <p class='card-text col-12 col-md-7'>
-              <label class='h6'>High Concept</label>: {{getCharacterValue(index, 'highconcept')}}<br>
-              <label class='h6'>Trouble</label>: {{getCharacterValue(index, 'trouble')}}
+              <label class='h6'>High Concept</label>: {{item.aspect.highconcept}}<br>
+              <label class='h6'>Trouble</label>: {{item.aspect.trouble}}
             </p>
           </div>
           <hr />
@@ -87,7 +87,7 @@ export default {
   data () {
     return {
       title: "Character List",
-      characters: {}
+      characters: {},
     }
   },
   methods : {
@@ -98,7 +98,8 @@ export default {
     list : function () {
       //reference this component so we can get/set data
       var $component = this;
-
+      let characterList = [];
+     
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
 
@@ -109,14 +110,26 @@ export default {
           FilterExpression: 'character_owner_id = :owner_id'
       }
 
-      docClient.scan(params, function (err, data) {
+      docClient.scan(params, onScan);
+
+      function onScan(err, data) {
           if (err) {
               console.log("Error", err);
           } else {
-              console.log("Success", data.Items);
-              $component.characters = data.Items;
+
+              Array.prototype.push.apply(characterList,data.Items);
+
+              if (typeof data.LastEvaluatedKey != "undefined") {
+                  console.log("Scanning for more...");                  
+                  params.ExclusiveStartKey = data.LastEvaluatedKey;
+                  docClient.scan(params, onScan);
+              }
+              else {
+                console.log("Success", characterList);                
+                $component.characters = characterList;
+              }
           }
-      });
+      }
     },
 
     deleteCharacter : function (event) {

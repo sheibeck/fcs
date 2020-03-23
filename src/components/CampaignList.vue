@@ -105,6 +105,7 @@ export default {
     list : function () {
       //reference this component so we can get/set data
       var $component = this;
+      let campaignList = [];
 
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
@@ -116,14 +117,26 @@ export default {
           FilterExpression: 'owner_id = :owner_id AND parent_id = :parent_id'
       }
 
-      docClient.scan(params, function (err, data) {
+      docClient.scan(params, onScan);
+      
+      function onScan (err, data) {
           if (err) {
               console.log("Error", err);
           } else {            
-              console.log("Success", data.Items);
-              $component.campaigns = data.Items;
+
+              Array.prototype.push.apply(campaignList,data.Items);
+
+              if (typeof data.LastEvaluatedKey != "undefined") {
+                  console.log("Scanning for more...");                  
+                  params.ExclusiveStartKey = data.LastEvaluatedKey;
+                  docClient.scan(params, onScan);
+              }
+              else {
+                console.log("Success", campaignList);
+                $component.campaigns = campaignList;
+              }
           }
-      });
+      }
     },  
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
@@ -139,6 +152,7 @@ export default {
     deleteCampaignLogs : function (campaignId) {
       //reference this component so we can get/set data
       var $component = this;
+      let sessionList = [];
 
       // Create DynamoDB document client
       let docClient = fatesheet.getDBClient();
@@ -154,37 +168,46 @@ export default {
           }
       }
 
-      docClient.scan(params, function(err, data) {
+      docClient.scan(params, onScan);
+      
+      function onScan(err, data) {
           if (err) {
             console.log("Error", err);
           } else {           
-            console.log("Success", data.Items[0]);
-            let sessions = data.Items;
 
-            var hasErrors = "";
-            try {
-              sessions.forEach(function(item) {          
-                docClient.delete({Key:{owner_id: $component.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
-                    if (error) {                        
-                        throw error;                        
-                    }
+          Array.prototype.push.apply(sessionList,data.Items);
+
+          if (typeof data.LastEvaluatedKey != "undefined") {
+              console.log("Scanning for more...");                  
+              params.ExclusiveStartKey = data.LastEvaluatedKey;
+              docClient.scan(params, onScan);
+          } else {          
+              console.log("Success", sessionList);             
+              var hasErrors = "";
+              try {
+                sessionList.forEach(function(item) {          
+                  docClient.delete({Key:{owner_id: $component.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
+                      if (error) {                        
+                          throw error;                        
+                      }
+                  });
                 });
-              });
-            } catch(error) {
-              hasErrors = error;
-            }
+              } catch(error) {
+                hasErrors = error;
+              }
 
-            if (hasErrors) {
-                fatesheet.notify(err.message || JSON.stringify(err));
-                console.error("Unable to delete campaign logs.");
-            } else {              
-                console.log("Campaign logs deleted.", JSON.stringify(data, null, 2));
-                               
-                //now that the logs are gone, delete the campaign itself
-                $component.deleteCampaignActual(campaignId);
-            }   
+              if (hasErrors) {
+                  fatesheet.notify(err.message || JSON.stringify(err));
+                  console.error("Unable to delete campaign logs.");
+              } else {              
+                  console.log("Campaign logs deleted.", JSON.stringify(data, null, 2));
+                                
+                  //now that the logs are gone, delete the campaign itself
+                  $component.deleteCampaignActual(campaignId);
+              }   
+            }
           }
-      });
+      }
     },
 
     deleteCampaignActual(campaignId) {

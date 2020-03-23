@@ -114,7 +114,7 @@ export default {
     return {
       title: "Adversary List",
       id: this.$route.params.id,
-      adversaries: {},
+      adversaries: [],
       title: "Adversary List",
       description: "Fate Adversaries",
     }
@@ -123,6 +123,7 @@ export default {
     list : function (searchText) {
         //reference this component so we can get/set data
         var $component = this;
+        let adversaryList = [];
 
         if (searchText)
         {
@@ -207,60 +208,73 @@ export default {
 
         }
 
-        docClient.scan(params, function (err, data) {
+        docClient.scan(params, onScan)
+        
+        function onScan(err, data) {
             if (err) {
                 console.log("Error", err);
             } else {
-                console.log("Success", data.Items);
+              
+              Array.prototype.push.apply(adversaryList,data.Items);              
 
-                //dynamodb doesn't order items, it's a NODB. WE'll manually tweak a few
-                // things to try and make them consistent
-                var adversaries = data.Items.sort(function(a,b) {return (a["adversary_name"] > b["adversary_name"]) ? 1 : ((b["adversary_name"] > a["adversary_name"]) ? -1 : 0);} );
-                $.each(adversaries, function(i, v) {
-                  if (v.adversary_aspects)
+              if (typeof data.LastEvaluatedKey != "undefined") {
+                  console.log("Scanning for more...");                  
+                  params.ExclusiveStartKey = data.LastEvaluatedKey;
+                  docClient.scan(params, onScan);
+              }
+              else {
+
+                  console.log("Success", adversaryList);
+
+                  //dynamodb doesn't order items, it's a NODB. WE'll manually tweak a few
+                  // things to try and make them consistent
+                  var adversaries = adversaryList.sort(function(a,b) {return (a["adversary_name"] > b["adversary_name"]) ? 1 : ((b["adversary_name"] > a["adversary_name"]) ? -1 : 0);} );
+                  $.each(adversaries, function(i, v) {
+                    if (v.adversary_aspects)
+                    {
+                      const orderedAspects = {};
+                      if (v.adversary_aspects["high_concept"])
+                        orderedAspects["high_concept"] = v.adversary_aspects["high_concept"];
+                      if (v.adversary_aspects["trouble"])
+                        orderedAspects["trouble"] = v.adversary_aspects["trouble"];
+                      if (v.adversary_aspects["other_aspects"])
+                        orderedAspects["other_aspects"] = v.adversary_aspects["other_aspects"];
+
+                      v.adversary_aspects = orderedAspects;
+                    }
+
+                    const orderedSkills = {};
+                    Object.keys(v.adversary_skills).sort().forEach(function(key) {
+                      orderedSkills[key] = v.adversary_skills[key];
+                    });
+                    v.adversary_skills = orderedSkills;
+
+                    const orderedConsequences = {};
+                    Object.keys(v.adversary_consequences).sort().forEach(function(key) {
+                      orderedConsequences[key] = v.adversary_consequences[key];
+                    });
+                    v.adversary_consequences = orderedConsequences;
+                  });
+
+                  //make the display wider if we only have 1 adversary
+                  if (adversaries.length === 1)
                   {
-                    const orderedAspects = {};
-                    if (v.adversary_aspects["high_concept"])
-                      orderedAspects["high_concept"] = v.adversary_aspects["high_concept"];
-                    if (v.adversary_aspects["trouble"])
-                      orderedAspects["trouble"] = v.adversary_aspects["trouble"];
-                    if (v.adversary_aspects["other_aspects"])
-                      orderedAspects["other_aspects"] = v.adversary_aspects["other_aspects"];
+                    $('#adversaryDetail').removeClass('card-columns');
 
-                    v.adversary_aspects = orderedAspects;
+                    $component.title = adversaries[0].adversary_name + ' (Adversary)';
+                    $component.description = adversaries[0].adversary_type;
                   }
+                  else {
+                    $('#adversaryDetail').addClass('card-columns');
 
-                  const orderedSkills = {};
-                  Object.keys(v.adversary_skills).sort().forEach(function(key) {
-                    orderedSkills[key] = v.adversary_skills[key];
-                  });
-                  v.adversary_skills = orderedSkills;
-
-                  const orderedConsequences = {};
-                  Object.keys(v.adversary_consequences).sort().forEach(function(key) {
-                    orderedConsequences[key] = v.adversary_consequences[key];
-                  });
-                  v.adversary_consequences = orderedConsequences;
-                });
-
-                //make the display wider if we only have 1 adversary
-                if (adversaries.length === 1)
-                {
-                  $('#adversaryDetail').removeClass('card-columns');
-
-                  $component.title = adversaries[0].adversary_name + ' (Adversary)';
-                  $component.description = adversaries[0].adversary_type;
-                }
-                else {
-                  $('#adversaryDetail').addClass('card-columns');
-
-                  $component.title = "Adversary List";
-                  $component.description = "Fate Adversaries";
+                    $component.title = "Adversary List";
+                    $component.description = "Fate Adversaries";
+                  }                
                 }
 
-                $component.adversaries = adversaries;
-            }
-        });
+                $component.adversaries = adversaryList;
+              }
+          }       
     },
     fixLabel: function (val) {
         return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
