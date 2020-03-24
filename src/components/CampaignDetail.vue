@@ -746,7 +746,7 @@ export default {
     },    
     saveCampaign : function() {      
         var $component = this;
-              debugger;
+                      
         // make sure we have a proper user id key
         $component.$set($component.campaign, "owner_id", this.userId);
         
