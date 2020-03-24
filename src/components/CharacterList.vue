@@ -103,16 +103,17 @@ export default {
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
 
-      var params = {
-          TableName: fs_char.config.charactertable,
-          Select: 'ALL_ATTRIBUTES',
-          ExpressionAttributeValues: {':owner_id' : $component.userId },
-          FilterExpression: 'character_owner_id = :owner_id'
+      let params = {
+          TableName: fs_char.config.charactertable,          
+          KeyConditionExpression: 'character_owner_id = :owner_id',          
+          ExpressionAttributeValues: {
+            ':owner_id': $component.userId            
+          }
       }
 
-      docClient.scan(params, onScan);
+      docClient.query(params, onQuery);
 
-      function onScan(err, data) {
+      function onQuery(err, data) {
           if (err) {
               console.log("Error", err);
           } else {
@@ -122,7 +123,7 @@ export default {
               if (typeof data.LastEvaluatedKey != "undefined") {
                   console.log("Scanning for more...");                  
                   params.ExclusiveStartKey = data.LastEvaluatedKey;
-                  docClient.scan(params, onScan);
+                  docClient.query(params, onQuery);
               }
               else {
                 console.log("Success", characterList);                

@@ -223,23 +223,24 @@ export default {
       var $component = this;
       let adversaryList = [];
 
-      $('#adversary_name').attr('disabled', true);
+      $('#adversary_name').attr('readonly', true);
 
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
 
-      var params = {
+      let params = {
           TableName: fs_adversary.config.adversarytable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(adversary_owner_id = :owner_id) AND (adversary_slug = :slug)',
+          IndexName: "adversary_slug-index",
+          KeyConditionExpression: 'adversary_slug = :slug',
+          FilterExpression: 'adversary_owner_id = :owner_id',
           ExpressionAttributeValues: {
             ':slug': slug,
-            ':owner_id': ownerid,
+            ':owner_id': ownerid
           }
       }
 
-      docClient.scan(params, onScan);
-      function onScan(err, data) {
+      docClient.query(params, onQuery);
+      function onQuery(err, data) {
         if (err) {
           console.log("Error", err);
         } else {
@@ -249,7 +250,7 @@ export default {
           if (typeof data.LastEvaluatedKey != "undefined") {
               console.log("Scanning for more...");                  
               params.ExclusiveStartKey = data.LastEvaluatedKey;
-              docClient.scan(params, onScan);
+              docClient.query(params, onQuery);
           }
           else {
 
