@@ -379,31 +379,42 @@ export default {
     },
     getCampaign : async function(id) {
       var $component = this;
-      
+      let campaignList = [];
+
       // Create DynamoDB document client
       let docClient = fatesheet.getDBClient();
 
       let params = {
           TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(id = :id)',
-          ExpressionAttributeValues: {
-            ':id': id,            
-          }
+          IndexName: "campaign_id-index",
+          KeyConditionExpression: 'id = :id',
+          ExpressionAttributeValues: {            
+            ':id': id,
+          },         
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
-
-            if (data.Items.length === 0)
+      docClient.query(params, onQuery);
+      
+      function onQuery(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } 
+        else {
+          Array.prototype.push.apply(campaignList,data.Items);
+          
+          if (typeof data.LastEvaluatedKey != "undefined") {
+            console.log("Scanning for more...");
+            params.ExclusiveStartKey = data.LastEvaluatedKey;
+            docClient.query(params, onQuery);
+          }
+          else {
+            if (campaignList.length === 0)
             {
               location.href = '/error';
             }
             else {
-              console.log("Success", data.Items[0]);
-              let c = data.Items[0];
+              console.log("Success", campaignList[0]);
+              let c = campaignList[0];
               $component.$set($component, 'campaign', c);              
               $component.listSessions(c.id);
 
@@ -411,39 +422,53 @@ export default {
               $component.description = c.description || "";
             }
           }
-      });
+        }
+      }
     },
     listSessions : function(id) {        
       var $component = this;
+      let sessionList = [];
 
       // Create DynamoDB document client
       let docClient = fatesheet.getDBClient();
 
       let params = {
           TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id) AND (ispublic = :is_public)',
+          KeyConditionExpression: 'owner_id = :owner_id',
+          FilterExpression: '(parent_id = :parent_id) AND (ispublic = :is_public)',
           ExpressionAttributeValues: {            
             ':owner_id': this.campaign.owner_id,
             ':parent_id': id,
             ':is_public': true,
-          }
+          },         
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {           
-            console.log("Success", data.Items[0]);
-            let s = data.Items;
+      docClient.query(params, onQuery);
+      
+      function onQuery(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } 
+        else {           
+          Array.prototype.push.apply(sessionList,data.Items);
 
-            if (s && s.length > 0) {
-              $component.sessions = s;
-              $component.parseSessionAll();
-            }        
+          if (typeof data.LastEvaluatedKey != "undefined") {
+            console.log("Scanning for more...");                  
+            params.ExclusiveStartKey = data.LastEvaluatedKey;
+            docClient.query(params, onQuery);
           }
-          $component.loading = false;
-      });
+          else {
+            console.log("Success", sessionList);              
+
+            if (sessionList && sessionList.length > 0) {
+              $component.sessions = sessionList;
+              $component.parseSessionAll();
+            }
+
+            $component.loading = false;
+          }
+        }        
+      }
     },    
     filterBy : function(thing) {
       this.$store.commit('updateSearchText', thing);

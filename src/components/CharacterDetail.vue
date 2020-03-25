@@ -19,6 +19,11 @@
             <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
           </div>
         </div>
+        <div class='col' v-if="!isAuthenticated">
+          <div class='row'>           
+            <input type="hidden" class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+          </div>
+        </div>
       </div>
 
     </form>
@@ -97,51 +102,56 @@ export default {
 
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
-
-      var params = {
+     
+      let params = {
           TableName: fs_char.config.charactertable,
-          Select: 'ALL_ATTRIBUTES',
-          ExpressionAttributeValues: {':character_id' : $component.id },
-          FilterExpression: 'character_id = :character_id'
+          IndexName: "character_id-index",
+          KeyConditionExpression: 'character_id = :character_id',
+          //FilterExpression: 'character_owner_id = :owner_id',
+          ExpressionAttributeValues: {
+            ':character_id': $component.id            
+          }
       }
 
-      docClient.scan(params, function (err, data) {
+      docClient.query(params, function(err, data) {
           if (err) {
               console.log("Error", err);
           } else {
-            var characterData = data.Items[0];
-            console.log("Success", characterData);
+          
+              var characterData = data.Items[0];
+              console.log("Success", characterData);
 
-            $component.title = characterData.name + ' (Character)';
-            $component.description = characterData.system;
+              $component.title = characterData.name + ' (Character)';
+              $component.description = characterData.system;
 
-            //if the viewer isn't the character owner then don't let them save it
-            // it would just copy it to their account, but for now we'll just
-            // remove the option
-            if (characterData.character_owner_id !== $component.userId)
-            {
-              $('.js-create-character').remove();
-            }
-
-            //check if there is an initSheet function and run it
-            if (typeof initSheet !== "undefined") {
-                initSheet();
-            }
-
-            $('form').populate(characterData);
-
-            if (typeof autocalc !== "undefined") {
-                autocalc();
-            }
-              
-            setTimeout(function() {					
-              //update the portrait
-              if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
-                $("img.portrait").prop("src", $("#character_image_url").val());
+              //if the viewer isn't the character owner then don't let them save it
+              // it would just copy it to their account, but for now we'll just
+              // remove the option
+              if (characterData.character_owner_id !== $component.userId)
+              {
+                $('.js-create-character').remove();
               }
-            }, 100);
-          }
-      });
+
+              //check if there is an initSheet function and run it
+              if (typeof initSheet !== "undefined") {
+                  initSheet();
+              }
+
+              $('form').populate(characterData);
+
+              if (typeof autocalc !== "undefined") {
+                  autocalc();
+              }
+                
+              setTimeout(function() {					
+                //update the portrait
+                if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
+                  $("img.portrait").prop("src", $("#character_image_url").val());
+                }
+              }, 100);
+            }
+      });      
+
     },
     save : function() {
       if (this.isAuthenticated) {

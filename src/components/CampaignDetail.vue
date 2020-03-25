@@ -645,7 +645,7 @@ export default {
     },
     getCampaign : async function(ownerid, id) {
       var $component = this;
-
+      
       if (id === "create") {
         this.create();
         return;
@@ -656,65 +656,79 @@ export default {
 
       let params = {
           TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(owner_id = :owner_id) AND (id = :id)',
-          ExpressionAttributeValues: {
-            ':id': id,
-            ':owner_id': ownerid,
+          Key: {
+            'owner_id': ownerid,
+            'id': id,
           }
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
-
-            if (data.Items.length === 0)
+      docClient.get(params, function (err, data) {
+        if (err) {
+          console.log("Error", err);
+          $component.loading = false;
+        } 
+        else {        
+            if (!data.Item)
             {
               location.href = '/error';
             }
             else {
-              console.log("Success", data.Items[0]);
-              let c = data.Items[0];
-              $component.$set($component, 'campaign', c);
-              $component.listSessions($component.userId, c.id);  
+              console.log("Success", data.Item);
+              
+              $component.$set($component, 'campaign', data.Item);
+              $component.listSessions($component.userId, data.Item.id);  
               
               $component.title = c.title + ' (Campaign)';
               $component.description = c.description || "";
             }
-          }
-      });
+
+            $component.loading = false;          
+        }
+      })
     },
     listSessions : function(ownerid, id) {      
       var $component = this;
+      let sessionList = [];
 
       // Create DynamoDB document client
       let docClient = fatesheet.getDBClient();
 
       let params = {
-          TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id)',
+          TableName: fs_camp.config.campaigntable,          
           ExpressionAttributeValues: {            
             ':owner_id': ownerid,
-            ':parent_id': id
-          }
+            ':parent_id': id,
+          },
+          KeyConditionExpression: 'owner_id = :owner_id',
+          FilterExpression: 'parent_id = :parent_id',
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {           
-            console.log("Success", data.Items[0]);
-            let s = data.Items;
-
-            if (s && s.length > 0) {
-              $component.sessions = s;
-              $component.parseSessionAll();
-            }        
-          }
+      docClient.query(params, onQuery);
+      
+      function onQuery(err, data) {        
+        if (err) {
+          console.log("Error", err);
           $component.loading = false;
-      });
+        } 
+        else {
+          Array.prototype.push.apply(sessionList,data.Items);
+
+          if (typeof data.LastEvaluatedKey != "undefined") {
+              console.log("Scanning for more...");                  
+              params.ExclusiveStartKey = data.LastEvaluatedKey;
+              docClient.query(params, onQuery);
+          }
+          else {
+            console.log("Success", sessionList);
+            
+            if (sessionList && sessionList.length > 0) {
+              $component.sessions = sessionList;
+              $component.parseSessionAll();
+            }
+            $component.loading = false;
+          }
+        }        
+      }
     },
     create : function() {
       let c = {
@@ -732,7 +746,7 @@ export default {
     },    
     saveCampaign : function() {      
         var $component = this;
-              
+                      
         // make sure we have a proper user id key
         $component.$set($component.campaign, "owner_id", this.userId);
         

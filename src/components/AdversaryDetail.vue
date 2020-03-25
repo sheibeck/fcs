@@ -221,33 +221,46 @@ export default {
       if (!slug) return;
 
       var $component = this;
-      $('#adversary_name').attr('disabled', true);
+      let adversaryList = [];
+
+      $('#adversary_name').attr('readonly', true);
 
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
 
-      var params = {
+      let params = {
           TableName: fs_adversary.config.adversarytable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(adversary_owner_id = :owner_id) AND (adversary_slug = :slug)',
+          IndexName: "adversary_slug-index",
+          KeyConditionExpression: 'adversary_slug = :slug',
+          FilterExpression: 'adversary_owner_id = :owner_id',
           ExpressionAttributeValues: {
             ':slug': slug,
-            ':owner_id': ownerid,
+            ':owner_id': ownerid
           }
       }
 
-      docClient.scan(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
+      docClient.query(params, onQuery);
+      function onQuery(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } else {
 
-            if (data.Items.length === 0)
+          Array.prototype.push.apply(adversaryList,data.Items);              
+
+          if (typeof data.LastEvaluatedKey != "undefined") {
+              console.log("Scanning for more...");                  
+              params.ExclusiveStartKey = data.LastEvaluatedKey;
+              docClient.query(params, onQuery);
+          }
+          else {
+
+            if (adversaryList.length === 0)
             {
               location.href = '/error';
             }
             else {
-              console.log("Success", data.Items[0]);
-              $component.adversary = data.Items[0];
+              console.log("Success", adversaryList);
+              $component.adversary = adversaryList[0];
               $component.clearAdversaryForm();
               $component.populateAdversaryForm($component.adversary);
 
@@ -255,7 +268,8 @@ export default {
               $component.description = $component.adversary.adversary_type;
             }
           }
-      });
+        }
+      }
     },
     upsertAdversary : function() {
         var $component = this;
