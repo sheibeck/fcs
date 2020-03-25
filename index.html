@@ -20,6 +20,10 @@
 
     <link rel="stylesheet" href="/static/site.css" />
 
+    <!-- sentry -->
+    <script src="https://browser.sentry-cdn.com/5.15.0/bundle.min.js" integrity="sha384-+ysfQckQvwCB5SppH41IScIz/Iynt2pePnJNMl+D7ZOzDJ+VYhQEuwB0pA60IDM0" crossorigin="anonymous">
+    </script>
+
     <!-- core js libraries -->
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.190.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -81,4 +85,7 @@
     <!-- built files will be auto injected -->
 
   </body>
+  <script>
+        Sentry.init({ dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522' });
+  </script>
 </html>

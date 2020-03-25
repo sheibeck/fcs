@@ -19,6 +19,11 @@
             <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
           </div>
         </div>
+        <div class='col' v-if="!isAuthenticated">
+          <div class='row'>           
+            <input type="hidden" class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+          </div>
+        </div>
       </div>
 
     </form>
