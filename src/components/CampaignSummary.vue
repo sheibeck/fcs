@@ -386,16 +386,16 @@ export default {
 
       let params = {
           TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(id = :id)',
-          ExpressionAttributeValues: {
-            ':id': id,            
-          }
+          IndexName: "campaign_id-index",
+          KeyConditionExpression: 'id = :id',
+          ExpressionAttributeValues: {            
+            ':id': id,
+          },         
       }
 
-      docClient.scan(params, onScan);
+      docClient.query(params, onQuery);
       
-      function onScan(err, data) {
+      function onQuery(err, data) {
         if (err) {
           console.log("Error", err);
         } 
@@ -405,7 +405,7 @@ export default {
           if (typeof data.LastEvaluatedKey != "undefined") {
             console.log("Scanning for more...");
             params.ExclusiveStartKey = data.LastEvaluatedKey;
-            docClient.scan(params, onScan);
+            docClient.query(params, onQuery);
           }
           else {
             if (campaignList.length === 0)
@@ -413,7 +413,7 @@ export default {
               location.href = '/error';
             }
             else {
-              console.log("Success", data.Items[0]);
+              console.log("Success", campaignList[0]);
               let c = campaignList[0];
               $component.$set($component, 'campaign', c);              
               $component.listSessions(c.id);
@@ -434,18 +434,18 @@ export default {
 
       let params = {
           TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id) AND (ispublic = :is_public)',
+          KeyConditionExpression: 'owner_id = :owner_id',
+          FilterExpression: '(parent_id = :parent_id) AND (ispublic = :is_public)',
           ExpressionAttributeValues: {            
             ':owner_id': this.campaign.owner_id,
             ':parent_id': id,
             ':is_public': true,
-          }
+          },         
       }
 
-      docClient.scan(params, onScan);
+      docClient.query(params, onQuery);
       
-      function onScan(err, data) {
+      function onQuery(err, data) {
         if (err) {
           console.log("Error", err);
         } 
@@ -455,7 +455,7 @@ export default {
           if (typeof data.LastEvaluatedKey != "undefined") {
             console.log("Scanning for more...");                  
             params.ExclusiveStartKey = data.LastEvaluatedKey;
-            docClient.scan(params, onScan);
+            docClient.query(params, onQuery);
           }
           else {
             console.log("Success", sessionList);              

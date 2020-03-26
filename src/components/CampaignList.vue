@@ -109,17 +109,20 @@ export default {
 
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
+    
+      let params = {
+          TableName: fs_camp.config.campaigntable,          
+          KeyConditionExpression: 'owner_id = :owner_id',
+          FilterExpression: 'parent_id = :parent_id',       
+          ExpressionAttributeValues: {           
+            ':owner_id': $component.userId,
+            ':parent_id' :  fatesheet.emptyGuid()
+          }
+      }        
 
-      var params = {
-          TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          ExpressionAttributeValues: {':owner_id' : $component.userId, ':parent_id' :  fatesheet.emptyGuid()},
-          FilterExpression: 'owner_id = :owner_id AND parent_id = :parent_id'
-      }
-
-      docClient.scan(params, onScan);
+      docClient.query(params, onQuery);
       
-      function onScan (err, data) {
+      function onQuery(err, data) {
           if (err) {
               console.log("Error", err);
           } else {            
@@ -129,7 +132,7 @@ export default {
               if (typeof data.LastEvaluatedKey != "undefined") {
                   console.log("Scanning for more...");                  
                   params.ExclusiveStartKey = data.LastEvaluatedKey;
-                  docClient.scan(params, onScan);
+                  docClient.query(params, onQuery);
               }
               else {
                 console.log("Success", campaignList);
@@ -159,18 +162,18 @@ export default {
 
       //get a list of all the logs for this campaign
       let params = {
-          TableName: fs_camp.config.campaigntable,
-          Select: 'ALL_ATTRIBUTES',
-          FilterExpression: '(owner_id = :owner_id) AND (parent_id = :parent_id)',
+          TableName: fs_camp.config.campaigntable,          
           ExpressionAttributeValues: {            
-            ':owner_id': $component.userId,
-            ':parent_id': campaignId
-          }
+            ':owner_id': this.userId,
+            ':parent_id': campaignId,
+          },
+          KeyConditionExpression: 'owner_id = :owner_id',
+          FilterExpression: 'parent_id = :parent_id',
       }
 
-      docClient.scan(params, onScan);
+      docClient.query(params, onQuery);
       
-      function onScan(err, data) {
+      function onQuery(err, data) {
           if (err) {
             console.log("Error", err);
           } else {           
@@ -180,7 +183,7 @@ export default {
           if (typeof data.LastEvaluatedKey != "undefined") {
               console.log("Scanning for more...");                  
               params.ExclusiveStartKey = data.LastEvaluatedKey;
-              docClient.scan(params, onScan);
+              docClient.onQuery(params, onQuery);
           } else {          
               console.log("Success", sessionList);             
               var hasErrors = "";

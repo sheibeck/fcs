@@ -19,6 +19,11 @@
             <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
           </div>
         </div>
+        <div class='col' v-if="!isAuthenticated">
+          <div class='row'>           
+            <input type="hidden" class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+          </div>
+        </div>
       </div>
 
     </form>
@@ -97,27 +102,22 @@ export default {
 
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
-
-      const params = {
+     
+      let params = {
           TableName: fs_char.config.charactertable,
-          Select: 'ALL_ATTRIBUTES',
-          ExpressionAttributeValues: {':character_id' : $component.id },
-          FilterExpression: 'character_id = :character_id'
+          IndexName: "character_id-index",
+          KeyConditionExpression: 'character_id = :character_id',
+          //FilterExpression: 'character_owner_id = :owner_id',
+          ExpressionAttributeValues: {
+            ':character_id': $component.id            
+          }
       }
 
-      docClient.scan(params, onScan);
-
-      function onScan(err, data) {
+      docClient.query(params, function(err, data) {
           if (err) {
               console.log("Error", err);
           } else {
-
-            if (typeof data.LastEvaluatedKey != "undefined") {
-                console.log("Scanning for more...");
-                params.ExclusiveStartKey = data.LastEvaluatedKey;
-                docClient.scan(params, onScan);
-            }
-            else {
+          
               var characterData = data.Items[0];
               console.log("Success", characterData);
 
@@ -150,8 +150,8 @@ export default {
                 }
               }, 100);
             }
-          }
-      }     
+      });      
+
     },
     save : function() {
       if (this.isAuthenticated) {
