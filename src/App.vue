@@ -74,13 +74,16 @@
 
     <footer class='footer'>
       <div class="container">
-        <div class='row'>
-          <div class="col text-right">
-            <span class="dice">C</span> Built by Darktier Studios, LLC.
+        <div class='d-flex justify-content-between'>
+          <div>
+            <span class="dice">C</span> <span class="d-none d-md-inline">Built by</span> Darktier Studios, LLC.
           </div>
-          <div class="col">
+          <div class="d-none d-sm-block">
             <span class="dice">A</span> Powered by Fate
           </div>
+          <div class="pt-2">
+            <a href="https://www.iubenda.com/privacy-policy/23267044" class="iubenda-black iubenda-embed" title="Privacy Policy ">Privacy Policy</a>            
+          </div>       
         </div>
       </div>
     </footer>
