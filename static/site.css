@@ -90,6 +90,11 @@
   background-color: #f5f5f5;
 }
 
+/* hack for production issue */
+textarea {
+  height: 100%;
+}
+
 /* print styles */
 @media print {
     div.sheet:last-child {
