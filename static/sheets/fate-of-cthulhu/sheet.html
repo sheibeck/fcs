@@ -1,5 +1,4 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<!-- css libraries -->
 <link rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -84,20 +83,20 @@
         cursor: pointer;
     }
 
-        /* IMAGE STYLES */
-        .corrupted-checkbox + div {
-            min-width: 50px;
-            min-height: 50px;
-            background-repeat: no-repeat;
-            background-position: center center;
-            cursor: pointer;
-            background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox.png');
-        }
+    /* IMAGE STYLES */
+    .corrupted-checkbox + div {
+        min-width: 50px;
+        min-height: 50px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        cursor: pointer;
+        background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox.png');
+    }
 
-        /* CHECKED STYLES */
-        .corrupted-checkbox:checked + div {
-            background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox-checked.png');
-        }
+    /* CHECKED STYLES */
+    .corrupted-checkbox:checked + div {
+        background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox-checked.png');
+    }
 
     textarea {
         border: 0 !important;
@@ -204,10 +203,10 @@
                     <textarea class="form-control" id="stunts" name="stunts" rows="14" placeholder="Regular Stunts"></textarea>
                 </div>
 
-                <div class="form-group">
-                    <div for="" class="fate-header">Corrupted Stunts</div>
-                </div>
-
+            </div>
+            
+            <div for="" class="fate-header">Corrupted Stunts</div>      
+            <div class="px-3">
                 <div class="form-group mb-0">
                     <div class="small text-muted font-italic">Whenever one of your aspects becomes corrupted, you also gain a corruption stunt at the next minor milestone.</div>
                     <textarea class="form-control" id="stunts_corrupted" name="stunts_corrupted" rows="14" placeholder="Corrupted Stunts"></textarea>
