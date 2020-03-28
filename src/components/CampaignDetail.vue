@@ -26,8 +26,8 @@
       border-bottom: solid 1px black;
     }   
     
-    textarea {
-      height: 150px;
+    .campaign textarea {
+      min-height: 150px;
     }
 
     .sessionLog {
@@ -49,7 +49,7 @@
 </style>
 
 <template>
-  <div class="container mt-2">
+  <div class="container mt-2 campaign">
 
     <div class="d-flex justify-content-center" v-if="isLoading">
       <div class="p-5 h2">Loading ... <i class="fas fa-cog fa-spin"></i></div>
