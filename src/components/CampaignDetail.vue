@@ -1,4 +1,4 @@
-<style type="text/css">  
+<style type="text/css">
     ul li.disabled {
         cursor: default;
         text-decoration: line-through;
@@ -256,9 +256,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import VueShowdown, { showdown } from 'vue-showdown'
+import { mapGetters } from 'vuex';
+import VueShowdown, { showdown } from 'vue-showdown';
 import { Datetime } from 'vue-datetime';
+import NamedRegExp from 'named-regexp-groups';
 
 showdown.extension('fcsCampaign', () => [ 
   {
@@ -454,10 +455,10 @@ export default {
 
       this.saveSession(session);
     },
-    parseThings: function(stringToParse, sessionId, removeThing){
+    parseThings: function(stringToParse, sessionId, removeThing){      
       var $component = this;      
       let regexString = `(?<thing>[#@!~]"(?<display>.+?)")(?:\\s?\\[(?<description>.*?)\\])?`;
-      let regex = new RegExp(regexString, "g");
+      let regex = new NamedRegExp(regexString, "g");
       let match = regex.exec(stringToParse);
 
       let listToUpdate = null;
@@ -509,7 +510,7 @@ export default {
       }
       return -1;
     },    
-    updateThing : function(list, sessionId, match, removeThing) {
+    updateThing : function(list, sessionId, match, removeThing) {      
       let thing = match.groups.thing;
       let display = match.groups.display;
       let description = match.groups.description || null;
@@ -678,8 +679,8 @@ export default {
               $component.$set($component, 'campaign', data.Item);
               $component.listSessions($component.userId, data.Item.id);  
               
-              $component.title = c.title + ' (Campaign)';
-              $component.description = c.description || "";
+              $component.title = $component.campaign.title + ' (Campaign)';
+              $component.description = $component.campaign.description || "";
             }
 
             $component.loading = false;          
