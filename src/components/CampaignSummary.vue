@@ -27,7 +27,7 @@
     }  
     
     .campaign textarea {
-      height: 150px;
+      min-height: 150px;
     }
 
     .sessionLog {
@@ -129,8 +129,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import VueShowdown, { showdown } from 'vue-showdown'
+import { mapGetters } from 'vuex';
+import VueShowdown, { showdown } from 'vue-showdown';
+import NamedRegExp from 'named-regexp-groups';
 
 showdown.extension('fcsCampaignHidden', () => [ 
   {
@@ -283,7 +284,7 @@ export default {
     parseThings: function(stringToParse, sessionId, removeThing){
       var $component = this;      
       let regexString = `(?<thing>[#@!~]"(?<display>.+?)")(?:\\s?\\[(?<description>.*?)\\])?`;
-      let regex = new RegExp(regexString, "g");
+      let regex = new NamedRegExp(regexString, "g");
       let match = regex.exec(stringToParse);
 
       let listToUpdate = null;
