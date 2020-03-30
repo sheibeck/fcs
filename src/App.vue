@@ -27,7 +27,7 @@
               </li>
               <li class="nav-item dropdown">
                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <i class="fas fa-microchip"></i> Tools
+                   <i class="fas fa-tools"></i> Tools
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                    <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
@@ -47,6 +47,9 @@
                   <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fab fa-wordpress"></i> Blog</a>
                   <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
                 </div>
+              </li>
+               <li class="nav-item" ref="el">
+                  <a class="nav-link" href="http://paypal.me/sheibeck" target="_blank"><i class="fas fa-coins"></i> Donate</a>
               </li>			              
           </ul>
 
