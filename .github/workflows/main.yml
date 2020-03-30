@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
+        node-version: [12.x]
 
     steps:
     - name: Extract branch name
@@ -33,7 +33,7 @@ jobs:
       with:
         args: --acl public-read
       env:
-        AWS_S3_BUCKET: ${{ format('{0}_{1}', 'secrets.AWS_S3_BUCKET', steps.extract_branch.outputs.branch) }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_develop }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}       
         SOURCE_DIR: "dist"
