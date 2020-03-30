@@ -116,17 +116,9 @@ const webpackConfig = merge(baseWebpackConfig, {
         ignore: ['.*']
       },
       { 
-        from: path.resolve(__dirname, '../robots.txt'),
+        from: path.resolve(__dirname, '../src/favicon'),
         to:'.'
-      },
-      { 
-        from: path.resolve(__dirname, '../favicon.png'),
-        to:'.'
-      },
-      { 
-        from: path.resolve(__dirname, '../favicon.ico'),
-        to:'.'
-      } 
+      },     
     ])
   ]
 })
