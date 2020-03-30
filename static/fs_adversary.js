@@ -40,7 +40,3 @@
     }
 
 })(window.fs_adversary = window.fs_adversary || {}, jQuery);
-
-$(function () {
-  fs_adversary.init();
-});

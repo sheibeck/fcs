@@ -9,10 +9,7 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-              <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
-                  <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
-              </li>
+          <ul class="navbar-nav mr-auto">              
               <li class="nav-item dropdown" v-if="isAuthenticated" v-bind:class="{active : isActive('character') || isActive('campaign')}">
                  <a class="nav-link dropdown-toggle" href="#" id="myStuffDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                    <span class="dice">C</span>My Stuff
@@ -22,6 +19,9 @@
                     <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>                        
                  </div>
               </li>             
+              <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
+                  <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
+              </li>
               <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>

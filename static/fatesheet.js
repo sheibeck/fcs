@@ -1,5 +1,3 @@
-
-
 /***********************************
   CORE FateCharacterSheet Library
 ***********************************/
@@ -388,7 +386,12 @@ String.prototype.toTitleCase = function () {
           default:
               fatesheet.config.environment = 'production';
               break;
-      }
+      }      
+
+      Sentry.init({
+        dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522',
+        environment: fatesheet.config.environment,
+      });
     }
 
     fatesheet.setTitle = function(title, page) {
