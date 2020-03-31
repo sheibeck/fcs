@@ -2,7 +2,6 @@
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader')
 
 const utils = require('./utils')
@@ -12,7 +11,7 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'assets': utils.resolve('src/assets'),
-      //'pages': utils.resolve('src/pages'),YT
+      'pages': utils.resolve('src/pages'),
       'static': utils.resolve('static'),
       'components': utils.resolve('src/components'),
       'vue': 'vue/dist/vue.js'
@@ -67,8 +66,7 @@ module.exports = {
     ]
   },
 
-  plugins: [
-    new CleanWebpackPlugin(),
+  plugins: [    
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
