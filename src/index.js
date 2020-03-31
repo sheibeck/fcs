@@ -10,6 +10,7 @@ import VueShowdown, { showdown } from 'vue-showdown'
 import App from './App'
 import router from './router'
 import 'whatwg-fetch'
+import './assets/site.scss'
 
 Vue.use(Vuex)
 Vue.use(VueAppend)

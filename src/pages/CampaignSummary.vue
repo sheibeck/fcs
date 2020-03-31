@@ -29,11 +29,7 @@
 
   .sessionLog {
     max-height: 500px;
-    overflow-y: scroll;
-
-    textarea {
-      min-height: 150px;
-    }
+    overflow-y: scroll;   
   }
 
   .card-body {

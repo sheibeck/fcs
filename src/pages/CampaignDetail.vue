@@ -26,13 +26,15 @@
     border-bottom: solid 1px black;
   }   
 
-  .sessionLog {
-    max-height: 500px;
-    overflow-y: scroll;
-    
+  #logs {
     textarea {
       min-height: 150px;
     }
+  }
+
+  .sessionLog {
+    max-height: 500px;
+    overflow-y: scroll;   
   }
 
   .card-body {

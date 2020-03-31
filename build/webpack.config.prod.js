@@ -7,6 +7,12 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = merge(baseConfig, {
   mode: 'production',
+  
+  output: {    
+    filename: '[name].[hash].js',
+    publicPath: "/",
+  }, 
+
   optimization: {
     splitChunks: {
       cacheGroups: {
@@ -19,36 +25,26 @@ module.exports = merge(baseConfig, {
     },
   },
   module: {
-    rules: [
+    rules: [      
       {
-        test: /\.css?$/,
-        use: [
-          MiniCssExtractPlugin.loader, 
-          'css-loader'
-        ]
-      }, {
-        test: /\.styl(us)?$/,
-        use: [
-          MiniCssExtractPlugin.loader, 
-          'css-loader', 
-          'stylus-loader'
-        ]
-      },
-      {
-        test: /\.s[ac]ss$/i,
-        use: [
+        test: /\.(sa|sc|c)ss$/,
+        use: [ 
           MiniCssExtractPlugin.loader,
-          'vue-style-loader',
+          //'vue-style-loader',
           'css-loader',
           'sass-loader'
         ]
       },
+      
     ]
   },
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'main.css'
+       // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: '[name].[hash].css',
+      chunkFilename: '[id].[hash].css',
     })
   ]
 })

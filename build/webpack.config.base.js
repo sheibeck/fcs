@@ -6,7 +6,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 const utils = require('./utils')
 
-module.exports = {  
+module.exports = { 
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
@@ -70,7 +70,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
-      inject: false,      
+      inject: true,      
     }),
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([{      
