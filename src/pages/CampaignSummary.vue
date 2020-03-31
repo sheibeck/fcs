@@ -1,55 +1,58 @@
-<style type="text/css">  
-    ul li.disabled {
-        cursor: default;
-        text-decoration: line-through;
-    }
-    label {
-      font-weight: 700;
-    }
+<style lang="scss" scoped>  
 
-    .fa-question-circle,
-    .fa-filter,
-    .fa-arrow-circle-down,
-    .fa-arrow-circle-up,
-    .cursor {
-      cursor: pointer;
-      color: #888;
-    }     
+  ul li.disabled {
+      cursor: default;
+      text-decoration: line-through;
+  }
+  label {
+    font-weight: 700;
+  }
 
-    .badge-secondary {
-      background-color: #ccc;
-      height: 50%;
-      margin-top: 10px;
-    }
+  .fa-question-circle,
+  .fa-filter,
+  .fa-arrow-circle-down,
+  .fa-arrow-circle-up,
+  .cursor {
+    cursor: pointer;
+    color: #888;
+  }     
 
-    .header {
-      border-bottom: solid 1px black;
-    }  
-    
-    .campaign textarea {
+  .badge-secondary {
+    background-color: #ccc;
+    height: 50%;
+    margin-top: 10px;
+  }
+
+  .header {
+    border-bottom: solid 1px black;
+  }    
+
+  .sessionLog {
+    max-height: 500px;
+    overflow-y: scroll;
+
+    textarea {
       min-height: 150px;
     }
+  }
 
-    .sessionLog {
-      max-height: 500px;
-      overflow-y: scroll;
-    }
-
-    .card-body {
-      padding: .5em;
-    }
-
-    #summary ul li {
-      list-style: none;
-    }
-
-    #summary ul {
+  .card-body {
+    padding: .5em;
+  }
+  
+  #summary {
+    ul { 
       padding-left: 10px;
+
+      li {
+        list-style: none;
+      }
     }
+  }
 </style>
 
 <template>
-  <div class="container mt-2 campaign">
+  <div class="container mt-2">
 
     <div class="d-flex justify-content-center" v-if="isLoading">
       <div class="p-5 h2">Loading ... <i class="fas fa-cog fa-spin"></i></div>

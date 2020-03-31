@@ -2,7 +2,7 @@
 <div class="container mt-2">
   <div class="row">
     <div class="col-12 text-center">
-    <img class="img-fluid" src="../assets/big-logo.png" alt="Big Logo" />
+    <img class="img-fluid" src="/static/img/big-logo.png" alt="Big Logo" />
     </div>
   </div>
 
