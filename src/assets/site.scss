@@ -1,4 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Bowlby+One+SC');
+$fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
+@import "./node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "./node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
 
 .brand-name {
     font-size: 1.5em;
