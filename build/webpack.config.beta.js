@@ -61,8 +61,8 @@ module.exports = merge(baseConfig, {
     }),
     new CopyWebpackPlugin([{      
       //copy sitemap and robots.txt
-      from: utils.resolve('src/assets/prod'),
-      to: utils.resolve('dist'),
+      from: utils.assetsPath('beta/'),
+      to: utils.resolve('dist/'),
       toType: 'dir'    
     }])
   ]
