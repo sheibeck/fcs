@@ -74,9 +74,8 @@ module.exports = {
     }),
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([{      
-      //copy sitemap and robots.txt
-      from: utils.resolve('src/assets/beta'),
-      to: utils.resolve('dist'),
+      from: utils.resolve('static'),
+      to: utils.resolve('dist/static'),
       toType: 'dir'    
     }])
   ]

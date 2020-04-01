@@ -11,6 +11,11 @@ import App from './App'
 import router from './router'
 import 'whatwg-fetch'
 import './assets/site.scss'
+import './assets/js/fatesheet'
+import './assets/js/fs_adversary'
+import './assets/js/fs_campaign'
+import './assets/js/fs_char'
+import './assets/js/fs_dicetray'
 
 Vue.use(Vuex)
 Vue.use(VueAppend)
