@@ -32,8 +32,7 @@
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                    <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
                    <div class="dropdown-divider"></div>
-                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="/static/img/roll20logo.png" alt="Roll20 logo" class="roll-20"> Roll20.net</a>
-                   <a class="nav-link" target="_blank" href="https://chrome.google.com/webstore/detail/solo-roleplay-tools/ihkaageibnflklkfegijfcjmkebmgbnl/reviews"><span class="dice">+</span> Solo Roleplay Tools</a>
+                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="/static/img/roll20logo.png" alt="Roll20 logo" class="roll-20"> Roll20.net</a>                   
                    <a class="nav-link" target="_blank" href="https://www.rpgsolo.com/"><span class="dice">+</span> RPG Solo</a>
                    <div class="dropdown-divider"></div>
                    <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Fate Dice Roller</a>
@@ -44,7 +43,7 @@
                   <span class="dice">O</span> Support
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fab fa-wordpress"></i> Blog</a>
+                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-blog"></i> Blog</a>
                   <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
                 </div>
               </li>
