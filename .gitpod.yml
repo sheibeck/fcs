@@ -1,0 +1,8 @@
+tasks:
+  - init: npm install
+    command: npm run dev
+
+vscode:
+  extensions:
+    - sdras.vue-vscode-extensionpack@0.2.0:J/GITGpgUKWSiKL4CL8Pug==
+    - octref.vetur@0.24.0:wQwUWmMBrV2Y+ZN1GPaapg==

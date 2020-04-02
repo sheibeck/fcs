@@ -10,10 +10,10 @@ const PORT = 8080
 module.exports = merge(baseConfig, {
   mode: 'development',
 
-  output: {    
+  output: {
     filename: '[name].js',
     publicPath: "/",
-  }, 
+  },
 
   devServer: {
     clientLogLevel: 'warning',
@@ -30,10 +30,10 @@ module.exports = merge(baseConfig, {
   },
 
   module: {
-    rules: [     
+    rules: [
       {
         test: /\.(sa|sc|c)ss$/,
-        use: [         
+        use: [
           'vue-style-loader',
           'css-loader',
           'sass-loader'
@@ -42,7 +42,7 @@ module.exports = merge(baseConfig, {
     ]
   },
 
-  plugins: [  
+  plugins: [
     new webpack.HotModuleReplacementPlugin()
   ]
 })

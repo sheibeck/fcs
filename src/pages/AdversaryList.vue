@@ -3,18 +3,22 @@
     <!-- list of adversaries -->
     <div class='js-adversary-list'>
 
-      <div v-if="!id" class="d-print-none mb-2 d-flex">
-        <a v-if="!isAuthenticated" href='/login' type="button" class="btn btn-primary mr-auto">
+      <div v-if="!id" class="d-print-none mb-2 d-md-flex">
+        <a v-if="!isAuthenticated" href='/login' type="button" class="btn btn-primary mb-1 mb-md-0">
             Login to Create an Adversary <span class='dice'>A</span>
         </a>
-            
-        <a v-if="isAuthenticated" role="button" href="/adversary/edit" class="btn btn-success js-create-adversary">Create Adversary <i class='fa fa-plus'></i></a>        
-        <span v-if="isAuthenticated" class="pt-2 pl-2 mr-auto">
+
+        <a v-if="isAuthenticated" role="button" href="/adversary/edit" class="btn btn-success js-create-adversary mb-1 mb-md-0">
+          Create Adversary <i class='fa fa-plus'></i>
+        </a>
+
+        <div v-if="isAuthenticated" class="pt-2 pl-2 mr-auto ">
           <input type="checkbox" class="" id="my_adversaries" v-on:change="list()" />
           <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
-        </span>
-                                
-        <button type="button" class="btn btn-warning btn-sm mr-1" v-show="$store.state.searchText" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
+        </div>
+
+        <search class=""></search>
+    </div>
       </div>
 
       <div class='card-columns' id="adversaryDetail">
@@ -83,9 +87,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Search from '../components/search'
 
 export default {
   name: 'CharacterList',
+  components: {
+    search: Search,
+  },
   created(){
     fs_adversary.init();
   },
@@ -101,7 +109,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-      'searchText'  
+      'searchText'
     ]),
   },
   watch: {
@@ -209,16 +217,16 @@ export default {
         }
 
         docClient.scan(params, onScan)
-        
+
         function onScan(err, data) {
             if (err) {
                 console.log("Error", err);
             } else {
-              
-              Array.prototype.push.apply(adversaryList,data.Items);              
+
+              Array.prototype.push.apply(adversaryList,data.Items);
 
               if (typeof data.LastEvaluatedKey != "undefined") {
-                  console.log("Scanning for more...");                  
+                  console.log("Scanning for more...");
                   params.ExclusiveStartKey = data.LastEvaluatedKey;
                   docClient.scan(params, onScan);
               }
@@ -269,12 +277,12 @@ export default {
 
                     $component.title = "Adversary List";
                     $component.description = "Fate Adversaries";
-                  }                
+                  }
                 }
 
                 $component.adversaries = adversaryList;
               }
-          }       
+          }
     },
     fixLabel: function (val) {
         return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
@@ -307,13 +315,13 @@ export default {
       return badge;
     },
     searchByTag : function(event) {
-      var tag = $(event.currentTarget).data('search-text');      
+      var tag = $(event.currentTarget).data('search-text');
       this.$store.commit('updateSearchText', tag)
-      fatesheet.search(tag);      
+      fatesheet.search(tag);
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fatesheet.search("");      
+      fatesheet.search("");
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;

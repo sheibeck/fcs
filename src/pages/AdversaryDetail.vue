@@ -229,7 +229,7 @@ export default {
       var docClient = fatesheet.getDBClient();
 
       let params = {
-          TableName: fs_adversary.config.adversarytable,
+          TableName: '',
           IndexName: "adversary_slug-index",
           KeyConditionExpression: 'adversary_slug = :slug',
           FilterExpression: 'adversary_owner_id = :owner_id',
@@ -245,10 +245,10 @@ export default {
           console.log("Error", err);
         } else {
 
-          Array.prototype.push.apply(adversaryList,data.Items);              
+          Array.prototype.push.apply(adversaryList,data.Items);
 
           if (typeof data.LastEvaluatedKey != "undefined") {
-              console.log("Scanning for more...");                  
+              console.log("Scanning for more...");
               params.ExclusiveStartKey = data.LastEvaluatedKey;
               docClient.query(params, onQuery);
           }

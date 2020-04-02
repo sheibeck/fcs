@@ -19,18 +19,17 @@
         else {
           $('.fs-tools').addClass('hidden');
         }
-      });      
+      });
     }
 
     function configEnvironment(env) {
       switch (env) {
-          case 'develop':
-          case 'beta':
-              fs_adversary.config.adversarytable = 'fate_adversary_dev';
+          case 'production':
+              fs_adversary.config.adversarytable = 'fate_adversary';
               break;
 
           default:
-              fs_adversary.config.adversarytable = 'fate_adversary';
+              fs_adversary.config.adversarytable = 'fate_adversary_dev';
       }
     }
 

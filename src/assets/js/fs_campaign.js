@@ -4,7 +4,7 @@
 ***********************************/
 (function (fs_camp, $, undefined) {
     fs_camp.config = {
-        campaigntable: '',        
+        campaigntable: '',
     }
 
     fs_camp.getShareUrl = function($obj) {
@@ -52,13 +52,12 @@
 
     function configEnvironment(env) {
       switch (env) {
-          case 'develop':
-          case 'beta':
-              fs_camp.config.campaigntable = 'fate_campaign_dev';              
+          case 'production':
+              fs_camp.config.campaigntable = 'fate_campaign';
               break;
 
           default:
-              fs_camp.config.campaigntable = 'fate_campaign';              
+              fs_camp.config.campaigntable = 'fate_campaign_dev';
       }
     }
 

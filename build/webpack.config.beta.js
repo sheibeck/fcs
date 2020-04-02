@@ -9,13 +9,13 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const utils = require('./utils')
 
 module.exports = merge(baseConfig, {
-  mode: 'production',
-  
-  output: {    
+  mode: 'development',
+
+  output: {
     filename: '[name].[hash].js',
     publicPath: "/",
-  }, 
-  optimization: {    
+  },
+  optimization: {
     minimize: true,
     minimizer: [
       new TerserPlugin({
@@ -38,17 +38,17 @@ module.exports = merge(baseConfig, {
     },
   },
   module: {
-    rules: [      
+    rules: [
       {
         test: /\.(sa|sc|c)ss$/,
-        use: [ 
+        use: [
           MiniCssExtractPlugin.loader,
           //'vue-style-loader',
           'css-loader',
           'sass-loader'
         ]
       },
-      
+
     ]
   },
   plugins: [
@@ -59,11 +59,11 @@ module.exports = merge(baseConfig, {
       filename: '[name].[hash].css',
       chunkFilename: '[id].[hash].css',
     }),
-    new CopyWebpackPlugin([{      
+    new CopyWebpackPlugin([{
       //copy sitemap and robots.txt
       from: utils.assetsPath('beta/'),
       to: utils.resolve('dist/'),
-      toType: 'dir'    
+      toType: 'dir'
     }])
   ]
 })

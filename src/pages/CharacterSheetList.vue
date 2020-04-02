@@ -1,8 +1,9 @@
-<template> 
+<template>
   <div class="container mt-2">
-      <div class="d-flex">
-        <h1 class="mr-auto">Character Sheets</h1>
-        <button type="button" class="btn btn-warning btn-sm mr-1 mt-2" style="max-height:40px;" v-show="$store.state.searchText" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
+      <div class="d-md-flex">
+        <h1 class="mr-auto justify-content-center d-none d-md-block">Character Sheets</h1>
+        <div class="mr-auto d-md-none"></div>
+        <search class="mt-0 mt-md-1 mb-1"></search>
       </div>
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
@@ -21,12 +22,16 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Search from '../components/search'
 
 export default {
   name: 'CharacterSheetList',
   metaInfo: {
       // if no subcomponents specify a metaInfo.title, this title will be used
-      title: 'Character Sheets',      
+      title: 'Character Sheets',
+  },
+  components: {
+    search: Search,
   },
   created(){
     fs_char.init();
@@ -75,7 +80,7 @@ export default {
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fatesheet.search("");      
+      fatesheet.search("");
     },
   }
 }

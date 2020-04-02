@@ -1,8 +1,8 @@
 <template>
   <div class="container mt-2">
-    <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-flex">      
-      <a href='/charactersheet' class='btn btn-success mr-auto'>Create a Character <i class='fa fa-user'></i></a>      
-      <button type="button" class="btn btn-warning btn-sm mr-1" v-show="$store.state.searchText" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
+    <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-md-flex">
+      <a href='/charactersheet' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Character <i class='fa fa-user'></i></a>
+      <search class=""></search>
     </div>
     <div class='card-columns'>
       <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
@@ -20,7 +20,7 @@
           <hr />
           <div class="d-flex">
             <a v-bind:href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
-            <a href='#' class='btn btn-secondary js-share-character mr-auto'>Share <i class='fa fa-share-square'></i></a>
+            <a href='#' class='btn btn-secondary js-share-character ml-1 mr-auto'>Share <i class='fa fa-share-square'></i></a>
             <a href='#' class='btn' style='color:red' v-bind:data-id='item.character_id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
           </div>
         </div>
@@ -56,12 +56,16 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Search from '../components/search'
 
 export default {
   name: 'CharacterList',
   metaInfo: {
       // if no subcomponents specify a metaInfo.title, this title will be used
-      title: 'My Characters',      
+      title: 'My Characters',
+  },
+  components: {
+    search: Search,
   },
   created(){
     fs_char.init();
@@ -99,15 +103,15 @@ export default {
       //reference this component so we can get/set data
       var $component = this;
       let characterList = [];
-     
+
       // Create DynamoDB document client
       var docClient = fatesheet.getDBClient();
 
       let params = {
-          TableName: fs_char.config.charactertable,          
-          KeyConditionExpression: 'character_owner_id = :owner_id',          
+          TableName: fs_char.config.charactertable,
+          KeyConditionExpression: 'character_owner_id = :owner_id',
           ExpressionAttributeValues: {
-            ':owner_id': $component.userId            
+            ':owner_id': $component.userId
           }
       }
 
@@ -121,12 +125,12 @@ export default {
               Array.prototype.push.apply(characterList,data.Items);
 
               if (typeof data.LastEvaluatedKey != "undefined") {
-                  console.log("Scanning for more...");                  
+                  console.log("Scanning for more...");
                   params.ExclusiveStartKey = data.LastEvaluatedKey;
                   docClient.query(params, onQuery);
               }
               else {
-                console.log("Success", characterList);                
+                console.log("Success", characterList);
                 $component.characters = characterList;
               }
           }
@@ -163,15 +167,15 @@ export default {
           }
       });
     },
-    
+
     searchByTag : function(event) {
-      var tag = $(event.currentTarget).data('search-text');      
+      var tag = $(event.currentTarget).data('search-text');
       this.$store.commit('updateSearchText', tag)
-      fatesheet.search(tag);      
+      fatesheet.search(tag);
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fatesheet.search("");      
+      fatesheet.search("");
     },
 
   }

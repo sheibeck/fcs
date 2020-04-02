@@ -44,15 +44,14 @@
 
     function configEnvironment(env) {
       switch (env) {
-          case 'develop':
-          case 'beta':
-              fs_char.config.charactersheettable = 'fate_charactersheet_dev';
-              fs_char.config.charactertable = 'fate_character_dev';
+          case 'production':
+              fs_char.config.charactersheettable = 'fate_charactersheet';
+              fs_char.config.charactertable = 'fate_character';
               break;
 
           default:
-              fs_char.config.charactersheettable = 'fate_charactersheet';
-              fs_char.config.charactertable = 'fate_character';
+              fs_char.config.charactersheettable = 'fate_charactersheet_dev';
+              fs_char.config.charactertable = 'fate_character_dev';
       }
     }
 

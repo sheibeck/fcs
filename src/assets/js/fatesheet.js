@@ -36,7 +36,7 @@ String.prototype.toTitleCase = function () {
     fatesheet.config = {
         callback: null,
         content: $('#results'),
-        environment: '',
+        environment: process.env.NODE_ENV,
         isAuthenticated: false,
         fbAppId: '189783225112476',
         authorizedUserArn: 'arn:aws:iam::210120940769:role/FateCharacterSheetUser',
@@ -178,7 +178,7 @@ String.prototype.toTitleCase = function () {
                 fcs.$options.filters.filterCampaigns();
             } else {
                 fcs.$options.filters.filterSessions();
-            }            
+            }
         }
     }
 
@@ -370,28 +370,20 @@ String.prototype.toTitleCase = function () {
     ENVIRONMENT
   ****************/
     // help out with dev tasks by switching environments up based on the URL
-    fatesheet.setupForEnvironment = function (env) {
+    fatesheet.setupForEnvironment = function () {
 
-      switch (env) {
-          case 'localhost:8080':
-              fatesheet.config.environment = 'develop';
-              $('body').prepend('<h1 class="d-print-none">'+ fatesheet.config.environment.toUpperCase() +'</h1>');
-              break;
+        if (fatesheet.config.environment !== 'production')
+        {
+          $('body').prepend('<h1 class="d-print-none">'+ fatesheet.config.environment.toUpperCase() +'</h1>');
+        }
 
-          case 'fatecharactersheet.s3-website-us-east-1.amazonaws.com':
-              fatesheet.config.environment = 'beta';
-              $('body').prepend('<h1 class="d-print-none">'+ fatesheet.config.environment.toUpperCase() +'</h1>');
-              break;
-
-          default:
-              fatesheet.config.environment = 'production';
-              break;
-      }      
-
-      Sentry.init({
-        dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522',
-        environment: fatesheet.config.environment,
-      });
+        if (window.location.host !== 'localhost:8080' && window.location.host.indexOf("gitpod.io") == -1)
+        {
+          Sentry.init({
+            dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522',
+            environment: fatesheet.config.environment,
+          });
+        }
     }
 
     fatesheet.setTitle = function(title, page) {
@@ -421,7 +413,7 @@ String.prototype.toTitleCase = function () {
     }
 
     fatesheet.init = function () {
-      fatesheet.setupForEnvironment(window.location.host);
+      fatesheet.setupForEnvironment();
 
       // initialize the application
       domEvents();
