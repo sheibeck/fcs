@@ -229,7 +229,7 @@ export default {
       var docClient = fatesheet.getDBClient();
 
       let params = {
-          TableName: '',
+          TableName: fs_adversary.config.adversarytable,
           IndexName: "adversary_slug-index",
           KeyConditionExpression: 'adversary_slug = :slug',
           FilterExpression: 'adversary_owner_id = :owner_id',
