@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css?family=Bowlby+One+SC');
+$fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
+@import "./node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "./node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+
+
+h1 {
+  font-family: 'Bowlby One SC', cursive;
+}
+
+.brand-name {
+    font-size: 1.5em;
+    background-color: black;
+    color: white;
+    font-family: 'Bowlby One SC', cursive;
+}
+
+@media only screen and (max-width: 640px) {
+    .brand-name {
+        font-size: 1.00em;
+    }
+}
+
+@font-face {
+    font-family: 'fate_core_glyphsregular';
+    src: url('fate_core_font-webfont.woff2') format('woff2'), url('fate_core_font-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.navbar-brand img {
+    max-height: 40px;
+}
+
+.form-control::placeholder { color: #C0C0C0 !important;} /* Chrome, Firefox, Opera*/
+:-ms-input-placeholder.form-control { color: #C0C0C0 !important; }  /* Internet Explorer*/
+.form-control::-ms-input-placeholder { color: #C0C0C0 !important; }  /* Microsoft Edge*/
+
+.roll-modifier {
+    background-color: lightgray;
+}
+
+.dice {
+    font-family: 'fate_core_glyphsregular';
+}
+
+.hidden {
+    display: none !important; /* override flex stuff */
+}
+
+.current-roll {
+    background-color: #ffc107;
+}
+
+.modal-header {
+    background-color: darkgrey;
+}
+
+.modal-title {
+    text-transform: uppercase;
+    color: white;
+}
+
+.roll-20 {
+    height: 20px;
+}
+
+.js-adversary-tag {
+  cursor: pointer;
+}
+
+.adversary-name,
+.character-name,
+.charactersheet-name {
+  font-family: 'Bowlby One SC', cursive;
+}
+
+.js-adversary-list h5.card-header {
+  font-style: italic;
+}
+
+.error {
+    text-align:center;
+    font-size: 35px;
+    margin-top: 100px;
+}
+
+.container {
+  margin-bottom: 120px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  background-color: #f5f5f5;
+}
+
+/* print styles */
+@media print {
+    div.sheet:last-child {
+      height: 11in;
+      page-break-after: auto !important;
+    }
+
+    footer, .footer,
+    button,
+    .addthis-smartlayers,
+    hr, .no-print {
+      display: none !important;
+    }
+
+    .form-control::placeholder { color: transparent !important;} /* Chrome, Firefox, Opera*/
+    :-ms-input-placeholder.form-control { color: transparent !important; }  /* Internet Explorer*/
+    .form-control::-ms-input-placeholder { color: transparent !important; }  /* Microsoft Edge*/
+}

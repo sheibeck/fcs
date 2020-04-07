@@ -2,7 +2,7 @@
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="/">
-          <img src='./assets/logo.png' alt="Logo"/>
+          <img src='/static/img/logo.png' alt="Logo"/>
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -10,30 +10,29 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-              <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
-                  <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
-              </li>
               <li class="nav-item dropdown" v-if="isAuthenticated" v-bind:class="{active : isActive('character') || isActive('campaign')}">
                  <a class="nav-link dropdown-toggle" href="#" id="myStuffDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                    <span class="dice">C</span>My Stuff
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                     <a class="nav-link" v-bind:class="{active : isActive('character')}" href="/character"><i class="fas fa-user"></i> My Characters</a>
-                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>                        
+                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>
                  </div>
-              </li>             
+              </li>
+              <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
+                  <a class="nav-link" href="/charactersheet"><span class="dice">D</span>Character Sheets</a>
+              </li>
               <li class="nav-item" v-bind:class="{active : isActive('adversary')}" ref="el">
                   <a class="nav-link" href="/adversary"><span class="dice">A</span>Adversaries</a>
               </li>
               <li class="nav-item dropdown">
                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <i class="fas fa-microchip"></i> Tools
+                   <i class="fas fa-tools"></i> Tools
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                    <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
                    <div class="dropdown-divider"></div>
-                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="./assets/roll20logo.png" alt="Roll20 logo" class="roll-20"> Roll20.net</a>
-                   <a class="nav-link" target="_blank" href="https://chrome.google.com/webstore/detail/solo-roleplay-tools/ihkaageibnflklkfegijfcjmkebmgbnl/reviews"><span class="dice">+</span> Solo Roleplay Tools</a>
+                   <a id="play-fate" class="nav-link" target="_blank" href="https://app.roll20.net/lfg/search/?playingstructured=fate"><img src="/static/img/roll20logo.png" alt="Roll20 logo" class="roll-20"> Roll20.net</a>
                    <a class="nav-link" target="_blank" href="https://www.rpgsolo.com/"><span class="dice">+</span> RPG Solo</a>
                    <div class="dropdown-divider"></div>
                    <a id="roll-fate" class="nav-link" target="#" href="#" data-toggle='modal' data-target='#modalDiceRoller'><span class="dice">+</span> Fate Dice Roller</a>
@@ -44,10 +43,13 @@
                   <span class="dice">O</span> Support
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fab fa-wordpress"></i> Blog</a>
+                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-blog"></i> Blog</a>
                   <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
                 </div>
-              </li>			              
+              </li>
+               <li class="nav-item" ref="el">
+                  <a class="nav-link" href="http://paypal.me/sheibeck" target="_blank"><i class="fas fa-coins"></i> Donate</a>
+              </li>
           </ul>
 
           <div v-if="!isAuthenticated" class="form-inline login-button">
@@ -57,15 +59,6 @@
           </div>
           <div v-if="isAuthenticated" class="form-inline logout-button mx-1 mb-sm-1">
               <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="logout">Logout</button>
-          </div>
-          <div class="form-inline my-2 my-sm-0">
-              <div class="input-group">
-                <input id="search-text" class="form-control" type="text" placeholder="Search" v-model="$store.state.searchText" @input="search" />
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" type="button" v-on:click="clearSearch"><i class="fa fa-times-circle"></i></button>
-                  <button id="search-button" class="btn btn-outline-success" type="button" v-on:click="search">Search</button>
-                </div>
-              </div>
           </div>
       </div>
     </nav>
@@ -82,8 +75,8 @@
             <span class="dice">A</span> Powered by Fate
           </div>
           <div class="pt-2">
-            <a href="https://www.iubenda.com/privacy-policy/23267044" class="iubenda-black iubenda-embed" title="Privacy Policy ">Privacy Policy</a>            
-          </div>       
+            <a href="https://www.iubenda.com/privacy-policy/23267044" class="iubenda-black iubenda-embed" title="Privacy Policy ">Privacy Policy</a>
+          </div>
         </div>
       </div>
     </footer>
@@ -149,14 +142,6 @@ export default {
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
     },
-    clearSearch : function() {      
-      this.$store.commit("updateSearchText", "");
-      $("#search-button").trigger("click");
-    },
-    search : function() {
-      let searchText = this.$store.state.searchText;
-      fatesheet.search(searchText);
-    }
   }
 }
 </script>
