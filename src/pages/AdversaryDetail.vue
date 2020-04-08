@@ -152,7 +152,7 @@
         </div>
         <button class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>
         <a href='/adversary' role="button" class="btn btn-secondary">Close <i class='fa fa-times-circle'></i></a>
-        <a href='#' class='btn btn-danger'data-toggle='modal' data-target='#modalDeleteAdversaryConfirm'>Delete</i></a>
+        <a href='#' class='btn btn-danger' data-toggle='modal' data-target='#modalDeleteAdversaryConfirm'> Delete <i class='fa fa-trash'></i></a>
     </form>
 
 
