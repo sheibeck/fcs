@@ -3,8 +3,7 @@ export default class AdversaryService {
         this.dbSvc = dbService;
     }
 
-    async list(searchText, ownerId) {
-        
+    async list(searchText, ownerId) {       
         let docClient = this.dbSvc.GetDbClient();
 
         var params = {

@@ -155,9 +155,9 @@ export default {
       }
       this.list();
     },
-    list : async function (searchText) {     
+    list : async function (searchText) {      
       let onlyShowMyAdversaries = $cookies.get("fcsAdversaryListDefault") ? this.$store.state.userId : null;
-      this.adversaries = await adversarySvc.list(this.id, onlyShowMyAdversaries);
+      this.adversaries = await adversarySvc.list(this.id ? this.id : searchText, onlyShowMyAdversaries);
       
       //make the display wider if we only have 1 adversary, this is
       //essentially the adversary "detail" page

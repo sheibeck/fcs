@@ -315,7 +315,7 @@ export default {
     insertAdversary: function(adversaryData) {
 
         var docClient = dbSvc.GetDbClient();
-debugger;
+
         var params = {
             TableName: fs_adversary.config.adversarytable,
             Key: {
@@ -323,8 +323,6 @@ debugger;
              'adversary_name': adversaryData.adversary_name,
             },
         }
-
-        debugger;
 
         // if this adversary already exists then warn and don't overwrite
         docClient.get(params, function(err, data) {

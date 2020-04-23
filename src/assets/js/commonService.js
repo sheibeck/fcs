@@ -122,15 +122,15 @@ export default class CommonService {
     }
     else if (pathname.includes('adversary'))
     {
-          this.fcs.$children[0].$children[0].list(searchText); //adversary search
-      }
-      else if (pathname.includes("campaign")) {
-          if (pathname.endsWith("campaign")) {
-              this.fcs.$options.filters.filterCampaigns();
-          } else {
-              this.fcs.$options.filters.filterSessions();
-          }
-      }
+      this.fcs.$children[0].$children[0].list(searchText); //adversary search
+    }
+    else if (pathname.includes("campaign")) {
+        if (pathname.endsWith("campaign")) {
+            this.fcs.$options.filters.filterCampaigns();
+        } else {
+            this.fcs.$options.filters.filterSessions();
+        }
+    }
   }
   
   // help out with dev tasks by switching environments up based on the URL
