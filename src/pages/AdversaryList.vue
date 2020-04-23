@@ -94,7 +94,7 @@ export default {
   components: {
     search: Search,
   },
-  created(){
+  mounted(){
     fs_adversary.init();
   },
   metaInfo() {

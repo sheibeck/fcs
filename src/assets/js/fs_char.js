@@ -1,35 +1,21 @@
+import CommonService from "./commonService";
+import UserService from "./userService";
 
 /***********************************
         CHARACTERS & SHEETS
 ***********************************/
-(function (fs_char, $, undefined) {
+(function (fs_char, $, commonSvc, userSvc, undefined) {
+    let fcs = null;
+
     fs_char.config = {
         charactersheettable: '',
         charactertable: '',
     }
 
-    fs_char.getShareUrl = function($obj) {
-      var baseUrl = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
-      var shareUrl = baseUrl + $obj.prev().attr('href');
-
-      var tempInput = document.createElement("input");
-      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-      tempInput.value = shareUrl;
-      console.log(shareUrl);
-
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      fatesheet.notify('Copied character url to clipboard', 'info', 2000);
-    }
-
     function domEvents() {
         $(document).on('click', '.js-share-character', function (e) {
             e.preventDefault();
-
-            fs_char.getShareUrl($(this));
+            commonSvc.GetShareUrl($(this));
         });
 
         $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {
@@ -55,9 +41,10 @@
       }
     }
 
-    fs_char.init = function () {
+    fs_char.init = function (vueInstance) {        
+        fcs = vueInstance;
         domEvents();
-        configEnvironment(fatesheet.config.environment);
+        configEnvironment(fcs.$store.state.environment);
     }
 
-})(window.fs_char = window.fs_char || {}, jQuery);
+})(window.fs_char = window.fs_char || {}, jQuery, new CommonService(), new UserService());

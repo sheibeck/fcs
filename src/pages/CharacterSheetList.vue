@@ -21,8 +21,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Search from '../components/search'
+import { mapGetters } from 'vuex';
+import Search from '../components/search';
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let dbSvc = null;
+let commonSvc= null;
 
 export default {
   name: 'CharacterSheetList',
@@ -33,8 +38,10 @@ export default {
   components: {
     search: Search,
   },
-  created(){
-    fs_char.init();
+  mounted(){
+    dbSvc = new DbService(this.$root);
+    commonSvc= new CommonService(this.$root);
+    fs_char.init(this.$root);
   },
   watch: {
     userId() {
@@ -54,12 +61,12 @@ export default {
     }
   },
   methods : {
-    list : function(){
+    list : function(){     
       //reference this component so we can get/set data
       var $component = this;
 
       // Create DynamoDB document client
-      var docClient = fatesheet.getDBClient();
+      var docClient = dbSvc.GetDbClient();
 
       var params = {
           TableName: fs_char.config.charactersheettable,
@@ -69,9 +76,7 @@ export default {
       docClient.scan(params, function (err, data) {
           if (err) {
               console.log("Error", err);
-
               return {};
-
           } else {
               console.log("Success", data.Items);
               $component.sheets = data.Items;
@@ -80,7 +85,7 @@ export default {
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fatesheet.search("");
+      commonSvc.Search("");
     },
   }
 }

@@ -1,34 +1,19 @@
+import CommonService from "./commonService";
 
 /***********************************
         CAMPAIGNS
 ***********************************/
-(function (fs_camp, $, undefined) {
+(function (fs_camp, $, commonSvc, undefined) {
+    let fcs = null;
+
     fs_camp.config = {
         campaigntable: '',
-    }
-
-    fs_camp.getShareUrl = function($obj) {
-      var baseUrl = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
-      var shareUrl = baseUrl + $obj.prev().attr('href');
-
-      var tempInput = document.createElement("input");
-      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-      tempInput.value = shareUrl;
-      console.log(shareUrl);
-
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      fatesheet.notify('Copied campaign url to clipboard', 'info', 2000);
-    }
+    } 
 
     function domEvents() {
         $(document).on('click', '.js-share', function (e) {
             e.preventDefault();
-
-            fs_camp.getShareUrl($(this));
+            commonSvc.GetShareUrl($(this));
         });
 
         $(document).on('show.bs.modal', '#modalDeleteConfirm', function (event) {
@@ -61,9 +46,10 @@
       }
     }
 
-    fs_camp.init = function () {
+    fs_camp.init = function (vueInstance) {
+        fcs = vueInstance;  
         domEvents();
-        configEnvironment(fatesheet.config.environment);
+        configEnvironment(fcs.$store.state.environment);
     }
 
-})(window.fs_camp = window.fs_camp || {}, jQuery);
+})(window.fs_camp = window.fs_camp || {}, jQuery, new CommonService());

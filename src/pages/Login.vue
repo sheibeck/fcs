@@ -34,6 +34,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import UserService from "./../assets/js/userService";
 
 export default {
   name: 'Login',
@@ -54,7 +55,8 @@ export default {
   },
   methods: {
     login: function() {
-      fatesheet.login($('#email').val(), $('#password').val());
+      let userSvc = new UserService(this.$root);
+      userSvc.Login($('#email').val(), $('#password').val());
     }
   }
 }

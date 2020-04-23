@@ -55,8 +55,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Search from '../components/search'
+import { mapGetters } from 'vuex';
+import Search from '../components/search';
+import CampaignService from "./../assets/js/campaignService";
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let campaignSvc = null;
+let commonSvc = null;
+let dbSvc = null;
 
 export default {
   name: 'CampaignList',
@@ -67,8 +74,11 @@ export default {
   components: {
     search: Search,
   },
-  created(){
-    fs_camp.init();
+  mounted(){
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    campaignSvc = new CampaignService(dbSvc);
+    fs_camp.init(this.$root);
   },
   data () {
     return {
@@ -105,63 +115,20 @@ export default {
           var itemValue = eval(`this.campaigns[${index}].${item}`);
           return itemValue;
     },
-    list : function () {
-      //reference this component so we can get/set data
-      var $component = this;
-      let campaignList = [];
-
-      // Create DynamoDB document client
-      var docClient = fatesheet.getDBClient();
-
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          KeyConditionExpression: 'owner_id = :owner_id',
-          FilterExpression: 'parent_id = :parent_id',
-          ExpressionAttributeValues: {
-            ':owner_id': $component.userId,
-            ':parent_id' :  fatesheet.emptyGuid()
-          }
-      }
-
-      docClient.query(params, onQuery);
-
-      function onQuery(err, data) {
-          if (err) {
-              console.log("Error", err);
-          } else {
-
-              Array.prototype.push.apply(campaignList,data.Items);
-
-              if (typeof data.LastEvaluatedKey != "undefined") {
-                  console.log("Scanning for more...");
-                  params.ExclusiveStartKey = data.LastEvaluatedKey;
-                  docClient.query(params, onQuery);
-              }
-              else {
-                console.log("Success", campaignList);
-                $component.campaigns = campaignList;
-              }
-          }
-      }
+    list : async function () {      
+      this.campaigns = await campaignSvc.ListCampaignsByOwnerId(this.userId); 
     },
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
-
-      //reference this component so we can get/set data
-      var $component = this;
-
-      var docClient = fatesheet.getDBClient();
-
-      $component.deleteCampaignLogs(campaignId);
+      var docClient = dbSvc.GetDbClient();
+      this.deleteCampaignLogs(campaignId);
     },
 
-    deleteCampaignLogs : function (campaignId) {
-      //reference this component so we can get/set data
-      var $component = this;
+    deleteCampaignLogs : async function (campaignId) {
       let sessionList = [];
 
       // Create DynamoDB document client
-      let docClient = fatesheet.getDBClient();
+      let docClient = dbSvc.GetDbClient();
 
       //get a list of all the logs for this campaign
       let params = {
@@ -174,83 +141,80 @@ export default {
           FilterExpression: 'parent_id = :parent_id',
       }
 
-      docClient.query(params, onQuery);
+      const deleteLogsForCampaign = async (params) => {
+        let lastEvaluatedKey = 'dummy'; // string must not be empty
+        let hasErrors = "";
 
-      function onQuery(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
-
-          Array.prototype.push.apply(sessionList,data.Items);
-
-          if (typeof data.LastEvaluatedKey != "undefined") {
-              console.log("Scanning for more...");
-              params.ExclusiveStartKey = data.LastEvaluatedKey;
-              docClient.onQuery(params, onQuery);
-          } else {
-              console.log("Success", sessionList);
-              var hasErrors = "";
-              try {
-                sessionList.forEach(function(item) {
-                  docClient.delete({Key:{owner_id: $component.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
-                      if (error) {
-                          throw error;
-                      }
-                  });
-                });
-              } catch(error) {
-                hasErrors = error;
-              }
-
-              if (hasErrors) {
-                  fatesheet.notify(err.message || JSON.stringify(err));
-                  console.error("Unable to delete campaign logs.");
-              } else {
-                  console.log("Campaign logs deleted.", JSON.stringify(data, null, 2));
-
-                  //now that the logs are gone, delete the campaign itself
-                  $component.deleteCampaignActual(campaignId);
-              }
-            }
+        while (lastEvaluatedKey) {
+          const data = await docClient.query(params).promise();
+          try {
+            data.Items.forEach((item) => {
+              docClient.delete({Key:{owner_id: this.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
+                  if (error) {
+                      throw error;
+                  }
+              });
+            });
+          } catch(error) {
+            hasErrors = error;
           }
+
+          lastEvaluatedKey = data.LastEvaluatedKey;
+          if (lastEvaluatedKey) {
+              params.ExclusiveStartKey = lastEvaluatedKey;
+          }          
+        }
+
+        return hasErrors;
+      }      
+
+      let hasErrors = await deleteLogsForCampaign(params);
+
+      if (hasErrors) {
+          commonSvc.Notify(err.message || JSON.stringify(err));
+          console.error("Unable to delete campaign logs.");
+      } else {
+          console.log("Campaign logs deleted.");
+
+          //now that the logs are gone, delete the campaign itself
+          this.deleteCampaignActual(campaignId);
       }
     },
 
     deleteCampaignActual(campaignId) {
-      var $component = this;
-      var docClient = fatesheet.getDBClient();
+      let docClient = dbSvc.GetDbClient();
 
-      var params = {
+      let params = {
           TableName: fs_camp.config.campaigntable,
           Key: {
-            'owner_id': $component.userId,
+            'owner_id': this.userId,
             'id': campaignId
           }
       };
 
       console.log("Deleting campaign ...");
-      docClient.delete(params, function (err, data) {
+      docClient.delete(params, (err, data) => {
           if (err) {
-              fatesheet.notify(err.message || JSON.stringify(err));
+              commonSvc.Notify(err.message || JSON.stringify(err));
               console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
           } else {
               console.log("Deleted item:", JSON.stringify(data, null, 2));
-              fatesheet.notify('Campaign deleted.', 'success', 2000);
-              $component.list();
+              commonSvc.Notify('Campaign deleted.', 'success', 2000);
+              this.list();
           }
       });
     },
 
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fcs.$options.filters.filterCampaigns();
+      this.$options.filters.filterCampaigns();
     },
 
     searchByTag : function(event) {
       var $elem = $(event.currentTarget);
       var tag = $elem.data('search-text');
       this.$store.commit('updateSearchText', tag);
-      fcs.$options.filters.filterCampaigns();
+      this.$options.filters.filterCampaigns();
     },
 
     getNiceDate : function(date) {

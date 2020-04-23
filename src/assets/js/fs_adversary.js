@@ -1,3 +1,5 @@
+import UserService from "./userService";
+
 /***********************************
         ADVERSARY
 ***********************************/
@@ -35,7 +37,7 @@
 
     fs_adversary.init = function () {
       domEvents();
-      configEnvironment(fatesheet.config.environment);
+      configEnvironment(fcs.$store.state.environment);
     }
 
 })(window.fs_adversary = window.fs_adversary || {}, jQuery);

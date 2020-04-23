@@ -131,6 +131,13 @@
 import { mapGetters } from 'vuex';
 import VueShowdown, { showdown } from 'vue-showdown';
 import NamedRegExp from 'named-regexp-groups';
+import CampaignService from "./../assets/js/campaignService";
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let campaignSvc = null;
+let commonSvc = null;
+let dbSvc = null;
 
 showdown.extension('fcsCampaignHidden', () => [ 
   {
@@ -168,11 +175,12 @@ export default {
        ]
      }
   },
-  created(){
-    fs_camp.init();        
-  },
   mounted(){
-    this.parseSessionAll();
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    campaignSvc = new CampaignService(dbSvc);
+    fs_camp.init(this.$root);
+    this.parseSessionAll();  
   },
   watch: {
     userId() {
@@ -352,7 +360,7 @@ export default {
         if (thingIdx === -1) {         
           let displayText =  `${display}`;
 
-          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: null} 
+          let newThing = {id: commonSvc.GenerateUUID(), sessionids: [sessionId], thing: thing, description: null} 
           list.unshift(newThing);
         }
         
@@ -364,111 +372,35 @@ export default {
         }
       }      
     }, 
-    copyThingToClipboard : function(text) {  
-      var tempInput = document.createElement("input");
-      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-      tempInput.value = text;
-      console.log(text);
-
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      fatesheet.notify('Copied thing to clipboard', 'info', 2000);      
+    copyThingToClipboard : function(text) {
+      commonSvc.CopyTextToClipboard(text);      
     },
     getCampaign : async function(id) {
-      var $component = this;
-      let campaignList = [];
 
-      // Create DynamoDB document client
-      let docClient = fatesheet.getDBClient();
+      let campaign = await campaignSvc.GetCampaignByIndex(id);
 
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          IndexName: "campaign_id-index",
-          KeyConditionExpression: 'id = :id',
-          ExpressionAttributeValues: {            
-            ':id': id,
-          },         
+      if (!campaign)
+      {
+          location.href = '/error';
       }
+      else {
+          console.log("Success", campaign);         
+          this.$set(this, 'campaign', campaign);              
+          this.listSessions(campaign.id);
 
-      docClient.query(params, onQuery);
-      
-      function onQuery(err, data) {
-        if (err) {
-          console.log("Error", err);
-        } 
-        else {
-          Array.prototype.push.apply(campaignList,data.Items);
-          
-          if (typeof data.LastEvaluatedKey != "undefined") {
-            console.log("Scanning for more...");
-            params.ExclusiveStartKey = data.LastEvaluatedKey;
-            docClient.query(params, onQuery);
-          }
-          else {
-            if (campaignList.length === 0)
-            {
-              location.href = '/error';
-            }
-            else {
-              console.log("Success", campaignList[0]);
-              let c = campaignList[0];
-              $component.$set($component, 'campaign', c);              
-              $component.listSessions(c.id);
-
-              $component.title = c.title + ' (Campaign)';
-              $component.description = c.description || "";
-            }
-          }
-        }
+          this.title = campaign.title + ' (Campaign)';
+          this.description = campaign.description || "";
       }
     },
-    listSessions : function(id) {        
-      var $component = this;
-      let sessionList = [];
+    listSessions : async function(id) {      
+      let sessionList = await campaignSvc.ListLogsForCampaign(this.campaign.owner_id, id, true);
 
-      // Create DynamoDB document client
-      let docClient = fatesheet.getDBClient();
-
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          KeyConditionExpression: 'owner_id = :owner_id',
-          FilterExpression: '(parent_id = :parent_id) AND (ispublic = :is_public)',
-          ExpressionAttributeValues: {            
-            ':owner_id': this.campaign.owner_id,
-            ':parent_id': id,
-            ':is_public': true,
-          },         
+      if (sessionList && sessionList.length > 0) {
+        this.sessions = sessionList;
+        this.parseSessionAll();
       }
 
-      docClient.query(params, onQuery);
-      
-      function onQuery(err, data) {
-        if (err) {
-          console.log("Error", err);
-        } 
-        else {           
-          Array.prototype.push.apply(sessionList,data.Items);
-
-          if (typeof data.LastEvaluatedKey != "undefined") {
-            console.log("Scanning for more...");                  
-            params.ExclusiveStartKey = data.LastEvaluatedKey;
-            docClient.query(params, onQuery);
-          }
-          else {
-            console.log("Success", sessionList);              
-
-            if (sessionList && sessionList.length > 0) {
-              $component.sessions = sessionList;
-              $component.parseSessionAll();
-            }
-
-            $component.loading = false;
-          }
-        }        
-      }
+      this.loading = false;
     },    
     filterBy : function(thing) {
       this.$store.commit('updateSearchText', thing);
@@ -481,7 +413,7 @@ export default {
       this.jumpTo("#summary");
     },
     getNiceDate : function(date) {
-        return new Date(date).toLocaleString();
+        commonSvc.GetNiceDate(date);
     },
     jumpTo : function(section) {
       $("html, body").animate({ scrollTop: $(section).offset().top }, 500);

@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
 
 export default {
   name: 'Recover',
@@ -45,20 +46,22 @@ export default {
   },
   methods: {
     confirm: function() {
+      let commonSvc = new CommonService(this.$root);
+
       var poolData = {
-          UserPoolId : fatesheet.config.cognito.poolId, // Your user pool id here
-          ClientId : fatesheet.config.cognito.clientId // Your client id here
+          UserPoolId : this.$store.state.cognito.poolId, // Your user pool id here
+          ClientId : this.$store.state.cognito.clientId // Your client id here
       };
 
       var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
       var cognitoUser = null;
 
       if ($('#password').val() == '') {
-        fatesheet.notify('You must enter your new password.');
+        commonSvc.Notify('You must enter your new password.');
         return;
       }
       if ($('#confirmationcode').val() == '') {
-        fatesheet.notify('You must enter your confirmation code from your email.');
+        commonSvc.Notify('You must enter your confirmation code from your email.');
         return;
       }
 
@@ -71,10 +74,10 @@ export default {
       cognitoUser.confirmPassword($('#confirmationcode').val(), $('#password').val(), {
         onSuccess: function (result) {
             console.log('Successfully reset password');
-            fatesheet.notify('Your password was successfully reset.', 'success', 2000, function() { location.href = 'login'});
+            commonSvc.Notify('Your password was successfully reset.', 'success', 2000, function() { location.href = 'login'});
         },
         onFailure: function(err) {
-            fatesheet.notify(err.message || JSON.stringify(err));
+            commonSvc.Notify(err.message || JSON.stringify(err));
         }
       });
 
