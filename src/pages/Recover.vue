@@ -24,7 +24,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
 
 export default {
   name: 'Recover',
@@ -45,39 +46,38 @@ export default {
   },
   methods: {
     recover: function() {
-        var poolData = {
-            UserPoolId : fatesheet.config.cognito.poolId, // Your user pool id here
-            ClientId : fatesheet.config.cognito.clientId // Your client id here
-        };
+      let commonSvc = new CommonService(this.$root);
 
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-        var cognitoUser = null;
+      var poolData = {
+          UserPoolId : this.$store.state.cognito.poolId, // Your user pool id here
+          ClientId : this.$store.state.config.cognito.clientId // Your client id here
+      };
 
+      var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+      var cognitoUser = null;
 
-        if ($('#email').val() == '') {
-          fatesheet.notify('You must enter your email address.');
-          return;
+      if ($('#email').val() == '') {
+        commonSvc.Notify('You must enter your email address.');
+        return;
+      }
+
+      // setup cognitoUser first
+      cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+          Username: $('#email').val(),
+          Pool: userPool
+      });
+
+      cognitoUser.forgotPassword({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+            location.href = 'confirm?u=' + $('#email').val();
+        },
+        onFailure: function(err) {
+          commonSvc.Notify(err.message || JSON.stringify(err));
         }
+      });
 
-
-        // setup cognitoUser first
-        cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-           Username: $('#email').val(),
-           Pool: userPool
-        });
-
-
-        cognitoUser.forgotPassword({
-            onSuccess: function (result) {
-                console.log('call result: ' + result);
-                location.href = 'confirm?u=' + $('#email').val();
-            },
-            onFailure: function(err) {
-                fatesheet.notify(err.message || JSON.stringify(err));
-            }
-        });
-
-        return false;
+      return false;
     }
   }
 }

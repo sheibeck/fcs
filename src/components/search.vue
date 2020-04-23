@@ -11,7 +11,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
 
 export default {
   name: 'Search',
@@ -32,7 +33,8 @@ export default {
     },
     search : function() {
       let searchText = this.$store.state.searchText;
-      fatesheet.search(searchText);
+      let commonSvc = new CommonService(this.$root);
+      commonSvc.Search(searchText);
     }
   }
 

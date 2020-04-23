@@ -2,6 +2,8 @@
         ADVERSARY
 ***********************************/
 (function (fs_adversary, $, undefined) {
+    let fcs = null;
+
     fs_adversary.config = {
         adversarytable: '',
     }
@@ -33,9 +35,10 @@
       }
     }
 
-    fs_adversary.init = function () {
+    fs_adversary.init = function (vueInstance) {
+      fcs = vueInstance;
       domEvents();
-      configEnvironment(fatesheet.config.environment);
+      configEnvironment(fcs.$store.state.environment);
     }
 
 })(window.fs_adversary = window.fs_adversary || {}, jQuery);

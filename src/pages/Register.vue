@@ -31,7 +31,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
 
 export default {
   name: 'Login',
@@ -56,20 +57,21 @@ export default {
       return re.test(String(email).toLowerCase());
     },
     register: function() {
+      let commonSvc = new CommonService(this.$root);
 
-        if ($('#password').val() != $('#passwordConfirm').val())
-        {
-          fatesheet.notify('Passwords do not match.');
-          return false;
-        }
+      if ($('#password').val() != $('#passwordConfirm').val())
+      {
+        commonSvc.Notify('Passwords do not match.');
+        return false;
+      }
 
-        if (!this.validateEmail($('#email').val()))
-        {
-          fatesheet.notify('Email is not valid.');
-          return false;
-        }
+      if (!this.validateEmail($('#email').val()))
+      {
+        commonSvc.Notify('Email is not valid.');
+        return false;
+      }
 
-        fatesheet.register($('#email').val(), $('#password').val());
+      commonSvc.Register($('#email').val(), $('#password').val());
 
     }
   }

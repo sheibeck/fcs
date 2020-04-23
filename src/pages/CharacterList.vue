@@ -19,8 +19,8 @@
           </div>
           <hr />
           <div class="d-flex">
-            <a v-bind:href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
-            <a href='#' class='btn btn-secondary js-share-character ml-1 mr-auto'>Share <i class='fa fa-share-square'></i></a>
+            <a :href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
+            <a :href='slugify[index]' class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
             <a href='#' class='btn' style='color:red' v-bind:data-id='item.character_id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
           </div>
         </div>
@@ -55,8 +55,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Search from '../components/search'
+import { mapGetters } from 'vuex';
+import Search from '../components/search';
+import CharacterService from '../assets/js/characterService';
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let commonSvc = null;
+let dbSvc = null;
+let characterSvc = null;
 
 export default {
   name: 'CharacterList',
@@ -67,13 +74,16 @@ export default {
   components: {
     search: Search,
   },
-  created(){
-    fs_char.init();
+  mounted(){
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    characterSvc = new CharacterService(dbSvc);
+    fs_char.init(this.$root);
   },
   computed: {
     slugify: function() {
       return this.characters.map(function(item) {
-          return '/character/' + item.sheetname + '/' + item.character_id + '/' + fatesheet.slugify(item.name);
+          return '/character/' + item.sheetname + '/' + item.character_id + '/' + commonSvc.Slugify(item.name);
       });
     },
     ...mapGetters([
@@ -95,87 +105,48 @@ export default {
     }
   },
   methods : {
-    getCharacterValue: function(index, item) {
-          var itemValue = eval('this.characters[' + index + ']["aspect"].' + item);
-          return itemValue;
-    },
-    list : function () {
-      //reference this component so we can get/set data
-      var $component = this;
-      let characterList = [];
-
-      // Create DynamoDB document client
-      var docClient = fatesheet.getDBClient();
-
-      let params = {
-          TableName: fs_char.config.charactertable,
-          KeyConditionExpression: 'character_owner_id = :owner_id',
-          ExpressionAttributeValues: {
-            ':owner_id': $component.userId
-          }
-      }
-
-      docClient.query(params, onQuery);
-
-      function onQuery(err, data) {
-          if (err) {
-              console.log("Error", err);
-          } else {
-
-              Array.prototype.push.apply(characterList,data.Items);
-
-              if (typeof data.LastEvaluatedKey != "undefined") {
-                  console.log("Scanning for more...");
-                  params.ExclusiveStartKey = data.LastEvaluatedKey;
-                  docClient.query(params, onQuery);
-              }
-              else {
-                console.log("Success", characterList);
-                $component.characters = characterList;
-              }
-          }
-      }
+    list : function () {            
+      let listitems = characterSvc.listByOwnerId(this.$store.state.userId).then( (data) => {      
+        this.characters = data;
+      });      
     },
 
     deleteCharacter : function (event) {
       var characterId = $(event.currentTarget).data('id');
-
-      //reference this component so we can get/set data
-      var $component = this;
-
-
-      var docClient = fatesheet.getDBClient();
-
+      var docClient = dbSvc.GetDbClient();
       var params = {
           TableName: fs_char.config.charactertable,
           Key: {
-            'character_owner_id': $component.userId,
+            'character_owner_id': this.userId,
             'character_id': characterId
           }
       };
 
       console.log("Deleting a character...");
-      docClient.delete(params, function (err, data) {
-          if (err) {
-              fatesheet.notify(err.message || JSON.stringify(err));
-              console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              $('#modalDeleteCharacterConfirm').modal('hide');
-              console.log("Deleted item:", JSON.stringify(data, null, 2));
-              fatesheet.notify('Character deleted.', 'success', 2000);
-              $component.list();
-          }
+      docClient.delete(params, (err, data) => {
+        if (err) {
+            commonSvc.Notify(err.message || JSON.stringify(err));
+            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
+            $('#modalDeleteCharacterConfirm').modal('hide');
+            console.log("Deleted item:", JSON.stringify(data, null, 2));
+            commonSvc.Notify('Character deleted.', 'success', 2000);
+            this.list();
+        }
       });
     },
-
+    shareUrl : function(event) {
+      event.preventDefault();
+      commonSvc.CopyTextToClipboard(event.currentTarget.href);
+    },
     searchByTag : function(event) {
       var tag = $(event.currentTarget).data('search-text');
       this.$store.commit('updateSearchText', tag)
-      fatesheet.search(tag);
+      commonSvc.Search(tag);
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fatesheet.search("");
+      commonSvc.Search("");
     },
 
   }
