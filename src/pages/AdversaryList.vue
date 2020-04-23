@@ -88,6 +88,13 @@
 <script>
 import { mapGetters } from 'vuex'
 import Search from '../components/search'
+import AdversaryService from "./../assets/js/adversaryService";
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let adversarySvc = null;
+let commonSvc = null;
+let dbSvc = null;
 
 export default {
   name: 'CharacterList',
@@ -95,7 +102,10 @@ export default {
     search: Search,
   },
   mounted(){
-    fs_adversary.init();
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    adversarySvc = new AdversaryService(dbSvc);
+    fs_adversary.init(this.$root);
   },
   metaInfo() {
     return {
@@ -128,161 +138,25 @@ export default {
     }
   },
   methods : {
-    list : function (searchText) {
-        //reference this component so we can get/set data
-        var $component = this;
-        let adversaryList = [];
+    list : async function (searchText) {     
+      let onlyShowMyAdversaries = $('#my_adversaries').is(':checked') ? this.$store.state.userId : null;
+      this.adversaries = await adversarySvc.list(this.id, onlyShowMyAdversaries);
+      
+      //make the display wider if we only have 1 adversary, this is
+      //essentially the adversary "detail" page
+      if (this.adversaries.length === 1)
+      {
+          $('#adversaryDetail').removeClass('card-columns');
 
-        if (searchText)
-        {
-          $(".adversaryFilter").removeClass("hidden");
-        }
-        else {
-          $(".adversaryFilter").addClass("hidden");
-        }
+          this.title = this.adversaries[0].adversary_name + ' (Adversary)';
+          this.description = this.adversaries[0].adversary_type;
+      }
+      else {
+          $('#adversaryDetail').addClass('card-columns');
 
-        //if we have a specified slug then we want just this one entry
-        if ($component.id) {
-          searchText = $component.id;
-        }
-
-        // Create DynamoDB document client
-        var docClient = fatesheet.getDBClient();
-
-        var params = {
-            TableName: fs_adversary.config.adversarytable,
-            Select: 'ALL_ATTRIBUTES'
-        }
-
-        //search
-        if (searchText && searchText.length > 0) {
-          params.ExpressionAttributeValues= {
-            ':an': searchText,
-            ':anl': searchText.toLowerCase(),
-            ':anu': searchText.toUpperCase(),
-            ':ant': searchText.toTitleCase(),
-          };
-
-          params.FilterExpression = '( contains (adversary_name, :an)';
-          params.FilterExpression += ' OR contains (adversary_name, :anl)';
-          params.FilterExpression += ' OR contains (adversary_name, :anu)';
-          params.FilterExpression += ' OR contains (adversary_name, :ant)';
-
-          params.FilterExpression += ' OR contains (adversary_aspects.high_concept, :an)';
-          params.FilterExpression += ' OR contains (adversary_aspects.high_concept, :anl)';
-          params.FilterExpression += ' OR contains (adversary_aspects.high_concept, :anu)';
-          params.FilterExpression += ' OR contains (adversary_aspects.high_concept, :ant)';
-
-          params.FilterExpression += ' OR contains (adversary_aspects.trouble, :an)';
-          params.FilterExpression += ' OR contains (adversary_aspects.trouble, :anl)';
-          params.FilterExpression += ' OR contains (adversary_aspects.trouble, :anu)';
-          params.FilterExpression += ' OR contains (adversary_aspects.trouble, :ant)';
-
-          params.FilterExpression += ' OR contains (adversary_aspects.other_aspects, :an)';
-          params.FilterExpression += ' OR contains (adversary_aspects.other_aspects, :anl)';
-          params.FilterExpression += ' OR contains (adversary_aspects.other_aspects, :anu)';
-          params.FilterExpression += ' OR contains (adversary_aspects.other_aspects, :ant)';
-
-          params.FilterExpression += ' OR contains (adversary_system, :an)';
-          params.FilterExpression += ' OR contains (adversary_system, :anl)';
-          params.FilterExpression += ' OR contains (adversary_system, :anu)';
-          params.FilterExpression += ' OR contains (adversary_system, :ant)';
-
-          params.FilterExpression += ' OR contains (adversary_type, :an)';
-          params.FilterExpression += ' OR contains (adversary_type, :anl)';
-          params.FilterExpression += ' OR contains (adversary_type, :anu)';
-          params.FilterExpression += ' OR contains (adversary_type, :ant)';
-
-          params.FilterExpression += ' OR contains (adversary_genre, :an)';
-          params.FilterExpression += ' OR contains (adversary_genre, :anl)';
-          params.FilterExpression += ' OR contains (adversary_genre, :anu)';
-          params.FilterExpression += ' OR contains (adversary_genre, :ant)';
-
-          params.FilterExpression += ' OR adversary_slug = :anl )';
-        }
-
-        //show only the current users adversaries if the box is checked
-        if ($('#my_adversaries').is(':checked'))
-        {
-          if (!params.FilterExpression)
-          {
-            params.ExpressionAttributeValues = {':owner_id' : fatesheet.config.userId };
-            params.FilterExpression = 'adversary_owner_id = :owner_id';
-          }
-          else {
-            params.ExpressionAttributeValues[':owner_id'] = fatesheet.config.userId;
-            params.FilterExpression += ' AND (adversary_owner_id = :owner_id)';
-          }
-
-        }
-
-        docClient.scan(params, onScan)
-
-        function onScan(err, data) {
-            if (err) {
-                console.log("Error", err);
-            } else {
-
-              Array.prototype.push.apply(adversaryList,data.Items);
-
-              if (typeof data.LastEvaluatedKey != "undefined") {
-                  console.log("Scanning for more...");
-                  params.ExclusiveStartKey = data.LastEvaluatedKey;
-                  docClient.scan(params, onScan);
-              }
-              else {
-
-                  console.log("Success", adversaryList);
-
-                  //dynamodb doesn't order items, it's a NODB. WE'll manually tweak a few
-                  // things to try and make them consistent
-                  var adversaries = adversaryList.sort(function(a,b) {return (a["adversary_name"] > b["adversary_name"]) ? 1 : ((b["adversary_name"] > a["adversary_name"]) ? -1 : 0);} );
-                  $.each(adversaries, function(i, v) {
-                    if (v.adversary_aspects)
-                    {
-                      const orderedAspects = {};
-                      if (v.adversary_aspects["high_concept"])
-                        orderedAspects["high_concept"] = v.adversary_aspects["high_concept"];
-                      if (v.adversary_aspects["trouble"])
-                        orderedAspects["trouble"] = v.adversary_aspects["trouble"];
-                      if (v.adversary_aspects["other_aspects"])
-                        orderedAspects["other_aspects"] = v.adversary_aspects["other_aspects"];
-
-                      v.adversary_aspects = orderedAspects;
-                    }
-
-                    const orderedSkills = {};
-                    Object.keys(v.adversary_skills).sort().forEach(function(key) {
-                      orderedSkills[key] = v.adversary_skills[key];
-                    });
-                    v.adversary_skills = orderedSkills;
-
-                    const orderedConsequences = {};
-                    Object.keys(v.adversary_consequences).sort().forEach(function(key) {
-                      orderedConsequences[key] = v.adversary_consequences[key];
-                    });
-                    v.adversary_consequences = orderedConsequences;
-                  });
-
-                  //make the display wider if we only have 1 adversary
-                  if (adversaries.length === 1)
-                  {
-                    $('#adversaryDetail').removeClass('card-columns');
-
-                    $component.title = adversaries[0].adversary_name + ' (Adversary)';
-                    $component.description = adversaries[0].adversary_type;
-                  }
-                  else {
-                    $('#adversaryDetail').addClass('card-columns');
-
-                    $component.title = "Adversary List";
-                    $component.description = "Fate Adversaries";
-                  }
-                }
-
-                $component.adversaries = adversaryList;
-              }
-          }
+          this.title = "Adversary List";
+          this.description = "Fate Adversaries";
+      }
     },
     fixLabel: function (val) {
         return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
@@ -317,16 +191,15 @@ export default {
     searchByTag : function(event) {
       var tag = $(event.currentTarget).data('search-text');
       this.$store.commit('updateSearchText', tag)
-      fatesheet.search(tag);
+      commonSvc.Search(tag);
     },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fatesheet.search("");
+      commonSvc.Search("");
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     }
-
   }
 }
 </script>

@@ -1,9 +1,9 @@
-import UserService from "./userService";
-
 /***********************************
         ADVERSARY
 ***********************************/
 (function (fs_adversary, $, undefined) {
+    let fcs = null;
+
     fs_adversary.config = {
         adversarytable: '',
     }
@@ -35,7 +35,8 @@ import UserService from "./userService";
       }
     }
 
-    fs_adversary.init = function () {
+    fs_adversary.init = function (vueInstance) {
+      fcs = vueInstance;
       domEvents();
       configEnvironment(fcs.$store.state.environment);
     }

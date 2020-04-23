@@ -66,7 +66,7 @@ export default class CommonService {
   }
 
   RemoveEmptyObjects = (obj) => {
-    $.each(obj, function(key, value){
+    $.each(obj, (key, value) => {
         if (key === "")
         {
           delete obj[""];
@@ -75,7 +75,7 @@ export default class CommonService {
           if (value === "" || value === null || value === undefined || value === {}){
               delete obj[key];
           } else if (Object.prototype.toString.call(value) === '[object Object]') {
-              this.removeEmptyObjects(value);
+              this.RemoveEmptyObjects(value);
           } else if ($.isArray(value)) {
               $.each(value, function (k,v) {
                 if (v === "") {

@@ -182,6 +182,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import AdversaryService from "./../assets/js/adversaryService";
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let adversarySvc = null;
+let commonSvc = null;
+let dbSvc = null;
 
 export default {
   name: 'AdversaryDetail',
@@ -193,8 +200,11 @@ export default {
        ]
      }
   },
-  created(){
-    fs_adversary.init();
+  mounted(){
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    adversarySvc = new AdversaryService(dbSvc);
+    fs_adversary.init(this.$root);
   },
   watch: {
     userId() {
@@ -226,7 +236,7 @@ export default {
       $('#adversary_name').attr('readonly', true);
 
       // Create DynamoDB document client
-      var docClient = fatesheet.getDBClient();
+      var docClient = dbSvc.GetDbClient();
 
       let params = {
           TableName: fs_adversary.config.adversarytable,
@@ -314,8 +324,8 @@ export default {
         if (!result.adversary_id)
         {
           // add a uniqueid
-          result['adversary_id'] = fatesheet.generateUUID();
-          result['adversary_owner_id'] = fatesheet.config.userId;
+          result['adversary_id'] = commonSvc.GenerateUUID();
+          result['adversary_owner_id'] = this.$store.state.userId;
           isNew = true;
         }
 
@@ -326,7 +336,7 @@ export default {
         }
 
         // clear empty values
-        fatesheet.removeEmptyObjects(result);
+        commonSvc.RemoveEmptyObjects(result);
 
         if (isNew)
         {
@@ -340,7 +350,7 @@ export default {
 
     insertAdversary: function(adversaryData) {
 
-        var docClient = fatesheet.getDBClient();
+        var docClient = dbSvc.GetDbClient();
 
         var params = {
             TableName: fs_adversary.config.adversarytable,
@@ -357,7 +367,7 @@ export default {
             } else {
               if (data.Item)
               {
-                fatesheet.notify('You already have an adversary with this name.', 'info', '2000');
+                commonSvc.Notify('You already have an adversary with this name.', 'info', '2000');
               }
               else {
                   // create a new creature
@@ -369,11 +379,11 @@ export default {
                   console.log("Adding a new adversary...");
                   docClient.put(params, function (err, data) {
                       if (err) {
-                          fatesheet.notify(err.message || JSON.stringify(err));
+                          commonSvc.Notify(err.message || JSON.stringify(err));
                           console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
                       } else {
                           console.log("Added item:", JSON.stringify(data, null, 2));
-                          fatesheet.notify('Adversary added.', 'success', 2000, function() {
+                          commonSvc.Notify('Adversary added.', 'success', 2000, function() {
                             location.href = '/adversary/' + adversaryData.adversary_slug;
                           } );
 
@@ -386,11 +396,11 @@ export default {
 
     deleteAdversary : function() {
         if (!this.isOwner($(adversary_owner_id).val())) {
-          fatesheet.notify('Permission Denied.', 'error', 2000);
+          commonSvc.Notify('Permission Denied.', 'error', 2000);
         }
         else {
           var $component = this;
-          var docClient = fatesheet.getDBClient();
+          var docClient = dbSvc.GetDbClient();
 
           var params = {
               TableName: fs_adversary.config.adversarytable,
@@ -403,14 +413,14 @@ export default {
           console.log("Deleting an adversary...");
           docClient.delete(params, function (err, data) {
               if (err) {
-                  fatesheet.notify(err.message || JSON.stringify(err));
+                  commonSvc.Notify(err.message || JSON.stringify(err));
                   console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
               } else {
                   $component.clearAdversaryForm();
                   $('#modalDeleteAdversaryConfirm').modal('hide');
                   console.log("Deleted item:", JSON.stringify(data, null, 2));
 
-                  fatesheet.notify('Adversary deleted.', 'success', 2000, function() {
+                  commonSvc.Notify('Adversary deleted.', 'success', 2000, function() {
                     location.href = '/adversary'
                   });
               }
@@ -419,7 +429,7 @@ export default {
     },
 
     updateAdversary : function(data) {
-        var docClient = fatesheet.getDBClient();
+        var docClient = dbSvc.GetDbClient();
 
         var params = {
             TableName: fs_adversary.config.adversarytable,
@@ -445,11 +455,11 @@ export default {
         console.log("Updating adversary...");
         docClient.update(params, function (err, data) {
             if (err) {
-                fatesheet.notify(err.message || JSON.stringify(err));
+                commonSvc.Notify(err.message || JSON.stringify(err));
                 console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
             } else {
                 console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
-                fatesheet.notify('Adversary updated.', 'success', 2000);
+                commonSvc.Notify('Adversary updated.', 'success', 2000);
             }
         });
     },
@@ -498,7 +508,7 @@ export default {
           }
       });
 
-      var slug = fatesheet.slugify(data.adversary_name);
+      var slug = commonSvc.Slugify(data.adversary_name);
       $('#adversary_slug').val(slug);
     },
 
@@ -594,7 +604,7 @@ export default {
     },
     slugifyName : function(event) {
       var $elem = $(event.currentTarget);
-      var slug = fatesheet.slugify($elem.val());
+      var slug = commonSvc.Slugify($elem.val());
       $('#adversary_slug').val(slug);
     }
   }
