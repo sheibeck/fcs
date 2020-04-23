@@ -120,4 +120,41 @@ export default class AdversaryService {
 
         return await scanAll(params);
     }
+
+    async EditAdversary(ownerid, slug) {
+        
+        // Create DynamoDB document client
+        var docClient = this.dbSvc.GetDbClient();
+  
+        let params = {
+            TableName: fs_adversary.config.adversarytable,
+            IndexName: "adversary_slug-index",
+            KeyConditionExpression: 'adversary_slug = :slug',
+            FilterExpression: 'adversary_owner_id = :owner_id',
+            ExpressionAttributeValues: {
+              ':slug': slug,
+              ':owner_id': ownerid
+            }
+        }
+  
+        const queryAll = async (params) => {
+            let lastEvaluatedKey = 'dummy'; // string must not be empty
+            const itemsAll = [];
+            while (lastEvaluatedKey && itemsAll.length == 0) {
+                const data = await docClient.query(params).promise();
+                itemsAll.push(...data.Items);
+                lastEvaluatedKey = data.LastEvaluatedKey;
+                if (lastEvaluatedKey) {
+                    params.ExclusiveStartKey = lastEvaluatedKey;
+                }
+            }
+            if (itemsAll.length > 0)
+                return itemsAll[0];
+            else 
+                return null;
+        }
+
+        return await queryAll(params);
+       
+    }
 }

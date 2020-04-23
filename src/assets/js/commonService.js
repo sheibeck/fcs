@@ -3,23 +3,6 @@ export default class CommonService {
     this.fcs = fcs;
   }
 
-  GetShareUrl = (elem) => {
-      var baseUrl = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
-      var shareUrl = baseUrl + elem.prev().attr('href');
-
-      var tempInput = document.createElement("input");
-      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-      tempInput.value = shareUrl;
-      console.log(shareUrl);
-
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      this.Notify('Copied url to clipboard', 'info', 2000);
-  }
-
   CopyTextToClipboard = (text) => {
     var tempInput = document.createElement("input");
     tempInput.style = "position: absolute; left: -1000px; top: -1000px";
@@ -31,7 +14,7 @@ export default class CommonService {
     document.execCommand("copy");
     document.body.removeChild(tempInput);
 
-    commonSvc.Notify('Copied thing to clipboard', 'info', 2000);
+    this.Notify('Copied to clipboard', 'info', 2000);
   }
 
   Notify = (message, type, timeout, callback) => {

@@ -226,60 +226,24 @@ export default {
     ]),
   },
   methods: {
-    editAdversary : function(ownerid, slug) {
+    editAdversary : async function(ownerid, slug) {
       //we only edit if we have a valid slug for an id
       if (!slug) return;
-
-      var $component = this;
-      let adversaryList = [];
-
       $('#adversary_name').attr('readonly', true);
-
-      // Create DynamoDB document client
-      var docClient = dbSvc.GetDbClient();
-
-      let params = {
-          TableName: fs_adversary.config.adversarytable,
-          IndexName: "adversary_slug-index",
-          KeyConditionExpression: 'adversary_slug = :slug',
-          FilterExpression: 'adversary_owner_id = :owner_id',
-          ExpressionAttributeValues: {
-            ':slug': slug,
-            ':owner_id': ownerid
-          }
+      
+      this.adversary = await adversarySvc.EditAdversary(ownerid, slug);
+      
+      if (!this.adversary)
+      {
+        location.href = '/error';
       }
+      else {       
+        this.clearAdversaryForm();
+        this.populateAdversaryForm(this.adversary);
 
-      docClient.query(params, onQuery);
-      function onQuery(err, data) {
-        if (err) {
-          console.log("Error", err);
-        } else {
-
-          Array.prototype.push.apply(adversaryList,data.Items);
-
-          if (typeof data.LastEvaluatedKey != "undefined") {
-              console.log("Scanning for more...");
-              params.ExclusiveStartKey = data.LastEvaluatedKey;
-              docClient.query(params, onQuery);
-          }
-          else {
-
-            if (adversaryList.length === 0)
-            {
-              location.href = '/error';
-            }
-            else {
-              console.log("Success", adversaryList);
-              $component.adversary = adversaryList[0];
-              $component.clearAdversaryForm();
-              $component.populateAdversaryForm($component.adversary);
-
-              $component.title = $component.adversary.adversary_name + ' (Adversary)';
-              $component.description = $component.adversary.adversary_type;
-            }
-          }
-        }
-      }
+        this.title = this.adversary.adversary_name + ' (Adversary)';
+        this.description = this.adversary.adversary_type;
+      }    
     },
     upsertAdversary : function() {
         var $component = this;

@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueAppend from 'vue-append'
+import VueCookies from 'vue-cookies'
 import { Datetime } from 'vue-datetime'
 // You need a specific loader for CSS files
 import 'vue-datetime/dist/vue-datetime.css'
@@ -18,6 +19,7 @@ import './assets/js/fs_dicetray'
 
 Vue.use(Vuex)
 Vue.use(VueAppend)
+Vue.use(VueCookies)
 Vue.use(Datetime)
 Vue.use(VueShowdown, {
   // set default flavor of showdown

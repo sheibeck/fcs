@@ -18,8 +18,8 @@
           </div>
           <hr />
           <div class="d-flex">
-            <a :href="`/campaign/${item.id}/${item.slug}`" class='btn btn-primary mr-auto' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-            <!--<a href='#' class='btn btn-secondary js-share'>Share <i class='fa fa-share-square'></i></a>-->
+            <a :href="`/campaign/${item.id}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
+            <a :href="`/campaign-summary/${item.id}/${item.slug}`" class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
             <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
           </div>
         </div>
@@ -204,21 +204,22 @@ export default {
           }
       });
     },
-
+    shareUrl : function(event) {
+      event.preventDefault();
+      commonSvc.CopyTextToClipboard(event.currentTarget.href);
+    },
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
       this.$options.filters.filterCampaigns();
     },
-
     searchByTag : function(event) {
       var $elem = $(event.currentTarget);
       var tag = $elem.data('search-text');
       this.$store.commit('updateSearchText', tag);
       this.$options.filters.filterCampaigns();
     },
-
     getNiceDate : function(date) {
-        return new Date(date).toLocaleString();
+        commonSvc.GetNiceDate(date);
     },
   }
 }

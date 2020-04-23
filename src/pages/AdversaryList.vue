@@ -13,7 +13,7 @@
         </a>
 
         <div v-if="isAuthenticated" class="pt-2 pl-2 mr-auto ">
-          <input type="checkbox" class="" id="my_adversaries" v-on:change="list()" />
+          <input type="checkbox" class="" id="my_adversaries" v-bind:checked="adversaryListDefault" v-on:change="toggleAdversaryListDefault()" />
           <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
         </div>
 
@@ -121,10 +121,18 @@ export default {
       'userId',
       'searchText'
     ]),
+    adversaryListDefault() {
+      if ($cookies.get("fcsAdversaryListDefault"))
+      {
+       return true; 
+      }
+      
+      return false;      
+    }
   },
   watch: {
     userId() {
-      //wait for our authentication
+      //wait for our authentication      
       this.list();
     }
   },
@@ -138,8 +146,17 @@ export default {
     }
   },
   methods : {
+    toggleAdversaryListDefault : function() {
+      if ($('#my_adversaries').is(':checked')) {
+        $cookies.set("fcsAdversaryListDefault", "mine");
+      }
+      else {
+        $cookies.remove("fcsAdversaryListDefault");
+      }
+      this.list();
+    },
     list : async function (searchText) {     
-      let onlyShowMyAdversaries = $('#my_adversaries').is(':checked') ? this.$store.state.userId : null;
+      let onlyShowMyAdversaries = $cookies.get("fcsAdversaryListDefault") ? this.$store.state.userId : null;
       this.adversaries = await adversarySvc.list(this.id, onlyShowMyAdversaries);
       
       //make the display wider if we only have 1 adversary, this is

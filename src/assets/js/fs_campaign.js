@@ -10,12 +10,7 @@ import CommonService from "./commonService";
         campaigntable: '',
     } 
 
-    function domEvents() {
-        $(document).on('click', '.js-share', function (e) {
-            e.preventDefault();
-            commonSvc.GetShareUrl($(this));
-        });
-
+    function domEvents() {      
         $(document).on('show.bs.modal', '#modalDeleteConfirm', function (event) {
             var button = $(event.relatedTarget) // Button that triggered the modal
             var id = button.data('id') // Extract info from data-* attributes

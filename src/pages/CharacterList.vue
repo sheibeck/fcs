@@ -19,8 +19,8 @@
           </div>
           <hr />
           <div class="d-flex">
-            <a v-bind:href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
-            <a href='#' class='btn btn-secondary js-share-character ml-1 mr-auto'>Share <i class='fa fa-share-square'></i></a>
+            <a :href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.character_id'>Play <i class='fa fa-play-circle'></i></a>
+            <a :href='slugify[index]' class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
             <a href='#' class='btn' style='color:red' v-bind:data-id='item.character_id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
           </div>
         </div>
@@ -105,11 +105,6 @@ export default {
     }
   },
   methods : {
-    getCharacterValue: function(index, item) {
-      var itemValue = eval('this.characters[' + index + ']["aspect"].' + item);
-      return itemValue;
-    },
-
     list : function () {            
       let listitems = characterSvc.listByOwnerId(this.$store.state.userId).then( (data) => {      
         this.characters = data;
@@ -140,7 +135,10 @@ export default {
         }
       });
     },
-
+    shareUrl : function(event) {
+      event.preventDefault();
+      commonSvc.CopyTextToClipboard(event.currentTarget.href);
+    },
     searchByTag : function(event) {
       var tag = $(event.currentTarget).data('search-text');
       this.$store.commit('updateSearchText', tag)

@@ -12,12 +12,7 @@ import UserService from "./userService";
         charactertable: '',
     }
 
-    function domEvents() {
-        $(document).on('click', '.js-share-character', function (e) {
-            e.preventDefault();
-            commonSvc.GetShareUrl($(this));
-        });
-
+    function domEvents() {      
         $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {
             var button = $(event.relatedTarget) // Button that triggered the modal
             var characterId = button.data('id') // Extract info from data-* attributes
