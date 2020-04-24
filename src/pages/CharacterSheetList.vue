@@ -43,8 +43,8 @@ export default {
     commonSvc= new CommonService(this.$root);
     fs_char.init(this.$root);
   },
-  watch: {
-    userId() {
+  watch: {    
+    userId() {      
       this.list();
     }
   },

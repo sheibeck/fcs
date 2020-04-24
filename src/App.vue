@@ -112,6 +112,9 @@ import { mapGetters } from "vuex"
 import CommonService from "./assets/js/commonService"
 import UserService from "./assets/js/userService"
 
+let userSvc = null;
+let commonSvc = null;
+
 export default {
   name: 'App',
   metaInfo() {
@@ -124,6 +127,8 @@ export default {
      }
   },
   mounted(){
+    userSvc = new UserService(this.$root);
+    commonSvc = new CommonService(this.$root);
     this.init();    
   },
   computed: {
@@ -138,15 +143,14 @@ export default {
     }
   },
   methods: {
-    logout: function() {
-      let userSvc = new UserService(this.$root);
+    logout: function() {      
       userSvc.Logout();
+      document.location.href = '/';
     },
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
     },
     init: function() {      
-      let commonSvc = new CommonService(this.$root);      
       commonSvc.SetupForEnvironment();
 
       // initialize the application
@@ -161,10 +165,8 @@ export default {
         document.location = '/login';
       });
 
-      AWS.config.region = 'us-east-1';
-
-      //if we have cached auth credentials then login automatically
-      let userSvc = new UserService(this.$root);
+      AWS.config.region = 'us-east-1';      
+      
       userSvc.Authenticate();
     }
   }

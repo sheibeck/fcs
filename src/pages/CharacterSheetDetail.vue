@@ -114,7 +114,7 @@ export default {
 
         //create a new characterId if we don't have one
         var isNew = true;
-        this.characterId = commonSvc.generateUUID();
+        this.characterId = commonSvc.GenerateUUID();
         characterData.character_id = this.characterId;
         fs_char.config.characterId = this.characterId;
         

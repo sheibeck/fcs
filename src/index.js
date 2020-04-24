@@ -56,7 +56,7 @@ const store = new Vuex.Store({
       poolId: 'us-east-1_x9gvO6Gy3',
       clientId: '4hds760dsd2acikun12bpcljhk',
       identityPool: 'us-east-1:ba495e76-4ecc-4ae5-b116-62ed4dd2a596',
-      cognitoUser: null,      
+      CognitoUser: null,      
     }
   },
   mutations: {
@@ -66,7 +66,7 @@ const store = new Vuex.Store({
     userInfo (state, userId) {
       this.state.userId = userId;
     },
-    cognitoUser (state, currentUser) {
+    CognitoUser (state, currentUser) {
       this.state.cognito.CognitoUser = currentUser;
     },
     credentials (state, credentials) {
@@ -98,7 +98,7 @@ const store = new Vuex.Store({
       this.state.sessions = value;      
     },
     currentUser: state => {
-      return state.cognito.cognitoUser;      
+      return state.cognito.CognitoUser;      
     },
     userId: state => {
       return state.userId;

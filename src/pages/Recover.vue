@@ -27,6 +27,8 @@
 import { mapGetters } from 'vuex';
 import CommonService from "./../assets/js/commonService";
 
+let commonSvc = null;
+
 export default {
   name: 'Recover',
   metaInfo: {
@@ -38,6 +40,9 @@ export default {
       title: "Recover Password"
     }
   },
+  mounted() {
+    commonSvc = new CommonService(this.$root);
+  },
   computed: {
     ...mapGetters([
       'isAuthenticated',
@@ -45,29 +50,27 @@ export default {
     ]),
   },
   methods: {
-    recover: function() {
-      let commonSvc = new CommonService(this.$root);
-
+    recover: function() {      
       var poolData = {
           UserPoolId : this.$store.state.cognito.poolId, // Your user pool id here
-          ClientId : this.$store.state.config.cognito.clientId // Your client id here
+          ClientId : this.$store.state.cognito.clientId // Your client id here
       };
 
       var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-      var cognitoUser = null;
+      var CognitoUser = null;
 
       if ($('#email').val() == '') {
         commonSvc.Notify('You must enter your email address.');
         return;
       }
 
-      // setup cognitoUser first
-      cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+      // setup CognitoUser first
+      CognitoUser = new AmazonCognitoIdentity.CognitoUser({
           Username: $('#email').val(),
           Pool: userPool
       });
 
-      cognitoUser.forgotPassword({
+      CognitoUser.forgotPassword({
         onSuccess: function (result) {
             console.log('call result: ' + result);
             location.href = 'confirm?u=' + $('#email').val();

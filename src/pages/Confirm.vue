@@ -54,7 +54,7 @@ export default {
       };
 
       var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-      var cognitoUser = null;
+      var CognitoUser = null;
 
       if ($('#password').val() == '') {
         commonSvc.Notify('You must enter your new password.');
@@ -65,13 +65,13 @@ export default {
         return;
       }
 
-      // setup cognitoUser first
-      cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+      // setup CognitoUser first
+      CognitoUser = new AmazonCognitoIdentity.CognitoUser({
          Username: this.$route.query.u,
          Pool: userPool
       });
 
-      cognitoUser.confirmPassword($('#confirmationcode').val(), $('#password').val(), {
+      CognitoUser.confirmPassword($('#confirmationcode').val(), $('#password').val(), {
         onSuccess: function (result) {
             console.log('Successfully reset password');
             commonSvc.Notify('Your password was successfully reset.', 'success', 2000, function() { location.href = 'login'});

@@ -4,7 +4,7 @@
     <div class='js-adversary-list'>
 
       <div v-if="!id" class="d-print-none mb-2 d-md-flex">
-        <a v-if="!isAuthenticated" href='/login' type="button" class="btn btn-primary mb-1 mb-md-0">
+        <a v-if="!isAuthenticated" href='/login' type="button" class="btn btn-primary mb-1 mb-md-0 mr-auto">
             Login to Create an Adversary <span class='dice'>A</span>
         </a>
 

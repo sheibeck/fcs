@@ -26,68 +26,70 @@ export default class UserService {
         if (err) {
             this.commonSvc.Notify(err.message || JSON.stringify(err));
             return;
-        }
-        cognitoUser = result.user;
-        console.log('user name is ' + cognitoUser.getUsername());
+        }        
         this.commonSvc.Notify('Successfully registered. Please check your email for a verification link.', 'success', 2000, () => { document.location = 'login' });
     });
   }
 
-  Login = (username, password) => {  
-    var authenticationData = {
+  Login = (username, password) => {
+    //make sure we don't have a cached credential
+    if (this.fcs.$store.state.cognito.CognitoUser) {
+      this.fcs.$store.state.cognito.CognitoUser.signOut();
+    }
+    
+    let authenticationData = {
         Username : username,
         Password : password,
     };
-    var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
-    var poolData = {
+    let authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+    let poolData = {
         UserPoolId : this.fcs.$store.state.cognito.poolId, // Your user pool id here
         ClientId : this.fcs.$store.state.cognito.clientId // Your client id here
     };
-    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-    var userData = {
+    let userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    let userData = {
         Username : username,
         Pool : userPool
     };
 
-    var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-    cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: (result) => {
-            console.log('access token + ' + result.getAccessToken().getJwtToken());
+    let CognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+    CognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: (result) => {
+        console.log('access token + ' + result.getAccessToken().getJwtToken());
 
-            //AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            let credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId : this.fcs.$store.state.cognito.identityPool, // your identity pool id here
-                Logins : {
-                    // Change the key below according to the specific region your user pool is in.
-                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_x9gvO6Gy3' : result.getIdToken().getJwtToken()
-                }
-            });
+        //AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        let credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId : this.fcs.$store.state.cognito.identityPool, // your identity pool id here
+            Logins : {
+                // Change the key below according to the specific region your user pool is in.
+                'cognito-idp.us-east-1.amazonaws.com/us-east-1_x9gvO6Gy3' : result.getIdToken().getJwtToken()
+            }
+        });
 
-            this.fcs.$store.commit("credentials", credentials);
-            this.fcs.$store.commit("cognitoUser", cognitoUser);            
-            this.SetupAuthorizedUser(result, cognitoUser);
+        this.fcs.$store.commit("credentials", credentials);
+        this.fcs.$store.commit("CognitoUser", CognitoUser);            
+        this.SetupAuthorizedUser(result, CognitoUser);
 
-            document.location = 'character';
-        },
+        document.location = 'character';
+      },
 
-        onFailure: (err) => {
-            this.commonSvc.Notify(err.message || JSON.stringify(err));
-        },
-
+      onFailure: (err) => {
+          this.commonSvc.Notify(err.message || JSON.stringify(err));
+      },
     });
   }
 
   Authenticate = () => {
     // grab an active session
-    var poolData = {
+    let poolData = {
         UserPoolId : this.fcs.$store.state.cognito.poolId, // Your user pool id here
         ClientId : this.fcs.$store.state.cognito.clientId // Your client id here
     };
-    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-    var cognitoUser = userPool.getCurrentUser();
+    let userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    let CognitoUser = userPool.getCurrentUser();
 
-    if (cognitoUser != null) {
-      cognitoUser.getSession( (err, session) => {
+    if (CognitoUser != null) {
+      CognitoUser.getSession( (err, session) => {
           if (err) {
               this.commonSvc.Notify(err.message || JSON.stringify(err));
               return;
@@ -109,9 +111,9 @@ export default class UserService {
             if (error) {
                 console.error(error);
             } else {
-                console.log('Successfully logged!');
+                console.log('Refreshed Credentials');
 
-                this.fcs.$store.commit("cognitoUser", cognitoUser);
+                this.fcs.$store.commit("CognitoUser", CognitoUser);
                 this.fcs.$store.commit("userInfo", credentials.identityId);
                 this.SetupAuthorizedUser(session);
             }
@@ -121,22 +123,22 @@ export default class UserService {
     else  {
       //get unathenticated user from pool
       let credentials = new AWS.CognitoIdentityCredentials({
-          IdentityPoolId : this.fcs.$store.cognito.identityPool, // your identity pool id here
+          IdentityPoolId : this.fcs.$store.state.cognito.identityPool, // your identity pool id here
       });
 
-      this.fcs.$store.commit("credentials", credentials);      
+      this.fcs.$store.commit("credentials", credentials);
 
       this.fcs.$store.state.credentials.refresh( (error) => {
         if (error) {
             console.error(error);
         } else {
-            console.log('Successfully logged!');
+            console.log('Refreshed Credentials');
         }
 
-        this.fcs.$store.commit("cognitoUser", cognitoUser);
-        this.fcs.$store.commit("userInfo", null);
+        this.fcs.$store.commit("CognitoUser", CognitoUser);        
+        this.fcs.$store.commit("userInfo", "public");
                 
-        this.setupUnAuthorizedUser();
+        this.SetupUnAuthorizedUser();
       });
     }
   }
@@ -153,8 +155,8 @@ export default class UserService {
     $('.requires-noauth').addClass('hidden');
   }
 
-  Logout = () => {    
-    this.fcs.$store.state.cognito.cognitoUser.signOut();
-    document.location.href = '/';
-  }
+  Logout = () => {        
+    this.fcs.$store.state.credentials.clearCachedId();
+    this.fcs.$store.state.cognito.CognitoUser.signOut();
+  } 
 }
