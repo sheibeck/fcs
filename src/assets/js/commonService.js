@@ -137,7 +137,12 @@ export default class CommonService {
   SetupForEnvironment = function () {
       if (this.fcs.$store.state.environment !== 'production')
       {
-        $('body').prepend('<h1 class="d-print-none">'+ this.fcs.$store.state.environment.toUpperCase() +'</h1>');
+        let environmentLabel = "BETA";
+        if (window.location.host == 'localhost:8080')
+        {
+          environmentLabel = "LOCAL";
+        }        
+        $('body').prepend(`<h1 class="d-print-none">${environmentLabel}</h1>`);
       }
 
       if (window.location.host !== 'localhost:8080' && window.location.host.indexOf("gitpod.io") == -1)
