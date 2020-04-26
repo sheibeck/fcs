@@ -55,6 +55,9 @@ export default {
     dbSvc = new DbService(this.$root);
     characterSvc = new CharacterService(dbSvc);
     fs_char.init(this.$root);
+
+    this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.sheetname);
+    this.characterId = commonSvc.SetId("CHARACTER", this.$route.params.id);
   },
   computed: {
     ...mapGetters([
@@ -65,50 +68,37 @@ export default {
   watch: {
     userId() {
       //wait for our authenticated user id
-      this.show(this.sheetname);
+      this.show();
     }
   },
   data () {
     return {
-      sheet: "",
-      id: this.$route.params.id,
-      sheetname: this.$route.params.sheetname,
+      sheet: "",      
+      sheetId: null,
       title: "",
       description: "",
+      characterid: null,      
+      characterData: null,
     }
   },
   methods : {
-    show : function (sheetname) {     
-      var docClient = dbSvc.GetDbClient();
-
-      var params = {
-        TableName: fs_char.config.charactersheettable,
-        Key: {
-          'charactersheetname': sheetname
-        },
-      }
-
-      docClient.get(params, (err, data) => {
-        if (err) {
-            console.log("Error", err);
-        } else {
-            console.log("Success", data.Item);
-            this.sheet = data.Item.charactersheetcontent;
-
-            //fetch the character data and populate it
-            this.getCharacterInfo(this.id);
-        }
+    async show() {     
+      this.characterData = await dbSvc.GetObject(this.characterId);
+      let response = await dbSvc.GetObject(this.characterData.related_id).then( (response) => {
+        this.sheetData = response;
+        this.sheet = response.content;
+      }).then(() => {
+        this.populateCharacterData();
       });
     },
-    async getCharacterInfo(id) {
-      var characterData = await characterSvc.GetCharacterDetail(id);
-      this.title = characterData.name + ' (Character)';
-      this.description = characterData.system;
+    populateCharacterData() {    
+      this.title = this.characterData.name + ' (Character)';
+      this.description = this.characterData.system;
 
       //if the viewer isn't the character owner then don't let them save it
       // it would just copy it to their account, but for now we'll just
       // remove the option
-      if (characterData.character_owner_id !== this.userId)
+      if (this.characterData.owner_id !== this.userId)
       {
         $('.js-create-character').remove();
       }
@@ -118,7 +108,7 @@ export default {
           initSheet();
       }
 
-      $('form').populate(characterData);
+      $('form').populate(this.characterData);
 
       if (typeof autocalc !== "undefined") {
           autocalc();
@@ -132,53 +122,42 @@ export default {
         }
       }, 100);
     },
-    save : function() {
+    async save() {
       if (this.isAuthenticated) {
         /// save a character
         var data = $('form').serializeJSON();
         var characterData = JSON.parse(data);
 
         // make sure we have a proper user id key
-        characterData.character_owner_id = this.userId;
+        characterData.owner_id = this.userId;
+        characterData.related_id = this.sheetData.id;
+        characterData.system = this.sheetData.system;
+
+        //remove some legacy values
+        characterData.sheetname = "";
+
 
         //create a new characterId if we don't have one
         var isNew = false;
-        if (!this.id) {
+        if (!this.characterId) {
             isNew = true;
-            this.id = commonSvc.GenerateUUID();              
+            this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());
         }
-        characterData.character_id = this.id;
-        fs_char.config.characterId = this.id;
+        characterData.id = this.characterId;
+        fs_char.config.characterId = this.characterId;
 
-        //dynamodb won't let us have empty attributes
-        commonSvc.RemoveEmptyObjects(characterData);
-
-        let docClient = dbSvc.GetDbClient();
-
-        // create/update a  character
-        // we always use the put operation because the data can change depending on your character sheet
-        let params = {
-            TableName: fs_char.config.charactertable,
-            Item: characterData
-        };
-
-        docClient.put(params, (err, data) => {
-          if (err) {
-              commonSvc.Notify(err.message || JSON.stringify(err));
-              console.error("Unable to save item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              commonSvc.Notify('Character saved.', 'success', 2000);
-              console.log("Added item:", JSON.stringify(data, null, 2));
+        let response = await dbSvc.SaveObject(characterData).then((response) => {          
+          if (response.error) {
+            commonSvc.Notify(response.error, 'success', 2000);
           }
-        });
-    
-        setTimeout(function() {					
-          //update the portrait
+          else {
+            commonSvc.Notify('Character saved.', 'success', 2000);
+          }   
+        }).then( () => {         
           if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
-            $("img.portrait").prop("src", $("#character_image_url").val());
-          }
-        }, 100);
-    
+              $("img.portrait").prop("src", $("#character_image_url").val());
+          }          
+        });
       }
       else {
           window.print();

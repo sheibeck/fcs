@@ -1,0 +1,352 @@
+{
+  "ModelName": "FateCharacterSheet",
+  "ModelMetadata": {
+    "Author": "smh",
+    "DateCreated": "Apr 24, 2020, 02:41 PM",
+    "DateLastModified": "Apr 26, 2020, 12:44 PM",
+    "Description": "fate character sheet website",
+    "Version": "1.0"
+  },
+  "DataModel": [
+    {
+      "TableName": "FateCharacterSheet_dev",
+      "KeyAttributes": {
+        "PartitionKey": {
+          "AttributeName": "owner_id",
+          "AttributeType": "S"
+        },
+        "SortKey": {
+          "AttributeName": "id",
+          "AttributeType": "S"
+        }
+      },
+      "NonKeyAttributes": [
+        {
+          "AttributeName": "object_type",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "related_id",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "name",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "system",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "approaches",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "consequences",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "description",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "image_url",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "stunts",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "stress",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "condition",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "refresh",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "skills",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "fatepoints",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "aspect_corrupted",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "mantles",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "scale",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "stunts_corrupted",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "content",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "displayname",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "slug",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "public",
+          "AttributeType": "BOOL"
+        },
+        {
+          "AttributeName": "aspects",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "genre",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "type",
+          "AttributeType": "S"
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "type",
+          "KeyAttributes": {
+            "PartitionKey": {
+              "AttributeName": "object_type",
+              "AttributeType": "S"
+            },
+            "SortKey": {
+              "AttributeName": "name",
+              "AttributeType": "S"
+            }
+          },
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        },
+        {
+          "IndexName": "relative",
+          "KeyAttributes": {
+            "PartitionKey": {
+              "AttributeName": "related_id",
+              "AttributeType": "S"
+            },
+            "SortKey": {
+              "AttributeName": "name",
+              "AttributeType": "S"
+            }
+          },
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        },
+        {
+          "IndexName": "item",
+          "KeyAttributes": {
+            "PartitionKey": {
+              "AttributeName": "id",
+              "AttributeType": "S"
+            }
+          },
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        }
+      ],
+      "TableData": [
+        {
+          "owner_id": {
+            "S": "USER|1"
+          },
+          "id": {
+            "S": "CAMPAIGN|1"
+          },
+          "object_type": {
+            "S": "CAMPAIGN"
+          },
+          "name": {
+            "S": "Campaign Name"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "USER|1"
+          },
+          "id": {
+            "S": "LOG|1"
+          },
+          "object_type": {
+            "S": "LOG"
+          },
+          "related_id": {
+            "S": "CAMPAIGN|1"
+          },
+          "name": {
+            "S": "2020-04-24 00:00"
+          },
+          "description": {
+            "S": "Wohooo"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "USER|1"
+          },
+          "id": {
+            "S": "LOG|2"
+          },
+          "object_type": {
+            "S": "LOG"
+          },
+          "related_id": {
+            "S": "CAMPAIGN|1"
+          },
+          "name": {
+            "S": "2020-04-24 08:00"
+          },
+          "description": {
+            "S": "Logging stuff"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "USER|2"
+          },
+          "id": {
+            "S": "CAMPAIGN|99"
+          },
+          "object_type": {
+            "S": "CAMPAIGN"
+          },
+          "name": {
+            "S": "My 99th Campaign"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "USER|2"
+          },
+          "id": {
+            "S": "LOG|5"
+          },
+          "object_type": {
+            "S": "LOG"
+          },
+          "related_id": {
+            "S": "CAMPAIGN|2"
+          },
+          "name": {
+            "S": "2020-03-18 09:00"
+          },
+          "description": {
+            "S": "Some log details"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "JARVIS"
+          },
+          "id": {
+            "S": "CHARACTERSHEET|fate-condensed"
+          },
+          "object_type": {
+            "S": "CHARACTERSHEET"
+          },
+          "name": {
+            "S": "Fate Condensed"
+          },
+          "system": {
+            "S": "Fate Condensed"
+          },
+          "content": {
+            "S": "<!-- COMMENT OUT FOR PRODUCTION --> <!-- <meta name=\"\"viewport\"\" content=\"\"width=device-width, initial-scale=1, shrink-to-fit=no\"\"> <link rel=\"\"stylesheet\"\"     type=\"\"text/css\"\"     href=\"\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css\"\"     integrity=\"\"sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm\"\"     crossorigin=\"\"anonymous\"\"> --> <style> \t@import url('https://fonts.googleapis.com/css?family=Open+Sans:800');  \t.sheet { \t\tmargin: 20px; \t\tmargin-top: 40px; \t\tmax-width: 1024px; \t}  \t.fate-logo { \t\tmargin-top: -27px; \t\tmax-height: 80px; \t}  \t.fate-header { \t\tfont-family: 'Open Sans', sans-serif; \t\ttext-transform: uppercase; \t\tbackground-color: black; \t\tcolor: white; \t\tfont-weight: 700; \t\tpadding-bottom: 0px; \t\tmargin-bottom: 0px; \t\tfont-size: 36px; \t\theight: 40px; \t}   \t.col-form-label { \t\tfont-family: 'Open Sans', sans-serif; \t\ttext-transform: uppercase; \t\tfont-size: 22px; \t\tfont-weight: 700; \t}  \t.fate-skills .form-group { \t\tmargin-top: 1px; \t\tmargin-bottom: 1px; \t}  \t.fate-skills label { \t\tpadding-bottom: 2px; \t}  \t.fate-aspects .form-group { \t\tmargin-bottom: 12px; \t\tmargin-top: 0px; \t}  \tinput[type=checkbox] { \t\theight: 50px; \t\twidth: 50px; \t}  \t.fate-conditions label { \t\tfont-family: 'IM Fell English', sans-serif; \t\ttext-transform: uppercase; \t\tfont-size: 30px; \t\tfont-weight: 700; \t\tmargin-left: -5px; \t\tmargin-right: -5px; \t}  \t.portrait { \t\tmax-height: 450px; \t\tpadding-top: 10px; \t}  \t.small { \t\tcolor: #888; \t}  \t/* IMAGE STYLES */\t \ttextarea { \t\tborder: 0 !important; \t}  \t#stunts { \t\theight: 500px;\t\t \t\tmin-height: 500px; \t}  \t.skills input { \t\tfont-size: 22px; \t\tfont-weight: 700; \t\tborder-width: 0px; \t\tpadding-top: 0px; \t\ttext-transform: capitalize; \t}  \tinput.refresh { \t\tborder: 4px solid black; \t\tborder-radius: 50px 50px; \t\twidth: 100px; \t\theight: 100px; \t\ttext-align: center; \t\tfont-size: 55px; \t\t \t}  \t@media print { \t\t.sheet { \t\t\tmargin: 20px; \t\t\tmargin-top: 20px; \t\t\tmax-width: 1024px; \t\t} \t} </style>  <div class=\"\"sheet\"\"> \t<input type=\"\"hidden\"\" id=\"\"sheetname\"\" name=\"\"sheetname\"\" value=\"\"fate-condensed\"\" /> \t<input type=\"\"hidden\"\" id=\"\"system\"\" name=\"\"system\"\" value=\"\"fate-condensed\"\" /> \t<div class=\"\"row\"\">\t\t \t\t<div class=\"\"col-sm-6\"\"> \t\t\t<div class=\"\"form-group\"\"> \t\t\t\t<input type=\"\"text\"\" class=\"\"form-control\"\" id=\"\"name\"\" name=\"\"name\"\" placeholder=\"\"Name\"\" /> \t\t\t</div> \t\t</div> \t\t<div class=\"\"col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0\"\"> \t\t\t<img alt=\"\"Fate Condensed\"\" class=\"\"img-fluid fate-logo\"\" src=\"\"/static/sheets/fate-condensed/logo.png\"\" /> \t\t</div> \t</div>  \t<div class=\"\"row\"\"> \t\t<!-- aspects --> \t\t<div class=\"\"col-sm-6 col-md-7 fate-aspects px-0\"\" style=\"\"border-right: 2px solid #3A5224;\"\"> \t\t\t<div for=\"\"\"\" class=\"\"fate-header\"\">Aspects</div> \t\t\t<div class=\"\"px-3\"\"> \t\t\t\t<div class=\"\"form-group mb-0\"\"> \t\t\t\t\t<div class=\"\"row\"\"> \t\t\t\t\t\t<div class=\"\"col\"\"> \t\t\t\t\t\t\t<label>High Concept</label> \t\t\t\t\t\t\t<input type=\"\"text\"\" class=\"\"form-control\"\" value=\"\"\"\" id=\"\"aspect[highconcept]\"\" name=\"\"aspect[highconcept]\"\" placeholder=\"\"High Concept\"\" /> \t\t\t\t\t\t</div>\t\t\t\t\t\t \t\t\t\t\t</div> \t\t\t\t</div> \t\t\t\t<div class=\"\"form-group\"\"> \t\t\t\t\t<div class=\"\"row\"\"> \t\t\t\t\t\t<div class=\"\"col\"\"> \t\t\t\t\t\t\t<label>Trouble</label> \t\t\t\t\t\t\t<input type=\"\"text\"\" class=\"\"form-control\"\" value=\"\"\"\" id=\"\"aspect[trouble]\"\" name=\"\"aspect[trouble]\"\" placeholder=\"\"Trouble\"\" /> \t\t\t\t\t\t</div>\t\t\t\t\t \t\t\t\t\t</div> \t\t\t\t</div> \t\t\t\t<div class=\"\"form-group\"\"> \t\t\t\t\t<div class=\"\"row\"\"> \t\t\t\t\t\t<div class=\"\"col\"\"> \t\t\t\t\t\t\t<label>Relationship</label> \t\t\t\t\t\t\t<input type=\"\"text\"\" class=\"\"form-control\"\" value=\"\"\"\" id=\"\"aspect[relationship]\"\" name=\"\"aspect[relationship]\"\" placeholder=\"\"Relationship\"\" /> \t\t\t\t\t\t</div>\t\t\t\t\t\t \t\t\t\t\t</div> \t\t\t\t</div> \t\t\t\t<div class=\"\"form-group\"\"> \t\t\t\t\t<div class=\"\"row\"\"> \t\t\t\t\t\t<div class=\"\"col\"\"> \t\t\t\t\t\t\t<label>Other Aspect</label> \t\t\t\t\t\t\t<input type=\"\"text\"\" class=\"\"form-control\"\" value=\"\"\"\" id=\"\"aspect[other1]\"\" name=\"\"aspect[other1]\"\" placeholder=\"\"Other Aspect\"\" /> \t\t\t\t\t\t</div>\t\t\t\t\t \t\t\t\t\t</div> \t\t\t\t</div> \t\t\t\t<div class=\"\"form-group\"\"> \t\t\t\t\t<div class=\"\"row\"\"> \t\t\t\t\t\t<div class=\"\"col\"\"> \t\t\t\t\t\t\t<label>Other Aspect</label> \t\t\t\t\t\t\t<input type=\"\"text\"\" class=\"\"form-control\"\" value=\"\"\"\" id=\"\"aspect[other2]\"\" name=\"\"aspect[other2]\"\" placeholder=\"\"Other Aspect\"\" /> \t\t\t\t\t\t</div>\t\t\t\t\t\t \t\t\t\t\t</div> \t\t\t\t</div> \t\t\t</div>  \t\t\t<div for=\"\"\"\" class=\"\"fate-header\"\">Regular Stunts</div>  \t\t\t<div class=\"\"px-3\"\"> \t\t\t\t<div class=\"\"form-group mb-0 pb-4\"\"> \t\t\t\t\t<div class=\"\"small text-muted font-italic\"\">Start with three stunts for free. You may buy additional stunts for 1 Refresh each, so long as your Refresh remains at or above 1.</div> \t\t\t\t\t<textarea class=\"\"form-control\"\" id=\"\"stunts\"\" name=\"\"stunts\"\" rows=\"\"14\"\" placeholder=\"\"Regular Stunts\"\"></textarea> \t\t\t\t</div> \t\t\t</div>\t\t  \t\t\t<div class=\"\"fate-header mb-5 mb-sm-0\"\"> \t\t\t\t<div class=\"\"d-flex\"\"> \t\t\t\t\t<input class=\"\"refresh center\"\" id=\"\"refresh\"\" name=\"\"refresh\"\" placeholder=\"\"3\"\" /> <div class=\"\"pt-0\"\">Refresh</div> \t\t\t\t</div> \t\t\t</div> \t\t</div>  \t\t<!-- Vitals and Skills --> \t\t<div class=\"\"col-sm-6 col-md-5 fate-skills px-0 mt-3 mt-sm-0\"\"> \t\t\t<div class=\"\"fate-header col-12\"\">Vitals</div>  \t\t\t<div class=\"\"px-3\"\">\t\t\t\t \t\t\t\t<!-- Stress --> \t\t\t\t<div class=\"\"form-group text-center font-weight-bold\"\"> \t\t\t\t\t<div class=\"\"col-12\"\">STRESS</div> \t\t\t\t</div>  \t\t\t\t<!-- physical stress --> \t\t\t\t<div class=\"\"d-flex flex-row \"\"> \t\t\t\t\t<div class=\"\"form-group font-weight-bold  pr-2 pt-2 mr-auto\"\"> \t\t\t\t\t\tPHYSICAL \t\t\t\t\t</div> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[stress1]\"\" name=\"\"stress[stress1]\"\"> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[stress2]\"\" name=\"\"stress[stress2]\"\"> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[stress3]\"\" name=\"\"stress[stress3]\"\"> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[stress4]\"\" name=\"\"stress[stress4]\"\" disabled data-required='physique' data-required-value='1'> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[stress5]\"\" name=\"\"stress[stress5]\"\" disabled data-required='physique' data-required-value='3'> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[stress6]\"\" name=\"\"stress[stress6]\"\" disabled data-required='physique' data-required-value='5'> \t\t\t\t</div>  \t\t\t\t<!-- mental stress --> \t\t\t\t<div class=\"\"d-flex flex-row\"\"> \t\t\t\t\t<div class=\"\"form-group font-weight-bold pr-3 pt-2 mr-auto\"\"> \t\t\t\t\t\tMENTAL \t\t\t\t\t</div> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[mental1]\"\" name=\"\"stress[mental1]\"\"> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[mental2]\"\" name=\"\"stress[mental2]\"\"> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[mental3]\"\" name=\"\"stress[mental3]\"\"> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[mental4]\"\" name=\"\"stress[mental4]\"\" disabled data-required='will' data-required-value='1'> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[mental5]\"\" name=\"\"stress[mental5]\"\" disabled data-required='will' data-required-value='3'> \t\t\t\t\t<input type=\"\"checkbox\"\" value=\"\"1\"\" id=\"\"stress[mental6]\"\" name=\"\"stress[mental6]\"\" disabled data-required='will' data-required-value='5'> \t\t\t\t</div>  \t\t\t\t<!-- consequences --> \t\t\t\t<div class=\"\"form-group text-center font-weight-bold\"\"> \t\t\t\t\t<div class=\"\"col-12\"\">CONSEQUENCES</div> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<label class=\"\"col-2 col-form-label\"\">2</label> \t\t\t\t\t<div class=\"\"col-10\"\"> \t\t\t\t\t\t<input class=\"\"form-control\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"consequence[mild]\"\" name=\"\"consequence[mild]\"\" placeholder=\"\"Mild\"\"> \t\t\t\t\t</div> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<label class=\"\"col-2 col-form-label\"\">4</label> \t\t\t\t\t<div class=\"\"col-10\"\"> \t\t\t\t\t\t<input class=\"\"form-control\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"consequence[moderate]\"\" name=\"\"consequence[moderate]\"\" placeholder=\"\"Moderate\"\"> \t\t\t\t\t</div> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<label class=\"\"col-2 col-form-label\"\">6</label> \t\t\t\t\t<div class=\"\"col-10\"\"> \t\t\t\t\t\t<input class=\"\"form-control\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"consequence[severe]\"\" name=\"\"consequence[severe]\"\" placeholder=\"\"Severe\"\"> \t\t\t\t\t</div> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<label class=\"\"col-2 col-form-label stat-requirement\"\">2</label> \t\t\t\t\t<div class=\"\"col-10\"\"> \t\t\t\t\t\t<input class=\"\"form-control\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"consequence[mild2]\"\" name=\"\"consequence[mild2]\"\" placeholder=\"\"Mild\"\" disabled data-required='physiqueOrWill' data-required-value='5'> \t\t\t\t\t</div> \t\t\t\t</div> \t\t\t</div>  \t\t\t<!-- Skills --> \t\t\t<div class=\"\"fate-header col-12\"\">Skills</div>  \t\t\t<div class=\"\"px-3 skills\"\"> \t\t\t\t<div class=\"\"small text-muted font-italic\"\">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div> \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill1]\"\" name=\"\"skill[skill1]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label1]\"\" name=\"\"skill[label1]\"\" placeholder=\"\"ACADEMICS\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill2]\"\" name=\"\"skill[skill2]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label2]\"\" name=\"\"skill[label2]\"\" placeholder=\"\"ATHLETICS\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill3]\"\" name=\"\"skill[skill3]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label3]\"\" name=\"\"skill[label3]\"\" placeholder=\"\"BURGLARY\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill4]\"\" name=\"\"skill[skill4]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label4]\"\" name=\"\"skill[label4]\"\" placeholder=\"\"CONTACTS\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill5]\"\" name=\"\"skill[skill5]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label5]\"\" name=\"\"skill[label5]\"\" placeholder=\"\"CRAFTS\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill6]\"\" name=\"\"skill[skill6]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label6]\"\" name=\"\"skill[label6]\"\" placeholder=\"\"DECEIVE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill7]\"\" name=\"\"skill[skill7]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label7]\"\" name=\"\"skill[label7]\"\" placeholder=\"\"DRIVE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill8]\"\" name=\"\"skill[skill8]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label8]\"\" name=\"\"skill[label8]\"\" placeholder=\"\"EMPATHY\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill9]\"\" name=\"\"skill[skill9]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label9]\"\" name=\"\"skill[label9]\"\" placeholder=\"\"FIGHT\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill10]\"\" name=\"\"skill[skill10]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label10]\"\" name=\"\"skill[label10]\"\" placeholder=\"\"INVESTIGATE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill11]\"\" name=\"\"skill[skill11]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label11]\"\" name=\"\"skill[label11]\"\" placeholder=\"\"LORE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill12]\"\" name=\"\"skill[skill12]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label12]\"\" name=\"\"skill[label12]\"\" placeholder=\"\"NOTICE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill13]\"\" name=\"\"skill[skill13]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label13]\"\" name=\"\"skill[label13]\"\" placeholder=\"\"PHYSIQUE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill14]\"\" name=\"\"skill[skill14]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label14]\"\" name=\"\"skill[label14]\"\" placeholder=\"\"PROVOKE\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill15]\"\" name=\"\"skill[skill15]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label15]\"\" name=\"\"skill[label15]\"\" placeholder=\"\"RAPPORT\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill16]\"\" name=\"\"skill[skill16]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label16]\"\" name=\"\"skill[label16]\"\" placeholder=\"\"RESOURCES\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill17]\"\" name=\"\"skill[skill17]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label17]\"\" name=\"\"skill[label17]\"\" placeholder=\"\"SHOOT\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill18]\"\" name=\"\"skill[skill18]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label18]\"\" name=\"\"skill[label18]\"\" placeholder=\"\"STEALTH\"\"> \t\t\t\t</div>  \t\t\t\t<div class=\"\"form-group row\"\"> \t\t\t\t\t<div class=\"\"col-3\"\"> \t\t\t\t\t\t<input class=\"\"form-control text-center\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[skill19]\"\" name=\"\"skill[skill19]\"\" placeholder=\"\"+\"\"> \t\t\t\t\t</div> \t\t\t\t\t<input class=\"\"col-9\"\" type=\"\"text\"\" value=\"\"\"\" id=\"\"skill[label19]\"\" name=\"\"skill[label19]\"\" placeholder=\"\"WILL\"\"> \t\t\t\t</div> \t\t\t</div> \t\t</div> \t</div>  \t<script type=\"\"text/javascript\"\"> \t\t// autocalculate stuff \t\tfunction autocalc() { \t\t\tvar physique = $('input[name=\"\"skill[skill13]\"\"]').val() || 0; \t\t\tvar will = $('input[name=\"\"skill[skill19]\"\"]').val() || 0;  \t\t\t$(\"\"input[data-required='physique']\"\").each(function () { \t\t\t\tvar $this = $(this); \t\t\t\tvar qualifies = physique >= parseInt($this.data('required-value')); \t\t\t\tshowQualified(qualifies, $this); \t\t\t});  \t\t\t$(\"\"input[data-required='will']\"\").each(function () { \t\t\t\tvar $this = $(this); \t\t\t\tvar qualifies = will >= parseInt($this.data('required-value')); \t\t\t\tshowQualified(qualifies, $this); \t\t\t});  \t\t\t$(\"\"input[data-required='physiqueOrWill']\"\").each(function () { \t\t\t\tvar $this = $(this); \t\t\t\tvar qualifies = physique >= parseInt($this.data('required-value')) || will >= parseInt($this.data('required-value')); \t\t\t\tshowQualified(qualifies, $this); \t\t\t}); \t\t}  \t\tfunction showQualified(isQualified, $elem) { \t\t\tif (isQualified) { \t\t\t\t$elem.attr('disabled', false); \t\t\t\t$elem.prev('label').removeClass('stat-requirement'); \t\t\t\t$elem.parent().prev('label').removeClass('stat-requirement'); \t\t\t} \t\t\telse { \t\t\t\t$elem.attr('disabled', true); \t\t\t\t$elem.prev('label').addClass('stat-requirement'); \t\t\t\t$elem.parent().prev('label').addClass('stat-requirement'); \t\t\t} \t\t}   \t\twindow.initSheet = function () { \t\t\t$(document).on('change', 'input[name=\"\"skill[skill13]\"\"], input[name=\"\"skill[skill19]\"\"]', function () { \t\t\t\tautocalc(); \t\t\t}); \t\t\tautocalc(); \t\t} \t</script> </div>"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "USER|3"
+          },
+          "id": {
+            "S": "CHARACTER|7"
+          },
+          "object_type": {
+            "S": "CHARACTER"
+          },
+          "related_id": {
+            "S": "CHARACTERSHEET|fate-condensed"
+          },
+          "name": {
+            "S": "Happy Guilmore"
+          },
+          "description": {
+            "S": "Fate Condensed with customizable skills."
+          }
+        },
+        {
+          "owner_id": {
+            "S": "USER|3"
+          },
+          "id": {
+            "S": "ADVERSARY|1"
+          },
+          "object_type": {
+            "S": "ADVERSARY"
+          },
+          "name": {
+            "S": "Some Bad Dude"
+          },
+          "genre": {
+            "S": "sci-fi"
+          },
+          "type": {
+            "S": "enemy"
+          }
+        },
+        {
+          "owner_id": {
+            "S": "us-east-1:21598ef1-7df9-4c74-b3be-95b9645adbeb"
+          },
+          "id": {
+            "S": "CHARACTER|0c85bbf7-88e9-4622-8ac7-32ddb35fb445"
+          },
+          "object_type": {
+            "S": "CHARACTER"
+          },
+          "related_id": {
+            "S": "CHARACTERSHEET|fate-condensed"
+          },
+          "name": {
+            "S": "Hello World"
+          },
+          "system": {
+            "S": "Fate Condensed"
+          },
+          "stunts": {
+            "S": "What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.  Why do we use it? It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).   Where does it come from? Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"\"de Finibus Bonorum et Malorum\"\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"\"Lorem ipsum dolor sit amet..\"\", comes from a line in section 1.10.32.  The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"\"de Finibus Bonorum et Malorum\"\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.  Where can I get some? There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+          },
+          "skills": {
+            "S": "{    \"label19\" : { \"S\" : \"willpower\" },    \"skill1\" : { \"S\" : \"0\" },    \"skill13\" : { \"S\" : \"5\" },    \"skill19\" : { \"S\" : \"1\" },    \"skill2\" : { \"S\" : \"2\" }  }"
+          }
+        }
+      ],
+      "DataAccess": {
+        "MySql": {}
+      }
+    }
+  ]
+}

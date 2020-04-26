@@ -45,7 +45,9 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
-    fs_char.init(this.$root);    
+    fs_char.init(this.$root);
+    
+    this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.id);
   },
   watch: {
     userId() {
@@ -76,27 +78,14 @@ export default {
         }
       }, 1000);
     },
-    show : function () {
-      //reference this component so we can get/set data    
-      var docClient = dbSvc.GetDbClient();
-      var params = {
-        TableName: fs_char.config.charactersheettable,
-        Key: {
-          'charactersheetname': this.id
-        },
-      }
+    async show() {      
+      let sheetData = await dbSvc.GetObject(this.sheetId, commonSvc.GetRootOwner()).then( (data) => {         
+        this.sheet = data.content;
 
-      docClient.get(params, (err, data) => {
-        if (err) {
-            console.log("Error", err);
-        } else {
-          console.log("Success", data.Item);
-          this.sheet = data.Item.charactersheetcontent;
+        this.title = data.name + ' (Character Sheet)';
+        this.description = data.description;
+      }); 
 
-          this.title = data.Item.charactersheetdisplayname + ' (Character Sheet)';
-          this.description = data.Item.charactersheetdescription;
-        }
-      });
     },
     save : function() {            
       if (this.isAuthenticated) {
@@ -116,7 +105,7 @@ export default {
         var isNew = true;
         this.characterId = commonSvc.GenerateUUID();
         characterData.character_id = this.characterId;
-        fs_char.config.characterId = this.characterId;
+        fs_char.config.characterId = this.characterId;        
         
         //dynamodb won't let us have empty attributes
         commonSvc.RemoveEmptyObjects(characterData);

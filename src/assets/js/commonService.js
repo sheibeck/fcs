@@ -82,7 +82,7 @@ export default class CommonService {
     });
   }
 
-  EmptyGuid() {
+  EmptyGuid = function() {
     return "00000000-0000-0000-0000-000000000000";
   }
 
@@ -154,7 +154,21 @@ export default class CommonService {
       }
   }
 
-  GetNiceDate(date) {
+  GetNiceDate = function(date) {
     return new Date(date).toLocaleString();
+  }
+
+  GetId = function(id) {
+    //ids are in the format of TYPE|ID, this will return just the id portion
+    return id.split("|")[1];    
+  }
+
+  SetId = function(type, id) {
+    //ids are in the format of TYPE|ID, this will return just the id portion    
+    return `${type.toUpperCase()}|${id}`;
+  }
+
+  GetRootOwner = function() {
+    return 'JARVIS';
   }
 }

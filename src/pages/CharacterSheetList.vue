@@ -7,12 +7,12 @@
       </div>
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
-          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="'/static/sheets/'+sheet.charactersheetname+'/logo.png'" v-bind:alt="sheet.charactersheetname + ' Logo'" />
+          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.name}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           <div class='card-body'>
-            <h5 class='card-title charactersheet-name'>{{sheet.charactersheetdisplayname}}</h5>
-            <a v-bind:href="'charactersheet/'+sheet.charactersheetname" class='btn btn-success' v-bind:data-id='sheet.charactersheetid' role="button">Create Character <i class='fa fa-user'></i></a>
+            <h5 class='card-title charactersheet-name'>{{sheet.system}}</h5>
+            <a v-bind:href="'charactersheet/'+sheet.name" class='btn btn-success' v-bind:data-id='sheet.id' role="button">Create Character <i class='fa fa-user'></i></a>
           </div>
-          <div class='card-footer text-muted small' v-html="sheet.charactersheetdescription">
+          <div class='card-footer text-muted small' v-html="sheet.description">
 
           </div>
          </div>
@@ -43,7 +43,7 @@ export default {
     commonSvc= new CommonService(this.$root);
     fs_char.init(this.$root);
   },
-  watch: {    
+  watch: {
     userId() {      
       this.list();
     }
@@ -61,7 +61,18 @@ export default {
     }
   },
   methods : {
-    list : function(){     
+    
+    getSheetLogoUrl(id) {
+      let folderName = id.split("|")[1];
+      return `/static/sheets/${folderName}/logo.png`;
+    },
+
+    list : function(){    
+      let listitems = dbSvc.ListItemsByType("CHARACTERSHEET").then( (data) => { 
+        this.sheets = data;
+      }); 
+/*
+
       //reference this component so we can get/set data
       var $component = this;
 
@@ -82,11 +93,12 @@ export default {
               $component.sheets = data.Items;
           }
       });
-    },
-    clearFilter : function() {
-      this.$store.commit('updateSearchText', "");
-      commonSvc.Search("");
-    },
+    */
+    }
+  },
+  clearFilter : function() {
+    this.$store.commit('updateSearchText', "");
+    commonSvc.Search("");
   }
 }
 </script>
