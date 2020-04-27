@@ -10,14 +10,14 @@ export default class DbService {
 
     GetDbClient() {        
         // Create DynamoDB document client
-        var docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+        let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
         docClient.service.config.credentials = this.fcs.$store.state.credentials;
   
         return docClient;
     }
 
     //get a specific object.
-    async GetObject(objectId, ownerId) {        
+    GetObject = async (objectId, ownerId) => {        
         //if we know the ownerId then get the object directly
         if(ownerId) {                           
             var docClient = this.GetDbClient();
@@ -70,7 +70,7 @@ export default class DbService {
         }
     }
 
-    async SaveObject(data) {            
+    SaveObject = async (data) => {            
         //dynamodb won't let us have empty attributes
         this.commonSvc.RemoveEmptyObjects(data);
         
@@ -91,7 +91,7 @@ export default class DbService {
         return await putItem(params);      
     }
 
-    async ListItemsByType(itemType) {        
+    ListItemsByType = async (itemType) => {
         let docClient = this.GetDbClient();
 
         let params = {
@@ -120,7 +120,7 @@ export default class DbService {
         return await queryAll(params);
     }
 
-    async ListItemsByOwner(itemType, ownerId) {    
+    ListItemsByOwner = async (itemType, ownerId) => {
         let docClient = this.GetDbClient();        
 
         let params = {

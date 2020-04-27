@@ -40,7 +40,7 @@ export default class CommonService {
       }).show();
   }
 
-  IsEmpty(obj) {
+  IsEmpty = function(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
             return false;
@@ -70,7 +70,7 @@ export default class CommonService {
       });
   };
 
-  GenerateUUID() { // Public Domain/MIT
+  GenerateUUID = function() { // Public Domain/MIT
     var d = new Date().getTime();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
         d += performance.now(); //use high-precision timer if available
@@ -134,7 +134,7 @@ export default class CommonService {
   }
   
   // help out with dev tasks by switching environments up based on the URL
-  SetupForEnvironment = function () {
+  SetupForEnvironment = () => {
       if (this.fcs.$store.state.environment !== 'production')
       {
         let environmentLabel = "BETA";

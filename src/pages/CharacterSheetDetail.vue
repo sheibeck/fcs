@@ -15,8 +15,8 @@
         </div>
         <div class='col' v-if="isAuthenticated">
             <div class='row'>
-              <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='character_image_url'>Portrait Url:</label>
-              <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+              <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='image_url'>Portrait Url:</label>
+              <input class='form-control col-12 col-md-9 d-print-none' id='image_url' name='image_url'  />
             </div>
         </div>
       </div>

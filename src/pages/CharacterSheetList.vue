@@ -7,16 +7,18 @@
       </div>
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
-          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.name}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
+          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           <div class='card-body'>
             <h5 class='card-title charactersheet-name'>{{sheet.system}}</h5>
-            <a v-bind:href="'charactersheet/'+sheet.name" class='btn btn-success' v-bind:data-id='sheet.id' role="button">Create Character <i class='fa fa-user'></i></a>
+            <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success' v-bind:data-id='sheet.id' role="button">Create Character <i class='fa fa-user'></i></a>
           </div>
           <div class='card-footer text-muted small' v-html="sheet.description">
 
           </div>
          </div>
       </div>
+
+      <button v-on:click="migrateData()">Migrate Data</button>
   </div>
 </template>
 
@@ -25,6 +27,9 @@ import { mapGetters } from 'vuex';
 import Search from '../components/search';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+
+import DbTools from '../assets/js/dbTools';
+let dbTools = null;
 
 let dbSvc = null;
 let commonSvc= null;
@@ -41,6 +46,7 @@ export default {
   mounted(){
     dbSvc = new DbService(this.$root);
     commonSvc= new CommonService(this.$root);
+    dbTools = new DbTools(this.$root);
     fs_char.init(this.$root);
   },
   watch: {
@@ -61,7 +67,10 @@ export default {
     }
   },
   methods : {
-    
+    migrateData() {
+      dbTools.MigrateData();
+    },
+
     getSheetLogoUrl(id) {
       let folderName = id.split("|")[1];
       return `/static/sheets/${folderName}/logo.png`;

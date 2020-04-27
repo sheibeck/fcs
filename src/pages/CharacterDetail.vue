@@ -15,13 +15,13 @@
         </div>
         <div class='col' v-if="isAuthenticated">
           <div class='row'>
-            <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='character_image_url'>Portrait Url:</label>
-            <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+            <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='image_url'>Portrait Url:</label>
+            <input class='form-control col-12 col-md-9 d-print-none' id='image_url' name='image_url'  />
           </div>
         </div>
         <div class='col' v-if="!isAuthenticated">
           <div class='row'>           
-            <input type="hidden" class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
+            <input type="hidden" class='form-control col-12 col-md-9 d-print-none' id='image_url' name='image_url'  />
           </div>
         </div>
       </div>
@@ -117,8 +117,8 @@ export default {
       //if there is an img elemet on the sheet, populate it with the image url if specified
       setTimeout(function() {					
         //update the portrait
-        if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
-          $("img.portrait").prop("src", $("#character_image_url").val());
+        if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {
+          $("img.portrait").prop("src", $("#image_url").val());
         }
       }, 100);
     },
@@ -154,8 +154,8 @@ export default {
             commonSvc.Notify('Character saved.', 'success', 2000);
           }   
         }).then( () => {         
-          if ($("img.portrait").length > 0 && $("#character_image_url").val().length > 0) {
-              $("img.portrait").prop("src", $("#character_image_url").val());
+          if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {
+              $("img.portrait").prop("src", $("#image_url").val());
           }          
         });
       }
