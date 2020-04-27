@@ -2,9 +2,10 @@ import CommonsService from "./commonService"
 import CommonService from "./commonService";
 
 export default class DbService {
+    TableName = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+
     constructor(fcs){        
-        this.fcs = fcs;
-        this.tablename = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+        this.fcs = fcs;        
         this.commonSvc = new CommonService(fcs);
     }
 
@@ -22,7 +23,7 @@ export default class DbService {
         if(ownerId) {                           
             var docClient = this.GetDbClient();
             var params = {            
-                TableName: this.tablename,
+                TableName: this.TableName,
                 Key: {
                     'owner_id': ownerId,
                     'id': objectId
@@ -41,11 +42,11 @@ export default class DbService {
             let docClient = this.GetDbClient();
 
             let params = {
-                TableName: this.tablename,
+                TableName: this.TableName,
                 IndexName: "item",
                 KeyConditionExpression: 'id = :id',
                 ExpressionAttributeValues: {
-                ':id': objectId
+                    ':id': objectId
                 }
             }
                 
@@ -79,7 +80,7 @@ export default class DbService {
         // create/update a  character
         // we always use the put operation because the data can change depending on your character sheet
         let params = {
-            TableName: this.tablename,
+            TableName: this.TableName,
             Item: data
         };
 
@@ -91,16 +92,24 @@ export default class DbService {
         return await putItem(params);      
     }
 
-    ListItemsByType = async (itemType) => {
+    ListItemsByType = async (itemType, filter) => {
         let docClient = this.GetDbClient();
 
         let params = {
-            TableName: this.tablename,
+            TableName: this.TableName,
             IndexName: "type",
             KeyConditionExpression: 'object_type = :item_type',
             ExpressionAttributeValues: {
               ':item_type': itemType
             }
+        }
+
+        if (filter) {
+            Object.keys(filter.ExpressionAttributeValues).forEach(function (item) {
+                ExpressionAttributeValues[item] = filter.ExpressionAttributeValues[item];
+            });
+            
+            params.FilterExpression += filter.filterExpression;
         }
              
         const queryAll = async (params) => {
@@ -120,17 +129,25 @@ export default class DbService {
         return await queryAll(params);
     }
 
-    ListItemsByOwner = async (itemType, ownerId) => {
+    ListItemsByOwner = async (itemType, ownerId, filter) => {
         let docClient = this.GetDbClient();        
 
         let params = {
-            TableName: this.tablename,
+            TableName: this.TableName,
             KeyConditionExpression: 'owner_id = :owner_id AND begins_with(id, :item_type)',          
             ExpressionAttributeValues: {
             ':owner_id': ownerId,
             ':item_type': itemType
             }
         }    
+
+        if (filter) {
+            Object.keys(filter.ExpressionAttributeValues).forEach(function (item) {
+                ExpressionAttributeValues[item] = filter.ExpressionAttributeValues[item];
+            });
+            
+            params.FilterExpression += filter.filterExpression;
+        }
         
         const queryAll = async (params) => {
             let lastEvaluatedKey = 'dummy'; // string must not be empty

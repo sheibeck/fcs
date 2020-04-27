@@ -37,7 +37,7 @@ export default new Router({
     { path: '/charactersheet', component: CharacterSheetList },    
     { path: '/charactersheet/:id', name: 'Character Sheet Detail', component: CharacterSheetDetail, props: true },
     { path: '/adversary/edit/:id?', component: AdversaryDetail, props: true },
-    { path: '/adversary/:id?', component: AdversaryList, props: true },
+    { path: '/adversary/:id?/:name?', component: AdversaryList, props: true },
     { path: '*', component: Error }
   ]
 })

@@ -60,9 +60,8 @@ export default class DbTools {
     let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     docClient.service.config.credentials = this.fcs.$store.state.credentials;
     
-    let tables = ["fate_charactersheet_dev"];
-    //let tables = ["fate_character_dev"];
-    
+    let tables = ["fate_adversary_dev"];
+        
     debugger;
 
     tables.forEach(async (tablename) => {
@@ -140,16 +139,54 @@ export default class DbTools {
             delete record.skill;
 
             record.image_url = record.character_image_url;
-            delete record.character_image_url;
-            
-            /*
-            if (record.aspect) delete Object.assign(record, {[aspect]: o[aspects] })[aspect];
-            if (record.skill) delete Object.assign(record, {[skill]: o[skills] })[skill];
-            if (record.consequence) delete Object.assign(record, {[consequence]: o[consequences] })[consequence];
-            if (record.approach) delete Object.assign(record, {[approach]: o[approaches] })[approach];
-            if (record.parent_id) delete Object.assign(record, {[parent_id]: o[related_id] })[parent_id];
-            */
+            delete record.character_image_url;                   
 
+          break;
+
+          case "fate_adversary":
+          case "fate_adversary_dev":      
+
+            recordType = "ADVERSARY";
+            record.object_type = recordType;
+
+            record.owner_id = record.adversary_owner_id;
+            delete record.adversary_owner_id;
+
+            record.id = `${recordType}|${record.adversary_id}`;
+            delete record.adversary_id;
+
+            record.name = record.adversary_name;
+            delete record.adversary_name;
+            
+            record.aspects = record.adversary_aspects;
+            delete record.adversary_aspects;
+            record.consequences = record.adversary_consequences;
+            delete record.adversary_consequences;
+            record.approaches = record.adversary_approaches;
+            delete record.adversary_approaches;            
+            record.skills = record.adversary_skills;
+            delete record.adversary_skills;
+
+            record.genre = record.adversary_genre;
+            delete record.adversary_genre;
+
+            record.stress = record.adversary_stress;
+            delete record.adversary_stress;
+
+            record.stunts = record.adversary_stunts;
+            delete record.adversary_stunts;
+
+            record.image_url = record.adversary_image;
+            delete record.adversary_image;
+
+            record.system = record.adversary_system;
+            delete record.adversary_system;    
+            
+            record.type = record.adversary_type;
+            delete record.adversary_type;
+            
+            record.slug = record.adversary_slug;
+            delete record.adversary_slug;
           break;
         }
          

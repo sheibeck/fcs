@@ -2,40 +2,40 @@
   <div class="container mt-2">
     <form id="adversaryForm" v-on:submit.prevent="upsertAdversary">
         <div class="row">
-            <input type="hidden" name="adversary_id" id="adversary_id" />
-            <input type="hidden" name="adversary_owner_id" id="adversary_owner_id" />
+            <input type="hidden" name="id" id="id" />
+            <input type="hidden" name="owner_id" id="owner_id" />
             <div class="col-sm-12 col-md-8">
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Name</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="text" value="" id="adversary_name" v-on:change="slugifyName" name="adversary_name">
+                        <input class="form-control" type="text" value="" id="name" v-on:change="slugifyName" name="name">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Slug</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="text" value="" id="adversary_slug" name="adversary_slug" readonly>
+                        <input class="form-control" type="text" value="" id="slug" name="slug" readonly>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">High Concept</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="hidden" name="adversary_aspects[name]" id="adversary_aspects[name]" data-name="high_concept" value="high_concept" >
-                        <input class="form-control" type="text" value="" name="adversary_aspects[value]" id="adversary_aspects[value]">
+                        <input class="form-control" type="hidden" name="aspects[name]" id="aspects[name]" data-name="high_concept" value="high_concept" >
+                        <input class="form-control" type="text" value="" name="aspects[value]" id="aspects[value]">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Trouble</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="hidden" name="adversary_aspects[name]" id="adversary_aspects[name]" data-name="trouble" value="trouble" >
-                        <input class="form-control" type="text" value="" name="adversary_aspects[value]" id="adversary_aspects[value]">
+                        <input class="form-control" type="hidden" name="aspects[name]" id="aspects[name]" data-name="trouble" value="trouble" >
+                        <input class="form-control" type="text" value="" name="aspects[value]" id="aspects[value]">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Other Aspects</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="hidden" name="adversary_aspects[name]" id="adversary_aspects[name]" data-name="other_aspects" value="other_aspects" >
-                        <input class="form-control" type="text" value="" name="adversary_aspects[value]" id="adversary_aspects[value]" placeholder="Aspect1; Aspect2; Aspect3">
+                        <input class="form-control" type="hidden" name="aspects[name]" id="aspects[name]" data-name="other_aspects" value="other_aspects" >
+                        <input class="form-control" type="text" value="" name="aspects[value]" id="aspects[value]" placeholder="Aspect1; Aspect2; Aspect3">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -43,10 +43,10 @@
                     <div class="col-sm-12 col-md-10">
                         <div class="row js-adversary-skills">
                             <div class="col-md-7">
-                                <input class="form-control" type="text" value="" name="adversary_skills[name]" id="adversary_skills[name]" placeholder="Skill Name (Average, Good OR Sneaky, Quickly)">
+                                <input class="form-control" type="text" value="" name="skills[name]" id="skills[name]" placeholder="Skill Name (Average, Good OR Sneaky, Quickly)">
                             </div>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" value="" name="adversary_skills[value]" id="adversary_skills[value]" placeholder="Skill Value (Physique, Fight OR +1, +2)">
+                                <input class="form-control" type="text" value="" name="skills[value]" id="skills[value]" placeholder="Skill Value (Physique, Fight OR +1, +2)">
                             </div>
                         </div>
                     </div>
@@ -63,10 +63,10 @@
                     <div class="col-sm-12 col-md-10">
                         <div class="row js-adversary-stunts">
                             <div class="col-12">
-                                <input class="form-control" type="text" value="" name="adversary_stunts[name]" id="adversary_stunts[name]" placeholder="Stunt/Extra/Gadget Name">
+                                <input class="form-control" type="text" value="" name="stunts[name]" id="stunts[name]" placeholder="Stunt/Extra/Gadget Name">
                             </div>
                             <div class="col-12">
-                                <textarea class="form-control" type="text" value="" name="adversary_stunts[value]" id="adversary_stunts[value]" placeholder="Stunt/Extra/Gadget Description"></textarea>
+                                <textarea class="form-control" type="text" value="" name="stunts[value]" id="stunts[value]" placeholder="Stunt/Extra/Gadget Description"></textarea>
                             </div>
                         </div>
                     </div>
@@ -81,10 +81,10 @@
                     <div class="col-sm-12 col-md-10">
                         <div class="row js-adversary-stress">
                             <div class="col-md-7">
-                                <input class="form-control" type="text" value="" name="adversary_stress[name]" id="adversary_stress[name]" placeholder="Stress Name (Physical, Mental, etc)">
+                                <input class="form-control" type="text" value="" name="stress[name]" id="stress[name]" placeholder="Stress Name (Physical, Mental, etc)">
                             </div>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" value="" name="adversary_stress[value]" id="adversary_stress[value]" placeholder="Stress Values (1,1,1 OR 1,2,3,4)">
+                                <input class="form-control" type="text" value="" name="stress[value]" id="stress[value]" placeholder="Stress Values (1,1,1 OR 1,2,3,4)">
                             </div>
                         </div>
                     </div>
@@ -101,10 +101,10 @@
                     <div class="col-sm-12 col-md-10">
                         <div class="row js-adversary-consequences">
                             <div class="col-12">
-                                <input class="form-control" type="text" value="" name="adversary_consequences[name]" id="adversary_consequences[name]" placeholder="Consequence Name (Mild, Serious, Exhausted)">
+                                <input class="form-control" type="text" value="" name="consequences[name]" id="consequences[name]" placeholder="Consequence Name (Mild, Serious, Exhausted)">
                             </div>
                             <div class="col-12">
-                                <textarea class="form-control" type="text" value="" name="adversary_consequences[value]" id="adversary_consequences[value]" placeholder="Consequence Values (Recover, Condition, etc)"></textarea>
+                                <textarea class="form-control" type="text" value="" name="consequences[value]" id="consequences[value]" placeholder="Consequence Values (Recover, Condition, etc)"></textarea>
                             </div>
                         </div>
                     </div>
@@ -116,9 +116,9 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="adversary_system" class="col-sm-12 col-md-2 col-form-label">Type</label>
+                    <label for="system" class="col-sm-12 col-md-2 col-form-label">Type</label>
                     <div class="col-sm-12 col-md-10">
-                        <select class="form-control" name="adversary_system" id="adversary_system">
+                        <select class="form-control" name="system" id="system">
                             <option>Fate Core</option>
                             <option>Fate Accelerated</option>
                             <option>Other</option>
@@ -126,9 +126,9 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="adversary_genre" class="col-sm-12 col-md-2 col-form-label">Genre</label>
+                    <label for="genre" class="col-sm-12 col-md-2 col-form-label">Genre</label>
                     <div class="col-sm-12 col-md-10">
-                        <select class="form-control" name="adversary_genre" id="adversary_genre">
+                        <select class="form-control" name="genre" id="genre">
                             <option>Fantasy</option>
                             <option>Modern</option>
                             <option>Sci-Fi</option>
@@ -138,9 +138,9 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="adversary_type" class="col-sm-12 col-md-2 col-form-label">Type</label>
+                    <label for="type" class="col-sm-12 col-md-2 col-form-label">Type</label>
                     <div class="col-sm-12 col-md-10">
-                        <select class="form-control" name="adversary_type" id="adversary_type">
+                        <select class="form-control" name="type" id="type">
                             <option>Enemy</option>
                             <option>Obstacle</option>
                             <option>Constraint</option>
@@ -182,11 +182,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import AdversaryService from "./../assets/js/adversaryService";
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
-let adversarySvc = null;
 let commonSvc = null;
 let dbSvc = null;
 
@@ -202,14 +200,12 @@ export default {
   },
   mounted(){
     commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);
-    adversarySvc = new AdversaryService(dbSvc);
-    fs_adversary.init(this.$root);
+    dbSvc = new DbService(this.$root);    
   },
   watch: {
     userId() {
       //wait for our authenticated user id
-      this.editAdversary(this.userId, fcs.$route.params.id);
+      this.init();     
     }
   },
   data () {
@@ -226,24 +222,36 @@ export default {
     ]),
   },
   methods: {
-    editAdversary : async function(ownerid, slug) {
-      //we only edit if we have a valid slug for an id
-      if (!slug) return;
-      $('#adversary_name').attr('readonly', true);
-      
-      this.adversary = await adversarySvc.EditAdversary(ownerid, slug);
-      
-      if (!this.adversary)
-      {
-        location.href = '/error';
-      }
-      else {       
-        this.clearAdversaryForm();
-        this.populateAdversaryForm(this.adversary);
+    init : function() {      
+      $(document).on('click', '.js-delete-adversary-item', function (eve) {
+          $(this).parent().parent().remove();
+      });
 
-        this.title = this.adversary.adversary_name + ' (Adversary)';
-        this.description = this.adversary.adversary_type;
-      }    
+      this.adversaryId = commonSvc.SetId("ADVERSARY", this.$route.params.id);
+
+      this.editAdversary();
+    },
+    editAdversary : async function() {            
+      if (this.id) {
+        //we only edit if we have a valid slug for an id      
+        if (!this.adversaryId) return;
+        $('#name').attr('readonly', true);
+        
+        let adversary = await dbSvc.GetObject(this.adversaryId, this.userId).then( (data) => {
+          this.adversary = data;
+          if (!this.adversary)
+          {
+            location.href = '/error';
+          }
+          else {       
+            this.clearAdversaryForm();
+            this.populateAdversaryForm(this.adversary);
+
+            this.title = this.adversary.name + ' (Adversary)';
+            this.description = this.adversary.type;
+          }    
+        });      
+      }
     },
     upsertAdversary : function() {
         var $component = this;
@@ -277,26 +285,26 @@ export default {
             }
         });
 
-        if (result.adversary_stress) {
+        if (result.stress) {
             //iterate over stress and make each value an array
-            $.each(result.adversary_stress, function (key, value) {
-                result.adversary_stress[key] = value.split(',');
+            $.each(result.stress, function (key, value) {
+                result.stress[key] = value.split(',');
             });
         }
 
         var isNew = false;
-        if (!result.adversary_id)
+        if (!result.id)
         {
           // add a uniqueid
-          result['adversary_id'] = commonSvc.GenerateUUID();
-          result['adversary_owner_id'] = this.$store.state.userId;
+          result['id'] = commonSvc.SetId("ADVERSARY", commonSvc.GenerateUUID());
+          result['owner_id'] = this.$store.state.userId;
           isNew = true;
         }
 
-        //adversary_name is a key field, we're going to force this to title case
-        if(result.adversary_name)
+        //name is a key field, we're going to force this to title case
+        if(result.name)
         {
-          result.adversary_name = result.adversary_name.toTitleCase();
+          result.name = result.name.toTitleCase();
         }
 
         // clear empty values
@@ -312,54 +320,44 @@ export default {
         }
     },
 
-    insertAdversary: function(adversaryData) {
+    insertAdversary: async function(adversaryData) {
 
         var docClient = dbSvc.GetDbClient();
 
         var params = {
-            TableName: fs_adversary.config.adversarytable,
+            TableName: dbSvc.TableName,
             Key: {
-             'adversary_owner_id': adversaryData.adversary_owner_id,
-             'adversary_name': adversaryData.adversary_name,
+             'owner_id': adversaryData.owner_id,
+             'name': adversaryData.name,
             },
         }
 
         // if this adversary already exists then warn and don't overwrite
-        docClient.get(params, function(err, data) {
-            if (err) {
-              console.log("Error", err);
-            } else {
-              if (data.Item)
-              {
-                commonSvc.Notify('You already have an adversary with this name.', 'info', '2000');
-              }
-              else {
-                  // create a new creature
-                  var params = {
-                      TableName: fs_adversary.config.adversarytable,
-                      Item: adversaryData
-                  };
+        let existingAdversary = await dbSvc.ListItemsByOwner(adversaryData.adversaryId, this.userId);        
+        if (existingAdversary)
+        {
+          commonSvc.Notify('You already have an adversary with this name.', 'info', '2000');
+        }
+        else {        
+          console.log("Adding a new adversary...");
 
-                  console.log("Adding a new adversary...");
-                  docClient.put(params, function (err, data) {
-                      if (err) {
-                          commonSvc.Notify(err.message || JSON.stringify(err));
-                          console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-                      } else {
-                          console.log("Added item:", JSON.stringify(data, null, 2));
-                          commonSvc.Notify('Adversary added.', 'success', 2000, function() {
-                            location.href = '/adversary/' + adversaryData.adversary_slug;
-                          } );
-
-                      }
-                  });
-              }
+          let response = await dbSvc.SaveObject(adversaryData).then((response) => {          
+            if (response.error) {
+              commonSvc.Notify(err.message || JSON.stringify(err));
+              console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
             }
-        });
+            else {
+              console.log("Added item:", JSON.stringify(data, null, 2));
+              commonSvc.Notify('Adversary added.', 'success', 2000, function() {
+                location.href = `/adversary/${commonSvc.GetId(adversaryData.id)}/${adversaryData.slug}`;
+              });                 
+            }
+          });
+        }
     },
 
     deleteAdversary : function() {
-        if (!this.isOwner($(adversary_owner_id).val())) {
+        if (!this.isOwner($(owner_id).val())) {
           commonSvc.Notify('Permission Denied.', 'error', 2000);
         }
         else {
@@ -367,10 +365,10 @@ export default {
           var docClient = dbSvc.GetDbClient();
 
           var params = {
-              TableName: fs_adversary.config.adversarytable,
+              TableName: dbSvc.TableName,
               Key: {
-               'adversary_owner_id': $component.userId,
-               'adversary_name': $('#adversary_name').val()
+               'owner_id': $component.userId,
+               'id': $('#id').val()
               }
           };
 
@@ -398,20 +396,20 @@ export default {
         var params = {
             TableName: fs_adversary.config.adversarytable,
             Key: {
-             'adversary_owner_id': data.adversary_owner_id,
-             'adversary_name': $('#adversary_name').val().toTitleCase() // it's disabled when we update so they don't try to change it.
+             'owner_id': data.owner_id,
+             'name': $('#name').val().toTitleCase() // it's disabled when we update so they don't try to change it.
             },
-            UpdateExpression: "set adversary_aspects = :a, adversary_slug =:slg, adversary_consequences=:c, adversary_genre=:g, adversary_skills=:sk, adversary_stress=:str, adversary_stunts=:stn, adversary_system=:sys, adversary_type=:t",
+            UpdateExpression: "set aspects = :a, slug =:slg, consequences=:c, genre=:g, skills=:sk, stress=:str, stunts=:stn, system=:sys, type=:t",
             ExpressionAttributeValues:{
-                ":a":data.adversary_aspects,
-                ":slg": data.adversary_slug,
-                ":c":data.adversary_consequences,
-                ":g":data.adversary_genre,
-                ":sk": data.adversary_skills,
-                ":str": data.adversary_stress,
-                ":stn": data.adversary_stunts,
-                ":sys": data.adversary_system,
-                ":t": data.adversary_type
+                ":a":data.aspects,
+                ":slg": data.slug,
+                ":c":data.consequences,
+                ":g":data.genre,
+                ":sk": data.skills,
+                ":str": data.stress,
+                ":stn": data.stunts,
+                ":sys": data.system,
+                ":t": data.type
             },
             ReturnValues:"UPDATED_NEW"
         };
@@ -433,8 +431,8 @@ export default {
       $('#adversaryForm').trigger("reset");
       $('.adversary-item-copy', '#adversaryForm').remove();
 
-      $('#adversary_id').val('');
-      $('#adversary_owner_id').val('');
+      $('#id').val('');
+      $('#owner_id').val('');
     },
 
     populateAdversaryForm : function (data) {
@@ -443,9 +441,9 @@ export default {
           if (typeof val === 'object')
           {
             switch(name) {
-              case 'adversary_aspects':
+              case 'aspects':
                 $.each(val, function(n, t) {
-                  $('input[name="adversary_aspects[name]"][data-name=' + n + ']').next().val(t);
+                  $('input[name="aspects[name]"][data-name=' + n + ']').next().val(t);
                 });
                 break;
               default:
@@ -472,8 +470,8 @@ export default {
           }
       });
 
-      var slug = commonSvc.Slugify(data.adversary_name);
-      $('#adversary_slug').val(slug);
+      var slug = commonSvc.Slugify(data.name);
+      $('#slug').val(slug);
     },
 
     appendDeletableRow : function($elem) {
@@ -489,8 +487,8 @@ export default {
         this.appendDeletableRow($(".js-adversary-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-skills:last"));
       };
       $.each($('.js-adversary-skills'), function(i, val) {
-        $(this).find('input[name="adversary_skills[name]"]').val(aSkills[i]);
-        $(this).find('input[name="adversary_skills[value]"]').val('');
+        $(this).find('input[name="skills[name]"]').val(aSkills[i]);
+        $(this).find('input[name="skills[value]"]').val('');
       })
     },
 
@@ -502,8 +500,8 @@ export default {
         this.appendDeletableRow($(".js-adversary-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-stress:last"));
       };
       $.each($('.js-adversary-stress'), function(i, val) {
-        $(this).find('input[name="adversary_stress[name]"]').val(aStress[i][0]);
-        $(this).find('input[name="adversary_stress[value]"]').val(aStress[i][1]);
+        $(this).find('input[name="stress[name]"]').val(aStress[i][0]);
+        $(this).find('input[name="stress[value]"]').val(aStress[i][1]);
       })
     },
 
@@ -516,8 +514,8 @@ export default {
         this.appendDeletableRow($(".js-adversary-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-consequences:last"));
       };
       $.each($('.js-adversary-consequences'), function(i, val) {
-        $(this).find('input[name="adversary_consequences[name]"]').val(aConsequences[i][0]);
-        $(this).find('textarea[name="adversary_consequences[value]"]').val(aConsequences[i][1]);
+        $(this).find('input[name="consequences[name]"]').val(aConsequences[i][0]);
+        $(this).find('textarea[name="consequences[value]"]').val(aConsequences[i][1]);
       })
     },
 
@@ -569,7 +567,7 @@ export default {
     slugifyName : function(event) {
       var $elem = $(event.currentTarget);
       var slug = commonSvc.Slugify($elem.val());
-      $('#adversary_slug').val(slug);
+      $('#slug').val(slug);
     }
   }
 }

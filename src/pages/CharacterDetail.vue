@@ -32,13 +32,11 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import CharacterService from '../assets/js/characterService';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
 let commonSvc = null;
 let dbSvc = null;
-let characterSvc = null;
 
 export default {
   name: 'CharacterDetail',
@@ -52,8 +50,7 @@ export default {
   },
   mounted(){    
     commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);
-    characterSvc = new CharacterService(dbSvc);
+    dbSvc = new DbService(this.$root);    
     fs_char.init(this.$root);
 
     this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.sheetname);
@@ -132,10 +129,10 @@ export default {
         characterData.owner_id = this.userId;
         characterData.related_id = this.sheetData.id;
         characterData.system = this.sheetData.system;
+        characterData.slug = commonSvc.Slugify(characterData.name);
 
         //remove some legacy values
         characterData.sheetname = "";
-
 
         //create a new characterId if we don't have one
         var isNew = false;

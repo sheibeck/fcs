@@ -87,7 +87,7 @@ export default {
       }); 
 
     },
-    save : function() {            
+    save : async function() {            
       if (this.isAuthenticated) {
         /// save a character
         var data = $('form').serializeJSON();
@@ -99,37 +99,30 @@ export default {
         }
 
         // make sure we have a proper user id key
-        characterData.character_owner_id = this.userId;
+        characterData.owner_id = this.userId;
+        characterData.related_id = this.sheetData.id;
+        characterData.system = this.sheetData.system;
+        characterData.slug = commonSvc.Slugify(characterData.name);
+
+        //remove some legacy values
+        characterData.sheetname = "";
 
         //create a new characterId if we don't have one
-        var isNew = true;
-        this.characterId = commonSvc.GenerateUUID();
-        characterData.character_id = this.characterId;
-        fs_char.config.characterId = this.characterId;        
-        
-        //dynamodb won't let us have empty attributes
-        commonSvc.RemoveEmptyObjects(characterData);
+        var isNew = true;                
+        this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());        
+        characterData.id = this.characterId;
+        fs_char.config.characterId = this.characterId;
 
-        var docClient = dbSvc.GetDbClient();
-
-        // create/update a  character
-        // we always use the put operation because the data can change depending on your character sheet
-        var params = {
-          TableName: fs_char.config.charactertable,
-          Item: characterData
-        };
-
-        docClient.put(params, (err, data) => {
-          if (err) {
-              commonSvc.Notify(err.message || JSON.stringify(err));
-              console.error("Unable to save item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              commonSvc.Notify('Character saved.', 'success', 2000);
-              console.log("Added item:", JSON.stringify(data, null, 2));
-
-              location.href = '/character/' + this.id + '/' + this.characterId;
+        let response = await dbSvc.SaveObject(characterData).then((response) => {          
+          if (response.error) {
+            commonSvc.Notify(response.error, 'success', 2000);
           }
+          else {
+            commonSvc.Notify('Character saved.', 'success', 2000);
+            location.href = `/character/${sheetData.slug}/${characterData.slug}`;
+          }   
         });
+
       }
       else {
           window.print();
