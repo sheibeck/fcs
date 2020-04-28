@@ -304,7 +304,7 @@ export default {
       // if this adversary already exists then warn and don't overwrite
       let existingAdversaries = await dbSvc.ListObjects("ADVERSARY", null, result.name);
       let foundAdversayWithName = existingAdversaries.filter(obj => {
-        return obj.name.toLowerCase() === result.name.toLowerCase();
+        return obj.name.toLowerCase() === result.name.toLowerCase() && obj.id !== result.id;
       })
 
       if (foundAdversayWithName.length > 0)
