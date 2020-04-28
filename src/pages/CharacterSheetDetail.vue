@@ -79,7 +79,8 @@ export default {
       }, 1000);
     },
     async show() {      
-      let sheetData = await dbSvc.GetObject(this.sheetId, commonSvc.GetRootOwner()).then( (data) => {         
+      await dbSvc.GetObject(this.sheetId, commonSvc.GetRootOwner()).then( (data) => { 
+        this.sheetData = data;        
         this.sheet = data.content;
 
         this.title = data.name + ' (Character Sheet)';
@@ -98,11 +99,11 @@ export default {
           return;
         }
 
-        // make sure we have a proper user id key
+        // make sure we have a proper user id key        
         characterData.owner_id = this.userId;
         characterData.related_id = this.sheetData.id;
         characterData.system = this.sheetData.system;
-        characterData.slug = commonSvc.Slugify(characterData.name);
+        characterData.slug = commonSvc.Slugify(characterData.name);        
 
         //remove some legacy values
         characterData.sheetname = "";
@@ -111,6 +112,8 @@ export default {
         var isNew = true;                
         this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());        
         characterData.id = this.characterId;
+        characterData.object_type = "CHARACTER";
+
         fs_char.config.characterId = this.characterId;
 
         let response = await dbSvc.SaveObject(characterData).then((response) => {          
@@ -119,7 +122,7 @@ export default {
           }
           else {
             commonSvc.Notify('Character saved.', 'success', 2000);
-            location.href = `/character/${sheetData.slug}/${characterData.slug}`;
+            location.href = `/character/${this.sheetData.slug}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
           }   
         });
 

@@ -76,9 +76,12 @@ export default {
       return `/static/sheets/${folderName}/logo.png`;
     },
 
-    list : function(){    
-      let items = dbSvc.ListObjects("CHARACTERSHEET").then( (data) => { 
-        this.sheets = data;
+    list : function(searchText){
+      let items = dbSvc.ListObjects("CHARACTERSHEET", commonSvc.GetRootOwner(), searchText).then( (data) => {
+        if (data.length > 0)
+          this.sheets = data;
+        else
+          return;
       });
     }
   },

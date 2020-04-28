@@ -25,7 +25,13 @@
           </div>
         </div>
         <div class='card-footer text-muted'>
-          <span class='small' v-html="item.description"></span> <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
+          <div v-if="item.description" class='small'>
+            {{item.description}}
+          </div> 
+          <div>
+            <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
+            <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -88,6 +94,9 @@ export default {
       'userId',
       'searchText'
     ]),
+    commonSvc() {
+      return commonSvc;
+    },
   },
   watch: {
     userId() {
