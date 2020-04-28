@@ -62,7 +62,7 @@
 
     <div v-else>
       <div class="d-flex flex-column flex-sm-row">
-        <h3 class="mr-auto">{{campaign.name}} - Campaign</h3> <a class="" :href="'/campaign-summary/'+ campaign.id + '/' + campaign.slug" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
+        <h3 class="mr-auto">{{campaign.name}} - Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
 
       <div id="accordion">
