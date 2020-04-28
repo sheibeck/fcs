@@ -29,12 +29,14 @@ export default {
   methods: {
     clearSearch : function() {
       this.$store.commit("updateSearchText", "");
-      $("#search-button").trigger("click");
+      $("#search-button").trigger("click");      
     },
     search : function() {
       let searchText = this.$store.state.searchText;
       let commonSvc = new CommonService(this.$root);
-      commonSvc.Search(searchText);
+      if (searchText.length === 0 || searchText.length > 2) {
+        commonSvc.Search(searchText);
+      }
     }
   }
 

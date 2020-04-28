@@ -12,7 +12,6 @@ import App from './App'
 import router from './router'
 import 'whatwg-fetch'
 import './assets/site.scss'
-import './assets/js/fs_adversary'
 import './assets/js/fs_campaign'
 import './assets/js/fs_char'
 import './assets/js/fs_dicetray'
@@ -46,7 +45,6 @@ const store = new Vuex.Store({
     content: $('#results'),
     environment: process.env.NODE_ENV,
     isAuthenticated: false,
-    fbAppId: '189783225112476',
     authorizedUserArn: 'arn:aws:iam::210120940769:role/FateCharacterSheetUser',
     userId: null,
     authProvider: '',

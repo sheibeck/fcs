@@ -40,7 +40,7 @@ export default class CommonService {
       }).show();
   }
 
-  IsEmpty(obj) {
+  IsEmpty = function(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
             return false;
@@ -70,7 +70,7 @@ export default class CommonService {
       });
   };
 
-  GenerateUUID() { // Public Domain/MIT
+  GenerateUUID = function() { // Public Domain/MIT
     var d = new Date().getTime();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
         d += performance.now(); //use high-precision timer if available
@@ -82,7 +82,7 @@ export default class CommonService {
     });
   }
 
-  EmptyGuid() {
+  EmptyGuid = function() {
     return "00000000-0000-0000-0000-000000000000";
   }
 
@@ -104,7 +104,7 @@ export default class CommonService {
   
   Search = (searchText) => {
     let pathname = location.pathname.toLowerCase();
-    if (pathname.includes('charactersheets') || pathname.includes('character'))
+    if (pathname.includes('charactersheets'))
     {
       $('.card').hide();
 
@@ -119,11 +119,7 @@ export default class CommonService {
       // filter by footer content
       $(".card-footer:contains('" + searchText + "')")
         .parent().show();
-    }
-    else if (pathname.includes('adversary'))
-    {
-      this.fcs.$children[0].$children[0].list(searchText); //adversary search
-    }
+    }  
     else if (pathname.includes("campaign")) {
         if (pathname.endsWith("campaign")) {
             this.fcs.$options.filters.filterCampaigns();
@@ -131,10 +127,15 @@ export default class CommonService {
             this.fcs.$options.filters.filterSessions();
         }
     }
+    else
+    {
+      //search with dynamodb
+      this.fcs.$children[0].$children[0].list(searchText); 
+    }
   }
   
   // help out with dev tasks by switching environments up based on the URL
-  SetupForEnvironment = function () {
+  SetupForEnvironment = () => {
       if (this.fcs.$store.state.environment !== 'production')
       {
         let environmentLabel = "BETA";
@@ -154,7 +155,21 @@ export default class CommonService {
       }
   }
 
-  GetNiceDate(date) {
+  GetNiceDate = function(date) {
     return new Date(date).toLocaleString();
+  }
+
+  GetId = function(id) {
+    //ids are in the format of TYPE|ID, this will return just the id portion
+    return id.split("|")[1];    
+  }
+
+  SetId = function(type, id) {
+    //ids are in the format of TYPE|ID, this will return just the id portion    
+    return `${type.toUpperCase()}|${id}`;
+  }
+
+  GetRootOwner = function() {
+    return 'JARVIS';
   }
 }

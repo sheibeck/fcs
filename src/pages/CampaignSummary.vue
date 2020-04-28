@@ -56,7 +56,7 @@
 
     <div v-else>     
       <div class="d-flex">
-        <h3 class="mr-auto">{{campaign.title}} - Campaign Summary</h3>
+        <h3 class="mr-auto">{{campaign.name}} - Campaign Summary</h3>
       </div>
 
       <div class="row mt-2">
@@ -131,11 +131,9 @@
 import { mapGetters } from 'vuex';
 import VueShowdown, { showdown } from 'vue-showdown';
 import NamedRegExp from 'named-regexp-groups';
-import CampaignService from "./../assets/js/campaignService";
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
-let campaignSvc = null;
 let commonSvc = null;
 let dbSvc = null;
 
@@ -169,7 +167,7 @@ export default {
   name: 'CampaignDetail',
   metaInfo() {
     return {
-       title: this.title,       
+       title: this.name,       
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -177,15 +175,15 @@ export default {
   },
   mounted(){
     commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);
-    campaignSvc = new CampaignService(dbSvc);
+    dbSvc = new DbService(this.$root);    
     fs_camp.init(this.$root);
     this.parseSessionAll();  
   },
   watch: {
     userId() {
       //wait for our authenticated user id
-      this.getCampaign(fcs.$route.params.id);      
+      this.campaignId = commonSvc.SetId("CAMPAIGN", fcs.$route.params.id);
+      this.getCampaign(this.campaignId);
     }
   },
   data () {
@@ -258,6 +256,9 @@ export default {
     },
     sortedAlphaAspects : function() {
       return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
+     commonSvc() {
+      return commonSvc;
     },
   },
   methods: { 
@@ -377,7 +378,7 @@ export default {
     },
     getCampaign : async function(id) {
 
-      let campaign = await campaignSvc.GetCampaignByIndex(id);
+      let campaign = await dbSvc.GetObject(id);
 
       if (!campaign)
       {
@@ -388,12 +389,12 @@ export default {
           this.$set(this, 'campaign', campaign);              
           this.listSessions(campaign.id);
 
-          this.title = campaign.title + ' (Campaign)';
+          this.title = campaign.name + ' (Campaign)';
           this.description = campaign.description || "";
       }
     },
-    listSessions : async function(id) {      
-      let sessionList = await campaignSvc.ListLogsForCampaign(this.campaign.owner_id, id, true);
+    listSessions : async function(campaignId) {      
+      let sessionList = await dbSvc.ListRelatedObjects(campaignId);
 
       if (sessionList && sessionList.length > 0) {
         this.sessions = sessionList;
@@ -413,7 +414,7 @@ export default {
       this.jumpTo("#summary");
     },
     getNiceDate : function(date) {
-        commonSvc.GetNiceDate(date);
+        return commonSvc.GetNiceDate(date);
     },
     jumpTo : function(section) {
       $("html, body").animate({ scrollTop: $(section).offset().top }, 500);

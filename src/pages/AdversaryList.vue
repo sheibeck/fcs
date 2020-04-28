@@ -22,43 +22,43 @@
       </div>
 
       <div class='card-columns' id="adversaryDetail">
-        <div class='card' v-for="item in adversaries" v-bind:key="item.adversary_id">
-          <img v-if="item.adversary_image" class="card-img-top img-fluid img-thumbnail" style="object-fit: cover; object-position:top; max-height: 180px;" v-bind:src="item.adversary_image" v-bind:alt="item.adversary_name + 'Image'">
+        <div class='card' v-for="item in adversaries" v-bind:key="item.id">
+          <img v-if="item.image_url" class="card-img-top img-fluid img-thumbnail" style="object-fit: cover; object-position:top; max-height: 180px;" v-bind:src="item.image_url" v-bind:alt="item.name + 'Image'">
 
           <h4 class='card-header adversary-name bg-light'>
-            <a v-bind:href="'/adversary/' + item.adversary_slug" style="text-decoration:none;">{{item.adversary_name}}</a>
-            <small v-if="isOwner(item.adversary_owner_id)">
-              <a v-if="isOwner(item.adversary_owner_id)" v-bind:href="'/adversary/edit/' + item.adversary_slug" class='d-print-none' style="color: #888 !important;"><i class='fa fa-edit'></i></a>
+            <a v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}`" style="text-decoration:none;">{{item.name}}</a>
+            <small v-if="isOwner(item.owner_id)">
+              <a v-if="isOwner(item.owner_id)" v-bind:href="`/adversary/edit/${commonSvc.GetId(item.id)}`" class='d-print-none' style="color: #888 !important;"><i class='fa fa-edit'></i></a>
             </small>
           </h4>
 
-          <div v-if="!isEmpty(item.adversary_aspects)">
+          <div v-if="!isEmpty(item.aspects)">
             <h5 class='card-header py-0'>Aspects</h5>
-            <p class='card-text px-4 my-0' v-for="aspect in item.adversary_aspects">
+            <p class='card-text px-4 my-0' v-for="aspect in item.aspects">
               <strong>{{fixLabel(aspect)}}</strong>
             </p>
           </div>
 
-          <div v-if="!isEmpty(item.adversary_skills)">
+          <div v-if="!isEmpty(item.skills)">
             <h5 class='card-header py-0'>Skills</h5>
 
-            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.adversary_skills">
+            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills">
                 <strong>{{skillIndex}}</strong> {{fixLabel(skill)}}
             </p>
           </div>
 
-          <div v-if="!isEmpty(item.adversary_stunts)">
+          <div v-if="!isEmpty(item.stunts)">
             <h5 class='card-header py-0'>Stunts & Extras</h5>
 
-            <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.adversary_stunts">
+            <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts">
                 <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
             </p>
           </div>
 
-          <div v-if="!isEmpty(item.adversary_stress)">
+          <div v-if="!isEmpty(item.stress)">
             <h5 class='card-header py-0'>Stress</h5>
 
-            <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.adversary_stress">
+            <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress">
                 <strong>{{stressMainIndex}}</strong>
                 <span v-for="(stressValue, stressIndex) in stressMain">
                   <input type='checkbox' v-bind:value='stressValue'>{{stressValue}}
@@ -66,18 +66,18 @@
             </p>
           </div>
 
-          <div v-if="!isEmpty(item.adversary_consequences)">
+          <div v-if="!isEmpty(item.consequences)">
             <h5 class='card-header py-0'>Consequences</h5>
 
-            <p class='card-text px-4 my-0' v-for="(con, conIndex) in item.adversary_consequences">
+            <p class='card-text px-4 my-0' v-for="(con, conIndex) in item.consequences">
                 <strong>{{conIndex}}</strong> {{fixLabel(con)}}
             </p>
           </div>
 
           <div class='card-footer'>
-              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_system' v-on:click="searchByTag">{{item.adversary_system}}</span>
-              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.adversary_genre' v-on:click="searchByTag">{{item.adversary_genre}}</span>
-              <span v-bind:class="badgeColor(item.adversary_type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.adversary_type' v-on:click="searchByTag">{{item.adversary_type}}</span>
+              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
+              <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.genre' v-on:click="searchByTag">{{item.genre}}</span>
+              <span v-bind:class="badgeColor(item.type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.type' v-on:click="searchByTag">{{item.type}}</span>
           </div>
         </div>
       </div>
@@ -88,11 +88,9 @@
 <script>
 import { mapGetters } from 'vuex'
 import Search from '../components/search'
-import AdversaryService from "./../assets/js/adversaryService";
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
-let adversarySvc = null;
 let commonSvc = null;
 let dbSvc = null;
 
@@ -104,8 +102,8 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
-    adversarySvc = new AdversaryService(dbSvc);
-    fs_adversary.init(this.$root);
+
+    this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
   },
   metaInfo() {
     return {
@@ -128,6 +126,9 @@ export default {
       }
       
       return false;      
+    },  
+    commonSvc() {
+      return commonSvc;
     }
   },
   watch: {
@@ -143,6 +144,7 @@ export default {
       adversaries: [],
       title: "Adversary List",
       description: "Fate Adversaries",
+    
     }
   },
   methods : {
@@ -155,9 +157,22 @@ export default {
       }
       this.list();
     },
-    list : async function (searchText) {      
+    list : async function (searchText) {  
       let onlyShowMyAdversaries = $cookies.get("fcsAdversaryListDefault") ? this.$store.state.userId : null;
-      this.adversaries = await adversarySvc.list(this.id ? this.id : searchText, onlyShowMyAdversaries);
+    
+      if (this.adversaryId) {
+        //we are expecting an array, so if we fetch a single object maintain the expected array for rendering
+        let singleAdversary = await dbSvc.GetObject(this.adversaryId);
+        this.adversaries = [singleAdversary];
+      }
+      else {
+        if (onlyShowMyAdversaries) {
+          this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, searchText);
+        }
+        else{      
+          this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, searchText);
+        }
+      } 
       
       //make the display wider if we only have 1 adversary, this is
       //essentially the adversary "detail" page
@@ -165,8 +180,8 @@ export default {
       {
           $('#adversaryDetail').removeClass('card-columns');
 
-          this.title = this.adversaries[0].adversary_name + ' (Adversary)';
-          this.description = this.adversaries[0].adversary_type;
+          this.title = this.adversaries[0].name + ' (Adversary)';
+          this.description = this.adversaries[0].type;
       }
       else {
           $('#adversaryDetail').addClass('card-columns');
@@ -179,11 +194,7 @@ export default {
         return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
     },
     isEmpty: function(obj) {
-      for(var key in obj) {
-          if(obj.hasOwnProperty(key))
-              return false;
-      }
-      return true;
+      return commonSvc.IsEmpty(obj);
     },
     badgeColor: function(type) {
       var badge;
