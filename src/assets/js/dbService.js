@@ -222,6 +222,11 @@ export default class DbService {
         FilterExpression += ' OR contains (genre, :anu)';
         FilterExpression += ' OR contains (genre, :ant)';
 
+        FilterExpression += ' OR contains (related_id, :an)';
+        FilterExpression += ' OR contains (related_id, :anl)';
+        FilterExpression += ' OR contains (related_id, :anu)';
+        FilterExpression += ' OR contains (related_id, :ant)';
+
         FilterExpression += ' OR slug = :anl )';
 
         
