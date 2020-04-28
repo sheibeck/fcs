@@ -131,6 +131,35 @@ export default class DbService {
 
         return await queryAll(params);
     }
+
+    ListRelatedObjects = async (relatedTo) => {
+        let docClient = this.GetDbClient();
+
+        let params = {
+            TableName: this.TableName,
+            IndexName: "relations",
+            KeyConditionExpression: 'related_id = :id',
+            ExpressionAttributeValues: {
+              ':id': relatedTo
+            }
+        }
+   
+        const queryAll = async (params) => {
+            let lastEvaluatedKey = 'dummy'; // string must not be empty
+            const itemsAll = [];
+            while (lastEvaluatedKey) {
+                const data = await docClient.query(params).promise();
+                itemsAll.push(...data.Items);
+                lastEvaluatedKey = data.LastEvaluatedKey;
+                if (lastEvaluatedKey) {
+                    params.ExclusiveStartKey = lastEvaluatedKey;
+                }
+            }
+            return itemsAll;
+        }
+
+        return await queryAll(params);
+    }
     
     DeleteObject = async (ownerId, id) => {
         let docClient = this.GetDbClient();        

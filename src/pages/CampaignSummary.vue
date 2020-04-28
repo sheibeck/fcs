@@ -56,7 +56,7 @@
 
     <div v-else>     
       <div class="d-flex">
-        <h3 class="mr-auto">{{campaign.title}} - Campaign Summary</h3>
+        <h3 class="mr-auto">{{campaign.name}} - Campaign Summary</h3>
       </div>
 
       <div class="row mt-2">
@@ -169,7 +169,7 @@ export default {
   name: 'CampaignDetail',
   metaInfo() {
     return {
-       title: this.title,       
+       title: this.name,       
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -388,7 +388,7 @@ export default {
           this.$set(this, 'campaign', campaign);              
           this.listSessions(campaign.id);
 
-          this.title = campaign.title + ' (Campaign)';
+          this.title = campaign.name + ' (Campaign)';
           this.description = campaign.description || "";
       }
     },
@@ -413,7 +413,7 @@ export default {
       this.jumpTo("#summary");
     },
     getNiceDate : function(date) {
-        commonSvc.GetNiceDate(date);
+        return commonSvc.GetNiceDate(date);
     },
     jumpTo : function(section) {
       $("html, body").animate({ scrollTop: $(section).offset().top }, 500);

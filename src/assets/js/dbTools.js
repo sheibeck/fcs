@@ -60,7 +60,7 @@ export default class DbTools {
     let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     docClient.service.config.credentials = this.fcs.$store.state.credentials;
     
-    let tables = ["fate_adversary_dev"];
+    let tables = ["fate_campaign_dev"];
         
     debugger;
 
@@ -188,6 +188,26 @@ export default class DbTools {
             record.slug = record.adversary_slug;
             delete record.adversary_slug;
           break;
+
+          case "fate_campaign":
+          case "fate_campaign_dev":
+            if (record.parent_id == "00000000-0000-0000-0000-000000000000") {
+              recordType = "CAMPAIGN";             
+            }
+            else {
+              recordType = "LOG";
+              record.related_id = `CAMPAIGN|${record.parent_id}`;
+            }
+            delete record.parent_id;
+
+            record.object_type = recordType;            
+            record.id = `${recordType}|${record.id}`;
+
+            record.name = record.title;
+            delete record.title;
+
+            record.public = record.ispublic;
+            delete record.ispublic;
         }
          
         this.RemoveEmptyObjects(record);
