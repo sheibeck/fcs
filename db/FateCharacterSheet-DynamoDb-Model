@@ -3,7 +3,7 @@
   "ModelMetadata": {
     "Author": "smh",
     "DateCreated": "Apr 24, 2020, 02:41 PM",
-    "DateLastModified": "Apr 27, 2020, 09:30 AM",
+    "DateLastModified": "Apr 28, 2020, 07:51 AM",
     "Description": "fate character sheet website",
     "Version": "1.0"
   },
@@ -127,7 +127,7 @@
               "AttributeType": "S"
             },
             "SortKey": {
-              "AttributeName": "name",
+              "AttributeName": "owner_id",
               "AttributeType": "S"
             }
           },
@@ -144,18 +144,6 @@
             },
             "SortKey": {
               "AttributeName": "name",
-              "AttributeType": "S"
-            }
-          },
-          "Projection": {
-            "ProjectionType": "ALL"
-          }
-        },
-        {
-          "IndexName": "item",
-          "KeyAttributes": {
-            "PartitionKey": {
-              "AttributeName": "id",
               "AttributeType": "S"
             }
           },

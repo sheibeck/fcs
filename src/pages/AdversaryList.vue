@@ -160,9 +160,9 @@ export default {
       }
       this.list();
     },
-    list : async function (searchText) {      
+    list : async function (searchText) {  
       let onlyShowMyAdversaries = $cookies.get("fcsAdversaryListDefault") ? this.$store.state.userId : null;
-            
+    
       if (this.adversaryId) {
         //we are expecting an array, so if we fetch a single object maintain the expected array for rendering
         let singleAdversary = await dbSvc.GetObject(this.adversaryId);
@@ -170,11 +170,11 @@ export default {
       }
       else {
         if (onlyShowMyAdversaries) {
-          this.adversaries = await dbSvc.ListItemsByOwner("ADVERSARY", this.$store.state.userId);
+          this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, searchText);
         }
         else{      
-          this.adversaries = await dbSvc.ListItemsByType("ADVERSARY");
-        }     
+          this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, searchText);
+        }
       } 
       
       //make the display wider if we only have 1 adversary, this is

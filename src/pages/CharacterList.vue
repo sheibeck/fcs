@@ -102,8 +102,8 @@ export default {
     }
   },
   methods : {   
-    list : function () {
-      let listitems = dbSvc.ListItemsByOwner("CHARACTER", this.$store.state.userId).then( (data) => {    
+    list : function (searchText) {      
+      let items = dbSvc.ListObjects("CHARACTER", this.$store.state.userId, searchText).then( (data) => {    
         this.characters = data;
       });    
     },

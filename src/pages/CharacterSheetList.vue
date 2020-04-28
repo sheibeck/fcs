@@ -77,32 +77,9 @@ export default {
     },
 
     list : function(){    
-      let listitems = dbSvc.ListItemsByType("CHARACTERSHEET").then( (data) => { 
+      let items = dbSvc.ListObjects("CHARACTERSHEET").then( (data) => { 
         this.sheets = data;
-      }); 
-/*
-
-      //reference this component so we can get/set data
-      var $component = this;
-
-      // Create DynamoDB document client
-      var docClient = dbSvc.GetDbClient();
-
-      var params = {
-          TableName: fs_char.config.charactersheettable,
-          Select: 'ALL_ATTRIBUTES'
-      }
-
-      docClient.scan(params, function (err, data) {
-          if (err) {
-              console.log("Error", err);
-              return {};
-          } else {
-              console.log("Success", data.Items);
-              $component.sheets = data.Items;
-          }
       });
-    */
     }
   },
   clearFilter : function() {

@@ -233,7 +233,7 @@ export default {
     },
     editAdversary : async function() {            
       if (this.id) {
-        //we only edit if we have a valid slug for an id      
+        //we only edit if we have a valid slug for an id
         if (!this.adversaryId) return;
         $('#name').attr('readonly', true);
         
@@ -333,7 +333,7 @@ export default {
         }
 
         // if this adversary already exists then warn and don't overwrite
-        let existingAdversary = await dbSvc.ListItemsByOwner(adversaryData.adversaryId, this.userId);        
+        let existingAdversary = await dbSvc.ListObjects(adversaryData.adversaryId, this.userId);        
         if (existingAdversary)
         {
           commonSvc.Notify('You already have an adversary with this name.', 'info', '2000');

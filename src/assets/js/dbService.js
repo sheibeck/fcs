@@ -18,10 +18,12 @@ export default class DbService {
     }
 
     //get a specific object.
-    GetObject = async (objectId, ownerId) => {        
+    GetObject = async (objectId, ownerId) => {  
+        var docClient = this.GetDbClient();
+              
         //if we know the ownerId then get the object directly
         if(ownerId) {                           
-            var docClient = this.GetDbClient();
+            
             var params = {            
                 TableName: this.TableName,
                 Key: {
@@ -39,8 +41,6 @@ export default class DbService {
         }    
         else {
             //if we don't know the owner we have to query for one
-            let docClient = this.GetDbClient();
-
             let params = {
                 TableName: this.TableName,
                 IndexName: "item",
@@ -92,7 +92,7 @@ export default class DbService {
         return await putItem(params);      
     }
 
-    ListItemsByType = async (itemType, filter) => {
+    ListObjects = async (itemType, ownerId, filter) => {
         let docClient = this.GetDbClient();
 
         let params = {
@@ -104,12 +104,15 @@ export default class DbService {
             }
         }
 
+        //if we know the owner then use the sort key, too
+        if (ownerId) {
+            params.KeyConditionExpression += ' AND owner_id = :owner_id';
+            params.ExpressionAttributeValues[':owner_id'] = ownerId;
+        }
+
+        //add some search parameters
         if (filter) {
-            Object.keys(filter.ExpressionAttributeValues).forEach(function (item) {
-                ExpressionAttributeValues[item] = filter.ExpressionAttributeValues[item];
-            });
-            
-            params.FilterExpression += filter.filterExpression;
+            this.GetSearchFilters(filter, params);
         }
              
         const queryAll = async (params) => {
@@ -129,6 +132,7 @@ export default class DbService {
         return await queryAll(params);
     }
 
+    /*
     ListItemsByOwner = async (itemType, ownerId, filter) => {
         let docClient = this.GetDbClient();        
 
@@ -136,17 +140,14 @@ export default class DbService {
             TableName: this.TableName,
             KeyConditionExpression: 'owner_id = :owner_id AND begins_with(id, :item_type)',          
             ExpressionAttributeValues: {
-            ':owner_id': ownerId,
-            ':item_type': itemType
+                ':owner_id': ownerId,
+                ':item_type': itemType
             }
-        }    
+        }
 
+        
         if (filter) {
-            Object.keys(filter.ExpressionAttributeValues).forEach(function (item) {
-                ExpressionAttributeValues[item] = filter.ExpressionAttributeValues[item];
-            });
-            
-            params.FilterExpression += filter.filterExpression;
+            this.GetSearchFilters(filter, params);
         }
         
         const queryAll = async (params) => {
@@ -164,5 +165,76 @@ export default class DbService {
         }
 
         return await queryAll(params);
+    }
+    */
+
+    GetSearchFilters(searchText, params) {
+        let FilterExpression = '( contains (#object_name, :an)';
+
+        FilterExpression += ' OR contains (#object_name, :anl)';
+        FilterExpression += ' OR contains (#object_name, :anu)';
+        FilterExpression += ' OR contains (#object_name, :ant)';
+
+        FilterExpression += ' OR contains (aspects.high_concept, :an)';
+        FilterExpression += ' OR contains (aspects.high_concept, :anl)';
+        FilterExpression += ' OR contains (aspects.high_concept, :anu)';
+        FilterExpression += ' OR contains (aspects.high_concept, :ant)';
+
+        FilterExpression += ' OR contains (aspects.highconcept, :an)';
+        FilterExpression += ' OR contains (aspects.highconcept, :anl)';
+        FilterExpression += ' OR contains (aspects.highconcept, :anu)';
+        FilterExpression += ' OR contains (aspects.highconcept, :ant)';
+
+        FilterExpression += ' OR contains (aspects.trouble, :an)';
+        FilterExpression += ' OR contains (aspects.trouble, :anl)';
+        FilterExpression += ' OR contains (aspects.trouble, :anu)';
+        FilterExpression += ' OR contains (aspects.trouble, :ant)';
+
+        FilterExpression += ' OR contains (aspects.other_aspects, :an)';
+        FilterExpression += ' OR contains (aspects.other_aspects, :anl)';
+        FilterExpression += ' OR contains (aspects.other_aspects, :anu)';
+        FilterExpression += ' OR contains (aspects.other_aspects, :ant)';
+
+        FilterExpression += ' OR contains (#object_game_system, :an)';
+        FilterExpression += ' OR contains (#object_game_system, :anl)';
+        FilterExpression += ' OR contains (#object_game_system, :anu)';
+        FilterExpression += ' OR contains (#object_game_system, :ant)';
+
+        FilterExpression += ' OR contains (#object_game_type, :an)';
+        FilterExpression += ' OR contains (#object_game_type, :anl)';
+        FilterExpression += ' OR contains (#object_game_type, :anu)';
+        FilterExpression += ' OR contains (#object_game_type, :ant)';
+
+        FilterExpression += ' OR contains (genre, :an)';
+        FilterExpression += ' OR contains (genre, :anl)';
+        FilterExpression += ' OR contains (genre, :anu)';
+        FilterExpression += ' OR contains (genre, :ant)';
+
+        FilterExpression += ' OR slug = :anl )';
+
+        
+        let filterParms = {
+            ExpressionAttributeValues: {
+                ':an': searchText,
+                ':anl': searchText.toLowerCase(),
+                ':anu': searchText.toUpperCase(),
+                ':ant': searchText.toTitleCase(),
+            },
+            ExpressionAttributeNames: {
+                "#object_name": "name",
+                "#object_game_type": "type",
+                "#object_game_system": "system"
+            },
+            FilterExpression: FilterExpression,
+        }
+
+        Object.keys(filterParms.ExpressionAttributeValues).forEach(function (item) {
+            params.ExpressionAttributeValues[item] = filterParms.ExpressionAttributeValues[item];
+        });
+        
+        params.ExpressionAttributeNames = filterParms.ExpressionAttributeNames;
+        params.FilterExpression = filterParms.FilterExpression;   
+        
+        return params;
     }
 }

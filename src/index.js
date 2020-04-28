@@ -45,7 +45,6 @@ const store = new Vuex.Store({
     content: $('#results'),
     environment: process.env.NODE_ENV,
     isAuthenticated: false,
-    fbAppId: '189783225112476',
     authorizedUserArn: 'arn:aws:iam::210120940769:role/FateCharacterSheetUser',
     userId: null,
     authProvider: '',

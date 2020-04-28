@@ -104,7 +104,7 @@ export default class CommonService {
   
   Search = (searchText) => {
     let pathname = location.pathname.toLowerCase();
-    if (pathname.includes('charactersheets') || pathname.includes('character'))
+    if (pathname.includes('charactersheets'))
     {
       $('.card').hide();
 
@@ -119,17 +119,18 @@ export default class CommonService {
       // filter by footer content
       $(".card-footer:contains('" + searchText + "')")
         .parent().show();
-    }
-    else if (pathname.includes('adversary'))
-    {
-      this.fcs.$children[0].$children[0].list(searchText); //adversary search
-    }
+    }  
     else if (pathname.includes("campaign")) {
         if (pathname.endsWith("campaign")) {
             this.fcs.$options.filters.filterCampaigns();
         } else {
             this.fcs.$options.filters.filterSessions();
         }
+    }
+    else
+    {
+      //search with dynamodb
+      this.fcs.$children[0].$children[0].list(searchText); 
     }
   }
   
