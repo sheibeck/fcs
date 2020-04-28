@@ -109,24 +109,12 @@ export default {
     },
 
     deleteCharacter : function (event) {
-      var characterId = $(event.currentTarget).data('id');
-      var docClient = dbSvc.GetDbClient();
-      var params = {
-          TableName: fs_char.config.charactertable,
-          Key: {
-            'character_owner_id': this.userId,
-            'character_id': characterId
-          }
-      };
-
-      console.log("Deleting a character...");
-      docClient.delete(params, (err, data) => {
-        if (err) {
-            commonSvc.Notify(err.message || JSON.stringify(err));
-            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+      var characterId = $(event.currentTarget).data('id');           
+      dbSvc.DeleteObject(  this.userId, characterId ).then( (response) => {
+        if (response.error) {
+            commonSvc.Notify(response.error.message || JSON.stringify(err));            
         } else {
-            $('#modalDeleteCharacterConfirm').modal('hide');
-            console.log("Deleted item:", JSON.stringify(data, null, 2));
+            $('#modalDeleteCharacterConfirm').modal('hide');            
             commonSvc.Notify('Character deleted.', 'success', 2000);
             this.list();
         }

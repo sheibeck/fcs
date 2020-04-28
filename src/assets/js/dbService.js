@@ -131,43 +131,26 @@ export default class DbService {
 
         return await queryAll(params);
     }
-
-    /*
-    ListItemsByOwner = async (itemType, ownerId, filter) => {
+    
+    DeleteObject = async (ownerId, id) => {
         let docClient = this.GetDbClient();        
 
-        let params = {
+        var params = {
             TableName: this.TableName,
-            KeyConditionExpression: 'owner_id = :owner_id AND begins_with(id, :item_type)',          
-            ExpressionAttributeValues: {
-                ':owner_id': ownerId,
-                ':item_type': itemType
+            Key: {
+             'owner_id': ownerId,
+             'id': id
             }
-        }
-
+        };
         
-        if (filter) {
-            this.GetSearchFilters(filter, params);
-        }
-        
-        const queryAll = async (params) => {
-            let lastEvaluatedKey = 'dummy'; // string must not be empty
-            const itemsAll = [];
-            while (lastEvaluatedKey) {
-                const data = await docClient.query(params).promise();
-                itemsAll.push(...data.Items);
-                lastEvaluatedKey = data.LastEvaluatedKey;
-                if (lastEvaluatedKey) {
-                    params.ExclusiveStartKey = lastEvaluatedKey;
-                }
-            }
-            return itemsAll;
-        }
+        const putItem = async (params) => {            
+            const data = await docClient.delete(params).promise();
+            return data;
+        };
 
-        return await queryAll(params);
+        return await putItem(params);      
     }
-    */
-
+    
     GetSearchFilters(searchText, params) {
         let FilterExpression = '( contains (#object_name, :an)';
 

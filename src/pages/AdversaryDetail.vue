@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-2">
-    <form id="adversaryForm" v-on:submit.prevent="upsertAdversary">
+    <form id="adversaryForm" v-on:submit.prevent="save">
         <div class="row">
             <input type="hidden" name="id" id="id" />
             <input type="hidden" name="owner_id" id="owner_id" />
@@ -8,15 +8,9 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Name</label>
                     <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="text" value="" id="name" v-on:change="slugifyName" name="name">
+                        <input class="form-control" type="text" value="" id="name" name="name">
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="name" class="col-sm-12 col-md-2 col-form-label">Slug</label>
-                    <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="text" value="" id="slug" name="slug" readonly>
-                    </div>
-                </div>
+                </div>                
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">High Concept</label>
                     <div class="col-sm-12 col-md-10">
@@ -231,199 +225,123 @@ export default {
 
       this.editAdversary();
     },
-    editAdversary : async function() {            
-      if (this.id) {
-        //we only edit if we have a valid slug for an id
-        if (!this.adversaryId) return;
-        $('#name').attr('readonly', true);
-        
-        let adversary = await dbSvc.GetObject(this.adversaryId, this.userId).then( (data) => {
-          this.adversary = data;
-          if (!this.adversary)
-          {
-            location.href = '/error';
+    editAdversary : function() {                
+      //we only edit if we have a valid slug for an id
+      if (!this.adversaryId) return;
+      
+      let adversary = dbSvc.GetObject(this.adversaryId, this.userId).then( (data) => {
+        this.adversary = data;
+        //if we find an adversary, then we're editing, otherwise we are creating
+        if (this.adversary) {
+          this.clearAdversaryForm();
+          this.populateAdversaryForm(this.adversary);
+
+          this.title = this.adversary.name + ' (Adversary)';
+          this.description = this.adversary.type;
+        }    
+      });     
+    },
+    save : async function() {
+      if (!$("#name").val())
+      {
+        commonSvc.Notify('You must enter a name', 'error', 2000);
+        return;
+      }
+
+      var data = $('#adversaryForm').serializeArray();
+
+      var result = {};
+      var currentKey;
+      $.each(data, function () {
+          if (this.name !== '') {
+              if (this.name.indexOf('[name]') > -1)
+              {
+                  var label = this.name.replace('[name]',''); //get the name of the parent property
+                  if (!result[label]) {
+                      result[label] = {};
+                  }
+                  currentKey = this.value; //get the value that needs to be appened to the parent
+                  result[label][this.value] = null;
+              }
+
+              else if (this.name.indexOf('[value]') > -1)
+              {
+                  var label = this.name.replace('[value]', '');//get the name of the parent property
+                  result[label][currentKey] = this.value; //get the last name we stored, should be in order so we assume the previous name is paired with this
+                  currentKey = '';
+              }
+
+              else {
+                  result[this.name] = this.value;
+              }
           }
-          else {       
+      });
+
+      if (result.stress) {
+          //iterate over stress and make each value an array
+          $.each(result.stress, function (key, value) {
+              result.stress[key] = value.split(',');
+          });
+      }
+
+      var isNew = false;
+      if (!result.id)
+      {
+        // add a uniqueid
+        result['id'] = commonSvc.SetId("ADVERSARY", commonSvc.GenerateUUID());
+        result['owner_id'] = this.$store.state.userId;
+        isNew = true;
+      }
+
+      //name is a key field, we're going to force this to title case
+      result.name = result.name.toTitleCase();
+      result.slug = commonSvc.Slugify(result.name); //update the url slug
+      result.object_type = "ADVERSARY";      
+
+      // clear empty values
+      commonSvc.RemoveEmptyObjects(result);
+
+      // if this adversary already exists then warn and don't overwrite
+      let existingAdversaries = await dbSvc.ListObjects("ADVERSARY", null, result.name);
+      let foundAdversayWithName = existingAdversaries.filter(obj => {
+        return obj.name.toLowerCase() === result.name.toLowerCase();
+      })
+
+      if (foundAdversayWithName.length > 0)
+      {
+        commonSvc.Notify('There is already an adversary with this name. Please choose a different name', 'error', 2000);
+      }
+      else {        
+        console.log("Saving adversary...");
+
+        let response = await dbSvc.SaveObject(result).then((response) => {
+          if (response.error) {
+            commonSvc.Notify(err.message || JSON.stringify(err));              
+          }
+          else {              
+            commonSvc.Notify('Adversary saved.', 'success', 2000);                 
+          }
+        });
+      }
+    },
+
+    deleteAdversary : async function() {
+      if (!this.isOwner($(owner_id).val())) {
+        commonSvc.Notify('You are not the owner of this Adversary', 'error', 2000);
+      }
+      else {
+        await dbSvc.DeleteObject( this.userId, $('#id').val() ).then( (response) => {             
+          if (response.error) {
+              commonSvc.Notify(response.error.message || JSON.stringify(response.error));                 
+          } else {
             this.clearAdversaryForm();
-            this.populateAdversaryForm(this.adversary);
-
-            this.title = this.adversary.name + ' (Adversary)';
-            this.description = this.adversary.type;
-          }    
-        });      
-      }
-    },
-    upsertAdversary : function() {
-        var $component = this;
-
-        var data = $('#adversaryForm').serializeArray();
-
-        var result = {};
-        var currentKey;
-        $.each(data, function () {
-            if (this.name !== '') {
-                if (this.name.indexOf('[name]') > -1)
-                {
-                    var label = this.name.replace('[name]',''); //get the name of the parent property
-                    if (!result[label]) {
-                        result[label] = {};
-                    }
-                    currentKey = this.value; //get the value that needs to be appened to the parent
-                    result[label][this.value] = null;
-                }
-
-                else if (this.name.indexOf('[value]') > -1)
-                {
-                    var label = this.name.replace('[value]', '');//get the name of the parent property
-                    result[label][currentKey] = this.value; //get the last name we stored, should be in order so we assume the previous name is paired with this
-                    currentKey = '';
-                }
-
-                else {
-                    result[this.name] = this.value;
-                }
-            }
-        });
-
-        if (result.stress) {
-            //iterate over stress and make each value an array
-            $.each(result.stress, function (key, value) {
-                result.stress[key] = value.split(',');
+            $('#modalDeleteAdversaryConfirm').modal('hide');
+            commonSvc.Notify('Adversary deleted.', 'success', 2000, function() {
+              location.href = '/adversary'
             });
-        }
-
-        var isNew = false;
-        if (!result.id)
-        {
-          // add a uniqueid
-          result['id'] = commonSvc.SetId("ADVERSARY", commonSvc.GenerateUUID());
-          result['owner_id'] = this.$store.state.userId;
-          isNew = true;
-        }
-
-        //name is a key field, we're going to force this to title case
-        if(result.name)
-        {
-          result.name = result.name.toTitleCase();
-        }
-
-        // clear empty values
-        commonSvc.RemoveEmptyObjects(result);
-
-        if (isNew)
-        {
-          //create the adversary
-          $component.insertAdversary(result);
-        }
-        else {
-          $component.updateAdversary(result);
-        }
-    },
-
-    insertAdversary: async function(adversaryData) {
-
-        var docClient = dbSvc.GetDbClient();
-
-        var params = {
-            TableName: dbSvc.TableName,
-            Key: {
-             'owner_id': adversaryData.owner_id,
-             'name': adversaryData.name,
-            },
-        }
-
-        // if this adversary already exists then warn and don't overwrite
-        let existingAdversary = await dbSvc.ListObjects(adversaryData.adversaryId, this.userId);        
-        if (existingAdversary)
-        {
-          commonSvc.Notify('You already have an adversary with this name.', 'info', '2000');
-        }
-        else {        
-          console.log("Adding a new adversary...");
-
-          let response = await dbSvc.SaveObject(adversaryData).then((response) => {          
-            if (response.error) {
-              commonSvc.Notify(err.message || JSON.stringify(err));
-              console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            }
-            else {
-              console.log("Added item:", JSON.stringify(data, null, 2));
-              commonSvc.Notify('Adversary added.', 'success', 2000, function() {
-                location.href = `/adversary/${commonSvc.GetId(adversaryData.id)}/${adversaryData.slug}`;
-              });                 
-            }
-          });
-        }
-    },
-
-    deleteAdversary : function() {
-        if (!this.isOwner($(owner_id).val())) {
-          commonSvc.Notify('Permission Denied.', 'error', 2000);
-        }
-        else {
-          var $component = this;
-          var docClient = dbSvc.GetDbClient();
-
-          var params = {
-              TableName: dbSvc.TableName,
-              Key: {
-               'owner_id': $component.userId,
-               'id': $('#id').val()
-              }
-          };
-
-          console.log("Deleting an adversary...");
-          docClient.delete(params, function (err, data) {
-              if (err) {
-                  commonSvc.Notify(err.message || JSON.stringify(err));
-                  console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-              } else {
-                  $component.clearAdversaryForm();
-                  $('#modalDeleteAdversaryConfirm').modal('hide');
-                  console.log("Deleted item:", JSON.stringify(data, null, 2));
-
-                  commonSvc.Notify('Adversary deleted.', 'success', 2000, function() {
-                    location.href = '/adversary'
-                  });
-              }
-          });
-      }
-    },
-
-    updateAdversary : function(data) {
-        var docClient = dbSvc.GetDbClient();
-
-        var params = {
-            TableName: fs_adversary.config.adversarytable,
-            Key: {
-             'owner_id': data.owner_id,
-             'name': $('#name').val().toTitleCase() // it's disabled when we update so they don't try to change it.
-            },
-            UpdateExpression: "set aspects = :a, slug =:slg, consequences=:c, genre=:g, skills=:sk, stress=:str, stunts=:stn, system=:sys, type=:t",
-            ExpressionAttributeValues:{
-                ":a":data.aspects,
-                ":slg": data.slug,
-                ":c":data.consequences,
-                ":g":data.genre,
-                ":sk": data.skills,
-                ":str": data.stress,
-                ":stn": data.stunts,
-                ":sys": data.system,
-                ":t": data.type
-            },
-            ReturnValues:"UPDATED_NEW"
-        };
-
-        console.log("Updating adversary...");
-        docClient.update(params, function (err, data) {
-            if (err) {
-                commonSvc.Notify(err.message || JSON.stringify(err));
-                console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
-                commonSvc.Notify('Adversary updated.', 'success', 2000);
-            }
+          }
         });
+      }
     },
 
     clearAdversaryForm : function() {
@@ -435,9 +353,8 @@ export default {
       $('#owner_id').val('');
     },
 
-    populateAdversaryForm : function (data) {
-      var $component = this;
-      $.each(data, function(name, val){
+    populateAdversaryForm : function (data) {      
+      $.each(data, (name, val) =>{
           if (typeof val === 'object')
           {
             switch(name) {
@@ -449,7 +366,7 @@ export default {
               default:
                 var objName = name.replace('_', '-');
                 for(var i=0;i<Object.keys(val).length-1;i++) {
-                  $component.appendDeletableRow($(".js-" + objName + ":first").clone().addClass('adversary-item-copy').insertAfter(".js-" + objName +":last"));
+                  this.appendDeletableRow($(".js-" + objName + ":first").clone().addClass('adversary-item-copy').insertAfter(".js-" + objName +":last"));
                 }
                 $(".js-"+objName).each(function(i) {
                   $(this).find('input[name="'+ name +'[name]"]').val(Object.keys(val)[i]);
@@ -468,10 +385,7 @@ export default {
                     $el.val(val);
             }
           }
-      });
-
-      var slug = commonSvc.Slugify(data.name);
-      $('#slug').val(slug);
+      });      
     },
 
     appendDeletableRow : function($elem) {
@@ -563,12 +477,7 @@ export default {
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
-    },
-    slugifyName : function(event) {
-      var $elem = $(event.currentTarget);
-      var slug = commonSvc.Slugify($elem.val());
-      $('#slug').val(slug);
-    }
+    }   
   }
 }
 </script>

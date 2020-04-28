@@ -88,11 +88,9 @@
 <script>
 import { mapGetters } from 'vuex'
 import Search from '../components/search'
-import AdversaryService from "./../assets/js/adversaryService";
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
-let adversarySvc = null;
 let commonSvc = null;
 let dbSvc = null;
 
@@ -104,7 +102,6 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
-    adversarySvc = new AdversaryService(dbSvc);
 
     this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
   },
