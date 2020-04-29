@@ -314,12 +314,9 @@ export default {
       else {        
         console.log("Saving adversary...");
 
-        let response = await dbSvc.SaveObject(result).then((response) => {
-          if (response.error) {
-            commonSvc.Notify(err.message || JSON.stringify(err));              
-          }
-          else {              
-            commonSvc.Notify('Adversary saved.', 'success', 2000);                 
+        let response = await dbSvc.SaveObject(result).then((response) => {    
+          if (response) {
+            commonSvc.Notify('Adversary saved.', 'success', 2000);
           }
         });
       }
@@ -330,10 +327,8 @@ export default {
         commonSvc.Notify('You are not the owner of this Adversary', 'error', 2000);
       }
       else {
-        await dbSvc.DeleteObject( this.userId, $('#id').val() ).then( (response) => {             
-          if (response.error) {
-              commonSvc.Notify(response.error.message || JSON.stringify(response.error));                 
-          } else {
+        await dbSvc.DeleteObject( this.userId, $('#id').val() ).then( (response) => { 
+          if (response) {
             this.clearAdversaryForm();
             $('#modalDeleteAdversaryConfirm').modal('hide');
             commonSvc.Notify('Adversary deleted.', 'success', 2000, function() {

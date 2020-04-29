@@ -119,14 +119,12 @@ export default {
 
     deleteCharacter : function (event) {
       var characterId = $(event.currentTarget).data('id');           
-      dbSvc.DeleteObject(  this.userId, characterId ).then( (response) => {
-        if (response.error) {
-            commonSvc.Notify(response.error.message || JSON.stringify(err));            
-        } else {
-            $('#modalDeleteCharacterConfirm').modal('hide');            
-            commonSvc.Notify('Character deleted.', 'success', 2000);
-            this.list();
-        }
+      dbSvc.DeleteObject(  this.userId, characterId ).then( (response) => {  
+        if (response) {    
+          $('#modalDeleteCharacterConfirm').modal('hide');            
+          commonSvc.Notify('Character deleted.', 'success', 2000);
+          this.list();   
+        }   
       });
     },
     shareUrl : function(event) {

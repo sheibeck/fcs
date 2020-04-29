@@ -5,24 +5,29 @@
       <div class='' v-append="sheet">
       </div>
 
-      <hr/>
+      <div class="d-print-none">
+        <hr/>
 
-      <div class='row'>
-        <div class='col'>
-           <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character d-print-none'>Save Character <i class='fa fa-user'></i></button>
-           <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-           <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
-        </div>
-        <div class='col' v-if="isAuthenticated">
-          <div class='row'>
-            <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='image_url'>Portrait Url:</label>
-            <input class='form-control col-12 col-md-9 d-print-none' id='image_url' name='image_url'  />
+        <div class='row'>
+          <div class='col'>
+            <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character'>Save Character <i class='fa fa-user'></i></button>
+            <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
+            <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+            <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
+              Character Properties
+            </button>
           </div>
         </div>
-        <div class='col' v-if="!isAuthenticated">
-          <div class='row'>           
-            <input type="hidden" class='form-control col-12 col-md-9 d-print-none' id='image_url' name='image_url'  />
+                
+        <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
+          <div class='form-group'>
+            <label class='' for='image_url'>Portrait Url:</label>
+            <input class='form-control' id='image_url' name='image_url'  />
           </div>
+        </div>
+      
+        <div class='row' v-if="!isAuthenticated">           
+          <input type="hidden" id='image_url' name='image_url'  />
         </div>
       </div>
 
@@ -130,7 +135,8 @@ export default {
         characterData.related_id = this.sheetData.id;
         characterData.system = this.sheetData.system;
         characterData.slug = commonSvc.Slugify(characterData.name);
-
+        characterData.object_type = "CHARACTER";
+        
         //remove some legacy values
         characterData.sheetname = "";
 
@@ -143,13 +149,10 @@ export default {
         characterData.id = this.characterId;
         fs_char.config.characterId = this.characterId;
 
-        let response = await dbSvc.SaveObject(characterData).then((response) => {          
-          if (response.error) {
-            commonSvc.Notify(response.error, 'success', 2000);
-          }
-          else {
+        let response = await dbSvc.SaveObject(characterData).then((response) => { 
+          if (response) {
             commonSvc.Notify('Character saved.', 'success', 2000);
-          }   
+          }
         }).then( () => {         
           if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {
               $("img.portrait").prop("src", $("#image_url").val());

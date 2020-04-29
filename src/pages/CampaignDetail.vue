@@ -62,7 +62,7 @@
 
     <div v-else>
       <div class="d-flex flex-column flex-sm-row">
-        <h3 class="mr-auto">{{campaign.name}} - Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
+        <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
 
       <div id="accordion">
@@ -328,7 +328,7 @@ export default {
   },
   data () {
     return {
-      title: "",
+      name: "",
       description: "",
       loading: true,
       campaign : {},
@@ -586,7 +586,14 @@ export default {
       this.$store.commit('updateSearchText', "");
       fcs.$options.filters.filterSessions();
 
-      let session = {id: commonSvc.GenerateUUID(), date: this.getFormattedDate(new Date()), description: "Details...", parent_id: this.campaign.id, owner_id: this.userId};
+      let session = {
+        id: commonSvc.GenerateUUID(),
+        object_type: "LOG",
+        date: this.getFormattedDate(new Date()),
+        description: "Details...",
+        related_id: this.campaign.id,
+        owner_id: this.userId,
+      };
       this.sessions.unshift(session);
 
       this.setCurrentSession(session.id);
@@ -615,57 +622,46 @@ export default {
       let $component = this;
       let sessionId = $(event.currentTarget).data('id');
 
-      dbSvc.DeleteObject(this.userId, sessionId).then((result) => {
-          let err = result.error;
-          if (err) {
-              commonSvc.Notify(err.message || JSON.stringify(err));
-              console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              console.log("Deleted item:", JSON.stringify(result, null, 2));
-              commonSvc.Notify('Session deleted.', 'success', 2000);
+      dbSvc.DeleteObject(this.userId, sessionId).then((response) => { 
+        if (response) {       
+          console.log("Deleted item:", JSON.stringify(response, null, 2));
+          commonSvc.Notify('Session deleted.', 'success', 2000);
 
-              // splice the item out of the list of sessions
-              let session = $component.sessions.find(x => x.id === sessionId);
-              //remove the things this session added
-              $component.parseThings(session.description, session.id, true);
-              let sessionIdx = $component.sessions.map(function(e) { return e.id; }).indexOf(sessionId);
-              $component.sessions.splice(sessionIdx, 1);
+          // splice the item out of the list of sessions
+          let session = $component.sessions.find(x => x.id === sessionId);
+          //remove the things this session added
+          $component.parseThings(session.description, session.id, true);
+          let sessionIdx = $component.sessions.map(function(e) { return e.id; }).indexOf(sessionId);
+          $component.sessions.splice(sessionIdx, 1);
 
-              //clear out any search filters so we get the fresh view of the data
-              $component.clearFilter()
-          }
+          //clear out any search filters so we get the fresh view of the data
+          $component.clearFilter()   
+        }      
       })
     },
     getCampaign : function(ownerId, id) {
       var $component = this;
 
-      if (id === "create") {
+      if (this.id === "create") {
         this.create();
         return;
       }
 
-      dbSvc.GetObject(id, ownerId).then ( (response) => {
-        let err = response.error;
-        if (err) {
-          console.log("Error", err);
-          $component.loading = false;
+      dbSvc.GetObject(id, ownerId).then ( (response) => {   
+        if (!response)
+        {
+          location.href = '/error';
         }
-        else {
-            if (!response)
-            {
-              location.href = '/error';
-            }
-            else {              
+        else {              
 
-              $component.$set($component, 'campaign', response);
-              $component.listSessions(response.id);
+          $component.$set($component, 'campaign', response);
+          $component.listSessions(response.id);
 
-              $component.title = $component.campaign.name + ' (Campaign)';
-              $component.description = $component.campaign.description || "";
-            }
-
-            $component.loading = false;
+          $component.name = $component.campaign.name + ' (Campaign)';
+          $component.description = $component.campaign.description || "";
         }
+
+        $component.loading = false;    
       })
     },
     listSessions : async function(campaignId) {
@@ -681,18 +677,19 @@ export default {
     create : function() {
       let c = {
         "description": "",
+        "object_type": "CAMPAIGN",
         "id": null,
         "owner_id": this.userId,        
         "scale": "",
         "slug": "new-campaign",
-        "title": "New Campaign",
+        "name": "New Campaign",
         "date": this.getFormattedDate(new Date()),
       };
       this.$set(this, 'campaign', c);
       this.loading = false;
     },
     saveCampaign : function() {
-    var $component = this;
+      var $component = this;
 
       // make sure we have a proper user id key
       $component.$set($component.campaign, "owner_id", this.userId);
@@ -704,13 +701,9 @@ export default {
           $component.$set($component.campaign, "id", `CAMPAIGN|${commonSvc.GenerateUUID()}`);
       }
   
-      dbSvc.SaveObject($component.campaign).then( (response) => {;
-        let err = response.error;       
-        if (err) {
-          commonSvc.Notify(err.message || JSON.stringify(err));
-        } else {
-          commonSvc.Notify('Campaign saved.', 'success', 2000);                
-
+      dbSvc.SaveObject($component.campaign).then( (response) => {
+        if (response) {
+          commonSvc.Notify('Campaign saved.', 'success', 2000);
           if (isNew) {
             location.href = '/campaign/' + commonSvc.GetId($component.campaign.id) + '/' + $component.campaign.slug;
           }
@@ -721,12 +714,9 @@ export default {
       //if we change the date, sometimes we lose the item when it sorts
       this.jumpTo(`#editor-${commonSvc.GetId(session.id)}`);      
 
-      dbSvc.SaveObject(session).then( (response) => {
-        let err = response.error;
-        if (err) {
-            commonSvc.Notify(err.message || JSON.stringify(err));             
-        } else {
-            commonSvc.Notify('Session saved.', 'success', 2000);              
+      dbSvc.SaveObject(session).then( (response) => {  
+        if (response) {      
+          commonSvc.Notify('Session saved.', 'success', 2000);
         }
       });
     },
