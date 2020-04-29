@@ -125,29 +125,26 @@ export default {
       if (sessionList.error) {
           commonSvc.Notify(err.message || JSON.stringify(err));
       } else {
-        let hasErrors = [];
+        let hasErrors = 0;
+
+        //delete sessions
         sessionList.forEach( async (item) => {
-          let result = await dbSvc.DeleteObject(this.userId, item.id)
-          if (result.error) {
-            hasErrors.push(result.error);
-          }
+          let result = await dbSvc.DeleteObject(this.userId, item.id);
+          if (!result) hasErrors++;
         });
         
-        if (hasErrors.length == 0)
+        if (!hasErrors)
         {
-          //now that the logs are gone, delete the campaign itself
-          await dbSvc.DeleteObject(this.userId, campaignId).then((result) => {
-            let err = result.error;
-            if (err) {
-                commonSvc.Notify(err.message || JSON.stringify(err));                
-            } else {                
-                commonSvc.Notify('Campaign deleted.', 'success', 2000);
-                this.list();
+          //delete campaign
+          await dbSvc.DeleteObject(this.userId, campaignId).then((response) => {
+            if (response) {
+              commonSvc.Notify('Campaign deleted.', 'success', 2000);
+              this.list();
             }
-          })
+          });        
         }
         else {
-          commonSvc.Notify("There was a problem deleting session logs for this campaign. Please contact the site administrator if this problem persists.");
+          commonSvc.Notify("There was a problem deleting session logs for this campaign", "error", 2000);
         }
       }
     },   

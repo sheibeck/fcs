@@ -12,14 +12,19 @@
           <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
           <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
           <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
-        </div>
-        <div class='col' v-if="isAuthenticated">
-            <div class='row'>
-              <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='image_url'>Portrait Url:</label>
-              <input class='form-control col-12 col-md-9 d-print-none' id='image_url' name='image_url'  />
-            </div>
+          <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
+              Character Properties
+          </button>
         </div>
       </div>
+
+      <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
+        <div class='form-group'>
+          <label class='' for='image_url'>Portrait Url:</label>
+          <input class='form-control' id='image_url' name='image_url'  />
+        </div>
+      </div>
+      
     </form>
   </div>
 </template>
@@ -116,14 +121,11 @@ export default {
 
         fs_char.config.characterId = this.characterId;
 
-        let response = await dbSvc.SaveObject(characterData).then((response) => {          
-          if (response.error) {
-            commonSvc.Notify(response.error, 'success', 2000);
-          }
-          else {
+        let response = await dbSvc.SaveObject(characterData).then((response) => {
+          if (response) {
             commonSvc.Notify('Character saved.', 'success', 2000);
             location.href = `/character/${this.sheetData.slug}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
-          }   
+          }
         });
 
       }

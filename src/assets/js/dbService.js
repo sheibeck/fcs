@@ -32,12 +32,13 @@ export default class DbService {
                 },
             }
 
-            const getItem = async (params) => {
-                const data = await docClient.get(params).promise();
-                return data.Item;
-            };
-
-            return await getItem(params);    
+            //return await getItem(params);    
+            return await docClient.get(params).promise()
+                .then((data) => {
+                    return data.Item;
+                }).catch(function(err) {
+                    this.commonSvc.Notify(err.code, 'error', 2000);
+                });
         }    
         else {
             //if we don't know the owner we have to query for one
@@ -54,12 +55,17 @@ export default class DbService {
                 let lastEvaluatedKey = 'dummy'; // string must not be empty
                 const itemsAll = [];
                 while (lastEvaluatedKey && itemsAll.length === 0) {
-                    const data = await docClient.query(params).promise();
-                    itemsAll.push(...data.Items);
-                    lastEvaluatedKey = data.LastEvaluatedKey;
-                    if (lastEvaluatedKey) {
-                        params.ExclusiveStartKey = lastEvaluatedKey;
-                    }
+                    await docClient.query(params).promise()
+                        .then((data) => {
+                            itemsAll.push(...data.Items);
+                            lastEvaluatedKey = data.LastEvaluatedKey;
+                            if (lastEvaluatedKey) {
+                                params.ExclusiveStartKey = lastEvaluatedKey;
+                            }
+                        }).catch((err) => {
+                            this.commonSvc.Notify(err.code, 'error', 2000);
+                        });
+                   
                 }
                 if (itemsAll.length > 0)
                     return itemsAll[0];
@@ -83,13 +89,14 @@ export default class DbService {
             TableName: this.TableName,
             Item: data
         };
-
-        const putItem = async (params) => {            
-            const data = await docClient.put(params).promise();
-            return data;
-        };
-
-        return await putItem(params);      
+             
+        //return await getItem(params);    
+        return await docClient.put(params).promise()
+            .then((data) => {
+                return data;
+            }).catch((err) => {
+                this.commonSvc.Notify(err.code, 'error', 2000);
+            });
     }
 
     ListObjects = async (itemType, ownerId, filter) => {
@@ -119,13 +126,18 @@ export default class DbService {
             let lastEvaluatedKey = 'dummy'; // string must not be empty
             const itemsAll = [];
             while (lastEvaluatedKey) {
-                const data = await docClient.query(params).promise();
-                itemsAll.push(...data.Items);
-                lastEvaluatedKey = data.LastEvaluatedKey;
-                if (lastEvaluatedKey) {
-                    params.ExclusiveStartKey = lastEvaluatedKey;
-                }
-            }
+                await docClient.query(params).promise()
+                    .then((data) => {
+                        itemsAll.push(...data.Items);
+                        lastEvaluatedKey = data.LastEvaluatedKey;
+                        if (lastEvaluatedKey) {
+                            params.ExclusiveStartKey = lastEvaluatedKey;
+                        }
+                    }).catch((err) => {
+                        this.commonSvc.Notify(err.code, 'error', 2000);
+                    });
+                
+            }            
             return itemsAll;
         }
 
@@ -148,12 +160,16 @@ export default class DbService {
             let lastEvaluatedKey = 'dummy'; // string must not be empty
             const itemsAll = [];
             while (lastEvaluatedKey) {
-                const data = await docClient.query(params).promise();
-                itemsAll.push(...data.Items);
-                lastEvaluatedKey = data.LastEvaluatedKey;
-                if (lastEvaluatedKey) {
-                    params.ExclusiveStartKey = lastEvaluatedKey;
-                }
+                await docClient.query(params).promise()
+                    .then((data) => {
+                        itemsAll.push(...data.Items);
+                        lastEvaluatedKey = data.LastEvaluatedKey;
+                        if (lastEvaluatedKey) {
+                            params.ExclusiveStartKey = lastEvaluatedKey;
+                        }
+                    }).catch((err) => {
+                        this.commonSvc.Notify(err.code, 'error', 2000);
+                    });              
             }
             return itemsAll;
         }
@@ -172,12 +188,13 @@ export default class DbService {
             }
         };
         
-        const putItem = async (params) => {            
-            const data = await docClient.delete(params).promise();
-            return data;
-        };
-
-        return await putItem(params);      
+         //return await getItem(params);    
+         return await docClient.delete(params).promise()
+            .then((data) => {
+                return data;
+            }).catch((err) => {
+                this.commonSvc.Notify(err.code, 'error', 2000);
+            });
     }
     
     GetSearchFilters(searchText, params) {
