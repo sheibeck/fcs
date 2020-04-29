@@ -16,9 +16,7 @@
 
           </div>
          </div>
-      </div>
-
-      <button v-on:click="migrateData()">Migrate Data</button>
+      </div>      
   </div>
 </template>
 
@@ -28,7 +26,7 @@ import Search from '../components/search';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
-import DbTools from '../assets/js/dbTools';
+//import DbTools from '../assets/js/dbTools';
 let dbTools = null;
 
 let dbSvc = null;
@@ -46,7 +44,7 @@ export default {
   mounted(){
     dbSvc = new DbService(this.$root);
     commonSvc= new CommonService(this.$root);
-    dbTools = new DbTools(this.$root);
+    //dbTools = new DbTools(this.$root);
     fs_char.init(this.$root);
   },
   watch: {
@@ -68,7 +66,7 @@ export default {
   },
   methods : {
     migrateData() {
-      dbTools.MigrateData();
+      //dbTools.MigrateData();
     },
 
     getSheetLogoUrl(id) {
