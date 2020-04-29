@@ -151,7 +151,7 @@ export default {
 
         let response = await dbSvc.SaveObject(characterData).then((response) => { 
           if (response) {
-            commonSvc.Notify('Character saved.', 'success', 2000);
+            commonSvc.Notify('Character saved.', 'success');
           }
         }).then( () => {         
           if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {

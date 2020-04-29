@@ -100,7 +100,7 @@ export default {
         var characterData = JSON.parse(data);
 
         if (!characterData.name) {
-          commonSvc.Notify('You must specify a name');
+          commonSvc.Notify('You must enter a name', 'error');
           return;
         }
 
@@ -123,11 +123,11 @@ export default {
 
         let response = await dbSvc.SaveObject(characterData).then((response) => {
           if (response) {
-            commonSvc.Notify('Character saved.', 'success', 2000);
-            location.href = `/character/${this.sheetData.slug}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
+            commonSvc.Notify('Character saved.', 'success', null, () => {
+                location.href = `/character/${this.sheetData.slug}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
+            });            
           }
         });
-
       }
       else {
           window.print();

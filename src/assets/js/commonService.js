@@ -14,7 +14,7 @@ export default class CommonService {
     document.execCommand("copy");
     document.body.removeChild(tempInput);
 
-    this.Notify('Copied to clipboard', 'info', 2000);
+    this.Notify('Copied to clipboard', 'info');
   }
 
   Notify = (message, type, timeout, callback) => {
@@ -26,7 +26,12 @@ export default class CommonService {
       }
 
       if (!timeout) {
-        timeout = false;
+        if (type == 'error') {
+          timeout = 2000;
+        }
+        else {
+          timeout = 1000;
+        }
       }
 
       new Noty({

@@ -27,7 +27,8 @@ export default class UserService {
             this.commonSvc.Notify(err.message || JSON.stringify(err));
             return;
         }        
-        this.commonSvc.Notify('Successfully registered. Please check your email for a verification link.', 'success', 2000, () => { document.location = 'login' });
+        this.commonSvc.Notify('Successfully registered. Please check your email for a verification link.', 'success', null, 
+          () => { document.location = 'login' });
     });
   }
 

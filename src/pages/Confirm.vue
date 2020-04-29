@@ -74,7 +74,7 @@ export default {
       CognitoUser.confirmPassword($('#confirmationcode').val(), $('#password').val(), {
         onSuccess: function (result) {
             console.log('Successfully reset password');
-            commonSvc.Notify('Your password was successfully reset.', 'success', 2000, function() { location.href = 'login'});
+            commonSvc.Notify('Your password was successfully reset.', 'success', null, () => { location.href = 'login'});
         },
         onFailure: function(err) {
             commonSvc.Notify(err.message || JSON.stringify(err));
