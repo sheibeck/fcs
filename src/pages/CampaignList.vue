@@ -138,13 +138,13 @@ export default {
           //delete campaign
           await dbSvc.DeleteObject(this.userId, campaignId).then((response) => {
             if (response) {
-              commonSvc.Notify('Campaign deleted.', 'success', 2000);
+              commonSvc.Notify('Campaign deleted.', 'success');
               this.list();
             }
           });        
         }
         else {
-          commonSvc.Notify("There was a problem deleting session logs for this campaign", "error", 2000);
+          commonSvc.Notify("There was a problem deleting session logs for this campaign", "error");
         }
       }
     },   

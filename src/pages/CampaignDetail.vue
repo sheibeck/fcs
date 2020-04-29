@@ -625,7 +625,7 @@ export default {
       dbSvc.DeleteObject(this.userId, sessionId).then((response) => { 
         if (response) {       
           console.log("Deleted item:", JSON.stringify(response, null, 2));
-          commonSvc.Notify('Session deleted.', 'success', 2000);
+          commonSvc.Notify('Session deleted.', 'success');
 
           // splice the item out of the list of sessions
           let session = $component.sessions.find(x => x.id === sessionId);
@@ -703,10 +703,11 @@ export default {
   
       dbSvc.SaveObject($component.campaign).then( (response) => {
         if (response) {
-          commonSvc.Notify('Campaign saved.', 'success', 2000);
-          if (isNew) {
-            location.href = '/campaign/' + commonSvc.GetId($component.campaign.id) + '/' + $component.campaign.slug;
-          }
+          commonSvc.Notify('Campaign saved.', 'success', null, () => {;
+            if (isNew) {
+              location.href = '/campaign/' + commonSvc.GetId($component.campaign.id) + '/' + $component.campaign.slug;
+            }
+          });
         }
       });
     },    
@@ -716,7 +717,7 @@ export default {
 
       dbSvc.SaveObject(session).then( (response) => {  
         if (response) {      
-          commonSvc.Notify('Session saved.', 'success', 2000);
+          commonSvc.Notify('Session saved.', 'success');
         }
       });
     },

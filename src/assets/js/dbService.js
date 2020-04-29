@@ -37,7 +37,7 @@ export default class DbService {
                 .then((data) => {
                     return data.Item;
                 }).catch(function(err) {
-                    this.commonSvc.Notify(err.code, 'error', 2000);
+                    this.commonSvc.Notify(err.code, 'error');
                 });
         }    
         else {
@@ -63,7 +63,7 @@ export default class DbService {
                                 params.ExclusiveStartKey = lastEvaluatedKey;
                             }
                         }).catch((err) => {
-                            this.commonSvc.Notify(err.code, 'error', 2000);
+                            this.commonSvc.Notify(err.code, 'error');
                         });
                    
                 }
@@ -95,7 +95,7 @@ export default class DbService {
             .then((data) => {
                 return data;
             }).catch((err) => {
-                this.commonSvc.Notify(err.code, 'error', 2000);
+                this.commonSvc.Notify(err.code, 'error');
             });
     }
 
@@ -134,7 +134,7 @@ export default class DbService {
                             params.ExclusiveStartKey = lastEvaluatedKey;
                         }
                     }).catch((err) => {
-                        this.commonSvc.Notify(err.code, 'error', 2000);
+                        this.commonSvc.Notify(err.code, 'error');
                     });
                 
             }            
@@ -168,7 +168,7 @@ export default class DbService {
                             params.ExclusiveStartKey = lastEvaluatedKey;
                         }
                     }).catch((err) => {
-                        this.commonSvc.Notify(err.code, 'error', 2000);
+                        this.commonSvc.Notify(err.code, 'error');
                     });              
             }
             return itemsAll;
@@ -193,7 +193,7 @@ export default class DbService {
             .then((data) => {
                 return data;
             }).catch((err) => {
-                this.commonSvc.Notify(err.code, 'error', 2000);
+                this.commonSvc.Notify(err.code, 'error');
             });
     }
     

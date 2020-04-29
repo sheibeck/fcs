@@ -122,7 +122,7 @@ export default {
       dbSvc.DeleteObject(  this.userId, characterId ).then( (response) => {  
         if (response) {    
           $('#modalDeleteCharacterConfirm').modal('hide');            
-          commonSvc.Notify('Character deleted.', 'success', 2000);
+          commonSvc.Notify('Character deleted.', 'success');
           this.list();   
         }   
       });
