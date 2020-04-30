@@ -12,7 +12,7 @@
             <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
               <img v-bind:src="item.image_url" class='img-fluid' />
             </p>
-            <p class='card-text col-12 col-md-7'>
+            <p class='card-text col'>
               <label class='h6'>High Concept</label>: {{item.aspects ? item.aspects.highconcept : ""}}<br>
               <label class='h6'>Trouble</label>: {{item.aspects ? item.aspects.trouble : ""}}
             </p>
@@ -26,7 +26,7 @@
         </div>
         <div class='card-footer text-muted'>
           <div v-if="item.description" class='small'>
-            {{item.description}}
+            {{ getShortText(item.description) }}
           </div> 
           <div>
             <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
@@ -140,7 +140,14 @@ export default {
       this.$store.commit('updateSearchText', "");
       commonSvc.Search("");
     },
-
+    getShortText : function(text) {
+      if (text)
+      {
+        let maxLength = 100;
+        return text.length < maxLength ? text : text.substring(0,maxLength) + "...";
+      }
+      return text;
+    },
   }
 }
 </script>
