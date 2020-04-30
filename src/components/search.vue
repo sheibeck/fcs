@@ -59,9 +59,9 @@ export default {
       this.$store.commit("updateSearchText", "");
       $("#search-button").trigger("click");
     },
-    search : function() {
+    search : function() {      
       let searchText = this.$store.state.searchText;      
-      if (searchText.length === 0 || searchText.length > 2) {
+      if (!searchText || searchText.length === 0 || searchText.length > 2) {
         commonSvc.Search(searchText);
       }
     }

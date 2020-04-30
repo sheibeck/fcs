@@ -133,7 +133,7 @@ Vue.filter('filterCampaigns', function () {
   let searchText = fcs.$store.state.searchText.toLowerCase();
   let campaigns = fcs.$store.state.campaigns;
   if (searchText.length > 0) {
-    campaigns = fcs.$store.state.campaigns.filter(item => item.description.toLowerCase().includes(searchText) || item.title.toLowerCase().includes(searchText) || item.scale.toLowerCase().includes(searchText));    
+    campaigns = fcs.$store.state.campaigns.filter(item => (item.description && item.description.toLowerCase().includes(searchText)) || (item.name && item.name.toLowerCase().includes(searchText)) || (item.scale && item.scale.toLowerCase().includes(searchText)));
   }      
   fcs.$store.commit('updateFilteredCampaigns', campaigns);  
 });

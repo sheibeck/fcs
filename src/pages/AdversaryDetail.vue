@@ -287,6 +287,7 @@ export default {
       var isNew = false;
       if (!result.id)
       {
+        debugger;
         // add a uniqueid
         result['id'] = commonSvc.SetId("ADVERSARY", commonSvc.GenerateUUID());
         result['owner_id'] = this.$store.state.userId;

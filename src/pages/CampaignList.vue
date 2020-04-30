@@ -12,8 +12,8 @@
             <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
               <img v-bind:src="item.image_url" class='img-fluid' />
             </p>
-            <p class='card-text col-12 col-md-7'>
-              {{item.description}}
+            <p class='card-text col'>
+              {{ getShortText(item.description) }}
             </p>
           </div>
           <hr />
@@ -116,14 +116,18 @@ export default {
     },
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
-      dbSvc.DeleteObject(this.userId, campaignId);
+      /*dbSvc.DeleteObject(this.userId, campaignId).then( (response) => {
+        if (response) {
+          this.commonSvc.Notify("Campaign Deleted.", 'success');
+        }
+      });*/
+      this.deleteCampaignLogs(campaignId);
     },
-
-    deleteCampaignLogs : async function (campaignId) {
-      let sessionList = await dvSvc.ListRelatedObjects(campaignId);
+    deleteCampaignLogs :  async function (campaignId) {
+      let sessionList = await dbSvc.ListRelatedObjects(campaignId);
 
       if (sessionList.error) {
-          commonSvc.Notify(err.message || JSON.stringify(err));
+          commonSvc.Notify(sessionList.error.code);
       } else {
         let hasErrors = 0;
 
@@ -138,7 +142,7 @@ export default {
           //delete campaign
           await dbSvc.DeleteObject(this.userId, campaignId).then((response) => {
             if (response) {
-              commonSvc.Notify('Campaign deleted.', 'success');
+              commonSvc.Notify('Campaign deleted.', 'success');              
               this.list();
             }
           });        
@@ -161,6 +165,14 @@ export default {
       var tag = $elem.data('search-text');
       this.$store.commit('updateSearchText', tag);
       this.$options.filters.filterCampaigns();
+    },
+    getShortText : function(text) {
+      if (text)
+      {
+        let maxLength = 100;
+        return text.length < maxLength ? text : text.substring(0,maxLength) + "...";
+      }
+      return text;
     },
     getNiceDate : function(date) {
         return commonSvc.GetNiceDate(date);

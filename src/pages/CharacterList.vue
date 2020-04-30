@@ -13,8 +13,8 @@
               <img v-bind:src="item.image_url" class='img-fluid' />
             </p>
             <p class='card-text col-12 col-md-7'>
-              <label class='h6'>High Concept</label>: {{item.aspects.highconcept}}<br>
-              <label class='h6'>Trouble</label>: {{item.aspects.trouble}}
+              <label class='h6'>High Concept</label>: {{item.aspects ? item.aspects.highconcept : ""}}<br>
+              <label class='h6'>Trouble</label>: {{item.aspects ? item.aspects.trouble : ""}}
             </p>
           </div>
           <hr />

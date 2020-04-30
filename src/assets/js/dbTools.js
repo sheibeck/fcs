@@ -1,9 +1,9 @@
-
-
+import CommonService from "./commonService";
 
 export default class DbTools {
   constructor(fcs){    
     this.fcs = fcs;
+    this.commonSvc = new CommonService(fcs);    
   }
 
   RemoveEmptyObjects = (obj) => {
@@ -37,7 +37,7 @@ export default class DbTools {
       TableName: tablename,      
       Select: 'ALL_ATTRIBUTES'
     }
-        
+
     const scanAll = async (params) => {
         let lastEvaluatedKey = 'dummy'; // string must not be empty
         const itemsAll = [];
@@ -60,12 +60,17 @@ export default class DbTools {
     let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     docClient.service.config.credentials = this.fcs.$store.state.credentials;
     
-    let tables = ["fate_campaign_dev"];
+    let tables = ["fate_character", "fate_adversary", "fate_campaign"];
         
     debugger;
 
     tables.forEach(async (tablename) => {
       let records = await this.GetData(tablename);
+      if (tablename.indexOf("campaign") > -1) {
+        //process all the parents first
+        records.sort((a, b) => (a.parent_id > b.parent_id) ? 1 : (a.parent_id === b.parent_id) ? ((a.parent_id > b.parent_id) ? 1 : -1) : -1 )
+      }
+      
       records.forEach(record => {
         let recordType = "";
 
@@ -103,8 +108,11 @@ export default class DbTools {
             record.name = record.charactersheetdisplayname;
             delete record.charactersheetdisplayname;                  
 
-            record.system = record.charactersheetsystem.replace(/-/gi, " ").toTitleCase();          
+            if (record.charactersheetsystem)
+            {
+            record.system = record.charactersheetsystem.replace(/-/gi, " ").toTitleCase();
             delete record.charactersheetsystem;
+            }            
 
             delete record.charactersheetid;
 
@@ -114,18 +122,25 @@ export default class DbTools {
           case "fate_character":
           case "fate_character_dev":      
 
-            recordType = "CHARACTER";
+            recordType = "CHARACTER";            
             record.object_type = recordType;
 
             record.owner_id = record.character_owner_id;
             delete record.character_owner_id;
-
-            record.id = `${recordType}|${record.character_id}`;
+            
+            record.id = `${recordType}|${this.commonSvc.GenerateUUID()}`;
             delete record.character_id;
+
+            if (!record.name)
+            {
+              record.name = "Un-named";
+            }
 
             record.related_id = `CHARACTERSHEET|${record.sheetname}`;
             delete record.sheetname;
-            record.system = record.system.replace(/-/gi, " ").toTitleCase();
+            if (record.system) {
+              record.system = record.system.replace(/-/gi, " ").toTitleCase();
+            }
 
             record.aspects = record.aspect;
             delete record.aspect;
@@ -152,7 +167,7 @@ export default class DbTools {
             record.owner_id = record.adversary_owner_id;
             delete record.adversary_owner_id;
 
-            record.id = `${recordType}|${record.adversary_id}`;
+            record.id = `${recordType}|${this.commonSvc.GenerateUUID()}`;
             delete record.adversary_id;
 
             record.name = record.adversary_name;
@@ -191,16 +206,25 @@ export default class DbTools {
 
           case "fate_campaign":
           case "fate_campaign_dev":
+
+            record.owner_id = record.owner_id;
+
+            //use new shortId
+            let newId = this.commonSvc.GenerateUUID();
+            updateChildrenId(records, record.id, newId);           
+            record.id = newId;
+
             if (record.parent_id == "00000000-0000-0000-0000-000000000000") {
-              recordType = "CAMPAIGN";             
+              recordType = "CAMPAIGN";                           
             }
             else {
               recordType = "LOG";
               record.related_id = `CAMPAIGN|${record.parent_id}`;
             }
             delete record.parent_id;
+            
 
-            record.object_type = recordType;            
+            record.object_type = recordType;
             record.id = `${recordType}|${record.id}`;
 
             record.name = record.title;
@@ -227,8 +251,16 @@ export default class DbTools {
           }
         });
       })
+
+      this.commonSvc.Notify("Migration Complete.");
     })    
 
+    function updateChildrenId(obj, oldId, newId) {
+      for (var i in obj) {
+        if (obj[i].parent_id == oldId) {
+          obj[i].parent_id = newId;           
+        }
+      }
+    }
   }
-  
 }

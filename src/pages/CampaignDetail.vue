@@ -691,6 +691,11 @@ export default {
     saveCampaign : function() {
       var $component = this;
 
+      if (!this.campaign.name) {
+        commonSvc.Notify('You must enter a name', 'error');
+        return;
+      }
+
       // make sure we have a proper user id key
       $component.$set($component.campaign, "owner_id", this.userId);
 

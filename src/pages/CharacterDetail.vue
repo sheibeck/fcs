@@ -130,6 +130,11 @@ export default {
         var data = $('form').serializeJSON();
         var characterData = JSON.parse(data);
 
+        if (!characterData.name) {
+          commonSvc.Notify('You must enter a name', 'error');
+          return;
+        }
+
         // make sure we have a proper user id key
         characterData.owner_id = this.userId;
         characterData.related_id = this.sheetData.id;

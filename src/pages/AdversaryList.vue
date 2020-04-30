@@ -18,8 +18,8 @@
         </div>
 
         <search class=""></search>
-    </div>
       </div>
+    </div>
 
       <div class='card-columns' id="adversaryDetail">
         <div class='card' v-for="item in adversaries" v-bind:key="item.id">
@@ -81,7 +81,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 

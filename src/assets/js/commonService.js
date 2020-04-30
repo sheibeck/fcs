@@ -1,3 +1,5 @@
+const shortid = require('shortid');
+
 export default class CommonService {
   constructor(fcs){
     this.fcs = fcs;
@@ -76,6 +78,10 @@ export default class CommonService {
   };
 
   GenerateUUID = function() { // Public Domain/MIT
+
+    return shortid.generate();
+
+    /*
     var d = new Date().getTime();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
         d += performance.now(); //use high-precision timer if available
@@ -85,10 +91,7 @@ export default class CommonService {
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
-  }
-
-  EmptyGuid = function() {
-    return "00000000-0000-0000-0000-000000000000";
+    */
   }
 
   SortObject = (obj) => {
@@ -99,12 +102,17 @@ export default class CommonService {
   }
 
   Slugify = (text) => {
-    return text.toString().toLowerCase()
-      .replace(/\s+/g, '-')           // Replace spaces with -
-      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-      .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-      .replace(/^-+/, '')             // Trim - from start of text
-      .replace(/-+$/, '');            // Trim - from end of text
+    if (text) {
+      return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '');            // Trim - from end of text
+    }
+    else {
+      return text;
+    }
   }
   
   Search = (searchText) => {
