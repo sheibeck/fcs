@@ -16,8 +16,7 @@
 
           </div>
          </div>
-      </div>      
-      <!--<button v-on:click="migrateData()">Migrate</button>-->
+      </div>       
   </div>
 </template>
 
@@ -25,12 +24,6 @@
 import { mapGetters } from 'vuex';
 import Search from '../components/search';
 import CommonService from "./../assets/js/commonService";
-import DbService from '../assets/js/dbService';
-
-/* remove this after migration */
-import DbTools from '../assets/js/dbTools';
-let dbTools = null;
-/* remove this after migration */
 
 let dbSvc = null;
 let commonSvc= null;
@@ -47,11 +40,6 @@ export default {
   mounted(){
     dbSvc = new DbService(this.$root);
     commonSvc= new CommonService(this.$root);
-
-    /* remove this after migration */
-    dbTools = new DbTools(this.$root);
-    /* remove this after migration */
-
     fs_char.init(this.$root);
   },
   watch: {
@@ -71,13 +59,7 @@ export default {
       sheets: {}
     }
   },
-  methods : {
-    /* remove this after migration */
-    migrateData() {
-      dbTools.MigrateData();
-    },
-  /* remove this after migration */
-
+  methods : {    
     getSheetLogoUrl(id) {
       let folderName = id.split("|")[1];
       return `/static/sheets/${folderName}/logo.png`;

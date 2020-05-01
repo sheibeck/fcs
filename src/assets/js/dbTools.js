@@ -3,7 +3,8 @@ import CommonService from "./commonService";
 export default class DbTools {
   constructor(fcs){    
     this.fcs = fcs;
-    this.commonSvc = new CommonService(fcs);    
+    this.commonSvc = new CommonService(fcs);
+    this.tablename = "";
   }
 
   RemoveEmptyObjects = (obj) => {
@@ -55,13 +56,46 @@ export default class DbTools {
     return scanAll(params);
   }
 
+  DeleteData = async() => {
+    let tablename = this.tablename;
+  
+    debugger;
+    let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+    docClient.service.config.credentials = this.fcs.$store.state.credentials;
+    let records = await this.GetData(tablename);
+
+    records.forEach(async (record) => {
+
+      // create/update a  character
+      // we always use the put operation because the data can change depending on your character sheet
+      let params = {
+        TableName: tablename,
+        Key: {
+          'owner_id': record.owner_id,
+          'id': record.id
+         }
+      };
+
+      await docClient.delete(params, function (err, data) {          
+        if (err) {         
+            console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
+            console.log("Deleted item:", JSON.stringify(data, null, 2));              
+        }
+      });
+    });
+
+    this.commonSvc.Notify("Delete Complete.");   
+  }
+
   MigrateData = async () => {    
     // Create DynamoDB document client
     let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     docClient.service.config.credentials = this.fcs.$store.state.credentials;
     
     let tables = ["fate_character", "fate_adversary", "fate_campaign"];
-        
+    //let tables = ["fate_charactersheet"];
+
     debugger;
 
     tables.forEach(async (tablename) => {
@@ -71,7 +105,7 @@ export default class DbTools {
         records.sort((a, b) => (a.parent_id > b.parent_id) ? 1 : (a.parent_id === b.parent_id) ? ((a.parent_id > b.parent_id) ? 1 : -1) : -1 )
       }
       
-      records.forEach(record => {
+      records.forEach(async (record) => {
         let recordType = "";
 
         //setup new pk schema
@@ -136,10 +170,19 @@ export default class DbTools {
               record.name = "Un-named";
             }
 
-            record.related_id = `CHARACTERSHEET|${record.sheetname}`;
+            record.related_id = `CHARACTERSHEET|${record.sheetname}`;            
+
             delete record.sheetname;
             if (record.system) {
               record.system = record.system.replace(/-/gi, " ").toTitleCase();
+              switch(record.system) {
+                case "Core":
+                  record.system = "Fate Core";
+                case "Accelerated":
+                case "Default":
+                case "Freeport":
+                  record.system = "Fate Accelerated";
+              }
             }
 
             record.aspects = record.aspect;
@@ -211,7 +254,7 @@ export default class DbTools {
 
             //use new shortId
             let newId = this.commonSvc.GenerateUUID();
-            updateChildrenId(records, record.id, newId);           
+            this.updateChildrenId(records, record.id, newId);           
             record.id = newId;
 
             if (record.parent_id == "00000000-0000-0000-0000-000000000000") {
@@ -239,27 +282,29 @@ export default class DbTools {
         // create/update a  character
         // we always use the put operation because the data can change depending on your character sheet
         let params = {
-          TableName: "FateCharacterSheet_dev",
+          TableName: this.tablename,
           Item: record
         };                  
         
-        docClient.put(params, function (err, data) {          
+        await docClient.put(params, function (err, data) {          
           if (err) {         
               console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
           } else {
               console.log("Migrated item:", JSON.stringify(data, null, 2));              
           }
-        });
+        });       
       })
 
-      this.commonSvc.Notify("Migration Complete.");
+      
     })    
 
-    function updateChildrenId(obj, oldId, newId) {
-      for (var i in obj) {
-        if (obj[i].parent_id == oldId) {
-          obj[i].parent_id = newId;           
-        }
+    this.commonSvc.Notify("Migration Complete.");    
+  }
+
+  updateChildrenId = function(obj, oldId, newId) {
+    for (var i in obj) {
+      if (obj[i].parent_id == oldId) {
+        obj[i].parent_id = newId;
       }
     }
   }
