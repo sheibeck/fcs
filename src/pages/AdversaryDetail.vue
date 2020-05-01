@@ -35,7 +35,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Skills</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-adversary-skills">
+                        <div class="row js-skills">
                             <div class="col-md-7">
                                 <input class="form-control" type="text" value="" name="skills[name]" id="skills[name]" placeholder="Skill Name (Average, Good OR Sneaky, Quickly)">
                             </div>
@@ -55,7 +55,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Stunts & Extras</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-adversary-stunts">
+                        <div class="row js-stunts">
                             <div class="col-12">
                                 <input class="form-control" type="text" value="" name="stunts[name]" id="stunts[name]" placeholder="Stunt/Extra/Gadget Name">
                             </div>
@@ -73,7 +73,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Stress</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-adversary-stress">
+                        <div class="row js-stress">
                             <div class="col-md-7">
                                 <input class="form-control" type="text" value="" name="stress[name]" id="stress[name]" placeholder="Stress Name (Physical, Mental, etc)">
                             </div>
@@ -93,7 +93,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Consequences</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-adversary-consequences">
+                        <div class="row js-consequences">
                             <div class="col-12">
                                 <input class="form-control" type="text" value="" name="consequences[name]" id="consequences[name]" placeholder="Consequence Name (Mild, Serious, Exhausted)">
                             </div>
@@ -217,7 +217,7 @@ export default {
   },
   methods: {
     init : function() {      
-      $(document).on('click', '.js-delete-adversary-item', function (eve) {
+      $(document).on('click', '.js-delete-item', function (eve) {
           $(this).parent().parent().remove();
       });
 
@@ -391,51 +391,51 @@ export default {
 
     appendDeletableRow : function($elem) {
       $('div:first', $elem).addClass('input-group-prepend')
-        .append('<div class="input-group-text btn btn-danger js-delete-adversary-item"><i class="fa fa-trash"><i></div>');
+        .append('<div class="input-group-text btn btn-danger js-delete-item"><i class="fa fa-trash"><i></div>');
     },
 
     adversaryAddSkills : function(aSkills) {
-      $('.js-adversary-skills.adversary-item-copy', '#adversaryForm').remove();
-      $('.js-adversary-skills input', '#adversaryForm').val('');
+      $('.js-skills.adversary-item-copy', '#adversaryForm').remove();
+      $('.js-skills input', '#adversaryForm').val('');
 
       for( var i = 0; i < aSkills.length-1; i++) {
-        this.appendDeletableRow($(".js-adversary-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-skills:last"));
+        this.appendDeletableRow($(".js-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-skills:last"));
       };
-      $.each($('.js-adversary-skills'), function(i, val) {
+      $.each($('.js-skills'), function(i, val) {
         $(this).find('input[name="skills[name]"]').val(aSkills[i]);
         $(this).find('input[name="skills[value]"]').val('');
       })
     },
 
     adversaryAddStress : function(aStress) {
-      $('.js-adversary-stress.adversary-item-copy', '#adversaryForm').remove();
-      $('.js-adversary-stress input', '#adversaryForm').val('');
+      $('.js-stress.adversary-item-copy', '#adversaryForm').remove();
+      $('.js-stress input', '#adversaryForm').val('');
 
       for( var i = 0; i < aStress.length-1; i++) {
-        this.appendDeletableRow($(".js-adversary-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-stress:last"));
+        this.appendDeletableRow($(".js-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-stress:last"));
       };
-      $.each($('.js-adversary-stress'), function(i, val) {
+      $.each($('.js-stress'), function(i, val) {
         $(this).find('input[name="stress[name]"]').val(aStress[i][0]);
         $(this).find('input[name="stress[value]"]').val(aStress[i][1]);
       })
     },
 
     adversaryAddConsequences : function(aConsequences) {
-      $('.js-adversary-consequences.adversary-item-copy', '#adversaryForm').remove();
-      $('.js-adversary-consequences input', '#adversaryForm').val('');
-      $('.js-adversary-consequences textarea', '#adversaryForm').val('');
+      $('.js-consequences.adversary-item-copy', '#adversaryForm').remove();
+      $('.js-consequences input', '#adversaryForm').val('');
+      $('.js-consequences textarea', '#adversaryForm').val('');
 
       for( var i = 0; i < aConsequences.length-1; i++) {
-        this.appendDeletableRow($(".js-adversary-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-consequences:last"));
+        this.appendDeletableRow($(".js-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-consequences:last"));
       };
-      $.each($('.js-adversary-consequences'), function(i, val) {
+      $.each($('.js-consequences'), function(i, val) {
         $(this).find('input[name="consequences[name]"]').val(aConsequences[i][0]);
         $(this).find('textarea[name="consequences[value]"]').val(aConsequences[i][1]);
       })
     },
 
     addSkill : function() {
-        this.appendDeletableRow($(".js-adversary-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-skills:last"));
+        this.appendDeletableRow($(".js-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-skills:last"));
     },
 
     addSkillFAE : function() {
@@ -449,11 +449,11 @@ export default {
     },
 
     addStunt : function() {
-        this.appendDeletableRow($(".js-adversary-stunts:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-stunts:last"));
+        this.appendDeletableRow($(".js-stunts:first").clone().addClass('adversary-item-copy').insertAfter(".js-stunts:last"));
     },
 
     addStress : function() {
-        this.appendDeletableRow($(".js-adversary-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-stress:last"));
+        this.appendDeletableRow($(".js-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-stress:last"));
     },
 
     addStressCore : function() {
@@ -467,9 +467,9 @@ export default {
     },
 
     addConsequence : function() {
-       var $item = $(".js-adversary-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-adversary-consequences:last")
+       var $item = $(".js-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-consequences:last")
           $('div:first', $item).addClass('input-group-prepend')
-            .append('<div class="input-group-text btn btn-danger js-delete-adversary-item">X</div>');
+            .append('<div class="input-group-text btn btn-danger js-delete-item">X</div>');
     },
 
     addConsequenceDefault : function() {
