@@ -173,8 +173,8 @@ export default class CommonService {
   }
 
   GetId = function(id) {
-    //ids are in the format of TYPE|ID, this will return just the id portion
-    if (id) {
+    //ids are in the format of TYPE|ID, this will return just the id portion    
+    if (id && id.indexOf("|") > -1) {
       return id.split("|")[1];
     } else {
       return id;

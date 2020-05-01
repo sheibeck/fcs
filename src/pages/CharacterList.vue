@@ -100,6 +100,9 @@ export default {
   },
   watch: {
     userId() {
+      if (!this.isAuthenticated) {
+        location.href = '/';
+      }
       //wait for our authenticated user id
       this.list();
     }

@@ -118,7 +118,7 @@
               <div>
                 <span v-if="currentSession !== session.id" class="badge badge-secondary">{{getNiceDate(session.date)}}</span>
                 <span v-if="currentSession === session.id" class="input-group-sm">
-                  <datetime v-model="session.date" type="datetime" @close="jumpTo(`editor-${commonSvc.GetId(session.id)}`)"></datetime>
+                  <datetime v-model="session.date" type="datetime" @close="jumpTo(`#editor-${commonSvc.GetId(session.id)}`)"></datetime>
                 </span>
               </div>
               <div class="d-flex">
@@ -650,7 +650,9 @@ export default {
       dbSvc.GetObject(id, ownerId).then ( (response) => {   
         if (!response)
         {
-          location.href = '/error';
+          commonSvc.Notify(`Could not find campaign with id <b>${commonSvc.GetId(id)}</b>`, 'error', 2000, () => {
+            document.location = '/campaign';
+          });
         }
         else {              
 
