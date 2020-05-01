@@ -7,22 +7,27 @@
       </div>
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
-          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="'/static/sheets/'+sheet.charactersheetname+'/logo.png'" v-bind:alt="sheet.charactersheetname + ' Logo'" />
+          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           <div class='card-body'>
-            <h5 class='card-title charactersheet-name'>{{sheet.charactersheetdisplayname}}</h5>
-            <a v-bind:href="'charactersheet/'+sheet.charactersheetname" class='btn btn-success' v-bind:data-id='sheet.charactersheetid' role="button">Create Character <i class='fa fa-user'></i></a>
+            <h5 class='card-title charactersheet-name'>{{sheet.system}}</h5>
+            <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success' v-bind:data-id='sheet.id' role="button">Create Character <i class='fa fa-user'></i></a>
           </div>
-          <div class='card-footer text-muted small' v-html="sheet.charactersheetdescription">
+          <div class='card-footer text-muted small' v-html="sheet.description">
 
           </div>
          </div>
-      </div>
+      </div>       
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Search from '../components/search'
+import { mapGetters } from 'vuex';
+import Search from '../components/search';
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let dbSvc = null;
+let commonSvc= null;
 
 export default {
   name: 'CharacterSheetList',
@@ -33,11 +38,13 @@ export default {
   components: {
     search: Search,
   },
-  created(){
-    fs_char.init();
+  mounted(){
+    dbSvc = new DbService(this.$root);
+    commonSvc= new CommonService(this.$root);
+    fs_char.init(this.$root);
   },
   watch: {
-    userId() {
+    userId() {      
       this.list();
     }
   },
@@ -53,35 +60,24 @@ export default {
       sheets: {}
     }
   },
-  methods : {
-    list : function(){
-      //reference this component so we can get/set data
-      var $component = this;
+  methods : {    
+    getSheetLogoUrl(id) {
+      let folderName = id.split("|")[1];
+      return `/static/sheets/${folderName}/logo.png`;
+    },
 
-      // Create DynamoDB document client
-      var docClient = fatesheet.getDBClient();
-
-      var params = {
-          TableName: fs_char.config.charactersheettable,
-          Select: 'ALL_ATTRIBUTES'
-      }
-
-      docClient.scan(params, function (err, data) {
-          if (err) {
-              console.log("Error", err);
-
-              return {};
-
-          } else {
-              console.log("Success", data.Items);
-              $component.sheets = data.Items;
-          }
+    list : function(searchText){
+      let items = dbSvc.ListObjects("CHARACTERSHEET", commonSvc.GetRootOwner(), searchText).then( (data) => {
+        if (data.length > 0)
+          this.sheets = data;
+        else
+          return;
       });
-    },
-    clearFilter : function() {
-      this.$store.commit('updateSearchText', "");
-      fatesheet.search("");
-    },
+    }
+  },
+  clearFilter : function() {
+    this.$store.commit('updateSearchText', "");
+    commonSvc.Search("");
   }
 }
 </script>

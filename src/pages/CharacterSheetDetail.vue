@@ -12,20 +12,30 @@
           <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
           <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
           <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
-        </div>
-        <div class='col' v-if="isAuthenticated">
-            <div class='row'>
-              <label class='col-12 col-md-3 text-right pt-2 d-print-none' for='character_image_url'>Portrait Url:</label>
-              <input class='form-control col-12 col-md-9 d-print-none' id='character_image_url' name='character_image_url'  />
-            </div>
+          <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
+              Character Properties
+          </button>
         </div>
       </div>
+
+      <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
+        <div class='form-group'>
+          <label class='' for='image_url'>Portrait Url:</label>
+          <input class='form-control' id='image_url' name='image_url'  />
+        </div>
+      </div>
+      
     </form>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let commonSvc = null;
+let dbSvc = null;
 
 export default {
   name: 'CharacterSheetDetail',
@@ -37,8 +47,12 @@ export default {
        ]
      }
   },
-  created(){
-    fs_char.init();
+  mounted(){
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    fs_char.init(this.$root);
+    
+    this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.id);
   },
   watch: {
     userId() {
@@ -61,92 +75,64 @@ export default {
     }
   },
   methods : {
-       appended: function() {
-         //check if there is an initSheet function and run it
-         setTimeout(function() {
-           if (typeof initSheet !== "undefined") {
-               initSheet();
-           }
-         }, 1000);
-       },
-       show : function (id) {
-          //reference this component so we can get/set data
-          var $component = this;
+    appended: function() {
+      //check if there is an initSheet function and run it
+      setTimeout(function() {
+        if (typeof initSheet !== "undefined") {
+            initSheet();
+        }
+      }, 1000);
+    },
+    async show() {      
+      await dbSvc.GetObject(this.sheetId, commonSvc.GetRootOwner()).then( (data) => { 
+        this.sheetData = data;        
+        this.sheet = data.content;
 
-          //$('.hide-on-detail').addClass('hidden');
+        this.title = data.name + ' (Character Sheet)';
+        this.description = data.description;
+      }); 
 
-          // Create DynamoDB document client
-          var docClient = fatesheet.getDBClient();
+    },
+    save : async function() {            
+      if (this.isAuthenticated) {
+        /// save a character
+        var data = $('form').serializeJSON();
+        var characterData = JSON.parse(data);
 
-          var params = {
-              TableName: fs_char.config.charactersheettable,
-              Key: {
-               'charactersheetname': $component.id
-              },
+        if (!characterData.name) {
+          commonSvc.Notify('You must enter a name', 'error');
+          return;
+        }
+
+        // make sure we have a proper user id key        
+        characterData.owner_id = this.userId;
+        characterData.related_id = this.sheetData.id;
+        characterData.system = this.sheetData.system;
+        characterData.slug = commonSvc.Slugify(characterData.name);        
+
+        //remove some legacy values
+        characterData.sheetname = "";
+
+        //create a new characterId if we don't have one
+        var isNew = true;                
+        this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());        
+        characterData.id = this.characterId;
+        characterData.object_type = "CHARACTER";
+
+        fs_char.config.characterId = this.characterId;
+
+        let response = await dbSvc.SaveObject(characterData).then((response) => {
+          if (response) {
+            commonSvc.Notify('Character saved.', 'success', null, () => {
+                location.href = `/character/${this.sheetData.slug}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
+            });            
           }
-
-          docClient.get(params, function (err, data) {
-              if (err) {
-                  console.log("Error", err);
-              } else {
-                  console.log("Success", data.Item);
-                  $component.sheet = data.Item.charactersheetcontent;
-
-                  $component.title = data.Item.charactersheetdisplayname + ' (Character Sheet)';
-                  $component.description = data.Item.charactersheetdescription;
-              }
-          });
-      },
-      save : function() {
-        var $component = this;
-        if (this.isAuthenticated) {
-            /// save a character
-            var data = $('form').serializeJSON();
-            var characterData = JSON.parse(data);
-
-            if (!characterData.name) {
-              fatesheet.notify('You must specify a name');
-              return;
-            }
-
-            // make sure we have a proper user id key
-            characterData.character_owner_id = $component.userId;
-
-            //create a new characterId if we don't have one
-            var isNew = true;
-            this.characterId = fatesheet.generateUUID();
-            characterData.character_id = this.characterId;
-            fs_char.config.characterId = this.characterId;
-            fatesheet.logAnalyticEvent('createdACharacter' + characterData.sheetname);
-
-            //dynamodb won't let us have empty attributes
-            fatesheet.removeEmptyObjects(characterData);
-
-            var docClient = fatesheet.getDBClient();
-
-            // create/update a  character
-            // we always use the put operation because the data can change depending on your character sheet
-            var params = {
-                TableName: fs_char.config.charactertable,
-                Item: characterData
-            };
-
-            docClient.put(params, function (err, data) {
-                if (err) {
-                    fatesheet.notify(err.message || JSON.stringify(err));
-                    console.error("Unable to save item. Error JSON:", JSON.stringify(err, null, 2));
-                } else {
-                    fatesheet.notify('Character saved.', 'success', 2000);
-                    console.log("Added item:", JSON.stringify(data, null, 2));
-
-                    location.href = '/character/' + $component.id + '/' + $component.characterId;
-                }
-            });
-        }
-        else {
-            window.print();
-        }
+        });
       }
+      else {
+          window.print();
+      }
+    }
   }
 }
 </script>

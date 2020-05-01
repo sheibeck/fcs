@@ -16,13 +16,16 @@
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Password">
+          <input type="password" class="form-control" id="password" placeholder="Password">          
         </div>
         <div class="form-group">
           <label for="passwordConfirm">Confirm Password</label>
           <input type="password" class="form-control" id="passwordConfirm" placeholder="Confirm Password">
         </div>
-        <button type="button" class="btn btn-primary col-sm-12 col-md-5 mt-1 mb-1" v-on:click="register">
+        <div class="small">
+          Password must be atleast 8 characters long and contain atleast one number, uppercase letter and lowercase letter.
+        </div>
+        <button type="button" class="btn btn-primary col-sm-12 col-md-5 mt-1 mb-1 mt-2" v-on:click="register">
             Register <i class="fas fa-user-plus"></i>
         </button>
       </div>
@@ -31,7 +34,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
+import UserService from "./../assets/js/userService";
 
 export default {
   name: 'Login',
@@ -56,21 +61,22 @@ export default {
       return re.test(String(email).toLowerCase());
     },
     register: function() {
+      let commonSvc = new CommonService(this.$root);
 
-        if ($('#password').val() != $('#passwordConfirm').val())
-        {
-          fatesheet.notify('Passwords do not match.');
-          return false;
-        }
+      if ($('#password').val() != $('#passwordConfirm').val())
+      {
+        commonSvc.Notify('Passwords do not match.');
+        return false;
+      }
 
-        if (!this.validateEmail($('#email').val()))
-        {
-          fatesheet.notify('Email is not valid.');
-          return false;
-        }
+      if (!this.validateEmail($('#email').val()))
+      {
+        commonSvc.Notify('Email is not valid.');
+        return false;
+      }
 
-        fatesheet.register($('#email').val(), $('#password').val());
-
+      let userSvc = new UserService(this.$root);
+      userSvc.Register($('#email').val(), $('#password').val());
     }
   }
 }

@@ -24,7 +24,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
+
+let commonSvc = null;
 
 export default {
   name: 'Recover',
@@ -37,6 +40,9 @@ export default {
       title: "Recover Password"
     }
   },
+  mounted() {
+    commonSvc = new CommonService(this.$root);
+  },
   computed: {
     ...mapGetters([
       'isAuthenticated',
@@ -44,40 +50,37 @@ export default {
     ]),
   },
   methods: {
-    recover: function() {
-        var poolData = {
-            UserPoolId : fatesheet.config.cognito.poolId, // Your user pool id here
-            ClientId : fatesheet.config.cognito.clientId // Your client id here
-        };
+    recover: function() {      
+      var poolData = {
+          UserPoolId : this.$store.state.cognito.poolId, // Your user pool id here
+          ClientId : this.$store.state.cognito.clientId // Your client id here
+      };
 
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-        var cognitoUser = null;
+      var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+      var CognitoUser = null;
 
+      if ($('#email').val() == '') {
+        commonSvc.Notify('You must enter your email address.');
+        return;
+      }
 
-        if ($('#email').val() == '') {
-          fatesheet.notify('You must enter your email address.');
-          return;
+      // setup CognitoUser first
+      CognitoUser = new AmazonCognitoIdentity.CognitoUser({
+          Username: $('#email').val(),
+          Pool: userPool
+      });
+
+      CognitoUser.forgotPassword({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+            location.href = 'confirm?u=' + $('#email').val();
+        },
+        onFailure: function(err) {
+          commonSvc.Notify(err.message || JSON.stringify(err));
         }
+      });
 
-
-        // setup cognitoUser first
-        cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-           Username: $('#email').val(),
-           Pool: userPool
-        });
-
-
-        cognitoUser.forgotPassword({
-            onSuccess: function (result) {
-                console.log('call result: ' + result);
-                location.href = 'confirm?u=' + $('#email').val();
-            },
-            onFailure: function(err) {
-                fatesheet.notify(err.message || JSON.stringify(err));
-            }
-        });
-
-        return false;
+      return false;
     }
   }
 }

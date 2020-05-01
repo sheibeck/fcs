@@ -57,7 +57,7 @@
                   Login <i class="fas fa-sign-in-alt"></i>
               </button>
           </div>
-          <div v-if="isAuthenticated" class="form-inline logout-button mx-1 mb-sm-1">
+          <div v-if="isAuthenticated" class="form-inline mx-1 mb-sm-1">
               <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="logout">Logout</button>
           </div>
       </div>
@@ -108,7 +108,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex"
+import CommonService from "./assets/js/commonService"
+import UserService from "./assets/js/userService"
+
+let userSvc = null;
+let commonSvc = null;
 
 export default {
   name: 'App',
@@ -121,8 +126,10 @@ export default {
        ]
      }
   },
-  created(){
-    fatesheet.init();
+  mounted(){
+    userSvc = new UserService(this.$root);
+    commonSvc = new CommonService(this.$root);
+    this.init();    
   },
   computed: {
     ...mapGetters([
@@ -136,12 +143,32 @@ export default {
     }
   },
   methods: {
-    logout: function() {
-      fatesheet.logout();
+    logout: function() {      
+      userSvc.Logout();
+      document.location.href = '/';
     },
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
     },
+    init: function() {      
+      commonSvc.SetupForEnvironment();
+
+      // initialize the application
+      //domEvents();
+      $(document).on('keyup', '#search-text', function (event) {
+        if (event.keyCode === 13) {
+            $("#search-button").click();
+        }
+      });
+
+      $(document).on('click', '.js-login', function (e) {
+        document.location = '/login';
+      });
+
+      AWS.config.region = 'us-east-1';      
+      
+      userSvc.Authenticate();
+    }
   }
 }
 </script>

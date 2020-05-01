@@ -7,19 +7,19 @@
     <div class='card-columns'>
       <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
         <div class='card-body'>
-          <h5 class='card-title campaign-name'>{{item.title}}</h5>
+          <h5 class='card-title campaign-name'>{{item.name}}</h5>
           <div class='row'>
             <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
               <img v-bind:src="item.image_url" class='img-fluid' />
             </p>
-            <p class='card-text col-12 col-md-7'>
-              {{item.description}}
+            <p class='card-text col'>
+              {{ getShortText(item.description) }}
             </p>
           </div>
           <hr />
           <div class="d-flex">
-            <a :href="`/campaign/${item.id}/${item.slug}`" class='btn btn-primary mr-auto' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-            <!--<a href='#' class='btn btn-secondary js-share'>Share <i class='fa fa-share-square'></i></a>-->
+            <a :href="`/campaign/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
+            <a :href="`/campaign-summary/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
             <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
           </div>
         </div>
@@ -55,20 +55,27 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Search from '../components/search'
+import { mapGetters } from 'vuex';
+import Search from '../components/search';
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let campaignSvc = null;
+let commonSvc = null;
+let dbSvc = null;
 
 export default {
   name: 'CampaignList',
-  metaInfo: {
-      // if no subcomponents specify a metaInfo.title, this title will be used
+  metaInfo: {      
       title: 'My Campaigns',
   },
   components: {
     search: Search,
   },
-  created(){
-    fs_camp.init();
+  mounted(){
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    fs_camp.init(this.$root);
   },
   data () {
     return {
@@ -88,6 +95,9 @@ export default {
       'filteredCampaigns',
       'searchText'
     ]),
+    commonSvc() {
+      return commonSvc;
+    },
     campaigns : {
       get : function() {
         return this.$store.state.campaigns;
@@ -100,161 +110,72 @@ export default {
       return this.$store.state.searchText;
     },
   },
-  methods : {
-    getValue: function(index, item) {
-          var itemValue = eval(`this.campaigns[${index}].${item}`);
-          return itemValue;
-    },
-    list : function () {
-      //reference this component so we can get/set data
-      var $component = this;
-      let campaignList = [];
-
-      // Create DynamoDB document client
-      var docClient = fatesheet.getDBClient();
-
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          KeyConditionExpression: 'owner_id = :owner_id',
-          FilterExpression: 'parent_id = :parent_id',
-          ExpressionAttributeValues: {
-            ':owner_id': $component.userId,
-            ':parent_id' :  fatesheet.emptyGuid()
-          }
-      }
-
-      docClient.query(params, onQuery);
-
-      function onQuery(err, data) {
-          if (err) {
-              console.log("Error", err);
-          } else {
-
-              Array.prototype.push.apply(campaignList,data.Items);
-
-              if (typeof data.LastEvaluatedKey != "undefined") {
-                  console.log("Scanning for more...");
-                  params.ExclusiveStartKey = data.LastEvaluatedKey;
-                  docClient.query(params, onQuery);
-              }
-              else {
-                console.log("Success", campaignList);
-                $component.campaigns = campaignList;
-              }
-          }
-      }
+  methods : {      
+    list : async function () {      
+      this.campaigns = await dbSvc.ListObjects("CAMPAIGN", this.userId);
     },
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
-
-      //reference this component so we can get/set data
-      var $component = this;
-
-      var docClient = fatesheet.getDBClient();
-
-      $component.deleteCampaignLogs(campaignId);
+      /*dbSvc.DeleteObject(this.userId, campaignId).then( (response) => {
+        if (response) {
+          this.commonSvc.Notify("Campaign Deleted.", 'success');
+        }
+      });*/
+      this.deleteCampaignLogs(campaignId);
     },
+    deleteCampaignLogs :  async function (campaignId) {
+      let sessionList = await dbSvc.ListRelatedObjects(campaignId);
 
-    deleteCampaignLogs : function (campaignId) {
-      //reference this component so we can get/set data
-      var $component = this;
-      let sessionList = [];
+      if (sessionList.error) {
+          commonSvc.Notify(sessionList.error.code);
+      } else {
+        let hasErrors = 0;
 
-      // Create DynamoDB document client
-      let docClient = fatesheet.getDBClient();
-
-      //get a list of all the logs for this campaign
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          ExpressionAttributeValues: {
-            ':owner_id': this.userId,
-            ':parent_id': campaignId,
-          },
-          KeyConditionExpression: 'owner_id = :owner_id',
-          FilterExpression: 'parent_id = :parent_id',
-      }
-
-      docClient.query(params, onQuery);
-
-      function onQuery(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
-
-          Array.prototype.push.apply(sessionList,data.Items);
-
-          if (typeof data.LastEvaluatedKey != "undefined") {
-              console.log("Scanning for more...");
-              params.ExclusiveStartKey = data.LastEvaluatedKey;
-              docClient.onQuery(params, onQuery);
-          } else {
-              console.log("Success", sessionList);
-              var hasErrors = "";
-              try {
-                sessionList.forEach(function(item) {
-                  docClient.delete({Key:{owner_id: $component.userId, id: item.id},TableName:fs_camp.config.campaigntable}, (error) => {
-                      if (error) {
-                          throw error;
-                      }
-                  });
-                });
-              } catch(error) {
-                hasErrors = error;
-              }
-
-              if (hasErrors) {
-                  fatesheet.notify(err.message || JSON.stringify(err));
-                  console.error("Unable to delete campaign logs.");
-              } else {
-                  console.log("Campaign logs deleted.", JSON.stringify(data, null, 2));
-
-                  //now that the logs are gone, delete the campaign itself
-                  $component.deleteCampaignActual(campaignId);
-              }
+        //delete sessions
+        sessionList.forEach( async (item) => {
+          let result = await dbSvc.DeleteObject(this.userId, item.id);
+          if (!result) hasErrors++;
+        });
+        
+        if (!hasErrors)
+        {
+          //delete campaign
+          await dbSvc.DeleteObject(this.userId, campaignId).then((response) => {
+            if (response) {
+              commonSvc.Notify('Campaign deleted.', 'success');              
+              this.list();
             }
-          }
+          });        
+        }
+        else {
+          commonSvc.Notify("There was a problem deleting session logs for this campaign", "error");
+        }
       }
+    },   
+    shareUrl : function(event) {
+      event.preventDefault();
+      commonSvc.CopyTextToClipboard(event.currentTarget.href);
     },
-
-    deleteCampaignActual(campaignId) {
-      var $component = this;
-      var docClient = fatesheet.getDBClient();
-
-      var params = {
-          TableName: fs_camp.config.campaigntable,
-          Key: {
-            'owner_id': $component.userId,
-            'id': campaignId
-          }
-      };
-
-      console.log("Deleting campaign ...");
-      docClient.delete(params, function (err, data) {
-          if (err) {
-              fatesheet.notify(err.message || JSON.stringify(err));
-              console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              console.log("Deleted item:", JSON.stringify(data, null, 2));
-              fatesheet.notify('Campaign deleted.', 'success', 2000);
-              $component.list();
-          }
-      });
-    },
-
     clearFilter : function() {
       this.$store.commit('updateSearchText', "");
-      fcs.$options.filters.filterCampaigns();
+      this.$options.filters.filterCampaigns();
     },
-
     searchByTag : function(event) {
       var $elem = $(event.currentTarget);
       var tag = $elem.data('search-text');
       this.$store.commit('updateSearchText', tag);
-      fcs.$options.filters.filterCampaigns();
+      this.$options.filters.filterCampaigns();
     },
-
+    getShortText : function(text) {
+      if (text)
+      {
+        let maxLength = 100;
+        return text.length < maxLength ? text : text.substring(0,maxLength) + "...";
+      }
+      return text;
+    },
     getNiceDate : function(date) {
-        return new Date(date).toLocaleString();
+        return commonSvc.GetNiceDate(date);
     },
   }
 }

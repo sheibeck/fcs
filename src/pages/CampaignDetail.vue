@@ -62,7 +62,7 @@
 
     <div v-else>
       <div class="d-flex flex-column flex-sm-row">
-        <h3 class="mr-auto">{{campaign.title}} - Campaign</h3> <a class="" :href="'/campaign-summary/'+ campaign.id + '/' + campaign.title" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
+        <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
 
       <div id="accordion">
@@ -75,7 +75,7 @@
           <div class="card-body">
             <div class="form-group">
               <label for="name">Name</label>
-              <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.title" @change="slugify">
+              <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.name" @change="slugify">
             </div>
             <div class="form-group">
               <label for="scale">Scale</label>
@@ -114,11 +114,11 @@
           <div class="p-5 h2" v-if="isLoading">Loading sessions...</div>
 
           <div v-for="session in filteredSessions" :key="session.id" class="mt-1" v-bind:class="{ 'mark': currentSession === session.id }">
-            <div class="px-1 bg-light" :id="'editor-'+session.id">
+            <div class="px-1 bg-light" :id="`editor-${commonSvc.GetId(session.id)}`">
               <div>
                 <span v-if="currentSession !== session.id" class="badge badge-secondary">{{getNiceDate(session.date)}}</span>
                 <span v-if="currentSession === session.id" class="input-group-sm">
-                  <datetime v-model="session.date" type="datetime" @close="jumpTo(`#editor-${session.id}`)"></datetime>
+                  <datetime v-model="session.date" type="datetime" @close="jumpTo(`editor-${commonSvc.GetId(session.id)}`)"></datetime>
                 </span>
               </div>
               <div class="d-flex">
@@ -265,6 +265,11 @@ import { mapGetters } from 'vuex';
 import VueShowdown, { showdown } from 'vue-showdown';
 import { Datetime } from 'vue-datetime';
 import NamedRegExp from 'named-regexp-groups';
+import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
+
+let commonSvc = null;
+let dbSvc = null;
 
 showdown.extension('fcsCampaign', () => [
   {
@@ -299,7 +304,7 @@ export default {
   name: 'CampaignDetail',
   metaInfo() {
     return {
-       title: this.title,
+       title: this.name,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -308,21 +313,22 @@ export default {
   components: {
   	datetime: Datetime
   },
-  created(){
-    fs_camp.init();
-  },
   mounted(){
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);    
+    fs_camp.init(this.$root);
     this.parseSessionAll();
-  },
+  },  
   watch: {
     userId() {
       //wait for our authenticated user id
-      this.getCampaign(this.userId, fcs.$route.params.id);
+      this.campaignId = commonSvc.SetId("CAMPAIGN", fcs.$route.params.id);
+      this.getCampaign(this.userId, this.campaignId);
     }
   },
   data () {
     return {
-      title: "",
+      name: "",
       description: "",
       loading: true,
       campaign : {},
@@ -400,6 +406,9 @@ export default {
     },
     sortedAlphaAspects : function() {
       return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
+    commonSvc() {
+      return commonSvc;
     },
   },
   methods: {
@@ -531,7 +540,7 @@ export default {
         if (thingIdx === -1) {
           let displayText =  `${display} ${description ? "[" + description + "]" : ""}`;
 
-          let newThing = {id: fatesheet.generateUUID(), sessionids: [sessionId], thing: thing, description: [description] || null}
+          let newThing = {id: commonSvc.GenerateUUID(), sessionids: [sessionId], thing: thing, description: [description] || null}
           list.unshift(newThing);
         }
 
@@ -570,32 +579,29 @@ export default {
       }
     },
     copyThingToClipboard : function(text) {
-      var tempInput = document.createElement("input");
-      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-      tempInput.value = text;
-      console.log(text);
-
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      fatesheet.notify('Copied thing to clipboard', 'info', 2000);
+      commonSvc.CopyTextToClipboard(text);      
     },
     addSession : function() {
       //clear the filter without jumping
       this.$store.commit('updateSearchText', "");
       fcs.$options.filters.filterSessions();
 
-      let session = {id: fatesheet.generateUUID(), date: this.getFormattedDate(new Date()), description: "Details...", parent_id: this.campaign.id, owner_id: this.userId};
+      let session = {
+        id: commonSvc.GenerateUUID(),
+        object_type: "LOG",
+        date: this.getFormattedDate(new Date()),
+        description: "Details...",
+        related_id: this.campaign.id,
+        owner_id: this.userId,
+      };
       this.sessions.unshift(session);
 
       this.setCurrentSession(session.id);
 
-      this.jumpTo(`#editor-${session.id}`);
+      this.jumpTo(`#editor-${commonSvc.GetId(session.id)}`);
     },
     getNiceDate : function(date) {
-        return new Date(date).toLocaleString();
+        return commonSvc.GetNiceDate(date);
     },
     getFormattedDate : function(date) {
       var year = date.getFullYear();
@@ -613,208 +619,112 @@ export default {
       return dateString;
     },
     deleteSession : function (event) {
-      var sessionId = $(event.currentTarget).data('id');
+      let $component = this;
+      let sessionId = $(event.currentTarget).data('id');
 
-      //reference this component so we can get/set data
-      var $component = this;
+      dbSvc.DeleteObject(this.userId, sessionId).then((response) => { 
+        if (response) {       
+          console.log("Deleted item:", JSON.stringify(response, null, 2));
+          commonSvc.Notify('Session deleted.', 'success');
 
-      // now remove it from the db
-      let docClient = fatesheet.getDBClient();
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          Key: {
-            'owner_id': $component.userId,
-            'id': sessionId,
-          }
-      };
+          // splice the item out of the list of sessions
+          let session = $component.sessions.find(x => x.id === sessionId);
+          //remove the things this session added
+          $component.parseThings(session.description, session.id, true);
+          let sessionIdx = $component.sessions.map(function(e) { return e.id; }).indexOf(sessionId);
+          $component.sessions.splice(sessionIdx, 1);
 
-      console.log("Deleting session ...");
-      docClient.delete(params, function (err, data) {
-          if (err) {
-              fatesheet.notify(err.message || JSON.stringify(err));
-              console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-          } else {
-              console.log("Deleted item:", JSON.stringify(data, null, 2));
-              fatesheet.notify('Session deleted.', 'success', 2000);
-
-              // splice the item out of the list of sessions
-              let session = $component.sessions.find(x => x.id === sessionId);
-              //remove the things this session added
-              $component.parseThings(session.description, session.id, true);
-              let sessionIdx = $component.sessions.map(function(e) { return e.id; }).indexOf(sessionId);
-              $component.sessions.splice(sessionIdx, 1);
-
-              //clear out any search filters so we get the fresh view of the data
-              $component.clearFilter()
-          }
-      });
+          //clear out any search filters so we get the fresh view of the data
+          $component.clearFilter()   
+        }      
+      })
     },
-    getCampaign : async function(ownerid, id) {
+    getCampaign : function(ownerId, id) {
       var $component = this;
 
-      if (id === "create") {
+      if (this.id === "create") {
         this.create();
         return;
       }
 
-      // Create DynamoDB document client
-      let docClient = fatesheet.getDBClient();
-
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          Key: {
-            'owner_id': ownerid,
-            'id': id,
-          }
-      }
-
-      docClient.get(params, function (err, data) {
-        if (err) {
-          console.log("Error", err);
-          $component.loading = false;
+      dbSvc.GetObject(id, ownerId).then ( (response) => {   
+        if (!response)
+        {
+          location.href = '/error';
         }
-        else {
-            if (!data.Item)
-            {
-              location.href = '/error';
-            }
-            else {
-              console.log("Success", data.Item);
+        else {              
 
-              $component.$set($component, 'campaign', data.Item);
-              $component.listSessions($component.userId, data.Item.id);
+          $component.$set($component, 'campaign', response);
+          $component.listSessions(response.id);
 
-              $component.title = $component.campaign.title + ' (Campaign)';
-              $component.description = $component.campaign.description || "";
-            }
-
-            $component.loading = false;
+          $component.name = $component.campaign.name + ' (Campaign)';
+          $component.description = $component.campaign.description || "";
         }
+
+        $component.loading = false;    
       })
     },
-    listSessions : function(ownerid, id) {
-      var $component = this;
-      let sessionList = [];
+    listSessions : async function(campaignId) {
+      let sessionList = await dbSvc.ListRelatedObjects(campaignId);
 
-      // Create DynamoDB document client
-      let docClient = fatesheet.getDBClient();
-
-      let params = {
-          TableName: fs_camp.config.campaigntable,
-          ExpressionAttributeValues: {
-            ':owner_id': ownerid,
-            ':parent_id': id,
-          },
-          KeyConditionExpression: 'owner_id = :owner_id',
-          FilterExpression: 'parent_id = :parent_id',
+      if (sessionList && sessionList.length > 0) {
+        this.sessions = sessionList;
+        this.parseSessionAll();
       }
 
-      docClient.query(params, onQuery);
-
-      function onQuery(err, data) {
-        if (err) {
-          console.log("Error", err);
-          $component.loading = false;
-        }
-        else {
-          Array.prototype.push.apply(sessionList,data.Items);
-
-          if (typeof data.LastEvaluatedKey != "undefined") {
-              console.log("Scanning for more...");
-              params.ExclusiveStartKey = data.LastEvaluatedKey;
-              docClient.query(params, onQuery);
-          }
-          else {
-            console.log("Success", sessionList);
-
-            if (sessionList && sessionList.length > 0) {
-              $component.sessions = sessionList;
-              $component.parseSessionAll();
-            }
-            $component.loading = false;
-          }
-        }
-      }
+      this.loading = false;
     },
     create : function() {
       let c = {
         "description": "",
+        "object_type": "CAMPAIGN",
         "id": null,
-        "owner_id": this.userId,
-        "parent_id": fatesheet.emptyGuid(),
+        "owner_id": this.userId,        
         "scale": "",
         "slug": "new-campaign",
-        "title": "New Campaign",
+        "name": "New Campaign",
         "date": this.getFormattedDate(new Date()),
       };
       this.$set(this, 'campaign', c);
       this.loading = false;
     },
     saveCampaign : function() {
-        var $component = this;
+      var $component = this;
 
-        // make sure we have a proper user id key
-        $component.$set($component.campaign, "owner_id", this.userId);
+      if (!this.campaign.name) {
+        commonSvc.Notify('You must enter a name', 'error');
+        return;
+      }
 
-        //create a new campaign Id if we don't have one
-        let isNew = false;
-        if (!$component.campaign.id) {
-            isNew = true;
-            $component.$set($component.campaign, "id", fatesheet.generateUUID());
-            fatesheet.logAnalyticEvent('createdACampaign' + $component.campaign.title);
+      // make sure we have a proper user id key
+      $component.$set($component.campaign, "owner_id", this.userId);
+
+      //create a new campaign Id if we don't have one
+      let isNew = false;
+      if (!$component.campaign.id) {
+          isNew = true;
+          $component.$set($component.campaign, "id", `CAMPAIGN|${commonSvc.GenerateUUID()}`);
+      }
+  
+      dbSvc.SaveObject($component.campaign).then( (response) => {
+        if (response) {
+          commonSvc.Notify('Campaign saved.', 'success', null, () => {;
+            if (isNew) {
+              location.href = '/campaign/' + commonSvc.GetId($component.campaign.id) + '/' + $component.campaign.slug;
+            }
+          });
         }
+      });
+    },    
+    saveSession : function(session) {    
+      //if we change the date, sometimes we lose the item when it sorts
+      this.jumpTo(`#editor-${commonSvc.GetId(session.id)}`);      
 
-        //dynamodb won't let us have empty attributes
-        fatesheet.removeEmptyObjects($component.campaign);
-
-        let docClient = fatesheet.getDBClient();
-
-        // create/update a  campaign
-        // we always use the put operation because the data can change depending on your campaign
-        let params = {
-            TableName: fs_camp.config.campaigntable,
-            Item: $component.campaign
-        };
-
-        docClient.put(params, function (err, data) {
-            if (err) {
-                fatesheet.notify(err.message || JSON.stringify(err));
-                console.error("Unable to save campaign. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                fatesheet.notify('Campaign saved.', 'success', 2000);
-                console.log("Added item:", JSON.stringify(data, null, 2));
-
-                if (isNew) {
-                  location.href = '/campaign/' + $component.campaign.id + '/' + $component.campaign.slug;
-                }
-            }
-        });
-
-    },
-    saveSession : function(session) {
-        var $component = this;
-        let docClient = fatesheet.getDBClient();
-
-        //if we change the date, sometimes we lose the item when it sorts
-        $component.jumpTo(`#editor-${session.id}`);
-
-        // create/update a  campaign
-        // we always use the put operation because the data can change depending on your campaign
-        let params = {
-            TableName: fs_camp.config.campaigntable,
-            Item: session
-        };
-
-        docClient.put(params, function (err, data) {
-            if (err) {
-                fatesheet.notify(err.message || JSON.stringify(err));
-                console.error("Unable to save session. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                fatesheet.notify('Session saved.', 'success', 2000);
-                console.log("Added item:", JSON.stringify(data, null, 2));
-            }
-        });
-
+      dbSvc.SaveObject(session).then( (response) => {  
+        if (response) {      
+          commonSvc.Notify('Session saved.', 'success');
+        }
+      });
     },
     filterBy : function(thing) {
       this.$store.commit('updateSearchText', thing);
@@ -829,7 +739,7 @@ export default {
       fcs.$options.filters.filterSessions();
       this.jumpTo("#summary");
     },
-    jumpTo : function(section) {
+    jumpTo : function(section) {      
       //give the ui time to make sure the id exists
       setTimeout(function() {
         $("html, body").animate({ scrollTop: $(section).offset().top }, 100);
@@ -837,7 +747,7 @@ export default {
     },
     slugify : function(event) {
       let $elem = $(event.currentTarget);
-      let slug = fatesheet.slugify($elem.val());
+      let slug = commonSvc.Slugify($elem.val());
       this.$set(this.campaign, "slug", slug);
     }
   }
