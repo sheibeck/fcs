@@ -140,10 +140,7 @@ export default {
         characterData.related_id = this.sheetData.id;
         characterData.system = this.sheetData.system;
         characterData.slug = commonSvc.Slugify(characterData.name);
-        characterData.object_type = "CHARACTER";
-        
-        //remove some legacy values
-        characterData.sheetname = "";
+        characterData.object_type = "CHARACTER";      
 
         //create a new characterId if we don't have one
         var isNew = false;
