@@ -24,6 +24,7 @@
 import { mapGetters } from 'vuex';
 import Search from '../components/search';
 import CommonService from "./../assets/js/commonService";
+import DbService from '../assets/js/dbService';
 
 let dbSvc = null;
 let commonSvc= null;
