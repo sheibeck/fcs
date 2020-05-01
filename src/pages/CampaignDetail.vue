@@ -118,7 +118,7 @@
               <div>
                 <span v-if="currentSession !== session.id" class="badge badge-secondary">{{getNiceDate(session.date)}}</span>
                 <span v-if="currentSession === session.id" class="input-group-sm">
-                  <datetime v-model="session.date" type="datetime" @close="jumpTo(`editor-${commonSvc.GetId(session.id)}`)"></datetime>
+                  <datetime v-model="session.date" type="datetime" @close="jumpTo(`#editor-${commonSvc.GetId(session.id)}`)"></datetime>
                 </span>
               </div>
               <div class="d-flex">
