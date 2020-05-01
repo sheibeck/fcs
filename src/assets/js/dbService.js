@@ -55,7 +55,8 @@ export default class DbService {
                 let lastEvaluatedKey = 'dummy'; // string must not be empty
                 const itemsAll = [];
                 while (lastEvaluatedKey && itemsAll.length === 0) {
-                    await docClient.query(params).promise()
+                    try {
+                     await docClient.query(params).promise()
                         .then((data) => {
                             itemsAll.push(...data.Items);
                             lastEvaluatedKey = data.LastEvaluatedKey;
@@ -64,8 +65,13 @@ export default class DbService {
                             }
                         }).catch((err) => {
                             this.commonSvc.Notify(err.code, 'error');
+                            lastEvaluatedKey = null;
                         });
-                   
+                    }
+                    catch(ex) {
+                        this.commonSvc.Notify(ex, 'error');
+                        break;                        
+                    }               
                 }
                 if (itemsAll.length > 0)
                     return itemsAll[0];
@@ -126,7 +132,8 @@ export default class DbService {
             let lastEvaluatedKey = 'dummy'; // string must not be empty
             const itemsAll = [];
             while (lastEvaluatedKey) {
-                await docClient.query(params).promise()
+                try {
+                    await docClient.query(params).promise()
                     .then((data) => {
                         itemsAll.push(...data.Items);
                         lastEvaluatedKey = data.LastEvaluatedKey;
@@ -135,8 +142,13 @@ export default class DbService {
                         }
                     }).catch((err) => {
                         this.commonSvc.Notify(err.code, 'error');
+                        lastEvaluatedKey = null;                    
                     });
-                
+                }
+                catch(ex) {
+                    this.commonSvc.Notify(ex, 'error');
+                    break;
+                }                
             }            
             return itemsAll;
         }
@@ -144,7 +156,7 @@ export default class DbService {
         return await queryAll(params);
     }
 
-    ListRelatedObjects = async (relatedTo) => {
+    ListRelatedObjects = async (relatedTo, publicOnly) => {
         let docClient = this.GetDbClient();
 
         let params = {
@@ -155,12 +167,22 @@ export default class DbService {
               ':id': relatedTo
             }
         }
+
+        if (publicOnly) {            
+            params.FilterExpression = '#ispublic = :ispublic';
+            params.ExpressionAttributeValues[':ispublic'] = true;
+            params.ExpressionAttributeNames = {
+                "#ispublic": "public",
+            }
+        }
    
         const queryAll = async (params) => {
             let lastEvaluatedKey = 'dummy'; // string must not be empty
             const itemsAll = [];
+                       
             while (lastEvaluatedKey) {
-                await docClient.query(params).promise()
+                try {
+                    await docClient.query(params).promise()
                     .then((data) => {
                         itemsAll.push(...data.Items);
                         lastEvaluatedKey = data.LastEvaluatedKey;
@@ -169,8 +191,15 @@ export default class DbService {
                         }
                     }).catch((err) => {
                         this.commonSvc.Notify(err.code, 'error');
-                    });              
+                        lastEvaluatedKey = null;
+                    });  
+                }
+                catch(ex) {
+                    this.commonSvc.Notify(ex, 'error');
+                    break;
+                } 
             }
+           
             return itemsAll;
         }
 

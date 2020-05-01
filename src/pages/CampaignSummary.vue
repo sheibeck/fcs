@@ -394,7 +394,7 @@ export default {
       }
     },
     listSessions : async function(campaignId) {      
-      let sessionList = await dbSvc.ListRelatedObjects(campaignId);
+      let sessionList = await dbSvc.ListRelatedObjects(campaignId, true);
 
       if (sessionList && sessionList.length > 0) {
         this.sessions = sessionList;
