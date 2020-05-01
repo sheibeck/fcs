@@ -650,7 +650,9 @@ export default {
       dbSvc.GetObject(id, ownerId).then ( (response) => {   
         if (!response)
         {
-          location.href = '/error';
+          commonSvc.Notify(`Could not find campaign with id <b>${commonSvc.GetId(id)}</b>`, 'error', 2000, () => {
+            document.location = '/campaign';
+          });
         }
         else {              
 
