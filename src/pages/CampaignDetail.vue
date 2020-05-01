@@ -123,7 +123,7 @@
               </div>
               <div class="d-flex">
                 <span class="mt-2 mr-2 cursor">
-                  <input type="checkbox" :id="'public-'+session.id" v-model="session.ispublic" @change="saveSession(session)">
+                  <input type="checkbox" :id="'public-'+session.id" v-model="session.public" @change="saveSession(session)">
                   <label class="cursor" style="font-weight: 400;" :for="'public-'+session.id">public?</label>
                 </span>
                 <span class="mx-2 cursor" v-if="currentSession !== session.id" @click="setCurrentSession(session.id, session.description)"><i class="fas fa-edit pt-2 mt-1"></i> edit</span>
