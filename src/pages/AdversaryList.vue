@@ -162,7 +162,15 @@ export default {
       if (this.adversaryId) {
         //we are expecting an array, so if we fetch a single object maintain the expected array for rendering
         let singleAdversary = await dbSvc.GetObject(this.adversaryId);
-        this.adversaries = [singleAdversary];
+
+        if (!singleAdversary) {
+          commonSvc.Notify(`Could not find adversary with id <b>${commonSvc.GetId(this.adversaryId)}</b>`, 'error', 2000, () => {
+            document.location = '/adversary';
+          });
+        }
+        else {
+          this.adversaries = singleAdversary;
+        }
       }
       else {
         if (onlyShowMyAdversaries) {

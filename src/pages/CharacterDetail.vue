@@ -86,12 +86,19 @@ export default {
   methods : {
     async show() {     
       this.characterData = await dbSvc.GetObject(this.characterId);
-      let response = await dbSvc.GetObject(this.characterData.related_id).then( (response) => {
-        this.sheetData = response;
-        this.sheet = response.content;
-      }).then(() => {
-        this.populateCharacterData();
-      });
+      if (this.characterData == null) {
+        commonSvc.Notify(`Could not find character with id <b>${commonSvc.GetId(this.characterId)}</b>`, 'error', 2000, () => {
+          document.location = '/character';
+        });
+      }
+      else {
+        let response = await dbSvc.GetObject(this.characterData.related_id).then( (response) => {
+          this.sheetData = response;
+          this.sheet = response.content;          
+        }).then(() => {
+          this.populateCharacterData();
+        });
+      }
     },
     populateCharacterData() {    
       this.title = this.characterData.name + ' (Character)';
