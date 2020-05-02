@@ -169,7 +169,13 @@ export default {
           });
         }
         else {
-          this.adversaries = singleAdversary;
+          //we need this to be an array to properly populate the fields, which is expecting an array
+          this.adversaries = [singleAdversary];
+
+          $('#adversaryDetail').removeClass('card-columns');
+
+          this.title = this.adversaries[0].name + ' (Adversary)';
+          this.description = this.adversaries[0].type;
         }
       }
       else {
@@ -179,23 +185,12 @@ export default {
         else{      
           this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, searchText);
         }
-      } 
-      
-      //make the display wider if we only have 1 adversary, this is
-      //essentially the adversary "detail" page
-      if (this.adversaries.length === 1)
-      {
-          $('#adversaryDetail').removeClass('card-columns');
 
-          this.title = this.adversaries[0].name + ' (Adversary)';
-          this.description = this.adversaries[0].type;
-      }
-      else {
-          $('#adversaryDetail').addClass('card-columns');
+         $('#adversaryDetail').addClass('card-columns');
 
           this.title = "Adversary List";
           this.description = "Fate Adversaries";
-      }
+      }        
     },
     fixLabel: function (val) {
         return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
