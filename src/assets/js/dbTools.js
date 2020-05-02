@@ -88,6 +88,68 @@ export default class DbTools {
     this.commonSvc.Notify("Delete Complete.");   
   }
 
+  UpdateData = async() => {
+     // Create DynamoDB document client
+     let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+     docClient.service.config.credentials = this.fcs.$store.state.credentials;
+     
+     let params = {
+          TableName: this.tablename,
+          IndexName: "relations",
+          KeyConditionExpression: 'related_id = :id',
+          ExpressionAttributeValues: {
+            ':id': "CHARACTERSHEET|fate-core"
+          }        
+      }
+
+      const queryAll = async (params) => {
+          let lastEvaluatedKey = 'dummy'; // string must not be empty
+          const itemsAll = [];
+                    
+          while (lastEvaluatedKey) {
+              try {
+                  await docClient.query(params).promise()
+                  .then((data) => {
+                      itemsAll.push(...data.Items);
+                      lastEvaluatedKey = data.LastEvaluatedKey;
+                      if (lastEvaluatedKey) {
+                          params.ExclusiveStartKey = lastEvaluatedKey;
+                      }
+                  }).catch((err) => {
+                      this.commonSvc.Notify(err.code, 'error');
+                      lastEvaluatedKey = null;
+                  });  
+              }
+              catch(ex) {
+                  this.commonSvc.Notify(ex, 'error');
+                  break;
+              } 
+          }
+        
+          return itemsAll;
+      }
+
+      let records = await queryAll(params);
+debugger;
+      records.forEach(async (record) => {        
+        record.system = "Fate Core";
+        // create/update a  character
+        // we always use the put operation because the data can change depending on your character sheet
+        let params = {
+          TableName: this.tablename,
+          Item: record
+        };                  
+        
+        await docClient.put(params, function (err, data) {          
+          if (err) {         
+              console.error("Unable to updated item. Error JSON:", JSON.stringify(err, null, 2));
+          } else {
+              console.log("Updated item:", JSON.stringify(data, null, 2));              
+          }
+        });
+      });
+  }
+
   MigrateData = async () => {    
     // Create DynamoDB document client
     let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
