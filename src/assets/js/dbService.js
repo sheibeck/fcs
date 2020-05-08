@@ -1,5 +1,6 @@
 import CommonsService from "./commonService"
 import CommonService from "./commonService";
+import UserService from "./userService";
 
 export default class DbService {
     TableName = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
@@ -10,11 +11,21 @@ export default class DbService {
     }
 
     GetDbClient() {        
+        // if the user session has expired, refresh it so we don't get DB errors
+        this.RefreshUserSession();
+
         // Create DynamoDB document client
         let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
         docClient.service.config.credentials = this.fcs.$store.state.credentials;
   
         return docClient;
+    }
+
+    RefreshUserSession = () => {        
+        if (this.fcs.$store.state.credentials.needsRefresh()) {
+            let userSvc = new UserService(this.fcs);
+            userSvc.RefreshSession();
+        }
     }
 
     //get a specific object.

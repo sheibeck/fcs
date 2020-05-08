@@ -69,7 +69,10 @@ const store = new Vuex.Store({
     },
     credentials (state, credentials) {
       this.state.credentials = credentials;
-    },   
+    },  
+    userSession (state, session) {
+      this.state.userSession = session;
+    },    
     updateSessions (state, value) {
       this.state.sessions = value; 
       this.state.filteredSessions = this.state.sessions;

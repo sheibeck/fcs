@@ -80,6 +80,13 @@ export default class UserService {
     });
   }
 
+  RefreshSession = () => {
+    let refresh_token = this.fcs.$store.state.userSession.refreshToken;
+    this.fcs.$store.state.cognito.CognitoUser.refreshSession(refresh_token, (err, session) => {
+      this.SetupAuthSession(err, session);
+    });  
+  }
+
   Authenticate = () => {
     // grab an active session
     let poolData = {
@@ -91,34 +98,8 @@ export default class UserService {
 
     if (CognitoUser != null) {
       CognitoUser.getSession( (err, session) => {
-          if (err) {
-              this.commonSvc.Notify(err.message || JSON.stringify(err));
-              return;
-          }
-          console.log('session validity: ' + session.isValid());
-
-          //AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-          let credentials = new AWS.CognitoIdentityCredentials({
-              IdentityPoolId : this.fcs.$store.state.cognito.identityPool, // your identity pool id here
-              Logins : {
-                  // Change the key below according to the specific region your user pool is in.
-                  'cognito-idp.us-east-1.amazonaws.com/us-east-1_x9gvO6Gy3' : session.getIdToken().getJwtToken()
-              }
-          });
-
-          this.fcs.$store.commit("credentials", credentials);
-
-          this.fcs.$store.state.credentials.refresh((error) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('Refreshed Credentials');
-
-                this.fcs.$store.commit("CognitoUser", CognitoUser);
-                this.fcs.$store.commit("userInfo", credentials.identityId);
-                this.SetupAuthorizedUser(session);
-            }
-          });
+        this.fcs.$store.commit("CognitoUser", CognitoUser);
+        this.SetupAuthSession(err, session);
       });
     }
     else  {
@@ -138,22 +119,56 @@ export default class UserService {
 
         this.fcs.$store.commit("CognitoUser", CognitoUser);        
         this.fcs.$store.commit("userInfo", "public");
-                
+                        
         this.SetupUnAuthorizedUser();
       });
     }
   }
 
+  SetupAuthSession = (err, session) => {
+    if (err) {
+      this.commonSvc.Notify(err.message || JSON.stringify(err));
+      return;
+    }
+    console.log('session validity: ' + session.isValid());
+
+    //AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    let credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId : this.fcs.$store.state.cognito.identityPool, // your identity pool id here
+        Logins : {
+            // Change the key below according to the specific region your user pool is in.
+            'cognito-idp.us-east-1.amazonaws.com/us-east-1_x9gvO6Gy3' : session.getIdToken().getJwtToken()
+        }
+    });
+
+    this.fcs.$store.commit("userSession", session);
+    this.fcs.$store.commit("credentials", credentials);
+    
+
+    this.fcs.$store.state.credentials.refresh((error) => {
+      if (error) {
+          console.error(error);
+      } else {
+          console.log('Refreshed Credentials');
+          
+          this.fcs.$store.commit("userInfo", credentials.identityId);
+          this.SetupAuthorizedUser(session);
+      }
+    });
+  }
+
   SetupUnAuthorizedUser = () => {    
     this.fcs.$store.commit('authenticate', false);    
+
     $('.requires-auth').addClass('hidden');
     $('.requires-noauth').removeClass('hidden');
   }
 
   SetupAuthorizedUser = (response) => {    
-    this.fcs.$store.commit('authenticate', true);    
+    this.fcs.$store.commit('authenticate', true);
+
     $('.requires-auth').removeClass('hidden');
-    $('.requires-noauth').addClass('hidden');
+    $('.requires-noauth').addClass('hidden');    
   }
 
   Logout = () => {        
