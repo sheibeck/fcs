@@ -41,7 +41,6 @@ export default {
   mounted(){
     dbSvc = new DbService(this.$root);
     commonSvc= new CommonService(this.$root);
-    fs_char.init(this.$root);
   },
   watch: {
     userId() {      

@@ -2,8 +2,7 @@
   <div class="container mt-2">
 
     <form>
-      <div class='' v-append="sheet" @appended="appended">
-      </div>
+      <charactersheet :character="characterData" :sheetid="id" />
       
       <hr/>
 
@@ -33,12 +32,16 @@
 import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import CharacterSheet from '../components/charactersheet'
 
 let commonSvc = null;
 let dbSvc = null;
 
 export default {
   name: 'CharacterSheetDetail',
+  components: {
+    "charactersheet": CharacterSheet,    
+  },
   metaInfo() {
     return {
        title: this.title,
@@ -50,8 +53,7 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
-    fs_char.init(this.$root);
-    
+   
     this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.id);
   },
   watch: {
@@ -63,7 +65,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-    ])
+    ]), 
   },
   data () {
     return {
@@ -72,6 +74,7 @@ export default {
       characterId: "",
       title: "",
       description: "",
+      characterData: {},
     }
   },
   methods : {
@@ -118,8 +121,6 @@ export default {
         this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());        
         characterData.id = this.characterId;
         characterData.object_type = "CHARACTER";
-
-        fs_char.config.characterId = this.characterId;
 
         let response = await dbSvc.SaveObject(characterData).then((response) => {
           if (response) {

@@ -2,8 +2,7 @@
   <div class="container mt-2">
 
     <form>
-      <div class='' v-append="sheet">
-      </div>
+      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.sheetname" />
 
       <div class="d-print-none">
         <hr/>
@@ -19,7 +18,7 @@
           </div>
         </div>
                 
-        <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
+        <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">
           <div class='form-group'>
             <label class='' for='image_url'>Portrait Url:</label>
             <input class='form-control' id='image_url' name='image_url'  />
@@ -39,12 +38,16 @@
 import { mapGetters } from 'vuex';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import CharacterSheet from '../components/charactersheet'
 
 let commonSvc = null;
 let dbSvc = null;
 
 export default {
   name: 'CharacterDetail',
+  components: {
+    "charactersheet": CharacterSheet,    
+  },
   metaInfo() {
     return {
        title: this.title,
@@ -56,8 +59,7 @@ export default {
   mounted(){    
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);    
-    fs_char.init(this.$root);
-
+    
     this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.sheetname);
     this.characterId = commonSvc.SetId("CHARACTER", this.$route.params.id);
   },
@@ -65,7 +67,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-    ])
+    ]),    
   },
   watch: {
     userId() {
@@ -80,7 +82,7 @@ export default {
       title: "",
       description: "",
       characterid: null,      
-      characterData: null,
+      characterData: null,        
     }
   },
   methods : {
@@ -96,7 +98,7 @@ export default {
           this.sheetData = response;
           this.sheet = response.content;          
         }).then(() => {
-          this.populateCharacterData();
+          //this.populateCharacterData();
         });
       }
     },
@@ -133,10 +135,13 @@ export default {
     },
     async save() {
       if (this.isAuthenticated) {
+        debugger;
         /// save a character
-        var data = $('form').serializeJSON();
-        var characterData = JSON.parse(data);
+        //var data = $('form').serializeJSON();
+        //var characterData = JSON.parse(data);
 
+        var characterData = this.characterData
+        
         if (!characterData.name) {
           commonSvc.Notify('You must enter a name', 'error');
           return;
@@ -155,8 +160,7 @@ export default {
             isNew = true;
             this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());
         }
-        characterData.id = this.characterId;
-        fs_char.config.characterId = this.characterId;
+        characterData.id = this.characterId;        
 
         let response = await dbSvc.SaveObject(characterData).then((response) => { 
           if (response) {

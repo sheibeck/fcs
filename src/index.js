@@ -12,9 +12,12 @@ import App from './App'
 import router from './router'
 import 'whatwg-fetch'
 import './assets/site.scss'
-import './assets/js/fs_campaign'
-import './assets/js/fs_char'
-import './assets/js/fs_dicetray'
+
+import 'aws-sdk'
+import 'amazon-cognito-identity-js'
+import 'jquery'
+import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 Vue.use(Vuex)
 Vue.use(VueAppend)
@@ -40,7 +43,7 @@ const store = new Vuex.Store({
     campaigns: [],
     filteredCampaigns: [],
     searchText: "",
-
+    diceRoller: null,
     callback: null,
     content: $('#results'),
     environment: process.env.NODE_ENV,
@@ -89,6 +92,9 @@ const store = new Vuex.Store({
     },
     updateSearchText (state, value) {
       this.state.searchText = value;
+    },
+    updateDiceRoller (state, value) {
+      this.state.diceRoller = value;
     }
   },
   getters: {
@@ -119,6 +125,9 @@ const store = new Vuex.Store({
     },
     searchText: state => {
       return state.searchText;
+    },
+    diceRoller: state => {
+      return state.diceRoller;
     }
   }
 })

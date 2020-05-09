@@ -1,5 +1,6 @@
 'use strict'
 
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
@@ -67,6 +68,10 @@ module.exports = {
   },
 
   plugins: [    
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery"
+    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',

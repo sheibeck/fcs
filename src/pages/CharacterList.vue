@@ -80,8 +80,7 @@ export default {
   },
   mounted(){
     commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);   
-    fs_char.init(this.$root);
+    dbSvc = new DbService(this.$root);    
   },
   computed: {
     slugify: function() {
@@ -113,7 +112,18 @@ export default {
       characters: {},
     }
   },
-  methods : {   
+  methods : {
+    init() {
+      $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var characterId = button.data('id') // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this);
+        $(modal.find('.js-delete-character')).data('id', characterId);
+      });
+    },
+
     list : function (searchText) {      
       let items = dbSvc.ListObjects("CHARACTER", this.$store.state.userId, searchText).then( (data) => {    
         this.characters = data;

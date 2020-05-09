@@ -1,4 +1,7 @@
 import CommonService from "./commonService";
+import AWS from 'aws-sdk';
+var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
+
 
 export default class UserService {    
   constructor(fcs, commonSvc = new CommonService())
@@ -81,10 +84,12 @@ export default class UserService {
   }
 
   RefreshSession = () => {
-    let refresh_token = this.fcs.$store.state.userSession.refreshToken;
-    this.fcs.$store.state.cognito.CognitoUser.refreshSession(refresh_token, (err, session) => {
-      this.SetupAuthSession(err, session);
-    });  
+    if (this.fcs.$store.state.userSession) {
+      let refresh_token = this.fcs.$store.state.userSession.refreshToken;
+      this.fcs.$store.state.cognito.CognitoUser.refreshSession(refresh_token, (err, session) => {
+        this.SetupAuthSession(err, session);
+      });  
+    }
   }
 
   Authenticate = () => {

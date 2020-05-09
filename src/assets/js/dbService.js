@@ -1,4 +1,4 @@
-import CommonsService from "./commonService"
+import AWS from 'aws-sdk';
 import CommonService from "./commonService";
 import UserService from "./userService";
 
@@ -21,8 +21,8 @@ export default class DbService {
         return docClient;
     }
 
-    RefreshUserSession = () => {        
-        if (this.fcs.$store.state.credentials.needsRefresh()) {
+    RefreshUserSession = () => {
+        if (this.fcs.$store.state.credentials && this.fcs.$store.state.credentials.needsRefresh()) {
             let userSvc = new UserService(this.fcs);
             userSvc.RefreshSession();
         }
