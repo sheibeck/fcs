@@ -21,12 +21,12 @@
         <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">
           <div class='form-group'>
             <label class='' for='image_url'>Portrait Url:</label>
-            <input class='form-control' id='image_url' name='image_url'  />
+            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />
           </div>
         </div>
       
         <div class='row' v-if="!isAuthenticated">           
-          <input type="hidden" id='image_url' name='image_url'  />
+          <input type="hidden" id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
         </div>
       </div>
 
@@ -86,6 +86,9 @@ export default {
     }
   },
   methods : {
+    exists(parent, value, defaultValue) {
+      return parent && parent[value] ? parent[value] : (defaultValue || "");
+    },
     async show() {     
       this.characterData = await dbSvc.GetObject(this.characterId);
       if (this.characterData == null) {
@@ -97,8 +100,6 @@ export default {
         let response = await dbSvc.GetObject(this.characterData.related_id).then( (response) => {
           this.sheetData = response;
           this.sheet = response.content;          
-        }).then(() => {
-          //this.populateCharacterData();
         });
       }
     },
@@ -123,15 +124,7 @@ export default {
 
       if (typeof autocalc !== "undefined") {
           autocalc();
-      }
-      
-      //if there is an img elemet on the sheet, populate it with the image url if specified
-      setTimeout(function() {					
-        //update the portrait
-        if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {
-          $("img.portrait").prop("src", $("#image_url").val());
-        }
-      }, 100);
+      }     
     },
     async save() {
       if (this.isAuthenticated) {
@@ -166,11 +159,13 @@ export default {
           if (response) {
             commonSvc.Notify('Character saved.', 'success');
           }
-        }).then( () => {         
+        });
+
+        /*.then( () => {         
           if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {
               $("img.portrait").prop("src", $("#image_url").val());
           }          
-        });
+        });*/
       }
       else {
           window.print();

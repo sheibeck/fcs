@@ -11,11 +11,11 @@
             <div class="row">
                 <div class="col-6 text-center">
                     <div for="refresh" class="fate-header">Refresh</div>
-                    <input type="text" class="form-control text-center" id="refresh" name="refresh" placeholder="Refresh" />
+                    <input type="text" class="form-control text-center" id="refresh" name="refresh" @change="character.refresh = $event.target.value" :value="exists(character, 'refresh')" placeholder="Refresh" />
                 </div>
                 <div class="col-6 text-center ">
                     <div for="fatepoints" class="fate-header">FP</div>
-                    <input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" placeholder="Fate Points" />
+                    <input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" @change="character.fatepoints = $event.target.value" :value="exists(character, 'fatepoints')" placeholder="Fate Points" />
                 </div>
             </div>
         </div>
@@ -23,11 +23,11 @@
         <div class="col-sm-6 col-md-8 order-md-1">
             <div class="form-group">
                 <div for="name" class="fate-header">Name</div>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Name" />
+                <input type="text" class="form-control" id="name" name="name" @change="character.name = $event.target.value" :value="exists(character, 'name')" placeholder="Name" />
             </div>
 
             <div class="form-group">
-                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description"></textarea>
+                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description" @change="character.description = $event.target.value" :value="exists(character, 'description')"></textarea>
             </div>
         </div>
     </div>
@@ -39,19 +39,19 @@
                 <div for="" class="fate-header">Aspects</div>
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" value="" id="aspect[highconcept]" name="aspect[highconcept]" placeholder="High Concept" />
+                <input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="character.aspects.highconcept = $event.target.value" :value="exists(character.aspects, 'highconcept')" placeholder="High Concept" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" value="" id="aspect[trouble]" name="aspect[trouble]" placeholder="Trouble" />
+                <input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="character.aspects.trouble = $event.target.value" :value="exists(character.aspects, 'trouble')" placeholder="Trouble" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" value="" id="aspect[other1]" name="aspect[other1]" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]" @change="character.aspects.other1 = $event.target.value" :value="exists(character.aspects, 'other1')" placeholder="Aspect" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" value="" id="aspect[other2]" name="aspect[other2]" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]" @change="character.aspects.other2 = $event.target.value" :value="exists(character.aspects, 'other2')" placeholder="Aspect" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" value="" id="aspect[other3]" name="aspect[other3]" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other3]" name="aspect[other3]" @change="character.aspects.other3 = $event.target.value" :value="exists(character.aspects, 'other3')" placeholder="Aspect" />
             </div>
         </div>
 
@@ -67,7 +67,7 @@
                     <div class="col-12 skill-desc">Awe, Inspire, Persuade</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" value="" id="approach[personality]" name="approach[personality]" placeholder="+">
+                    <input class="form-control text-center" type="text" id="approach[personality]" name="approach[personality]" @change="character.approaches.personality = $event.target.value" :value="exists(character.approaches, 'personality')" placeholder="+" />
                 </div>
             </div>
 
@@ -77,7 +77,7 @@
                     <div class="col-12 skill-desc">Athletics, Travel, Stealth</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" value="" id="approach[movement]" name="approach[movement]" placeholder="+">
+                    <input class="form-control text-center" type="text" id="approach[movement]" name="approach[movement]" @change="character.approaches.movement = $event.target.value" :value="exists(character.approaches, 'movement')" placeholder="+" />
                 </div>
             </div>
 
@@ -87,7 +87,7 @@
                     <div class="col-12 skill-desc">Awareness, Insight, Search</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" value="" id="approach[perception]" name="approach[perception]" placeholder="+">
+                    <input class="form-control text-center" type="text" id="approach[perception]" name="approach[perception]" @change="character.approaches.perception = $event.target.value" :value="exists(character.approaches, 'perception')" placeholder="+" />
                 </div>
             </div>
 
@@ -97,7 +97,7 @@
                     <div class="col-12 skill-desc">Explore, Healing, Hunting</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" value="" id="approach[survival]" name="approach[survival]" placeholder="+">
+                    <input class="form-control text-center" type="text" id="approach[survival]" name="approach[survival]" @change="character.approaches.survival = $event.target.value" :value="exists(character.approaches, 'survival')" placeholder="+" />
                 </div>
             </div>
 
@@ -107,7 +107,7 @@
                     <div class="col-12 skill-desc">Song, Courtesy, Riddle</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" value="" id="approach[custom]" name="approach[custom]" placeholder="+">
+                    <input class="form-control text-center" type="text" id="approach[custom]" name="approach[custom]" @change="character.approaches.custom = $event.target.value" :value="exists(character.approaches, 'custom')"  placeholder="+" />
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
                     <div class="col-12 skill-desc">Craft, Battle, Lore</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" value="" id="approach[vocation]" name="approach[vocation]" placeholder="+">
+                    <input class="form-control text-center" type="text" id="approach[vocation]" name="approach[vocation]" @change="character.approaches.vocation = $event.target.value" :value="exists(character.approaches, 'vocation')" placeholder="+" />
                 </div>
             </div>
         </div>
@@ -127,13 +127,13 @@
         <div class="col-sm-12 col-md-6">
             <div class="form-group">
                 <div for="stunts" class="fate-header">Stunts</div>
-                <textarea class="form-control" id="stunts" name="stunts" rows="17" placeholder="Stunts"></textarea>
+                <textarea class="form-control" id="stunts" name="stunts" rows="17" placeholder="Stunts" @change="character.stunts = $event.target.value" :value="exists(character, 'stunts')" ></textarea>
             </div>
         </div>
         <div class="col-sm-12 col-md-6">
             <div class="form-group">
                 <div for="gear" class="fate-header">Gear</div>
-                <textarea class="form-control" id="gear" name="gear" rows="17" placeholder="Gear"></textarea>
+                <textarea class="form-control" id="gear" name="gear" rows="17" placeholder="Gear" @change="character.approaches.gear = $event.target.value" :value="exists(character, 'gear')" ></textarea>
             </div>
         </div>
     </div>
@@ -152,7 +152,7 @@
                         <br /><strong>Recover: </strong>Spend at least one full day in a warm, safe place with acceptable food and be in the company of close friends.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[hopeful]" name="condition[hopeful]" class="col-2" checked>
+                <input type="checkbox" value="2" id="condition[hopeful]" name="condition[hopeful]" class="col-2" @change="character.conditions.hopeful = $event.target.value" :checked="exists(character.conditions, 'hopeful', true)" />
             </div>
 
             <div class="row">
@@ -163,7 +163,7 @@
                         <br/><strong>Recover: </strong>You must have a few hours of rest.
                     </div>
                 </div>
-                <input type="checkbox" value="1" id="condition[weary]" name="condition[weary]" class="col-2">
+                <input type="checkbox" value="1" id="condition[weary]" name="condition[weary]" class="col-2" @change="character.conditions.weary = $event.target.value" :checked="exists(character.conditions, 'weary', false)" />
             </div>
 
             <div class="row">
@@ -174,7 +174,7 @@
                         <br /><strong>Recover: </strong>You must have a warm dry place to rest and a meal.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[miserable]" name="condition[miserable]" class="col-2">
+                <input type="checkbox" value="2" id="condition[miserable]" name="condition[miserable]" class="col-2" @change="character.conditions.miserable = $event.target.value" :checked="exists(character.conditions, 'miserable', false)" />
             </div>
 
             <div class="row">
@@ -185,7 +185,7 @@
                         <br /><strong>Recover: </strong>At the beginning of any scene where you are no longer in the presence of the source of your fear.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[frightened]" name="condition[frightened]" class="col-2">
+                <input type="checkbox" value="2" id="condition[frightened]" name="condition[frightened]" class="col-2"  @change="character.conditions.frightened = $event.target.value" :checked="exists(character.conditions, 'frightened', false)">
             </div>
         </div>
 
@@ -198,7 +198,7 @@
                         <br /><strong>Recover: </strong>Receive medical care and have ample time to rest and eat.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[poisoned]" name="condition[poisoned]" class="col-2">
+                <input type="checkbox" value="2" id="condition[poisoned]" name="condition[poisoned]" class="col-2" @change="character.conditions.poisoned = $event.target.value" :checked="exists(character.conditions, 'poisoned', false)">
             </div>
 
             <div class="row mt-4">
@@ -209,7 +209,7 @@
                         <br /><strong>Recover: </strong>Uncheck this box after the end of the next scene.
                     </div>
                 </div>
-                <label class="col-1">2</label><input type="checkbox" value="2" id="condition[injured]" name="condition[injured]" class="col-3"></input>
+                <label class="col-1">2</label><input type="checkbox" value="2" id="condition[injured]" name="condition[injured]" class="col-3" @change="character.conditions.injured = $event.target.value" :checked="exists(character.conditions, 'injured', false)" />
             </div>
 
             <div class="row">
@@ -220,7 +220,7 @@
                         <br /><strong>Recover: </strong>requires medical attention. Uncheck this box at the beginning of the next game session.
                     </div>
                 </div>
-                <label class="col-1">4</label><input type="checkbox" value="4" id="condition[wounded]" name="condition[wounded]" class="col-3"></input>
+                <label class="col-1">4</label><input type="checkbox" value="4" id="condition[wounded]" name="condition[wounded]" class="col-3" @change="character.conditions.wounded = $event.target.value" :checked="exists(character.conditions, 'wounded', false)" />
 
             </div>
 
@@ -232,7 +232,7 @@
                         <br /><strong>Recover: </strong>Requires medical attention as well as a long recovery in a safe place with ample food and rest.
                     </div>
                 </div>
-                <label class="col-1">6</label><input type="checkbox" value="6" id="condition[dying]" name="condition[dying]" class="col-3"></input>
+                <label class="col-1">6</label><input type="checkbox" value="6" id="condition[dying]" name="condition[dying]" class="col-3" @change="character.conditions.dying = $event.target.value" :checked="exists(character.conditions, 'dying', false)" />
             </div>
         </div>
 
@@ -243,28 +243,23 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
   name: 'SheetMiddleEarth',
-  mounted() {
-    this.init();
-  },
-  props: {
-    sheetid: String,
+  props: {    
     character: Object,
   },
   computed: {
-    
+   
   },
   data () {
     return {
     }
   },
-  methods: {
-   
+  methods: {  
+    exists(parent, value, defaultValue) {
+      this.$parent.exists(parent, value, defaultValue);
+    }  
   }
-
 }
 </script>
 

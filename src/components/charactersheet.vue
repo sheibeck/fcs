@@ -12,8 +12,7 @@ import SheetMiddleEarth from "./sheet-middle-earth";
 
 export default {
   name: 'CharacterSheet',
-  mounted() {
-    this.init();
+  mounted() {    
   },
   components: {
     "sheet-fate-core": SheetFateCore,
@@ -33,7 +32,9 @@ export default {
     }
   },
   methods: {
-   
+   exists(parent, value, defaultValue) {
+      return parent && parent[value] ? parent[value] : (defaultValue || "");
+    }
   }
 
 }

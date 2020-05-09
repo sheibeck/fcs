@@ -20,7 +20,7 @@
       <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
         <div class='form-group'>
           <label class='' for='image_url'>Portrait Url:</label>
-          <input class='form-control' id='image_url' name='image_url'  />
+          <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
         </div>
       </div>
       
@@ -78,13 +78,8 @@ export default {
     }
   },
   methods : {
-    appended: function() {
-      //check if there is an initSheet function and run it
-      setTimeout(function() {
-        if (typeof initSheet !== "undefined") {
-            initSheet();
-        }
-      }, 1000);
+    exists(parent, value, defaultValue) {
+      return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
     async show() {      
       await dbSvc.GetObject(this.sheetId, commonSvc.GetRootOwner()).then( (data) => { 
