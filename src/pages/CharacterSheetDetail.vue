@@ -10,9 +10,9 @@
         <div class='col'>
           <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
           <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-          <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+          <button type='button' class='btn btn-dark' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
           <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
-              Character Properties
+              Character Properties <i class="fas fa-cog"></i>
           </button>
         </div>
       </div>
@@ -93,9 +93,8 @@ export default {
     },
     save : async function() {            
       if (this.isAuthenticated) {
-        /// save a character
-        var data = $('form').serializeJSON();
-        var characterData = JSON.parse(data);
+        /// save a character       
+        let characterData = this.characterData;
 
         if (!characterData.name) {
           commonSvc.Notify('You must enter a name', 'error');
@@ -108,11 +107,7 @@ export default {
         characterData.system = this.sheetData.system;
         characterData.slug = commonSvc.Slugify(characterData.name);        
 
-        //remove some legacy values
-        characterData.sheetname = "";
-
         //create a new characterId if we don't have one
-        var isNew = true;                
         this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());        
         characterData.id = this.characterId;
         characterData.object_type = "CHARACTER";

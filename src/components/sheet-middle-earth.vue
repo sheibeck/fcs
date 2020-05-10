@@ -257,11 +257,10 @@ export default {
   },
   methods: {  
     getVal(graphPath, defaultValue) {
-      this.$parent.getVal(this.character, graphPath, defaultValue);
+      return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {
-       this.$parent.setVal(this.character, arr, val);
-       this.autocalc();
+       this.$parent.setVal(this.character, arr, val);       
     },
   }
 }

@@ -183,28 +183,28 @@
                     <label for="stress">
                         1
                     </label>
-                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1', $event.target.value)" :checked="getVal(character.stress, 'stress1', false)" />
+                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1', $event.target.value)" :checked="getVal('stress.stress1', false)" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         2
                     </label>
-                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2', $event.target.value)" :checked="getVal(character.stress, 'stress2', false)" />
+                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2', $event.target.value)" :checked="getVal('stress.stress2', false)" />
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         3
                     </label>
-                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3', $event.target.value)" :checked="getVal(character.stress, 'stress3', false)" disabled data-required='physique' data-required-value='1'>
+                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3', $event.target.value)" :checked="getVal('stress.stress3', false)" disabled data-required='physique' data-required-value='1'>
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         4
                     </label>
-                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4', $event.target.value)" :checked="getVal(character.stress, 'stress4', false)" disabled data-required='physique' data-required-value='3'>
+                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4', $event.target.value)" :checked="getVal('stress.stress4', false)" disabled data-required='physique' data-required-value='3'>
                 </div>
             </div>
 
@@ -217,28 +217,28 @@
                     <label for="stress">
                         1
                     </label>
-                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1', $event.target.value)" :checked="getVal(character.stress, 'mental1', false)" />
+                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1', $event.target.value)" :checked="getVal('stress.mental1', false)" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         2
                     </label>
-                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2', $event.target.value)" :checked="getVal(character.stress, 'mental2', false)" />
+                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2', $event.target.value)" :checked="getVal('stress.mental2', false)" />
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         3
                     </label>
-                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3', $event.target.value)" :checked="getVal(character.stress, 'mental3', false)" disabled data-required='will' data-required-value='1'>
+                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3', $event.target.value)" :checked="getVal('stress.mental3', false)" disabled data-required='will' data-required-value='1'>
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         4
                     </label>
-                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]"  @change="setVal('stress.mental4', $event.target.value)" :checked="getVal(character.stress, 'mental4', false)" disabled data-required='will' data-required-value='3'>
+                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]"  @change="setVal('stress.mental4', $event.target.value)" :checked="getVal('stress.mental4', false)" disabled data-required='will' data-required-value='3'>
                 </div>
             </div>
         </div>
@@ -250,28 +250,28 @@
             <div class="form-group row">
                 <label class="col-2 col-form-label">2</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequences.mild', $event.target.value)" :checked="getVal(character.consequences, 'mild')" />
+                    <input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequences.mild', $event.target.value)" :checked="getVal('consequences.mild')" />
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-2 col-form-label">4</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequences.moderate', $event.target.value)" :checked="getVal(character.consequences, 'moderate')" />
+                    <input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequences.moderate', $event.target.value)" :checked="getVal('consequences.moderate')" />
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-2 col-form-label">6</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequences.severe', $event.target.value)" :checked="getVal(character.consequences, 'severe')" />
+                    <input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequences.severe', $event.target.value)" :checked="getVal('consequences.severe')" />
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-2 col-form-label stat-requirement">2</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" @change="setVal('consequences.mild2', $event.target.value)" :checked="getVal(character.consequences, 'mild2')" disabled data-required='physiqueOrWill' data-required-value='5'>
+                    <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" @change="setVal('consequences.mild2', $event.target.value)" :checked="getVal('consequences.mild2')" disabled data-required='physiqueOrWill' data-required-value='5'>
                 </div>
             </div>
         </div>
@@ -298,7 +298,7 @@ export default {
   },
   methods: {  
     getVal(graphPath, defaultValue) {
-      this.$parent.getVal(this.character, graphPath, defaultValue);
+      return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {
        this.$parent.setVal(this.character, arr, val);
@@ -379,7 +379,7 @@ export default {
             }));
         });
     },
-    initSheet() {      
+    initSheet() {
         this.populateSkillList();
     }
   }

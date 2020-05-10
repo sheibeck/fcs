@@ -78,9 +78,8 @@ export default {
   components: {
     search: Search,
   },
-  mounted(){
-    commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);    
+  mounted(){   
+    this.init();
   },
   computed: {
     slugify: function() {
@@ -114,7 +113,10 @@ export default {
   },
   methods : {
     init() {
-      $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {
+      commonSvc = new CommonService(this.$root);
+      dbSvc = new DbService(this.$root);
+
+      $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {        
         var button = $(event.relatedTarget) // Button that triggered the modal
         var characterId = button.data('id') // Extract info from data-* attributes
         // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).

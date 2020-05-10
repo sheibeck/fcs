@@ -72,9 +72,8 @@ export default {
   components: {
     search: Search,
   },
-  mounted(){
-    commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);    
+  mounted(){    
+    this.init();    
   },
   data () {
     return {
@@ -111,6 +110,9 @@ export default {
   },
   methods : {
    init() {
+      commonSvc = new CommonService(this.$root);
+      dbSvc = new DbService(this.$root);
+
       $(document).on('show.bs.modal', '#modalDeleteConfirm', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         var id = button.data('id') // Extract info from data-* attributes

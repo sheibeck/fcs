@@ -2,7 +2,7 @@
   <div class="container mt-2">
 
     <form>
-      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.sheetname" />
+      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" />
 
       <div class="d-print-none">
         <hr/>
@@ -11,9 +11,9 @@
           <div class='col'>
             <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character'>Save Character <i class='fa fa-user'></i></button>
             <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-            <button type='button' class='btn btn-default d-print-none' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+            <button type='button' class='btn btn-dark' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
             <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
-              Character Properties
+              Character Properties <i class="fas fa-cog"></i>
             </button>
           </div>
         </div>
@@ -127,12 +127,7 @@ export default {
       }     
     },
     async save() {
-      if (this.isAuthenticated) {
-        debugger;
-        /// save a character
-        //var data = $('form').serializeJSON();
-        //var characterData = JSON.parse(data);
-
+      if (this.isAuthenticated && this.characterId) {    
         var characterData = this.characterData
         
         if (!characterData.name) {
@@ -145,27 +140,13 @@ export default {
         characterData.related_id = this.sheetData.id;
         characterData.system = this.sheetData.system;
         characterData.slug = commonSvc.Slugify(characterData.name);
-        characterData.object_type = "CHARACTER";      
-
-        //create a new characterId if we don't have one
-        var isNew = false;
-        if (!this.characterId) {
-            isNew = true;
-            this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());
-        }
-        characterData.id = this.characterId;        
+        characterData.object_type = "CHARACTER";
 
         let response = await dbSvc.SaveObject(characterData).then((response) => { 
           if (response) {
             commonSvc.Notify('Character saved.', 'success');
           }
         });
-
-        /*.then( () => {         
-          if ($("img.portrait").length > 0 && $("#image_url").val().length > 0) {
-              $("img.portrait").prop("src", $("#image_url").val());
-          }          
-        });*/
       }
       else {
           window.print();

@@ -6,25 +6,36 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import SheetFateCore from "./sheet-fate-core";
-import SheetMiddleEarth from "./sheet-middle-earth";
+import { mapGetters } from 'vuex'
+import CommonService from "./../assets/js/commonService"
+import SheetFateCore from "./sheet-fate-core"
+import SheetMiddleEarth from "./sheet-middle-earth"
+import SheetDresdenFilesAccelerated from "./sheet-dresden-files-accelerated"
+
+let commonSvc = null;
 
 export default {
   name: 'CharacterSheet',
-  mounted() {    
+  mounted() {       
+    if (!commonSvc) { 
+      commonSvc = new CommonService(this.$root);
+    }
   },
   components: {
     "sheet-fate-core": SheetFateCore,
     "sheet-middle-earth": SheetMiddleEarth,
+    "sheet-dresden-files-accelerated": SheetDresdenFilesAccelerated,
   },
   props: {
     sheetid: String,
     character: Object,
   },
   computed: {
-    currentCharacterSheet() {
-      return `sheet-${this.sheetid}`;
+    currentCharacterSheet() {      
+      if (!commonSvc) { 
+        commonSvc = new CommonService(this.$root);
+      }
+      return `sheet-${commonSvc.GetId(this.sheetid)}`;
     }
   },
   data () {
@@ -45,7 +56,7 @@ export default {
           return (defaultValue || "");
       }
 
-      return eval(`${obj}${graphPath}`);
+      return eval(`obj.${graphPath}`);
     },
     setVal(obj, arr, val) {
 
@@ -71,7 +82,7 @@ export default {
       return result;
     },
     GetSheetImage(){
-      return `/static/sheets/${this.sheetid}/logo.png`;
+      return `/static/sheets/${commonSvc.GetId(this.sheetid)}/logo.png`;
     }
   }
 
