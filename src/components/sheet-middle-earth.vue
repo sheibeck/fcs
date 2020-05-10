@@ -4,12 +4,12 @@
         <div class="col-sm-6 col-md-4 order-md-2">
             <div class="row">
                 <div class="col text-center">
-                    <img alt="LOGO" class="img-fluid fate-logo" src="/static/sheets/middle-earth/logo.png" />
+                    <img alt="LOGO" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-6 text-center">
+                <div class="col-6 text-center"> 
                     <div for="refresh" class="fate-header">Refresh</div>
                     <input type="text" class="form-control text-center" id="refresh" name="refresh" @change="character.refresh = $event.target.value" :value="exists(character, 'refresh')" placeholder="Refresh" />
                 </div>
@@ -256,8 +256,8 @@ export default {
     }
   },
   methods: {  
-    exists(parent, value, defaultValue) {
-      this.$parent.exists(parent, value, defaultValue);
+    exists(parent, index, defaultValue) {
+      this.$parent.exists(parent, index, defaultValue);
     }  
   }
 }

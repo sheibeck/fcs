@@ -32,8 +32,32 @@ export default {
     }
   },
   methods: {
-   exists(parent, value, defaultValue) {
-      return parent && parent[value] ? parent[value] : (defaultValue || "");
+    exists(parent, index, defaultValue, secondary) {
+      if (!secondary) {
+        return parent && parent[index] ? parent[index] : (defaultValue || "");
+      }
+      else {
+        return parent && parent[index] && parent[index][secondary] ? parent[index][secondary] : (defaultValue || "");
+      }
+    },
+    set(parent, index, value, secondary) {
+      debugger;
+      if(!this.character[parent]) {
+        this.character[parent] = {};
+      }      
+      
+      if (!secondary) {
+        this.character[index] = value;
+      }
+      else {       
+       if (!this.character[parent][index]) {
+        this.character[parent][index] = {};
+        }
+        this.character[parent][index][secondary] = value;
+      }
+    },
+    GetSheetImage(){
+      return `/static/sheets/${this.sheetid}/logo.png`;
     }
   }
 
