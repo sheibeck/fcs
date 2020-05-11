@@ -67,7 +67,7 @@
                     <div class="col-12 skill-desc">Awe, Inspire, Persuade</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" id="approach[personality]" name="approach[personality]" @change="setVal('approaches.personality', $event.target.value)" :value="getVal('aspects.personality')" placeholder="+" />
+                    <input class="form-control text-center" type="text" id="approach[personality]" name="approach[personality]" @change="setVal('approaches.personality', $event.target.value)" :value="getVal('approaches.personality')" placeholder="+" />
                 </div>
             </div>
 
@@ -77,7 +77,7 @@
                     <div class="col-12 skill-desc">Athletics, Travel, Stealth</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" id="approach[movement]" name="approach[movement]" @change="setVal('approaches.movement', $event.target.value)" :value="getVal('aspects.movement')" placeholder="+" />
+                    <input class="form-control text-center" type="text" id="approach[movement]" name="approach[movement]" @change="setVal('approaches.movement', $event.target.value)" :value="getVal('approaches.movement')" placeholder="+" />
                 </div>
             </div>
 
@@ -87,7 +87,7 @@
                     <div class="col-12 skill-desc">Awareness, Insight, Search</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" id="approach[perception]" name="approach[perception]" @change="setVal('approaches.perception', $event.target.value)" :value="getVal('aspects.perception')" placeholder="+" />
+                    <input class="form-control text-center" type="text" id="approach[perception]" name="approach[perception]" @change="setVal('approaches.perception', $event.target.value)" :value="getVal('approaches.perception')" placeholder="+" />
                 </div>
             </div>
 
@@ -97,7 +97,7 @@
                     <div class="col-12 skill-desc">Explore, Healing, Hunting</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" id="approach[survival]" name="approach[survival]" @change="setVal('approaches.survival', $event.target.value)" :value="getVal('aspects.survival')" placeholder="+" />
+                    <input class="form-control text-center" type="text" id="approach[survival]" name="approach[survival]" @change="setVal('approaches.survival', $event.target.value)" :value="getVal('approaches.survival')" placeholder="+" />
                 </div>
             </div>
 
@@ -107,7 +107,7 @@
                     <div class="col-12 skill-desc">Song, Courtesy, Riddle</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" id="approach[custom]" name="approach[custom]" @change="setVal('approaches.custom', $event.target.value)" :value="getVal('aspects.custom')"  placeholder="+" />
+                    <input class="form-control text-center" type="text" id="approach[custom]" name="approach[custom]" @change="setVal('approaches.custom', $event.target.value)" :value="getVal('approaches.custom')"  placeholder="+" />
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
                     <div class="col-12 skill-desc">Craft, Battle, Lore</div>
                 </div>
                 <div class="col-3">
-                    <input class="form-control text-center" type="text" id="approach[vocation]" name="approach[vocation]" @change="setVal('approaches.vocation', $event.target.value)" :value="getVal('aspects.vocation')" placeholder="+" />
+                    <input class="form-control text-center" type="text" id="approach[vocation]" name="approach[vocation]" @change="setVal('approaches.vocation', $event.target.value)" :value="getVal('approaches.vocation')" placeholder="+" />
                 </div>
             </div>
         </div>
@@ -152,7 +152,7 @@
                         <br /><strong>Recover: </strong>Spend at least one full day in a warm, safe place with acceptable food and be in the company of close friends.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[hopeful]" name="condition[hopeful]" class="col-2" @change="setVal('coditions.hopeful', $event.target.value)" :checked="getVal('conditions.hopeful', true)" />
+                <input type="checkbox" value="2" id="condition[hopeful]" name="condition[hopeful]" class="col-2" @change="setVal('conditions.hopeful', $event.target.checked)" :checked="getVal('conditions.hopeful', true)" />
             </div>
 
             <div class="row">
@@ -163,7 +163,7 @@
                         <br/><strong>Recover: </strong>You must have a few hours of rest.
                     </div>
                 </div>
-                <input type="checkbox" value="1" id="condition[weary]" name="condition[weary]" class="col-2" @change="setVal('coditions.weary', $event.target.value)" :checked="getVal('conditions.weary', false)" />
+                <input type="checkbox" value="1" id="condition[weary]" name="condition[weary]" class="col-2" @change="setVal('conditions.weary', $event.target.checked)" :checked="getVal('conditions.weary')" />
             </div>
 
             <div class="row">
@@ -174,7 +174,7 @@
                         <br /><strong>Recover: </strong>You must have a warm dry place to rest and a meal.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[miserable]" name="condition[miserable]" class="col-2" @change="setVal('coditions.miserable', $event.target.value)" :checked="getVal('conditions.miserable', false)" />
+                <input type="checkbox" value="2" id="condition[miserable]" name="condition[miserable]" class="col-2" @change="setVal('conditions.miserable', $event.target.checked)" :checked="getVal('conditions.miserable')" />
             </div>
 
             <div class="row">
@@ -185,7 +185,7 @@
                         <br /><strong>Recover: </strong>At the beginning of any scene where you are no longer in the presence of the source of your fear.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[frightened]" name="condition[frightened]" class="col-2"  @change="setVal('coditions.frightened', $event.target.value)" :checked="getVal('conditions.frightened', false)">
+                <input type="checkbox" value="2" id="condition[frightened]" name="condition[frightened]" class="col-2"  @change="setVal('conditions.frightened', $event.target.checked)" :checked="getVal('conditions.frightened')">
             </div>
         </div>
 
@@ -198,7 +198,7 @@
                         <br /><strong>Recover: </strong>Receive medical care and have ample time to rest and eat.
                     </div>
                 </div>
-                <input type="checkbox" value="2" id="condition[poisoned]" name="condition[poisoned]" class="col-2" @change="setVal('coditions.poisoned', $event.target.value)" :checked="getVal('conditions.poisoned', false)">
+                <input type="checkbox" value="2" id="condition[poisoned]" name="condition[poisoned]" class="col-2" @change="setVal('conditions.poisoned', $event.target.checked)" :checked="getVal('conditions.poisoned')">
             </div>
 
             <div class="row mt-4">
@@ -209,7 +209,7 @@
                         <br /><strong>Recover: </strong>Uncheck this box after the end of the next scene.
                     </div>
                 </div>
-                <label class="col-1">2</label><input type="checkbox" value="2" id="condition[injured]" name="condition[injured]" class="col-3" @change="setVal('coditions.injured', $event.target.value)" :checked="getVal('conditions.injured', false)" />
+                <label class="col-1">2</label><input type="checkbox" value="2" id="condition[injured]" name="condition[injured]" class="col-3" @change="setVal('conditions.injured', $event.target.checked)" :checked="getVal('conditions.injured')" />
             </div>
 
             <div class="row">
@@ -220,7 +220,7 @@
                         <br /><strong>Recover: </strong>requires medical attention. Uncheck this box at the beginning of the next game session.
                     </div>
                 </div>
-                <label class="col-1">4</label><input type="checkbox" value="4" id="condition[wounded]" name="condition[wounded]" class="col-3" @change="setVal('coditions.wounded', $event.target.value)" :checked="getVal('conditions.wounded', false)" />
+                <label class="col-1">4</label><input type="checkbox" value="4" id="condition[wounded]" name="condition[wounded]" class="col-3" @change="setVal('conditions.wounded', $event.target.checked)" :checked="getVal('conditions.wounded')" />
 
             </div>
 
@@ -232,7 +232,7 @@
                         <br /><strong>Recover: </strong>Requires medical attention as well as a long recovery in a safe place with ample food and rest.
                     </div>
                 </div>
-                <label class="col-1">6</label><input type="checkbox" value="6" id="condition[dying]" name="condition[dying]" class="col-3" @change="setVal('coditions.dying', $event.target.value)" :checked="getVal('conditions.dying', false)" />
+                <label class="col-1">6</label><input type="checkbox" value="6" id="condition[dying]" name="condition[dying]" class="col-3" @change="setVal('conditions.dying', $event.target.checked)" :checked="getVal('conditions.dying')" />
             </div>
         </div>
 

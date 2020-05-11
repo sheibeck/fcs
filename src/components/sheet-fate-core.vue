@@ -63,95 +63,145 @@
             <div class="form-group row mr-0">
                 <label class="col-xs-12 pr-md-0 col-md-2 col-form-label ">Superb (+5)</label>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s1]" name="skill[superb][s1]" @change="setVal('skills.superb.s1', $event.target.value)" :value="getVal('skills.superb.s1')" placeholder=""></select>
+                    <select class="form-control" id="skill[superb][s1]" name="skill[superb][s1]" @change="setVal('skills.superb.s1', $event.target.value)" :value="getVal('skills.superb.s1')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>                    
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s2]" name="skill[superb][s2]" @change="setVal('skills.superb.s2', $event.target.value)" :value="getVal('skills.superb.s2')" placeholder=""></select>
+                    <select class="form-control" id="skill[superb][s2]" name="skill[superb][s2]" @change="setVal('skills.superb.s2', $event.target.value)" :value="getVal('skills.superb.s2')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s3]" name="skill[superb][s3]" @change="setVal('skills.superb.s3', $event.target.value)" :value="getVal('skills.superb.s3')" placeholder=""></select>
+                    <select class="form-control" id="skill[superb][s3]" name="skill[superb][s3]" @change="setVal('skills.superb.s3', $event.target.value)" :value="getVal('skills.superb.s3')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                                        </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s4]" name="skill[superb][s4]" @change="setVal('skills.superb.s4', $event.target.value)" :value="getVal('skills.superb.s4')" placeholder=""></select>
+                    <select class="form-control" id="skill[superb][s4]" name="skill[superb][s4]" @change="setVal('skills.superb.s4', $event.target.value)" :value="getVal('skills.superb.s4')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s5]" name="skill[superb][s5]" @change="setVal('skills.superb.s5', $event.target.value)" :value="getVal('skills.superb.s5')" placeholder=""></select>
+                    <select class="form-control" id="skill[superb][s5]" name="skill[superb][s5]" @change="setVal('skills.superb.s5', $event.target.value)" :value="getVal('skills.superb.s5')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group row mr-0">
                 <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Great (+4)</label>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s1]" name="skill[great][s1]" @change="setVal('skills.great.s1', $event.target.value)" :value="getVal('skills.great.s1')" placeholder=""></select>
+                    <select class="form-control" id="skill[great][s1]" name="skill[great][s1]" @change="setVal('skills.great.s1', $event.target.value)" :value="getVal('skills.great.s1')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s2]" name="skill[great][s2]" @change="setVal('skills.great.s2', $event.target.value)" :value="getVal('skills.great.s2')" placeholder=""></select>
+                    <select class="form-control" id="skill[great][s2]" name="skill[great][s2]" @change="setVal('skills.great.s2', $event.target.value)" :value="getVal('skills.great.s2')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s3]" name="skill[great][s3]" @change="setVal('skills.great.s3', $event.target.value)" :value="getVal('skills.great.s3')" placeholder=""></select>
+                    <select class="form-control" id="skill[great][s3]" name="skill[great][s3]" @change="setVal('skills.great.s3', $event.target.value)" :value="getVal('skills.great.s3')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s4]" name="skill[great][s4]" @change="setVal('skills.great.s4', $event.target.value)" :value="getVal('skills.great.s4')" placeholder=""></select>
+                    <select class="form-control" id="skill[great][s4]" name="skill[great][s4]" @change="setVal('skills.great.s4', $event.target.value)" :value="getVal('skills.great.s4')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s5]" name="skill[great][s5]" @change="setVal('skills.great.s5', $event.target.value)" :value="getVal('skills.great.s5')" placeholder=""></select>
+                    <select class="form-control" id="skill[great][s5]" name="skill[great][s5]" @change="setVal('skills.great.s5', $event.target.value)" :value="getVal('skills.great.s5')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group row mr-0">
                 <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Good (+3)</label>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s1]" name="skill[good][s1]" @change="setVal('skills.good.s1', $event.target.value)" :value="getVal('skills.good.s1')" placeholder=""></select>
+                    <select class="form-control" id="skill[good][s1]" name="skill[good][s1]" @change="setVal('skills.good.s1', $event.target.value)" :value="getVal('skills.good.s1')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s2]" name="skill[good][s2]" @change="setVal('skills.good.s2', $event.target.value)" :value="getVal('skills.good.s2')" placeholder=""></select>
+                    <select class="form-control" id="skill[good][s2]" name="skill[good][s2]" @change="setVal('skills.good.s2', $event.target.value)" :value="getVal('skills.good.s2')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s3]" name="skill[good][s3]" @change="setVal('skills.good.s3', $event.target.value)" :value="getVal('skills.good.s3')" placeholder=""></select>
+                    <select class="form-control" id="skill[good][s3]" name="skill[good][s3]" @change="setVal('skills.good.s3', $event.target.value)" :value="getVal('skills.good.s3')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s4]" name="skill[good][s4]" @change="setVal('skills.good.s4', $event.target.value)" :value="getVal('skills.good.s4')" placeholder=""></select>
+                    <select class="form-control" id="skill[good][s4]" name="skill[good][s4]" @change="setVal('skills.good.s4', $event.target.value)" :value="getVal('skills.good.s4')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s5]" name="skill[good][s5]" @change="setVal('skills.good.s5', $event.target.value)" :value="getVal('skills.good.s5')" placeholder=""></select>
+                    <select class="form-control" id="skill[good][s5]" name="skill[good][s5]" @change="setVal('skills.good.s5', $event.target.value)" :value="getVal('skills.good.s5')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group row mr-0">
                 <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Fair (+2)</label>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s1]" name="skill[fair][s1]" @change="setVal('skills.fair.s1', $event.target.value)" :value="getVal('skills.fair.s1')" placeholder=""></select>
+                    <select class="form-control" id="skill[fair][s1]" name="skill[fair][s1]" @change="setVal('skills.fair.s1', $event.target.value)" :value="getVal('skills.fair.s1')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s2]" name="skill[fair][s2]" @change="setVal('skills.fair.s2', $event.target.value)" :value="getVal('skills.fair.s2')" placeholder=""></select>
+                    <select class="form-control" id="skill[fair][s2]" name="skill[fair][s2]" @change="setVal('skills.fair.s2', $event.target.value)" :value="getVal('skills.fair.s2')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s3]" name="skill[fair][s3]" @change="setVal('skills.fair.s3', $event.target.value)" :value="getVal('skills.fair.s3')" placeholder=""></select>
+                    <select class="form-control" id="skill[fair][s3]" name="skill[fair][s3]" @change="setVal('skills.fair.s3', $event.target.value)" :value="getVal('skills.fair.s3')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s4]" name="skill[fair][s4]" @change="setVal('skills.fair.s4', $event.target.value)" :value="getVal('skills.fair.s4')" placeholder=""></select>
+                    <select class="form-control" id="skill[fair][s4]" name="skill[fair][s4]" @change="setVal('skills.fair.s4', $event.target.value)" :value="getVal('skills.fair.s4')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s5]" name="skill[fair][s5]" @change="setVal('skills.fair.s5', $event.target.value)" :value="getVal('skills.fair.s5')" placeholder=""></select>
+                    <select class="form-control" id="skill[fair][s5]" name="skill[fair][s5]" @change="setVal('skills.fair.s5', $event.target.value)" :value="getVal('skills.fair.s5')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group row mr-0">
                 <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Average (+1)</label>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s1]" name="skill[average][s1]" @change="setVal('skills.average.s1', $event.target.value)" :value="getVal('skills.average.s1')" placeholder=""></select>
+                    <select class="form-control" id="skill[average][s1]" name="skill[average][s1]" @change="setVal('skills.average.s1', $event.target.value)" :value="getVal('skills.average.s1')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s2]" name="skill[average][s2]" @change="setVal('skills.average.s2', $event.target.value)" :value="getVal('skills.average.s2')" placeholder=""></select>
+                    <select class="form-control" id="skill[average][s2]" name="skill[average][s2]" @change="setVal('skills.average.s2', $event.target.value)" :value="getVal('skills.average.s2')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s3]" name="skill[average][s3]" @change="setVal('skills.average.s3', $event.target.value)" :value="getVal('skills.average.s3')" placeholder=""></select>
+                    <select class="form-control" id="skill[average][s3]" name="skill[average][s3]" @change="setVal('skills.average.s3', $event.target.value)" :value="getVal('skills.average.s3')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s4]" name="skill[average][s4]" @change="setVal('skills.average.s4', $event.target.value)" :value="getVal('skills.average.s4')" placeholder=""></select>
+                    <select class="form-control" id="skill[average][s4]" name="skill[average][s4]" @change="setVal('skills.average.s4', $event.target.value)" :value="getVal('skills.average.s4')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s5]" name="skill[average][s5]" @change="setVal('skills.average.s5', $event.target.value)" :value="getVal('skills.average.s5')" placeholder=""></select>
+                    <select class="form-control" id="skill[average][s5]" name="skill[average][s5]" @change="setVal('skills.average.s5', $event.target.value)" :value="getVal('skills.average.s5')" placeholder="">
+                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -183,28 +233,28 @@
                     <label for="stress">
                         1
                     </label>
-                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1', $event.target.value)" :checked="getVal('stress.stress1', false)" />
+                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1', $event.target.checked)" :checked="getVal('stress.stress1', false)" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         2
                     </label>
-                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2', $event.target.value)" :checked="getVal('stress.stress2', false)" />
+                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2', $event.target.checked)" :checked="getVal('stress.stress2', false)" />
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         3
                     </label>
-                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3', $event.target.value)" :checked="getVal('stress.stress3', false)" disabled data-required='physique' data-required-value='1'>
+                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3', $event.target.checked)" :checked="getVal('stress.stress3', false)" disabled data-required='physique' data-required-value='1'>
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         4
                     </label>
-                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4', $event.target.value)" :checked="getVal('stress.stress4', false)" disabled data-required='physique' data-required-value='3'>
+                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4', $event.target.checked)" :checked="getVal('stress.stress4', false)" disabled data-required='physique' data-required-value='3'>
                 </div>
             </div>
 
@@ -217,28 +267,28 @@
                     <label for="stress">
                         1
                     </label>
-                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1', $event.target.value)" :checked="getVal('stress.mental1', false)" />
+                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1', $event.target.checked)" :checked="getVal('stress.mental1', false)" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         2
                     </label>
-                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2', $event.target.value)" :checked="getVal('stress.mental2', false)" />
+                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2', $event.target.checked)" :checked="getVal('stress.mental2', false)" />
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         3
                     </label>
-                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3', $event.target.value)" :checked="getVal('stress.mental3', false)" disabled data-required='will' data-required-value='1'>
+                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3', $event.target.checked)" :checked="getVal('stress.mental3', false)" disabled data-required='will' data-required-value='1'>
                 </div>
 
                 <div class="col">
                     <label class="stat-requirement" for="stress">
                         4
                     </label>
-                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]"  @change="setVal('stress.mental4', $event.target.value)" :checked="getVal('stress.mental4', false)" disabled data-required='will' data-required-value='3'>
+                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]"  @change="setVal('stress.mental4', $event.target.checked)" :checked="getVal('stress.mental4', false)" disabled data-required='will' data-required-value='3'>
                 </div>
             </div>
         </div>
@@ -250,28 +300,28 @@
             <div class="form-group row">
                 <label class="col-2 col-form-label">2</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequences.mild', $event.target.value)" :checked="getVal('consequences.mild')" />
+                    <input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequences.mild', $event.target.checked)" :checked="getVal('consequences.mild')" />
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-2 col-form-label">4</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequences.moderate', $event.target.value)" :checked="getVal('consequences.moderate')" />
+                    <input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequences.moderate', $event.target.checked)" :checked="getVal('consequences.moderate')" />
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-2 col-form-label">6</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequences.severe', $event.target.value)" :checked="getVal('consequences.severe')" />
+                    <input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequences.severe', $event.target.checked)" :checked="getVal('consequences.severe')" />
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-2 col-form-label stat-requirement">2</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" @change="setVal('consequences.mild2', $event.target.value)" :checked="getVal('consequences.mild2')" disabled data-required='physiqueOrWill' data-required-value='5'>
+                    <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" @change="setVal('consequences.mild2', $event.target.checked)" :checked="getVal('consequences.mild2')" disabled data-required='physiqueOrWill' data-required-value='5'>
                 </div>
             </div>
         </div>
@@ -285,15 +335,16 @@ export default {
   name: 'SheetFateCore',
   props: {
     character: Object,
-  },
-  mounted() {    
-      this.initSheet();
-  },
+  }, 
   computed: {
    
   },
   data () {
     return {
+        skills: 
+            ['', 'Athletics', 'Burglary', 'Contacts', 'Crafts', 'Deceive', 'Drive', 'Empathy'
+                , 'Fight', 'Investigate', 'Lore', 'Notice', 'Physique', 'Provoke', 'Rapport'
+                , 'Resources', 'Shoot', 'Stealth', 'Will']        
     }
   },
   methods: {  
@@ -366,22 +417,7 @@ export default {
             $elem.prev('label').addClass('stat-requirement');
             $elem.parent().prev('label').addClass('stat-requirement');
         }
-    },
-    populateSkillList() {
-        var skills = ['', 'Athletics', 'Burglary', 'Contacts', 'Crafts', 'Deceive', 'Drive', 'Empathy'
-                    , 'Fight', 'Investigate', 'Lore', 'Notice', 'Physique', 'Provoke', 'Rapport'
-                    , 'Resources', 'Shoot', 'Stealth', 'Will'];
-
-        $.each(skills, function (i, item) {
-            $('select').append($('<option>', {
-                value: item,
-                text: item
-            }));
-        });
-    },
-    initSheet() {
-        this.populateSkillList();
-    }
+    },    
   }
 }
 </script>

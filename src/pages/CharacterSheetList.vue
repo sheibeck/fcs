@@ -7,7 +7,9 @@
       </div>
       <div class='card-columns'>
         <div v-for='sheet in sheets' class='card'>
-          <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
+          <a v-bind:href="`charactersheet/${sheet.slug}`" v-bind:data-id='sheet.id' role="button">
+            <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
+          </a>
           <div class='card-body'>
             <h5 class='card-title charactersheet-name'>{{sheet.system}}</h5>
             <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success' v-bind:data-id='sheet.id' role="button">Create Character <i class='fa fa-user'></i></a>

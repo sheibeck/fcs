@@ -50,7 +50,8 @@ export default {
       for (var i = 0; i < parts.length; i++)
       {
         var part = parts[i];
-        if (root[part] && root.hasOwnProperty(part))
+        //account for false values in checkboxes
+        if ((root[part] || root[part] == false) && root.hasOwnProperty(part))
           root = root[part];
         else
           return (defaultValue || "");
