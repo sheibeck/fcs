@@ -10,10 +10,11 @@ import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService"
 
 //sheets
-import SheetFateCore from "./sheet-fate-core"
-import SheetFateCoreCustom from "./sheet-fate-core-custom"
-import SheetMiddleEarth from "./sheet-middle-earth"
-import SheetDresdenFilesAccelerated from "./sheet-dresden-files-accelerated"
+import SheetFateAccelerated from "./../sheets/fate-accelerated"
+import SheetFateCore from "./../sheets/fate-core"
+import SheetFateCoreCustom from "./../sheets/fate-core-custom"
+import SheetMiddleEarth from "./../sheets/middle-earth"
+import SheetDresdenFilesAccelerated from "./../sheets/dresden-files-accelerated"
 
 let commonSvc = null;
 
@@ -25,10 +26,11 @@ export default {
     }
   },
   components: {
-    "sheet-fate-core": SheetFateCore,
-    "sheet-fate-core-custom": SheetFateCoreCustom,
-    "sheet-middle-earth": SheetMiddleEarth,
-    "sheet-dresden-files-accelerated": SheetDresdenFilesAccelerated,
+    "fate-accelerated": SheetFateAccelerated,
+    "fate-core": SheetFateCore,
+    "fate-core-custom": SheetFateCoreCustom,
+    "middle-earth": SheetMiddleEarth,
+    "dresden-files-accelerated": SheetDresdenFilesAccelerated,
   },
   props: {
     sheetid: String,
@@ -39,7 +41,7 @@ export default {
       if (!commonSvc) { 
         commonSvc = new CommonService(this.$root);
       }
-      return `sheet-${commonSvc.GetId(this.sheetid)}`;
+      return `${commonSvc.GetId(this.sheetid)}`;
     }
   },
   data () {
@@ -87,6 +89,7 @@ export default {
       return result;
     },
     skillHasValue(skillList, value) { 
+      try {
       // this will only find one instance of the skill, not all.
       // we expect that each skill only shows up once.
       let skillArray = skillList.split("|");
@@ -130,7 +133,11 @@ export default {
                 skills.push(eval(found[0])); //grab the skill leve
         });
 
-        return Math.max.apply(Math, skills) >= value;        
+        return Math.max.apply(Math, skills) >= value;  
+      }
+      catch(e) {
+        return false;
+      }      
     },
     GetSheetImage(){
       return `/static/sheets/${commonSvc.GetId(this.sheetid)}/logo.png`;

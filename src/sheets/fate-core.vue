@@ -65,7 +65,7 @@
                 <div class="col-xs-12 col-md-2 p-md-0">
                     <select class="form-control" id="skill[superb][s1]" name="skill[superb][s1]" @change="setVal('skills.superb.s1', $event.target.value)" :value="getVal('skills.superb.s1')" placeholder="">
                         <option v-for="skill in skills" :value="skill">{{skill}}</option>                    
-                    </select>
+                    </select>                   
                 </div>
                 <div class="col-xs-12 col-md-2 p-md-0">
                     <select class="form-control" id="skill[superb][s2]" name="skill[superb][s2]" @change="setVal('skills.superb.s2', $event.target.value)" :value="getVal('skills.superb.s2')" placeholder="">
@@ -361,7 +361,7 @@ export default {
            this.autocalc();
        }       
     },
-    skillHasValue(skillList, value) {          
+    skillHasValue(skillList, value) {        
       return this.$parent.skillHasValue(skillList, value);
     },
     // autocalculate stuff
