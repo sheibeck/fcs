@@ -4,7 +4,7 @@
 		<div class="col-sm-6 col-md-4 order-md-2">
 			<div class="row">
 				<div class="col text-center">
-					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" src="/static/sheets/fate-accelerated/logo.png" />
+					<img alt="FATE ACCELERATED" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />
 				</div>
 			</div>
 

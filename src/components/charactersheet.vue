@@ -15,6 +15,7 @@ import SheetFateCore from "./../sheets/fate-core"
 import SheetFateCoreCustom from "./../sheets/fate-core-custom"
 import SheetMiddleEarth from "./../sheets/middle-earth"
 import SheetDresdenFilesAccelerated from "./../sheets/dresden-files-accelerated"
+import SheetFateCondensed from "./../sheets/fate-condensed"
 
 let commonSvc = null;
 
@@ -31,6 +32,7 @@ export default {
     "fate-core-custom": SheetFateCoreCustom,
     "middle-earth": SheetMiddleEarth,
     "dresden-files-accelerated": SheetDresdenFilesAccelerated,
+    "fate-condensed": SheetFateCondensed,
   },
   props: {
     sheetid: String,

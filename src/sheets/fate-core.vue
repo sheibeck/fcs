@@ -363,42 +363,6 @@ export default {
     },
     skillHasValue(skillList, value) {        
       return this.$parent.skillHasValue(skillList, value);
-    },
-    // autocalculate stuff
-    getSkillValue(name) {
-        if (name.indexOf('average') > -1)
-            return 1;
-
-        if (name.indexOf('fair') > -1)
-            return 2;
-
-        if (name.indexOf('good') > -1)
-            return 3;
-
-        if (name.indexOf('great') > -1)
-            return 4;
-
-        if (name.indexOf('superb') > -1)
-            return 5;
-
-        return 0;
-    },
-    autocalc() {     
-        
-        
-               
-    },
-    showQualified(isQualified, $elem) {
-        if (isQualified) {
-            $elem.attr('disabled', false);
-            $elem.prev('label').removeClass('stat-requirement');
-            $elem.parent().prev('label').removeClass('stat-requirement');
-        }
-        else {
-            $elem.attr('disabled', true);
-            $elem.prev('label').addClass('stat-requirement');
-            $elem.parent().prev('label').addClass('stat-requirement');
-        }
     },    
   }
 }
