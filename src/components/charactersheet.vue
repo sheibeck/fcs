@@ -8,7 +8,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService"
+
+//sheets
 import SheetFateCore from "./sheet-fate-core"
+import SheetFateCoreCustom from "./sheet-fate-core-custom"
 import SheetMiddleEarth from "./sheet-middle-earth"
 import SheetDresdenFilesAccelerated from "./sheet-dresden-files-accelerated"
 
@@ -23,6 +26,7 @@ export default {
   },
   components: {
     "sheet-fate-core": SheetFateCore,
+    "sheet-fate-core-custom": SheetFateCoreCustom,
     "sheet-middle-earth": SheetMiddleEarth,
     "sheet-dresden-files-accelerated": SheetDresdenFilesAccelerated,
   },
@@ -81,6 +85,52 @@ export default {
 
       let result = addProp(obj,arr,val);
       return result;
+    },
+    skillHasValue(skillList, value) { 
+      // this will only find one instance of the skill, not all.
+      // we expect that each skill only shows up once.
+      let skillArray = skillList.split("|");
+
+        function getPath(obj, value) {
+          if(obj.constructor !== Object) {
+              throw new TypeError('getPath() can only operate on object with Object as constructor');
+          }
+          var path = [];
+          var found = false;
+
+          function search(haystack) {
+            for (var key in haystack) {
+              path.push(key);
+              if(haystack[key] === value) {
+                  found = true;
+                  break;
+              }
+              if(haystack[key].constructor === Object) {
+                  search(haystack[key]);
+                  if(found) break;
+              }
+              path.pop();
+            }
+          }
+
+          search(obj);
+          return path;         
+        }
+
+        let average = 1;
+        let fair = 2;
+        let good = 3;
+        let great = 4;
+        let superb = 5;        
+
+        let skills = [];
+        skillArray.forEach( (skillName) => {
+            let found = getPath(this.character.skills, skillName);
+            if (found.length > 0)
+                skills.push(eval(found[0])); //grab the skill leve
+        });
+
+        return Math.max.apply(Math, skills) >= value;        
     },
     GetSheetImage(){
       return `/static/sheets/${commonSvc.GetId(this.sheetid)}/logo.png`;
