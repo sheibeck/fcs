@@ -56,10 +56,7 @@ export default {
    
     this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.id);
   },
-  watch: {
-    userId() {
-      this.show();
-    }
+  watch: {     
   },
   computed: {
     ...mapGetters([
@@ -71,26 +68,18 @@ export default {
     return {
       sheet: "",
       id: this.$route.params.id,
-      characterId: "",
+      characterId: null,
       title: "",
       description: "",
-      characterData: {},
+      characterData: {        
+        related_id: `CHARACTERSHEET|${this.$route.params.id}`
+      },
     }
   },
   methods : {
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
-    },
-    async show() {      
-      await dbSvc.GetObject(this.sheetId, commonSvc.GetRootOwner()).then( (data) => { 
-        this.sheetData = data;        
-        this.sheet = data.content;
-
-        this.title = data.name + ' (Character Sheet)';
-        this.description = data.description;
-      }); 
-
-    },
+    },    
     save : async function() {            
       if (this.isAuthenticated) {
         /// save a character       
@@ -101,10 +90,10 @@ export default {
           return;
         }
 
-        // make sure we have a proper user id key        
+        // make sure we have a proper user id key
         characterData.owner_id = this.userId;
-        characterData.related_id = this.sheetData.id;
-        characterData.system = this.sheetData.system;
+        characterData.related_id = commonSvc.SetId("CHARACTERSHEET", this.id);
+        //characterData.system = this.sheetData.system;
         characterData.slug = commonSvc.Slugify(characterData.name);        
 
         //create a new characterId if we don't have one
@@ -115,7 +104,7 @@ export default {
         let response = await dbSvc.SaveObject(characterData).then((response) => {
           if (response) {
             commonSvc.Notify('Character saved.', 'success', null, () => {
-                location.href = `/character/${this.sheetData.slug}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
+                location.href = `/character/${this.id}/${commonSvc.GetId(characterData.id)}/${characterData.slug}`;
             });            
           }
         });

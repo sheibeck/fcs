@@ -248,8 +248,8 @@ export default {
   props: {    
     character: Object,
   },
-  computed: {
-   
+  mounted() {
+   this.$parent.$parent.title = 'Middle Earth (Character Sheet)';
   },
   data () {
     return {

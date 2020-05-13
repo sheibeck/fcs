@@ -16,6 +16,7 @@ import SheetFateCoreCustom from "./../sheets/fate-core-custom"
 import SheetMiddleEarth from "./../sheets/middle-earth"
 import SheetDresdenFilesAccelerated from "./../sheets/dresden-files-accelerated"
 import SheetFateCondensed from "./../sheets/fate-condensed"
+import SheetFateFreeport from "./../sheets/fate-freeport"
 
 let commonSvc = null;
 
@@ -33,6 +34,7 @@ export default {
     "middle-earth": SheetMiddleEarth,
     "dresden-files-accelerated": SheetDresdenFilesAccelerated,
     "fate-condensed": SheetFateCondensed,
+    "fate-freeport": SheetFateFreeport,
   },
   props: {
     sheetid: String,
@@ -68,78 +70,38 @@ export default {
       return eval(`obj.${graphPath}`);
     },
     setVal(obj, arr, val) {
-
-      function addProp(obj,arr,val) {
-        if (typeof arr == 'string')
-          arr = arr.split(".");
-
-        obj[arr[0]] = obj[arr[0]] || {};
-
-        var tmpObj = obj[arr[0]];
-
-        if (arr.length > 1) {
-            arr.shift();
-            addProp(tmpObj, arr, val);
-        }
-        else
-            obj[arr[0]] = val;
-
-        return obj;
+      arr = arr.split(".");
+      
+      if (arr.length == 1)
+      {
+        Vue.set(obj, arr[0], val);       
       }
-
-      let result = addProp(obj,arr,val);
-      return result;
-    },
-    skillHasValue(skillList, value) { 
-      try {
-      // this will only find one instance of the skill, not all.
-      // we expect that each skill only shows up once.
-      let skillArray = skillList.split("|");
-
-        function getPath(obj, value) {
-          if(obj.constructor !== Object) {
-              throw new TypeError('getPath() can only operate on object with Object as constructor');
-          }
-          var path = [];
-          var found = false;
-
-          function search(haystack) {
-            for (var key in haystack) {
-              path.push(key);
-              if(haystack[key] === value) {
-                  found = true;
-                  break;
-              }
-              if(haystack[key].constructor === Object) {
-                  search(haystack[key]);
-                  if(found) break;
-              }
-              path.pop();
-            }
-          }
-
-          search(obj);
-          return path;         
-        }
-
-        let average = 1;
-        let fair = 2;
-        let good = 3;
-        let great = 4;
-        let superb = 5;        
-
-        let skills = [];
-        skillArray.forEach( (skillName) => {
-            let found = getPath(this.character.skills, skillName);
-            if (found.length > 0)
-                skills.push(eval(found[0])); //grab the skill leve
-        });
-
-        return Math.max.apply(Math, skills) >= value;  
+      if (arr.length == 2)
+      {        
+        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+        Vue.set(obj[arr[0]], arr[1], val);  
       }
-      catch(e) {
-        return false;
-      }      
+      if (arr.length == 3)
+      {
+        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
+        Vue.set(obj[arr[0]][arr[1]], arr[2], val);             
+      }
+      if (arr.length == 4)
+      {
+        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
+        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
+        Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], val);        
+      }
+      if (arr.length == 5)
+      {
+        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
+        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
+        if (!obj[arr[0]][arr[1]][arr[2]])Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], {});
+        Vue.set(obj[arr[0]][arr[1]][arr[2]][arr[3]], arr[4], val);
+      }
     },
     GetSheetImage(){
       return `/static/sheets/${commonSvc.GetId(this.sheetid)}/logo.png`;

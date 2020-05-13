@@ -292,8 +292,8 @@ export default {
   props: {
     character: Object,
   }, 
-  computed: {
-   
+  mounted() {
+   this.$parent.$parent.title = 'Fate Core Custom (Character Sheet)';
   },
   data () {
     return {       

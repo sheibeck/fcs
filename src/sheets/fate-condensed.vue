@@ -293,8 +293,8 @@ export default {
   props: {    
     character: Object,
   },
-  computed: {
-   
+  mounted() {
+   this.$parent.$parent.title = 'Fate Condensed (Character Sheet)';
   },
   data () {
     return {

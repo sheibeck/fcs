@@ -9,7 +9,7 @@
 
         <div class='row'>
           <div class='col'>
-            <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success js-create-character'>Save Character <i class='fa fa-user'></i></button>
+            <button v-if="isAuthenticated && isOwner" type='button' v-on:click="save" class='btn btn-success'>Save Character <i class='fa fa-user'></i></button>
             <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
             <button type='button' class='btn btn-dark' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
             <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
@@ -67,7 +67,10 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-    ]),    
+    ]),
+    isOwner() {      
+      return this.characterData && this.characterData.owner_id == this.userId;
+    }    
   },
   watch: {
     userId() {
@@ -90,44 +93,15 @@ export default {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
     async show() {     
-      this.characterData = await dbSvc.GetObject(this.characterId);
+      this.characterData = await dbSvc.GetObject(this.characterId);      
       if (this.characterData == null) {
         commonSvc.Notify(`Could not find character with id <b>${commonSvc.GetId(this.characterId)}</b>`, 'error', 2000, () => {
           document.location = '/character';
         });
-      }
-      else {
-        let response = await dbSvc.GetObject(this.characterData.related_id).then( (response) => {
-          this.sheetData = response;
-          this.sheet = response.content;          
-        });
-      }
-    },
-    populateCharacterData() {    
-      this.title = this.characterData.name + ' (Character)';
-      this.description = this.characterData.system;
-
-      //if the viewer isn't the character owner then don't let them save it
-      // it would just copy it to their account, but for now we'll just
-      // remove the option
-      if (this.characterData.owner_id !== this.userId)
-      {
-        $('.js-create-character').remove();
-      }
-
-      //check if there is an initSheet function and run it
-      if (typeof initSheet !== "undefined") {
-          initSheet();
-      }
-
-      $('form').populate(this.characterData);
-
-      if (typeof autocalc !== "undefined") {
-          autocalc();
       }     
-    },
+    },   
     async save() {
-      if (this.isAuthenticated && this.characterId) {    
+      if (this.isAuthenticated && this.characterId && this.isOwner) {
         var characterData = this.characterData
         
         if (!characterData.name) {
@@ -137,8 +111,8 @@ export default {
 
         // make sure we have a proper user id key
         characterData.owner_id = this.userId;
-        characterData.related_id = this.sheetData.id;
-        characterData.system = this.sheetData.system;
+        characterData.related_id = this.sheetId;
+        //characterData.system = this.sheetData.system;
         characterData.slug = commonSvc.Slugify(characterData.name);
         characterData.object_type = "CHARACTER";
 

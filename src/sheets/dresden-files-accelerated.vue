@@ -349,8 +349,8 @@ export default {
   props: {    
     character: Object,
   },
-  computed: {
-   
+  mounted() {
+   this.$parent.$parent.title = 'Dresden Files Accelerated (Character Sheet)';
   },
   data () {
     return {
