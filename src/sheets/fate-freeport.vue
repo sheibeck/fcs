@@ -144,14 +144,14 @@
                 </div>
 
                 <div class="col">
-                    <label class="stat-requirement" for="stress">
+                    <label :class="{'stat-requirement': !approachHasValue('constitution', 1)}" for="stress">
                         3
                     </label>
                     <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]"  @change="setVal('stress.stress3',  $event.target.checked)" :check="getVal('stress.stress3')" :disabled="!approachHasValue('constitution', 1)" />
                 </div>
 
                 <div class="col">
-                    <label class="stat-requirement" for="stress">
+                    <label :class="{'stat-requirement': !approachHasValue('constitution', 3)}" for="stress">
                         4
                     </label>
                     <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :check="getVal('stress.stress4')" :disabled="!approachHasValue('constitution', 3)" />
@@ -178,14 +178,14 @@
                 </div>
 
                 <div class="col">
-                    <label class="stat-requirement" for="stress">
+                    <label :class="{'stat-requirement': !approachHasValue('wisdom', 1)}" for="stress">
                         3
                     </label>
                     <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3',  $event.target.checked)" :check="getVal('stress.mental3')" :disabled="!approachHasValue('wisdom', 1)">
                 </div>
 
                 <div class="col">
-                    <label class="stat-requirement" for="stress">
+                    <label :class="{'stat-requirement': !approachHasValue('wisdom', 3)}" for="stress">
                         4
                     </label>
                     <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]" @change="setVal('stress.mental4',  $event.target.checked)" :check="getVal('stress.mental4')" :disabled="!approachHasValue('wisdom', 3)">
@@ -254,21 +254,21 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-2 col-form-label stat-requirement">2</label>
+                <label class="col-2 col-form-label" :class="{'stat-requirement': !approachHasValue('constitution|wisdom', 5)}">2</label>
                 <div class="col-10">
                     <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" @change="setVal('consequences.mild2',  $event.target.value)" :value="getVal('consequences.mild2')" placeholder="Mild" :disabled="!approachHasValue('constitution|wisdom', 5)" />
                 </div>
             </div>
 
             <div class="form-group row">
-                <label class="col-2 col-form-label stat-requirement">4</label>
+                <label class="col-2 col-form-label" :class="{'stat-requirement': !approachHasValue('constitution|wisdom', 6)}">4</label>
                 <div class="col-10">
                     <input class="form-control" type="text" id="consequence[moderate2]" name="consequence[moderate2]" @change="setVal('consequences.moderate2',  $event.target.value)" :value="getVal('consequences.moderate2')" placeholder="Moderate" :disabled="!approachHasValue('constitution|wisdom', 6)" />
                 </div>
             </div>
 
             <div class="form-group row">
-                <label class="col-2 col-form-label stat-requirement">6</label>
+                <label class="col-2 col-form-label" :class="{'stat-requirement': !approachHasValue('constitution|wisdom', 7)}">6</label>
                 <div class="col-10">
                     <input class="form-control" type="text" id="consequence[severe2]" name="consequence[severe2]" @change="setVal('consequences.severe2',  $event.target.value)" :value="getVal('consequences.severe2')" placeholder="Severe" :disabled="!approachHasValue('constitution|wisdom', 7)" />
                 </div>
@@ -309,7 +309,7 @@ export default {
     setVal(arr, val) {
        this.$parent.setVal(this.character, arr, val);
     },
-    approachHasValue(approachList, value) {        
+    approachHasValue(approachList, value) {                
         const aObj = this.character.approaches;
         var itemArray = approachList.split("|");
         
@@ -317,7 +317,7 @@ export default {
         itemArray.forEach( (approachName) => {
             if (aObj && aObj[approachName] && parseInt(aObj[approachName]) >= value)
             {
-                result = true;                
+                result = true;
             }
         });
 
