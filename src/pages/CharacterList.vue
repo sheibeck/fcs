@@ -28,8 +28,7 @@
           <div v-if="item.description" class='small'>
             {{ getShortText(item.description) }}
           </div> 
-          <div>
-            <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
+          <div>            
             <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>
           </div>
         </div>

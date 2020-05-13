@@ -39,22 +39,22 @@
                 <div for="" class="fate-header">Aspects</div>
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspect.highconcept',  $event.target.value)" :value="getVal('aspect.highconcept')" placeholder="High Concept" />
+                <input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept',  $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspect.trouble',  $event.target.value)" :value="getVal('aspect.trouble')" placeholder="Trouble" />
+                <input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]" @change="setVal('aspect.other1',  $event.target.value)" :value="getVal('aspect.other1')" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]" @change="setVal('aspects.other1',  $event.target.value)" :value="getVal('aspects.other1')" placeholder="Aspect" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]" @change="setVal('aspect.other2',  $event.target.value)" :value="getVal('aspect.other2')" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]" @change="setVal('aspects.other2',  $event.target.value)" :value="getVal('aspects.other2')" placeholder="Aspect" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other3]" name="aspect[other3]" @change="setVal('aspect.other3',  $event.target.value)" :value="getVal('aspect.other3')" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other3]" name="aspect[other3]" @change="setVal('aspects.other3',  $event.target.value)" :value="getVal('aspects.other3')" placeholder="Aspect" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other4]" name="aspect[other4]" @change="setVal('aspect.other4',  $event.target.value)" :value="getVal('aspect.other4')" placeholder="Aspect" />
+                <input type="text" class="form-control" id="aspect[other4]" name="aspect[other4]" @change="setVal('aspects.other4',  $event.target.value)" :value="getVal('aspects.other4')" placeholder="Aspect" />
             </div>
         </div>
 
@@ -280,7 +280,7 @@
 
             <div class="form-group row">
                 <div class="col">
-                    <textarea class="form-control" id="spells" name="insanity" rows="2" @change="setVal('insanity',  $event.target.value)" :value="getVal('insanity')" placeholder="insanity"></textarea>
+                    <textarea class="form-control" id="insanity" name="insanity" rows="2" @change="setVal('insanity',  $event.target.value)" :value="getVal('insanity')" placeholder="insanity"></textarea>
                 </div>
             </div>
         </div>
