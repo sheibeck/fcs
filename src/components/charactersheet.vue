@@ -19,6 +19,8 @@ import SheetDresdenFilesAccelerated from "./../sheets/dresden-files-accelerated"
 import SheetFateCondensed from "./../sheets/fate-condensed"
 import SheetFateFreeport from "./../sheets/fate-freeport"
 import SheetFateOfCthulhu from "./../sheets/fate-of-cthulhu"
+import SheetMouseGuard from "./../sheets/mouse-guard"
+import SheetStarTrek from "./../sheets/star-trek"
 
 let commonSvc = null;
 
@@ -39,6 +41,8 @@ export default {
     "fate-condensed": SheetFateCondensed,
     "fate-freeport": SheetFateFreeport,
     "fate-of-cthulhu": SheetFateOfCthulhu,
+    "mouse-guard": SheetMouseGuard,
+    "star-trek": SheetStarTrek,
   },
   props: {
     sheetid: String,
