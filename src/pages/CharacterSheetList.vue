@@ -92,9 +92,10 @@ export default {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-accelerated",
-        "description": "Fate Accelerated with default stress and consequences and customizable approaches.",
+        "description": "Fate Accelerated with default stress and consequences or <em>Create Customized</em> to enter your own approaches.",
         "id": "CHARACTERSHEET|fate-accelerated",
-        "name": "Fate Accelerated",        
+        "name": "Fate Accelerated",
+        "customizable": true,
         "sort": 7,
       }, {
         "system": "Fate Accelerated",

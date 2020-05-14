@@ -106,8 +106,8 @@
 					<input type="checkbox" value="1" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2',  $event.target.checked)" :checked="getVal('stress.mental2')" />
 					<input type="checkbox" value="1" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3',  $event.target.checked)" :checked="getVal('stress.mental3')" />
 					<input type="checkbox" value="1" id="stress[mental4]" name="stress[mental4]" @change="setVal('stress.mental4',  $event.target.checked)" :checked="getVal('stress.mental4')" :disabled="!skillHasValue('skill19', 1)" />
-					<input type="checkbox" value="1" id="stress[mental5]" name="stress[mental5]" @change="setVal('stress.mental5',  $event.target.checked)" :checked="getVal('stress.mental5')" :disabled="!skillHasValue('skill19', 1)" />
-					<input type="checkbox" value="1" id="stress[mental6]" name="stress[mental6]" @change="setVal('stress.mental6',  $event.target.checked)" :checked="getVal('stress.mental6')" :disabled="!skillHasValue('skill19', 1)" />
+					<input type="checkbox" value="1" id="stress[mental5]" name="stress[mental5]" @change="setVal('stress.mental5',  $event.target.checked)" :checked="getVal('stress.mental5')" :disabled="!skillHasValue('skill19', 3)" />
+					<input type="checkbox" value="1" id="stress[mental6]" name="stress[mental6]" @change="setVal('stress.mental6',  $event.target.checked)" :checked="getVal('stress.mental6')" :disabled="!skillHasValue('skill19', 3)" />
 				</div>
 
 				<!-- consequences -->
@@ -151,7 +151,7 @@
 				<div class="small text-muted font-italic">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
 				<div class="form-group row">
 					<div class="col-3">
-						<input class="form-control text-center" type="text" id="skills[skill1]" name="skills[skill1]" @change="setVal('skills.',  $event.target.value)" :value="getVal('skills.')" placeholder="+" />
+						<input class="form-control text-center" type="text" id="skills[skill1]" name="skills[skill1]" @change="setVal('skills.skill1',  $event.target.value)" :value="getVal('skills.skill1')" placeholder="+" />
 					</div>
 					<input class="col-9" type="text" id="skills[label1]" name="skills[label1]" @change="setVal('skills.',  $event.target.value)" :value="getVal('skills.')" placeholder="ACADEMICS" />
 				</div>

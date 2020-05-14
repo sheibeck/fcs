@@ -66,55 +66,55 @@
 
 			<div class="form-group row">
 				<div class="col-9">
-				  <label class="col-9 col-form-label">Careful</label>
+				  <input class="form-control approachlabel" type="text" id="approach[label1]" name="approach[label1]" @change="setVal('approaches.label1',  $event.target.value)" :value="getVal('approaches.label1')" placeholder="Careful">
 				</div>
 			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[careful]" name="approach[careful]" @change="setVal('approaches.careful',  $event.target.value)" :value="getVal('approaches.careful')" placeholder="+">
+					<input class="form-control text-center" type="text" id="approach[approach1]" name="approach[approach1]" @change="setVal('approaches.approach1',  $event.target.value)" :value="getVal('approaches.approach1')" placeholder="+">
 			  </div>
 			</div>
 
 			<div class="form-group row">
 				<div class="col-9">
-			  		<label class="col-9 col-form-label">Clever</label>
+			  	<input class="form-control approachlabel" type="text" id="approach[label2]" name="approach[label2]" @change="setVal('approaches.label2',  $event.target.value)" :value="getVal('approaches.label2')" placeholder="Clever">
 				</div>
 				<div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[clever]" name="approach[clever]" @change="setVal('approaches.clever',  $event.target.value)" :value="getVal('approaches.clever')" placeholder="+">
+					<input class="form-control text-center" type="text" id="approach[approach2]" name="approach[approach2]" @change="setVal('approaches.approach2',  $event.target.value)" :value="getVal('approaches.approach2')" placeholder="+">
 			  </div>
 			</div>
 
 			<div class="form-group row">
 				<div class="col-9">
-			  		<label class="col-9 col-form-label">Flashy</label>
+			  	<input class="form-control approachlabel" type="text" id="approach[label3]" name="approach[label3]" @change="setVal('approaches.label3',  $event.target.value)" :value="getVal('approaches.label3')" placeholder="Flashy">
 				</div>
 			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[flashy]" name="approach[flashy]" @change="setVal('approaches.flashy',  $event.target.value)" :value="getVal('approaches.flashy')" placeholder="+">
+					<input class="form-control text-center" type="text" id="approach[approach3]" name="approach[approach3]" @change="setVal('approaches.approach3',  $event.target.value)" :value="getVal('approaches.approach3')" placeholder="+">
 			  </div>
 			</div>
 
 			<div class="form-group row">
 				<div class="col-9">
-					<label class="col-9 col-form-label">Forceful</label>
+				  <input class="form-control approachlabel" type="text" id="approach[label4]" name="approach[label4]" @change="setVal('approaches.label4',  $event.target.value)" :value="getVal('approaches.label4')" placeholder="Forceful">
 				</div>
 				<div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[forceful]" name="approach[forceful]" @change="setVal('approaches.forceful',  $event.target.value)" :value="getVal('approaches.forceful')" placeholder="+">
+					<input class="form-control text-center" type="text" id="approach[approach4]" name="approach[approach4]" @change="setVal('approaches.approach4',  $event.target.value)" :value="getVal('approaches.approach4')" placeholder="+">
 			  </div>
 			</div>
 
 			<div class="form-group row">
 				<div class="col-9">
-			  		<label class="col-9 col-form-label">Quick</label>
+			  	<input class="form-control approachlabel" type="text" id="approach[label5]" name="approach[label5]" @change="setVal('approaches.label5',  $event.target.value)" :value="getVal('approaches.label5')" placeholder="Quick">
 				</div>
 			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[quick]" name="approach[quick]" @change="setVal('approaches.quick',  $event.target.value)" :value="getVal('approaches.quick')" placeholder="+">
+					<input class="form-control text-center" type="text" id="approach[approach5]" name="approach[approach5]" @change="setVal('approaches.approach5',  $event.target.value)" :value="getVal('approaches.approach5')" placeholder="+">
 			  </div>
 			</div>
 
 			<div class="form-group row">
 				<div class="col-9">
-			  		<label class="col-9 col-form-label">Sneaky</label>
+			  	<input class="form-control approachlabel" type="text" id="approach[label6]" name="approach[label6]" @change="setVal('approaches.label6',  $event.target.value)" :value="getVal('approaches.label6')" placeholder="Sneaky">
 				</div>
 			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[sneaky]" name="approach[sneaky]" @change="setVal('approaches.sneaky',  $event.target.value)" :value="getVal('approaches.sneaky')" placeholder="+">
+					<input class="form-control text-center" type="text" id="approach[approach6]" name="approach[approach6]" @change="setVal('approaches.approach6',  $event.target.value)" :value="getVal('approaches.approach6')" placeholder="+">
 			  </div>
 			</div>
 		</div>
@@ -192,12 +192,12 @@
 
 <script>
 export default {
-  name: 'SheetFateAccelerated',
+  name: 'SheetFateAcceleratedCustom',
   props: {    
     character: Object,
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate Accelerated (Character Sheet)';
+   this.$parent.$parent.title = 'Fate Accelerated Custom (Character Sheet)';
   },
   data () {
     return {

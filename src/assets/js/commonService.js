@@ -1,4 +1,6 @@
 import Noty from 'noty'
+import 'noty/lib/noty.css';
+import 'noty/lib/themes/metroui.css';
 import shortid from 'shortid'
 
 export default class CommonService {
