@@ -53,9 +53,9 @@
           </ul>
 
           <div v-if="!isAuthenticated" class="form-inline login-button">
-              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0 js-login">
+              <a href="/login" type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0">
                   Login <i class="fas fa-sign-in-alt"></i>
-              </button>
+              </a>
           </div>
           <div v-if="isAuthenticated" class="form-inline mx-1 mb-sm-1">
               <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="logout">Logout</button>
@@ -167,10 +167,6 @@ export default {
         if (event.keyCode === 13) {
             $("#search-button").click();
         }
-      });
-
-      $(document).on('click', '.js-login', function (e) {
-        document.location = '/login';
       });
 
       AWS.config.region = 'us-east-1';      

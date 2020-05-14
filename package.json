@@ -21,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
+    "@sentry/browser": "^5.15.5",
     "amazon-cognito-identity-js": "^4.2.3",
     "aws-sdk": "^2.672.0",
     "bootstrap": "^4.4.1",

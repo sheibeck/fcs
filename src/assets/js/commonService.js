@@ -2,6 +2,7 @@ import Noty from 'noty'
 import 'noty/lib/noty.css';
 import 'noty/lib/themes/metroui.css';
 import shortid from 'shortid'
+import * as Sentry from '@sentry/browser';
 
 export default class CommonService {
   constructor(fcs){
