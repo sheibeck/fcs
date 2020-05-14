@@ -316,8 +316,7 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);    
-    fs_camp.init(this.$root);
-    this.parseSessionAll();
+    this.init();    
   },  
   watch: {
     userId() {
@@ -412,6 +411,18 @@ export default {
     },
   },
   methods: {
+    init() {
+      $(document).on('show.bs.modal', '#modalDeleteSessionConfirm', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id') // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this);
+        $(modal.find('.js-delete')).data('id', id);
+      });
+      
+      this.parseSessionAll();
+    },
     setCurrentSession(value, description) {
       this.currentSession = value;
       this.currentSessionText = description || "";

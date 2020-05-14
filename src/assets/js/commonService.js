@@ -1,4 +1,7 @@
-const shortid = require('shortid');
+import Noty from 'noty'
+import 'noty/lib/noty.css';
+import 'noty/lib/themes/metroui.css';
+import shortid from 'shortid'
 
 export default class CommonService {
   constructor(fcs){
@@ -77,21 +80,8 @@ export default class CommonService {
       });
   };
 
-  GenerateUUID = function() { // Public Domain/MIT
-
+  GenerateUUID = function() {
     return shortid.generate();
-
-    /*
-    var d = new Date().getTime();
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
-        d += performance.now(); //use high-precision timer if available
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    */
   }
 
   SortObject = (obj) => {
@@ -184,9 +174,5 @@ export default class CommonService {
   SetId = function(type, id) {
     //ids are in the format of TYPE|ID, this will return just the id portion    
     return `${type.toUpperCase()}|${id}`;
-  }
-
-  GetRootOwner = function() {
-    return 'JARVIS';
   }
 }
