@@ -111,8 +111,7 @@ export default {
 
         // make sure we have a proper user id key
         characterData.owner_id = this.userId;
-        characterData.related_id = this.sheetId;
-        //characterData.system = this.sheetData.system;
+        characterData.related_id = this.sheetId;        
         characterData.slug = commonSvc.Slugify(characterData.name);
         characterData.object_type = "CHARACTER";
 

@@ -92,8 +92,7 @@ export default {
 
         // make sure we have a proper user id key
         characterData.owner_id = this.userId;
-        characterData.related_id = commonSvc.SetId("CHARACTERSHEET", this.id);
-        //characterData.system = this.sheetData.system;
+        characterData.related_id = commonSvc.SetId("CHARACTERSHEET", this.id);        
         characterData.slug = commonSvc.Slugify(characterData.name);        
 
         //create a new characterId if we don't have one

@@ -175,8 +175,4 @@ export default class CommonService {
     //ids are in the format of TYPE|ID, this will return just the id portion    
     return `${type.toUpperCase()}|${id}`;
   }
-
-  GetRootOwner = function() {
-    return 'JARVIS';
-  }
 }
