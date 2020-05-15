@@ -83,11 +83,11 @@ export default class UserService {
     });
   }
 
-  RefreshSession = () => {
+  RefreshSession = async () => {
     if (this.fcs.$store.state.userSession) {
       let refresh_token = this.fcs.$store.state.userSession.refreshToken;
-      this.fcs.$store.state.cognito.CognitoUser.refreshSession(refresh_token, (err, session) => {
-        this.SetupAuthSession(err, session);
+      this.fcs.$store.state.cognito.CognitoUser.refreshSession(refresh_token, async (err, session) => {
+        await this.SetupAuthSession(err, session);
       });  
     }
   }
@@ -130,7 +130,7 @@ export default class UserService {
     }
   }
 
-  SetupAuthSession = (err, session) => {
+  SetupAuthSession = async(err, session) => {
     if (err) {
       this.commonSvc.Notify(err.message || JSON.stringify(err));
       return;
@@ -150,7 +150,7 @@ export default class UserService {
     this.fcs.$store.commit("credentials", credentials);
     
 
-    this.fcs.$store.state.credentials.refresh((error) => {
+    await this.fcs.$store.state.credentials.refresh((error) => {
       if (error) {
           console.error(error);
       } else {
