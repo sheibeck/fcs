@@ -153,7 +153,7 @@
 					<div class="col-3">
 						<input class="form-control text-center" type="text" id="skills[skill1]" name="skills[skill1]" @change="setVal('skills.skill1',  $event.target.value)" :value="getVal('skills.skill1')" placeholder="+" />
 					</div>
-					<input class="col-9" type="text" id="skills[label1]" name="skills[label1]" @change="setVal('skills.',  $event.target.value)" :value="getVal('skills.')" placeholder="ACADEMICS" />
+					<input class="col-9" type="text" id="skills[label1]" name="skills[label1]" @change="setVal('skills.label1',  $event.target.value)" :value="getVal('skills.label1')" placeholder="ACADEMICS" />
 				</div>
 
 				<div class="form-group row">
