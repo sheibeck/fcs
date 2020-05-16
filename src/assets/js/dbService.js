@@ -1,5 +1,6 @@
-import CommonsService from "./commonService"
+import AWS from 'aws-sdk';
 import CommonService from "./commonService";
+import UserService from "./userService";
 
 export default class DbService {
     TableName = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
@@ -9,7 +10,10 @@ export default class DbService {
         this.commonSvc = new CommonService(fcs);
     }
 
-    GetDbClient() {        
+    async GetDbClient() {        
+        // if the user session has expired, refresh it so we don't get DB errors
+        await this.RefreshUserSession();
+
         // Create DynamoDB document client
         let docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
         docClient.service.config.credentials = this.fcs.$store.state.credentials;
@@ -17,9 +21,16 @@ export default class DbService {
         return docClient;
     }
 
+    RefreshUserSession = async() => {
+        if (this.fcs.$store.state.credentials && this.fcs.$store.state.credentials.needsRefresh()) {
+            let userSvc = new UserService(this.fcs);
+            await userSvc.RefreshSession();
+        }
+    }
+
     //get a specific object.
     GetObject = async (objectId, ownerId) => {  
-        var docClient = this.GetDbClient();
+        var docClient = await this.GetDbClient();
               
         //if we know the ownerId then get the object directly
         if(ownerId) {                           
@@ -87,7 +98,7 @@ export default class DbService {
         //dynamodb won't let us have empty attributes
         this.commonSvc.RemoveEmptyObjects(data);
         
-        let docClient = this.GetDbClient();
+        let docClient = await this.GetDbClient();
 
         // create/update a  character
         // we always use the put operation because the data can change depending on your character sheet
@@ -106,7 +117,7 @@ export default class DbService {
     }
 
     ListObjects = async (itemType, ownerId, filter) => {
-        let docClient = this.GetDbClient();
+        let docClient = await this.GetDbClient();
 
         let params = {
             TableName: this.TableName,
@@ -157,7 +168,7 @@ export default class DbService {
     }
 
     ListRelatedObjects = async (relatedTo, publicOnly) => {
-        let docClient = this.GetDbClient();
+        let docClient = await this.GetDbClient();
 
         let params = {
             TableName: this.TableName,
@@ -207,7 +218,7 @@ export default class DbService {
     }
     
     DeleteObject = async (ownerId, id) => {
-        let docClient = this.GetDbClient();        
+        let docClient = await this.GetDbClient();        
 
         var params = {
             TableName: this.TableName,

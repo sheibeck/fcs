@@ -28,8 +28,7 @@
           <div v-if="item.description" class='small'>
             {{ getShortText(item.description) }}
           </div> 
-          <div>
-            <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
+          <div>            
             <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>
           </div>
         </div>
@@ -78,10 +77,8 @@ export default {
   components: {
     search: Search,
   },
-  mounted(){
-    commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);   
-    fs_char.init(this.$root);
+  mounted(){   
+    this.init();
   },
   computed: {
     slugify: function() {
@@ -113,7 +110,21 @@ export default {
       characters: {},
     }
   },
-  methods : {   
+  methods : {
+    init() {
+      commonSvc = new CommonService(this.$root);
+      dbSvc = new DbService(this.$root);
+
+      $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {        
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var characterId = button.data('id') // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this);
+        $(modal.find('.js-delete-character')).data('id', characterId);
+      });
+    },
+
     list : function (searchText) {      
       let items = dbSvc.ListObjects("CHARACTER", this.$store.state.userId, searchText).then( (data) => {    
         this.characters = data;

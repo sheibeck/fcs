@@ -176,7 +176,6 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);    
-    fs_camp.init(this.$root);
     this.parseSessionAll();  
   },
   watch: {
