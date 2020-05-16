@@ -108,7 +108,7 @@ export default class CommonService {
   
   Search = (searchText) => {
     let pathname = location.pathname.toLowerCase();
-    if (pathname.includes('charactersheets'))
+    if (pathname.includes('charactersheet'))
     {
       $('.card').hide();
 

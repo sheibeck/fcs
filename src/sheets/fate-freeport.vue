@@ -133,28 +133,28 @@
                     <label for="stress">
                         1
                     </label>
-                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :check="getVal('stress.stress1')" />
+                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         2
                     </label>
-                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :check="getVal('stress.stress2')" />
+                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
                 </div>
 
                 <div class="col">
                     <label :class="{'stat-requirement': !approachHasValue('constitution', 1)}" for="stress">
                         3
                     </label>
-                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]"  @change="setVal('stress.stress3',  $event.target.checked)" :check="getVal('stress.stress3')" :disabled="!approachHasValue('constitution', 1)" />
+                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]"  @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" :disabled="!approachHasValue('constitution', 1)" />
                 </div>
 
                 <div class="col">
                     <label :class="{'stat-requirement': !approachHasValue('constitution', 3)}" for="stress">
                         4
                     </label>
-                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :check="getVal('stress.stress4')" :disabled="!approachHasValue('constitution', 3)" />
+                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :checked="getVal('stress.stress4')" :disabled="!approachHasValue('constitution', 3)" />
                 </div>
             </div>
 
@@ -167,28 +167,28 @@
                     <label for="stress">
                         1
                     </label>
-                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1',  $event.target.checked)" :check="getVal('stress.mental1')" />
+                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1',  $event.target.checked)" :checked="getVal('stress.mental1')" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         2
                     </label>
-                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2',  $event.target.checked)" :check="getVal('stress.mental2')" />
+                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2',  $event.target.checked)" :checked="getVal('stress.mental2')" />
                 </div>
 
                 <div class="col">
                     <label :class="{'stat-requirement': !approachHasValue('wisdom', 1)}" for="stress">
                         3
                     </label>
-                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3',  $event.target.checked)" :check="getVal('stress.mental3')" :disabled="!approachHasValue('wisdom', 1)">
+                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3',  $event.target.checked)" :checked="getVal('stress.mental3')" :disabled="!approachHasValue('wisdom', 1)">
                 </div>
 
                 <div class="col">
                     <label :class="{'stat-requirement': !approachHasValue('wisdom', 3)}" for="stress">
                         4
                     </label>
-                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]" @change="setVal('stress.mental4',  $event.target.checked)" :check="getVal('stress.mental4')" :disabled="!approachHasValue('wisdom', 3)">
+                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]" @change="setVal('stress.mental4',  $event.target.checked)" :checked="getVal('stress.mental4')" :disabled="!approachHasValue('wisdom', 3)">
                 </div>
             </div>
 
@@ -201,28 +201,28 @@
                     <label for="stress">
                         &nbsp;&nbsp;
                     </label>
-                    <input type="checkbox" value="1" id="corruption[corruption1]" name="corruption[corruption1]" @change="setVal('corruption.corruption1',  $event.target.checked)" :check="getVal('corruption.corruption1')" />
+                    <input type="checkbox" value="1" id="corruption[corruption1]" name="corruption[corruption1]" @change="setVal('corruption.corruption1',  $event.target.checked)" :checked="getVal('corruption.corruption1')" />
                 </div>
 
                 <div class="col">
                     <label for="stress">
                         &nbsp;&nbsp;
                     </label>
-                    <input type="checkbox" value="2" id="corruption[corruption2]" name="corruption[corruption2]" @change="setVal('corruption.corruption2',  $event.target.checked)" :check="getVal('corruption.corruption2')" />
+                    <input type="checkbox" value="2" id="corruption[corruption2]" name="corruption[corruption2]" @change="setVal('corruption.corruption2',  $event.target.checked)" :checked="getVal('corruption.corruption2')" />
                 </div>
 
                 <div class="col">
                     <label class="" for="stress">
                         &nbsp;&nbsp;
                     </label>
-                    <input type="checkbox" value="3" id="corruption[corruption3]" name="corruption[corruption3]" @change="setVal('corruption.corruption3',  $event.target.checked)" :check="getVal('corruption.corruption3')" />
+                    <input type="checkbox" value="3" id="corruption[corruption3]" name="corruption[corruption3]" @change="setVal('corruption.corruption3',  $event.target.checked)" :checked="getVal('corruption.corruption3')" />
                 </div>
 
                 <div class="col">
                     <label class="" for="stress">
                         &nbsp;&nbsp;
                     </label>
-                    <input type="checkbox" value="4" id="corruption[corruption4]" name="corruption[corruption4]" @change="setVal('corruption.corruption4',  $event.target.checked)" :check="getVal('corruption.corruption4')" />
+                    <input type="checkbox" value="4" id="corruption[corruption4]" name="corruption[corruption4]" @change="setVal('corruption.corruption4',  $event.target.checked)" :checked="getVal('corruption.corruption4')" />
                 </div>
             </div>
 

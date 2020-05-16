@@ -58,12 +58,12 @@
 				</div>
 			</div>
 
-			<div for="" class="fate-header">Regular Stunts</div>
+			<div for="" class="fate-header">Stunts</div>
 
 			<div class="px-3">
 				<div class="form-group mb-0 pb-4">
 					<div class="small text-muted font-italic">Start with three stunts for free. You may buy additional stunts for 1 Refresh each, so long as your Refresh remains at or above 1.</div>
-					<textarea class="form-control" id="stunts" name="stunts" rows="14" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')" placeholder="Regular Stunts"></textarea>
+					<textarea class="form-control" id="stunts" name="stunts" rows="14" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')" placeholder="Stunts"></textarea>
 				</div>
 			</div>		
 
