@@ -73,7 +73,7 @@ export default {
         case "invoke":
           msg = fateOf20.MsgInvoke(character, description, data);
           break;
-        case "fatepoint":
+        case "fatepoint":          
           msg = fateOf20.MsgFatePoint(character, description, data);
           break;
         case "stress":

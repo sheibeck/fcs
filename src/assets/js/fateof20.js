@@ -24,15 +24,16 @@ export default class FateOf20 {
             type: "invoke",
             character: character,
             description: description,
-            aspect: aspect,                    
+            aspect: aspect,
         }
     }
 
-    MsgFatePoint = (character, description) => {
+    MsgFatePoint = (character, description, modifier) => {
         return {
             type: "fatepoint",
             character: character,
-            description: description,                             
+            description: description,
+            modifier: modifier,                          
         }
     }
 

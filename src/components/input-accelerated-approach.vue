@@ -1,6 +1,6 @@
 <template>
   <div class="form-group d-flex">
-      <span class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
+      <span v-if="hasRoll20" class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
       <label class="p-1 mr-auto">{{this.item}}</label>
       <input class="form-control text-center w-25" type="text" :id="this.item" :name="this.item" 
         @change="$parent.setVal(`approaches.${this.item}`,  $event.target.value)" 
@@ -10,12 +10,21 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'InputAcceleratedApproach',
   props: {
     item: String,    
   },
-  computed: {   
+   computed: {
+ 	  ...mapGetters([
+      'isAuthenticated',      
+      'roll20Enabled'
+    ]),
+    hasRoll20() {
+      return this.isAuthenticated && this.roll20Enabled;
+    }
   },
   data () {
     return {

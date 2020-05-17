@@ -11,13 +11,11 @@
 			<div class="row">
 				<div class="col-6 text-center">
 					<div for="refresh" class="fate-header">Refresh</div>
-					<input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
+					<input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
 				</div>
 				<div class="col-6 text-center ">
-					<div for="fatepoints" class="fate-header">FP 
-						<span class="dice fo20" v-on:click="sendToRoll20('fatepoint')">+</span>
-					</div>
-					<input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
+					<div for="fatepoints" class="fate-header">FP</div>
+					<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
 				</div>
 			</div>
 		</div>
@@ -117,6 +115,7 @@
 import InputAcceleratedApproach from '../components/input-accelerated-approach'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'SheetFateAccelerated',
@@ -127,6 +126,13 @@ export default {
   },
   props: {    
     character: Object,
+  },
+  computed: {
+ 	...mapGetters([
+      'isAuthenticated',
+      'userId',
+      'roll20Enabled'
+    ]),
   },
   mounted() {
    this.$parent.$parent.title = 'Fate Accelerated (Character Sheet)';
@@ -153,7 +159,7 @@ export default {
 	sendToRoll20(type, label, obj, item) {
 		if (type === "fatepoint")
 		{
-			this.$parent.sendToRoll20(type, this.character.name);
+			this.$parent.sendToRoll20(type, this.character.name, null, item);
 		}
 		else {
 			this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
@@ -163,8 +169,24 @@ export default {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {
-    	this.$parent.setVal(this.character, arr, val);       
-    },
+		if (this.roll20Enabled && arr === 'fatepoints') {
+			this.roll20FatePoints(arr,val)
+		}
+		this.$parent.setVal(this.character, arr, val);
+	},
+	roll20FatePoints(arr,val) {
+		if(arr === 'fatepoints')
+		{
+			let oldVal = this.character[arr];
+			if (parseInt(oldVal) < parseInt(val)) {
+				this.sendToRoll20("fatepoint", null, arr, "1");
+			}
+			else {
+				this.sendToRoll20("fatepoint", null, arr, "-1");
+			}
+		}
+		this.$parent.$parent.save();
+	}
   }
 }
 </script>
