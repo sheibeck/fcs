@@ -1,8 +1,4 @@
-// Start a long-running conversation:
-//editorExtensionId = "imabdeabahdahhekhhciinbagdcdpibo";
-
 console.log("loaded roll20.js");
-//this.port = chrome.runtime.connect(this.editorExtensionId);
 
 function handleListener(msg, sender, sendResponse) {    
     let chatMessage = "";
