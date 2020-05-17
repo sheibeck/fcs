@@ -1,6 +1,8 @@
 export default class FateOf20 {
-    // The ID of the extension we want to talk to.
-    editorExtensionId = "pdackompknmfmhalbdbdoncafoeebbhp";
+    // for local dev
+    //editorExtensionId = "pdackompknmfmhalbdbdoncafoeebbhp";    
+    editorExtensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
+    
     port = null;
 
     constructor() {
