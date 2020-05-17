@@ -9,17 +9,23 @@ function handleListener(msg, sender, sendResponse) {
             chatMessage = template;
             break;
         case "invoke":      
-            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=Invoked an aspect}} {{aspect=" + msg.aspect +"}}";            
+            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=Invoked an aspect}} {{aspect=" + msg.aspect +"}}";
+            break;
+        case "fatepoint":               
+            const m = parseInt(msg.modifier) > 0 ? "Gained a Fate Point": "Spent a Fate Point";
+            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + m +"}}"; 
             break;
     }
-    postChatMessage(chatMessage, msg.character);
+    roll20ChatMessage(chatMessage, msg.character);
 }
 
 const chat = document.getElementById("textchat-input");
 const txt = chat.getElementsByTagName("textarea")[0];
 const btn = chat.getElementsByTagName("button")[0];
 
-function postChatMessage(message, character = null) {
+
+//from beyond20 extension
+function roll20ChatMessage(message, character = null) {
     let set_speakingas = true;
     const old_as = speakingas.value;
     if (character) {
