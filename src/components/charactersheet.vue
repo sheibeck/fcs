@@ -69,7 +69,7 @@ export default {
       
       switch(type) {
         case "diceroll":      
-          msg = fateOf20.MsgDiceRoll(character, description, `/roll 4df+${data}`);
+          msg = fateOf20.MsgDiceRoll(character, description, data);
           break;
         case "invoke":
           msg = fateOf20.MsgInvoke(character, description, data);
