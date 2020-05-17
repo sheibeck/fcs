@@ -1,0 +1,7 @@
+
+.sheet-rolltemplate-default table caption {
+    text-align: center;
+    background-color: black !important;
+    text-transform: uppercase;
+    font-weight: 700;
+}
