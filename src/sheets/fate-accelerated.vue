@@ -38,24 +38,13 @@
 			<div class="form-group">
 				<div for="" class="fate-header">Aspects</div>
 			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept',  $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]" @change="setVal('aspects.other1',  $event.target.value)" :value="getVal('aspects.other1')" placeholder="Aspect" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]" @change="setVal('aspects.other2',  $event.target.value)" :value="getVal('aspects.other2')" placeholder="Aspect" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other3]" name="aspect[other3]" @change="setVal('aspects.other3',  $event.target.value)" :value="getVal('aspects.other3')" placeholder="Aspect" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other4]" name="aspect[other4]" @change="setVal('aspects.other4',  $event.target.value)" :value="getVal('aspects.other4')" placeholder="Aspect" />
-			</div>
+
+			<div v-for="aspect in aspects" :key="aspect.obj">
+				<div class="form-group d-flex">
+					<span class="dice fo20 pt-2" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">+</span>				
+					<input type="text" class="form-control" :id="'aspects.' + aspect.obj" :name="'aspects.' + aspect.obj" @change="setVal(`aspects.${aspect.obj}`,  $event.target.value)" :value="getVal(`aspects.${aspect.obj}`)" :placeholder="aspect.label" />				
+				</div>
+			</div>		
 		</div>
 
 		<!-- aspects -->
@@ -64,67 +53,18 @@
 				<div class="fate-header col-12">Approaches</div>
 			</div>
 
-			<div class="form-group row">
-				<div class="col-9">
-				  <label class="col-9 col-form-label">Careful</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[careful]" name="approach[careful]" @change="setVal('approaches.careful',  $event.target.value)" :value="getVal('approaches.careful')" placeholder="+">
-			  </div>
+			<div v-for="approach in approaches" :key="approach">
+				<inputapproach :itemname="`${approach}`" />
 			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Clever</label>
-				</div>
-				<div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[clever]" name="approach[clever]" @change="setVal('approaches.clever',  $event.target.value)" :value="getVal('approaches.clever')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Flashy</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[flashy]" name="approach[flashy]" @change="setVal('approaches.flashy',  $event.target.value)" :value="getVal('approaches.flashy')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-					<label class="col-9 col-form-label">Forceful</label>
-				</div>
-				<div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[forceful]" name="approach[forceful]" @change="setVal('approaches.forceful',  $event.target.value)" :value="getVal('approaches.forceful')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Quick</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[quick]" name="approach[quick]" @change="setVal('approaches.quick',  $event.target.value)" :value="getVal('approaches.quick')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Sneaky</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[sneaky]" name="approach[sneaky]" @change="setVal('approaches.sneaky',  $event.target.value)" :value="getVal('approaches.sneaky')" placeholder="+">
-			  </div>
-			</div>
+			
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col">
 			<div class="form-group">
-				<div for="stunts" class="fate-header">Stunts & Extras</div>
-				<textarea class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts & Extras" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')"></textarea>
+				<div for="stunts" class="fate-header">Stunts &amp; Extras</div>
+				<textarea class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts &amp; Extras" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')"></textarea>
 			</div>
 		</div>
 	</div>
@@ -191,8 +131,13 @@
 </template>
 
 <script>
+import InputAcceleratedApproach from '../components/input-accelerated-approach'
+
 export default {
   name: 'SheetFateAccelerated',
+  components: {
+    "inputapproach": InputAcceleratedApproach,    
+  },
   props: {    
     character: Object,
   },
@@ -201,9 +146,21 @@ export default {
   },
   data () {
     return {
+		approaches: ["careful","clever","flashy","forceful","quick","sneaky"],
+		aspects: [
+			{label:"High Concept", obj:"highconcept"},
+			{label:"Trouble", obj:"trouble"},
+			{label:"Aspect", obj:"other1"},
+			{label:"Aspect", obj:"other2"},
+			{label:"Aspect", obj:"other3"},
+			{label:"Aspect", obj:"other4"},
+		],
     }
   },
-  methods: {  
+  methods: {
+	sendToRoll20(type, label, obj, item) {		
+        this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
+    },
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
@@ -306,5 +263,4 @@ export default {
 		margin-left: -5px;
 		margin-right: -5px;
 	}
-
 </style>

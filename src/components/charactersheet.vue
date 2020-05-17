@@ -8,6 +8,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService"
+import FateOf20 from '../assets/js/fateof20'
 
 //sheets
 import SheetFateAccelerated from "./../sheets/fate-accelerated"
@@ -23,6 +24,7 @@ import SheetMouseGuard from "./../sheets/mouse-guard"
 import SheetStarTrek from "./../sheets/star-trek"
 
 let commonSvc = null;
+let fateOf20 = null;
 
 export default {
   name: 'CharacterSheet',
@@ -30,6 +32,7 @@ export default {
     if (!commonSvc) { 
       commonSvc = new CommonService(this.$root);
     }
+    fateOf20 = new FateOf20();
   },
   components: {
     "fate-accelerated": SheetFateAccelerated,
@@ -61,6 +64,24 @@ export default {
     }
   },
   methods: {
+    sendToRoll20(type, character, description, data) {       
+      let msg = null;
+      
+      switch(type) {
+        case "diceroll":      
+          msg = fateOf20.MsgDiceRoll(character, description, `/roll 4df+${data}`);
+          break;
+        case "invoke":
+          msg = fateOf20.MsgInvoke(character, description, data);
+          break;
+        case "fatepoint":
+        case "stress":
+        case "stunt":
+        case "consequence":
+          break;
+      }
+      fateOf20.SendMessage(msg);
+    },
     getVal(obj, graphPath, defaultValue){
       var parts = graphPath.split(".");
       var root = obj;
@@ -119,6 +140,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+
+	.fo20 {
+    cursor: pointer;
+    color: green;
+	}
+
+  @media print {
+    .fo20 {
+      display: none;
+    }
+  }
 
 </style>
