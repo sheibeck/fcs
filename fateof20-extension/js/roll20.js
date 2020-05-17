@@ -2,6 +2,7 @@ console.log("loaded roll20.js");
 
 function handleListener(msg, sender, sendResponse) {    
     let chatMessage = "";
+    let subMessage = "";   
     switch(msg.type) { 
         case "diceroll":    
             let thing = msg.skill.split(" ");            
@@ -12,8 +13,21 @@ function handleListener(msg, sender, sendResponse) {
             chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=Invoked an aspect}} {{aspect=" + msg.aspect +"}}";
             break;
         case "fatepoint":               
-            const m = parseInt(msg.modifier) > 0 ? "Gained a Fate Point": "Spent a Fate Point";
-            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + m +"}}"; 
+        subMessage = parseInt(msg.modifier) > 0 ? "Gained a Fate Point": "Spent a Fate Point";
+            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + subMessage +"}}";
+            break;
+        case "stress":               
+            subMessage = `${msg.stress ? "Took" : "Recovered"} ${msg.description} stress`;
+            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + subMessage +"}}"; 
+            break;
+        case "consequence":            
+            if (msg.consequence !== "")
+            {                
+                chatMessage = "&{template:default} {{name=" + msg.character + "}} {{gained=" + msg.description + " consequence}} {{consequence=" + msg.consequence + "}}"; 
+            }
+            else {
+                chatMessage = "&{template:default} {{name=" + msg.character + "}} {{recovered=" + msg.description + " consequence}}"; 
+            }
             break;
     }
     roll20ChatMessage(chatMessage, msg.character);

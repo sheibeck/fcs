@@ -72,26 +72,10 @@
 			<div class="form-group">
 				<div for="" class="fate-header">Stress</div>
 			</div>
-			<div class="row">
-				<div class="col">
-				  <label for="stress">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
-				</div>
 
-				<div class="col">
-				  <label for="stress">
-					2
-				  </label>
-				  <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
-				</div>
-
-				<div class="col">
-				  <label class="" for="stress">
-					3
-				  </label>
-				  <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" />
+			<div class="d-flex">
+				<div v-for="stress in stresses" :key="stress.obj">
+					<inputstress :stress="stress" />
 				</div>
 			</div>
 		</div>
@@ -115,6 +99,7 @@
 import InputAcceleratedApproach from '../components/input-accelerated-approach'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
+import InputAccleratedStress from '../components/input-accelerated-stress'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -123,6 +108,7 @@ export default {
 	"inputapproach": InputAcceleratedApproach,    
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
+	"inputstress": InputAccleratedStress,
   },
   props: {    
     character: Object,
@@ -153,26 +139,36 @@ export default {
 			{label:"Moderate", obj:"moderate", value: "4"},
 			{label:"Severe", obj:"severe", value: "6"},			
 		],
+		stresses: [
+			{label:"1", obj:"stress1"},
+			{label:"2", obj:"stress2"},
+			{label:"3", obj:"stress3"},			
+		],
     }
   },
   methods: {
 	sendToRoll20(type, label, obj, item) {
-		if (type === "fatepoint")
-		{
-			this.$parent.sendToRoll20(type, this.character.name, null, item);
-		}
-		else {
-			this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
+		switch(type)
+		{			
+			case "fatepoint":
+				this.$parent.sendToRoll20(type, this.character.name, null, item);
+			case "stress":
+			case "consequence":
+				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				break;			
+			default:
+				this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
 		}
     },
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
-    setVal(arr, val) {
+    setVal(arr, val) {		
 		if (this.roll20Enabled && arr === 'fatepoints') {
 			this.roll20FatePoints(arr,val)
+		} else {
+			this.$parent.setVal(this.character, arr, val);
 		}
-		this.$parent.setVal(this.character, arr, val);
 	},
 	roll20FatePoints(arr,val) {
 		if(arr === 'fatepoints')
@@ -185,6 +181,7 @@ export default {
 				this.sendToRoll20("fatepoint", null, arr, "-1");
 			}
 		}
+		this.$parent.setVal(this.character, arr, val);
 		this.$parent.$parent.save();
 	}
   }

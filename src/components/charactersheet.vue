@@ -64,7 +64,7 @@ export default {
     }
   },
   methods: {
-    sendToRoll20(type, character, description, data) {       
+    sendToRoll20(type, character, description, data) {         
       let msg = null;      
       switch(type) {
         case "diceroll":      
@@ -77,8 +77,12 @@ export default {
           msg = fateOf20.MsgFatePoint(character, description, data);
           break;
         case "stress":
-        case "stunt":
+          msg = fateOf20.MsgStress(character, description, data);
+          break;
         case "consequence":
+          msg = fateOf20.MsgConsequence(character, description, data);
+          break;
+        case "stunt":        
           break;
       }
       fateOf20.SendMessage(msg);
@@ -99,7 +103,7 @@ export default {
 
       return eval(`obj.${graphPath}`);
     },
-    setVal(obj, arr, val) {
+    setVal(obj, arr, val) {      
       arr = arr.split(".");
       
       if (arr.length == 1)

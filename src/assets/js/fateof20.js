@@ -37,6 +37,24 @@ export default class FateOf20 {
         }
     }
 
+    MsgStress = (character, description, stress) => {
+        return {
+            type: "stress",
+            character: character,
+            description: description,
+            stress: stress,
+        }
+    }
+
+    MsgConsequence = (character, description, consequence) => {
+        return {
+            type: "consequence",
+            character: character,
+            description: description,
+            consequence: consequence,            
+        }
+    }
+
     SendMessage = (msg) => {         
         this.port.postMessage(msg);
     }

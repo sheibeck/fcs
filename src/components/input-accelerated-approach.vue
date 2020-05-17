@@ -17,7 +17,7 @@ export default {
   props: {
     item: String,    
   },
-   computed: {
+  computed: {
  	  ...mapGetters([
       'isAuthenticated',      
       'roll20Enabled'
