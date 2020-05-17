@@ -65,8 +65,7 @@ export default {
   },
   methods: {
     sendToRoll20(type, character, description, data) {       
-      let msg = null;
-      
+      let msg = null;      
       switch(type) {
         case "diceroll":      
           msg = fateOf20.MsgDiceRoll(character, description, data);
@@ -75,6 +74,8 @@ export default {
           msg = fateOf20.MsgInvoke(character, description, data);
           break;
         case "fatepoint":
+          msg = fateOf20.MsgFatePoint(character, description, data);
+          break;
         case "stress":
         case "stunt":
         case "consequence":

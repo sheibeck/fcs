@@ -19,6 +19,9 @@ chrome.runtime.onConnectExternal.addListener(function(port) {
             case "invoke":      
                 port.postMessage({result: `${msg.character} invoked ${msg.description}: ${msg.aspect}`});
                 break;
+            case "fatepoint":
+                port.postMessage({result: `${msg.character} spends a Fate Point`});
+                break;
             default:
                 port.postMessage({result: `Unrecognized message type`});
         }

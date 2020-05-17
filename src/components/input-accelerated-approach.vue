@@ -1,10 +1,10 @@
 <template>
   <div class="form-group d-flex">
       <span class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
-      <label class="p-1 mr-auto">{{this.itemname}}</label>
-      <input class="form-control text-center w-25" type="text" :id="this.itemname" :name="this.itemname" 
-        @change="this.$parent.setVal(`approaches.${this.itemname}`,  $event.target.value)" 
-        :value="this.$parent.getVal(`approaches.${this.itemname}`)" placeholder="+">			  
+      <label class="p-1 mr-auto">{{this.item}}</label>
+      <input class="form-control text-center w-25" type="text" :id="this.item" :name="this.item" 
+        @change="$parent.setVal(`approaches.${this.item}`,  $event.target.value)" 
+        :value="$parent.getVal(`approaches.${this.item}`)" placeholder="+">			  
     </div>
 </template>
 
@@ -13,7 +13,7 @@
 export default {
   name: 'InputAcceleratedApproach',
   props: {
-    itemname: String,    
+    item: String,    
   },
   computed: {   
   },
@@ -23,8 +23,8 @@ export default {
   },
   methods: { 
     sendToRoll20() {      
-      let label = `approach ${this.itemname.toTitleCase()}`;
-      this.$parent.sendToRoll20('diceroll', label, "approaches", this.itemname);
+      let label = `approach ${this.item.toTitleCase()}`;
+      this.$parent.sendToRoll20('diceroll', label, "approaches", this.item);
     }
   }
 }

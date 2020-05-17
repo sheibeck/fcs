@@ -28,7 +28,15 @@ export default class FateOf20 {
         }
     }
 
-    SendMessage = (msg) => {        
+    MsgFatePoint = (character, description) => {
+        return {
+            type: "fatepoint",
+            character: character,
+            description: description,                             
+        }
+    }
+
+    SendMessage = (msg) => {         
         this.port.postMessage(msg);
     }
 

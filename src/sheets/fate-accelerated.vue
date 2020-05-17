@@ -14,7 +14,9 @@
 					<input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
 				</div>
 				<div class="col-6 text-center ">
-					<div for="fatepoints" class="fate-header">FP</div>
+					<div for="fatepoints" class="fate-header">FP 
+						<span class="dice fo20" v-on:click="sendToRoll20('fatepoint')">+</span>
+					</div>
 					<input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
 				</div>
 			</div>
@@ -40,11 +42,8 @@
 			</div>
 
 			<div v-for="aspect in aspects" :key="aspect.obj">
-				<div class="form-group d-flex">
-					<span class="dice fo20 pt-2" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">+</span>				
-					<input type="text" class="form-control" :id="'aspects.' + aspect.obj" :name="'aspects.' + aspect.obj" @change="setVal(`aspects.${aspect.obj}`,  $event.target.value)" :value="getVal(`aspects.${aspect.obj}`)" :placeholder="aspect.label" />				
-				</div>
-			</div>		
+				<inputaspect :aspect="aspect" />
+			</div>
 		</div>
 
 		<!-- aspects -->
@@ -54,7 +53,7 @@
 			</div>
 
 			<div v-for="approach in approaches" :key="approach">
-				<inputapproach :itemname="`${approach}`" />
+				<inputapproach :item="approach" />
 			</div>
 			
 		</div>
@@ -104,26 +103,10 @@
 				<div class="fate-header col-12">Consequences</div>
 			</div>
 
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">2</label>
-			  <div class="col-10">
-				<input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequence.mild',  $event.target.value)" :value="getVal('consequence.mild')" />
-			  </div>
+			<div v-for="consequence in consequences" :key="consequence.obj">
+				<inputconsequence :consequence="consequence" />
 			</div>
 
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">4</label>
-			  <div class="col-10">
-				<input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequence.moderate',  $event.target.value)" :value="getVal('consequence.moderate')" />
-			  </div>
-			</div>
-
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">6</label>
-			  <div class="col-10">
-				<input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequence.severe',  $event.target.value)" :value="getVal('consequence.severe')" />
-			  </div>
-			</div>
 		</div>
 	</div>
 
@@ -132,11 +115,15 @@
 
 <script>
 import InputAcceleratedApproach from '../components/input-accelerated-approach'
+import InputAspect from '../components/input-aspect'
+import InputConsequence from '../components/input-consequence'
 
 export default {
   name: 'SheetFateAccelerated',
   components: {
-    "inputapproach": InputAcceleratedApproach,    
+	"inputapproach": InputAcceleratedApproach,    
+	"inputaspect": InputAspect,
+	"inputconsequence": InputConsequence,
   },
   props: {    
     character: Object,
@@ -155,11 +142,22 @@ export default {
 			{label:"Aspect", obj:"other3"},
 			{label:"Aspect", obj:"other4"},
 		],
+		consequences: [
+			{label:"Mild", obj:"mild", value: "2"},
+			{label:"Moderate", obj:"moderate", value: "4"},
+			{label:"Severe", obj:"severe", value: "6"},			
+		],
     }
   },
   methods: {
-	sendToRoll20(type, label, obj, item) {		
-        this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
+	sendToRoll20(type, label, obj, item) {
+		if (type === "fatepoint")
+		{
+			this.$parent.sendToRoll20(type, this.character.name);
+		}
+		else {
+			this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
+		}
     },
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
