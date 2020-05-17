@@ -2,7 +2,7 @@
   "name": "Fate of 20",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "This extension allows you to use Fate Character Sheet website with Roll20",
+  "description": "This extension allows you to use FateCharacterSheet.com along with Roll20 for Fate-based roll20 Campaigns",
   "permissions": [
     "activeTab",
 		"tabs",
@@ -18,8 +18,8 @@
   "homepage_url": "https://github.com/sheibeck/fcs-vtt-extension",
   "icons": {
     "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "32": "icons/icon32.png",
+    "144": "icons/icon144.png"
   },
   "default_locale": "en",  
   "background": {
@@ -32,7 +32,7 @@
 		"images/*"		    
 	],
   "browser_action": {
-    "default_icon": "icons/icon19.png",
+    "default_icon": "icons/icon16.png",
     "default_title": "Fate of 20"   
   },
   "content_scripts": [	
