@@ -1,18 +1,26 @@
 <template>
   <div class="form-group d-flex">
-    <span class="dice fo20 pt-2 pr-3" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">+</span>
+    <span v-if="hasRoll20" class="dice fo20 pt-2 pr-3" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">+</span>
     <input type="text" class="form-control" :id="'aspects.' + aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(`aspects.${aspect.obj}`,  $event.target.value)" :value="$parent.getVal(`aspects.${aspect.obj}`)" :placeholder="aspect.label" />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'InputAspects',
   props: {
     aspect: Object,    
   },
-  computed: {   
+  computed: {
+ 	  ...mapGetters([
+      'isAuthenticated',      
+      'roll20Enabled'
+    ]),
+    hasRoll20() {
+      return this.isAuthenticated && this.roll20Enabled;
+    }
   },
   data () {
     return {

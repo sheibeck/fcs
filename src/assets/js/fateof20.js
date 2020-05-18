@@ -16,19 +16,20 @@ export default class FateOf20 {
                 //try local
                 chrome.runtime.sendMessage(this.devExtensionId, { message: "installed?" }, null, response => {
                     if (!response) {                        
-                        fcs.$store.state.roll20Enabled = false;
+                        fcs.$store.state.roll20Installed = false;
                         return;
-                    }
+                    }                    
                     this.ConnectToExtension(this.devExtensionId);
                   });            
             }
-            else {
+            else {                
                 this.ConnectToExtension(this.extensionId);
             }
           });
     }
 
     ConnectToExtension(id) {
+        fcs.$store.state.roll20Installed = true;
         this.port = chrome.runtime.connect(id);
         this.port.onMessage.addListener(this.HandleListener);
     }

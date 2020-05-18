@@ -38,7 +38,8 @@ Vue.config.productionTip = false
 
 const store = new Vuex.Store({
   state: {
-    roll20Enabled: true,    
+    roll20Enabled: true,
+    roll20Installed: false,  
     sessions: [],
     filteredSessions: [],
     campaigns: [],
@@ -100,7 +101,7 @@ const store = new Vuex.Store({
   },
   getters: {
     roll20Enabled: state => {
-      return state.roll20Enabled;
+      return state.roll20Enabled && state.roll20Installed;
     },
     isAuthenticated: state => {
       return state.isAuthenticated;
