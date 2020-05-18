@@ -1,13 +1,35 @@
 export default class FateOf20 {
     // for local dev
-    //editorExtensionId = "pdackompknmfmhalbdbdoncafoeebbhp";    
-    editorExtensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
+    devExtensionId = "pdackompknmfmhalbdbdoncafoeebbhp";    
+    extensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
     
     port = null;
 
-    constructor() {
-        // Start a long-running conversation:
-        this.port = chrome.runtime.connect(this.editorExtensionId);
+    constructor() {        
+        this.CheckForExtension();
+    }
+
+    CheckForExtension = () => {
+        // try to connect to the live app       
+        chrome.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
+            if (!response) {
+                //try local
+                chrome.runtime.sendMessage(this.devExtensionId, { message: "installed?" }, null, response => {
+                    if (!response) {                        
+                        fcs.$store.state.roll20Enabled = false;
+                        return;
+                    }
+                    this.ConnectToExtension(this.devExtensionId);
+                  });            
+            }
+            else {
+                this.ConnectToExtension(this.extensionId);
+            }
+          });
+    }
+
+    ConnectToExtension(id) {
+        this.port = chrome.runtime.connect(id);
         this.port.onMessage.addListener(this.HandleListener);
     }
 
