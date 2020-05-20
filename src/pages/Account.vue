@@ -21,56 +21,45 @@
           </a>
         </div>
 
-        <div v-if="loaded && HasSubscription" class="form-group">
+        <div v-if="loaded && !HasSubscription" class="form-group">
           <label>Subscription: </label> <span>{{SubscriptionStatus}}</span>
           <a href="#" v-on:click="GotoManagePortal($event)">[Manage]</a>
         </div>
        
-        <div v-if="loaded && !HasSubscription" class="d-flex justify-content-center">          
-          <div class="card mx-1 w-25">
+        <div v-if="loaded && HasSubscription" class="d-md-flex justify-content-center">          
+          <div class="card col col-md-6">
             <div class="card-body">
-              <h5 class="card-title">Monthly Subscription</h5>
-              <p class="card-text">
-                Pay a low monthly fee to gain subscriber benefits.
-              </p>
-              <ul>
-                <li>Roll20 Integration</li>
-                <li>Coming soon</li>
-              </ul>                        
-              <p>
-                <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="Subscribe('plan_HJ5iyg7r8S6mN8')"
-                  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
-                  id="checkout-button-plan_HJ5iyg7r8S6mN8"
-                  role="link"
-                >
-                  $2.99 per Month
-                </button>
-              </p>
-            </div>
-          </div>
-
-          <div class="card mx-1 w-25">       
-            <div class="card-body">
-              <h5 class="card-title">Yearly Subscription</h5>
-              <p class="card-text">
-                 Pay a discounted rate by subscribing annually and gain subscriber benefits.
-              </p>
-              <ul class="">
-                <li>Roll20 Integration</li>
-                <li>Coming soon</li>
-              </ul>
-                          
-              <p>
-                <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="Subscribe('plan_HJ5jvo20YLp962')"
-                  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
-                  id="checkout-button-plan_HJ5iyg7r8S6mN8"
-                  role="link"
-                >
-                  $24.99 per Year
-                </button>
-              </p>
+                <h5 class="card-title">Subscribe to Fate Character Sheet</h5>
+                <p class="card-text">
+                  Pay a low monthly fee or a get a discounted rate by subscribing yearly 
+                  and you gain access to subscriber only benefits.
+                </p>
+                <ul class="list-unstyled font-weight-bold py-3">
+                  <li>Roll20 Integration</li>
+                  <li>Coming soon</li>
+                </ul>
+                <p>
+                  <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
+                  <button v-on:click="Subscribe('plan_HJ5iyg7r8S6mN8')"
+                    style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
+                    id="checkout-button-plan_HJ5iyg7r8S6mN8"
+                    role="link"
+                  >
+                    $2.99 per Month
+                  </button>
+                </p>
+                <p> &mdash; OR &mdash;</p>
+                <p>
+                  <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
+                  <button v-on:click="Subscribe('plan_HJ5jvo20YLp962')"
+                    style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
+                    id="checkout-button-plan_HJ5iyg7r8S6mN8"
+                    role="link"
+                  >
+                    $24.99 per Year
+                  </button>
+                </p>              
+              </div>
             </div>
           </div>
         </div>
