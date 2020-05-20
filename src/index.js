@@ -39,6 +39,7 @@ Vue.config.productionTip = false
 const store = new Vuex.Store({
   state: {
     hasActiveSubscription: false,
+    customerId: null,
     roll20Enabled: true,
     roll20Installed: false,    
     sessions: [],

@@ -12,7 +12,7 @@
       <div v-if="isAuthenticated">
         <div class="form-group">
           <label>Email address: </label>
-          <span>{{GetEmail}}</span>
+          <span>{{GetEmail()}}</span>
         </div>
         <div class="form-group">
           <label>Password: </label>
@@ -23,14 +23,14 @@
 
          <div class="form-group">          
           <a href='/recover'>            
-            <form method="POST" action="/create_billing_portal">
+            <form method="POST" :action="manageUrl">
                 <button type="submit" class="btn btn-primary">Manage Subscription</button>
             </form>
           </a>
         </div>
        
-        <div class="d-flex justify-content-center">          
-          <div class="card mx-1">       
+        <div v-if="!HasSubscription" class="d-flex justify-content-center">          
+          <div class="card mx-1">
             <div class="card-body">
               <h5 class="card-title">Monthly Subscription</h5>
               <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -97,33 +97,44 @@ export default {
   mounted() {
     userSvc = new UserService(this.$root);
     commonSvc = new CommonService(this.$root);
-    subSvc = new SubService(this.$root, commonSvc, userSvc);
+    subSvc = new SubService(this.$root, commonSvc, userSvc);    
+  }, 
+  created() {    
+    this.GetBillingPortal();    
   },
   data () {
     return {
       title: "Account",
-      attributes: null,
+      manageUrl: null,           
     }
   },
-  watch: {    
+  watch: {   
   },
   computed: {
     ...mapGetters([
       'isAuthenticated',
       'userId'  
-    ]),
-    GetEmail() {
-      return userSvc.GetUserAttribute("email");
-    },
+    ]),   
+    HasSubscription() {
+      return this.$store.state.hasActiveSubscription;      
+    }
   },
   methods: {      
-    async Subscribe(pricePlan) { 
-      let email = this.GetEmail;
-
-      let result = await subSvc.GetCustomer();
-      
+    GetEmail() {      
+      return this.$store.state.userSession.getIdToken().payload['email'];      
+    },
+    Subscribe() {
+      //subSvc.Checkout();
+    },
+    async GetBillingPortal() { 
       debugger;
-      //subSvc.Checkout(pricePlan);
+      let sv = new UserService(this.$root)
+      debugger;     
+      let id = await sv.GetUserAttribute("custom:stripe_customer").then( async(resp) => {
+      debugger;
+        let result = await subSvc.ManageAccount(id);
+        this.manageUrl = result;
+      });  
     }
   }
 }

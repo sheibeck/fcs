@@ -1,17 +1,14 @@
 
 import CommonService from './commonService';
-import UserService from './userService';
 
 export default class SubService {
   stripe;
   commonSvc;
-  userSvc;
 
   constructor(fcs, commonSvc, userSvc){
     this.fcs = fcs;
     this.stripe = Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT');
-    this.commonSvc = userSvc;  
-    this.userSvc = commonSvc;
+    this.commonSvc = commonSvc;  
   }
 
   async CallLambda(params) {    
@@ -21,10 +18,6 @@ export default class SubService {
   }
 
   async GetCustomer(id) { 
-
-    
-    id = "cus_HJGMdqqIQM69Gi";
-
     var params = {
       FunctionName: "FCSStripe", 
       Payload: JSON.stringify({         
@@ -35,69 +28,22 @@ export default class SubService {
      };
         
     const lambdaResult = await this.CallLambda(params);
-
-    debugger;
-
     const resultObject = JSON.parse(lambdaResult.Payload)
 
     return resultObject;
 
-  // determine if a customer exists && cache this in vuex unless there is a call to manage the session
-  //  ManageSubscription or if there is a call to navigate to checkout
-
-  // determine if the customer already has a subscrption
-  
-   //deleted: { id: 'cus_HJ5eBBr4pAwjZV', object: 'customer', deleted: true }
-   //not exists: 
-   //success
    /* 
    Response:
 {
   "id": "cus_HJEltLkQhdOFKP",
-  "object": "customer",
-  "address": null,
-  "balance": 0,
-  "created": 1589921052,
-  "currency": null,
-  "default_source": null,
-  "delinquent": false,
-  "description": "Fate Character Sheet Subscriber",
-  "discount": null,
-  "email": "jouctasjaxx@gmail.com",
-  "invoice_prefix": "B2E0F131",
-  "invoice_settings": {
-    "custom_fields": null,
-    "default_payment_method": null,
-    "footer": null
-  },
-  "livemode": false,
-  "metadata": {},
-  "name": null,
-  "next_invoice_sequence": 1,
-  "phone": null,
-  "preferred_locales": [],
-  "shipping": null,
-  "sources": {
-    "object": "list",
-    "data": [],
-    "has_more": false,
-    "total_count": 0,
-    "url": "/v1/customers/cus_HJEltLkQhdOFKP/sources"
-  },
+  "object": "customer", 
+  "email": "jouctasjaxx@gmail.com",  
   "subscriptions": {
     "object": "list",
     "data": [],
     "has_more": false,
     "total_count": 0,
     "url": "/v1/customers/cus_HJEltLkQhdOFKP/subscriptions"
-  },
-  "tax_exempt": "none",
-  "tax_ids": {
-    "object": "list",
-    "data": [],
-    "has_more": false,
-    "total_count": 0,
-    "url": "/v1/customers/cus_HJEltLkQhdOFKP/tax_ids"
   }
 }
 */
@@ -105,34 +51,22 @@ export default class SubService {
   }
 
   CreateCustomer = async (email) => {
-    debugger;
     var lambda = new AWS.Lambda();
     lambda.config.credentials = this.fcs.$store.state.credentials;
 
     var params = {
       FunctionName: "FCSStripe", 
-      InvokeArgs: JSON.stringify({         
+      Payload: JSON.stringify({         
         environment: "development",
         item: "createcustomer",
         email: email,
-      }),      
-     };
-    
-     let response = await lambda.invoke(params, function(err, data, callback) {
-       debugger;
-       if (err) console.log(err, err.stack); // an error occurred
-       else     console.log(data);           // successful response
-       /*
-       data = {
-        Payload: <Binary String>, 
-        StatusCode: 200
-       }
-       */    
-      
-       debugger;
-       return data;
-     });
+      }),
+    };
+        
+    const lambdaResult = await this.CallLambda(params);    
+    const resultObject = JSON.parse(lambdaResult.Payload)
 
+    return resultObject;
 
     //deleted: { id: 'cus_HJ5eBBr4pAwjZV', object: 'customer', deleted: true }
     //not exists: 
@@ -191,7 +125,25 @@ export default class SubService {
       */
    }
 
-   ManageSubscription = async (id) => {
+   ManageAccount = async (id) => {
+
+    var lambda = new AWS.Lambda();
+    lambda.config.credentials = this.fcs.$store.state.credentials;      
+
+    var params = {
+      FunctionName: "FCSStripe", 
+      Payload: JSON.stringify({
+        environment: "development",
+        item: "manage",
+        customer: id,
+      }),
+    };
+        
+    const lambdaResult = await this.CallLambda(params);    
+    const resultObject = JSON.parse(lambdaResult.Payload)
+
+    return resultObject;
+
      //self-service portal in stripe
      // navigate to url
      /*
@@ -221,8 +173,7 @@ export default class SubService {
         // Instead use one of the strategies described in
         // https://stripe.com/docs/payments/checkout/fulfillment
         successUrl: `${window.location.host}/success`,
-        cancelUrl: `${window.location.host}/cancelled`,
-        customerEmail: userSvc.GetUserAttribute("email")
+        cancelUrl: `${window.location.host}/cancelled`        
       })
       .then(function (result) {        
         if (result.error) {
