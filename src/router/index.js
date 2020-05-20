@@ -17,6 +17,7 @@ import CharacterSheetDetail from 'pages/CharacterSheetDetail'
 import CharacterSheetList from 'pages/CharacterSheetList'
 import AdversaryDetail from 'pages/AdversaryDetail'
 import AdversaryList from 'pages/AdversaryList'
+import Account from 'pages/Account'
 
 Vue.use(Router)
 Vue.use(Meta)
@@ -26,6 +27,7 @@ export default new Router({
   routes: [
     { path: '/', name: 'Home', component: Home, props: true},
     { path: '/login', component: Login },
+    { path: '/account', component: Account },
     { path: '/register', component: Register },
     { path: '/recover', component: Recover },
     { path: '/confirm', component: Confirm },

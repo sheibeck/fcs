@@ -38,8 +38,9 @@ Vue.config.productionTip = false
 
 const store = new Vuex.Store({
   state: {
+    hasActiveSubscription: false,
     roll20Enabled: true,
-    roll20Installed: false,  
+    roll20Installed: false,    
     sessions: [],
     filteredSessions: [],
     campaigns: [],
@@ -100,8 +101,16 @@ const store = new Vuex.Store({
     }
   },
   getters: {
-    roll20Enabled: state => {
-      return state.roll20Enabled && state.roll20Installed;
+    isSubscriber : state => {      
+      var groups = state.userSession.getIdToken().payload['cognito:groups'];
+      if (groups && groups.includes("super-user")) {
+        return true;
+      }      
+      return state.hasActiveSubscription;
+    },
+    roll20Enabled: (state, getters) => {     
+      let enabled = state.roll20Enabled && state.roll20Installed && getters.isSubscriber;
+      return enabled;
     },
     isAuthenticated: state => {
       return state.isAuthenticated;

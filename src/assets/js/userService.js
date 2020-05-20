@@ -1,4 +1,5 @@
 import CommonService from "./commonService";
+import SubService from "./subService";
 import AWS from 'aws-sdk';
 var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 
@@ -7,7 +8,7 @@ export default class UserService {
   constructor(fcs, commonSvc = new CommonService())
   {
     this.fcs = fcs;
-    this.commonSvc = commonSvc;
+    this.commonSvc = commonSvc;    
   }
 
   Register = (email, password) => {
@@ -58,7 +59,7 @@ export default class UserService {
 
     let CognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
     CognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
+      onSuccess: (result) => {        
         console.log('access token + ' + result.getAccessToken().getJwtToken());
 
         //AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -101,7 +102,7 @@ export default class UserService {
     let userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     let CognitoUser = userPool.getCurrentUser();
 
-    if (CognitoUser != null) {
+    if (CognitoUser != null) {      
       CognitoUser.getSession( (err, session) => {
         this.fcs.$store.commit("CognitoUser", CognitoUser);
         this.SetupAuthSession(err, session);
@@ -130,7 +131,7 @@ export default class UserService {
     }
   }
 
-  SetupAuthSession = async(err, session) => {
+  SetupAuthSession = async(err, session) => {    
     if (err) {
       this.commonSvc.Notify(err.message || JSON.stringify(err));
       return;
@@ -148,7 +149,8 @@ export default class UserService {
 
     this.fcs.$store.commit("userSession", session);
     this.fcs.$store.commit("credentials", credentials);
-    
+
+    this.CheckSubscription();
 
     await this.fcs.$store.state.credentials.refresh((error) => {
       if (error) {
@@ -160,6 +162,20 @@ export default class UserService {
           this.SetupAuthorizedUser(session);
       }
     });
+  }
+
+  CheckSubscription = async () => {    
+    var customerId = this.fcs.$store.state.userSession.getIdToken().payload["custom:stripe_customer"];    
+    
+    if (!customerId) {
+      this.fcs.$store.state.hasActiveSubscription = false;
+    }
+    else {
+      let subSvc = new SubService(this.$root);
+      var customer = await subSvc.GetCustomer(customerId);
+      debugger;
+      this.fcs.$store.state.hasActiveSubscription = false;
+    }
   }
 
   SetupUnAuthorizedUser = () => {    
@@ -174,6 +190,29 @@ export default class UserService {
 
     $('.requires-auth').removeClass('hidden');
     $('.requires-noauth').addClass('hidden');    
+  }
+
+  IsUserInGroup(groupName) {
+    var groups = this.fcs.$store.userSession.getIdToken().payload['cognito:groups'];
+    if (!groups) {
+      return false
+    }
+    return groups.includes(groupName);
+  }
+
+  GetUserAttribute = (attrName) => {    
+    if (this.fcs.$store.state.userSession)
+    {
+     let attr = this.fcs.$store.state.userSession.getIdToken().payload[attrName];
+     if (attr) {
+       return attr;
+     }
+     else {
+       return null;
+     }
+    } else {
+      return null;
+    }
   }
 
   Logout = () => {        

@@ -52,13 +52,18 @@
               </li>
           </ul>
 
-          <div v-if="!isAuthenticated" class="form-inline login-button">
-              <a href="/login" type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0">
-                  Login <i class="fas fa-sign-in-alt"></i>
+          <div v-if="!isAuthenticated" class="navbar-nav">
+              <a href="/login" type="button" class="nav-link">
+                  <i class="fas fa-sign-in-alt"></i> Sign in
               </a>
           </div>
-          <div v-if="isAuthenticated" class="form-inline mx-1 mb-sm-1">
-              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="logout">Logout</button>
+          <div v-if="isAuthenticated" class="navbar-nav">               
+              <a class="nav-link" href="/account">
+                <i class="fas fa-user-cog"></i> Account 
+              </a>
+              <a href="#" class="nav-link" v-on:click="logout">
+                <i class="fas fa-sign-out-alt"></i> Sign out 
+              </a>
           </div>
       </div>
     </nav>
