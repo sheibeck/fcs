@@ -27,7 +27,8 @@ export default {
     }
   },
   methods: { 
-    sendToRoll20() {      
+    sendToRoll20() {   
+      if (!this.aspect || !this.aspect.label) return;   
       let label = `aspect ${this.aspect.label}`;
       this.$parent.sendToRoll20('invoke', label, "aspects", this.aspect.obj);
     }

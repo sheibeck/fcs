@@ -4,7 +4,10 @@
       <a href='/charactersheet' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Character <i class='fa fa-user'></i></a>
       <search class=""></search>
     </div>
-    <div class='card-columns'>
+    <div v-if="!hasCharacters">
+      <h2>You have not created any characters.</h2>
+    </div>
+    <div v-if="hasCharacters" class='card-columns'>
       <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
         <div class='card-body'>
           <h5 class='card-title character-name'>{{item.name}}</h5>
@@ -81,6 +84,9 @@ export default {
     this.init();
   },
   computed: {
+    hasCharacters() {
+      return this.characters.length > 0;
+    },
     slugify: function() {
       return this.characters.map(function(item) {
           return '/character/' + commonSvc.GetId(item.related_id) + '/' + commonSvc.GetId(item.id) + '/' + commonSvc.Slugify(item.name);

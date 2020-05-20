@@ -157,6 +157,7 @@ export default {
 				this.$parent.sendToRoll20(type, this.character.name, label, item);
 				break;			
 			default:
+				if (!this.character[obj] || !this.character[obj][item]) return;
 				this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
 		}
     },
@@ -174,7 +175,7 @@ export default {
 		if(arr === 'fatepoints')
 		{
 			let oldVal = this.character[arr];
-			if (parseInt(oldVal) < parseInt(val)) {
+			if (!oldVal || (parseInt(oldVal) < parseInt(val))) {
 				this.sendToRoll20("fatepoint", null, arr, "1");
 			}
 			else {

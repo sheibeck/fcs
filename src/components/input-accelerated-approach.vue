@@ -1,10 +1,10 @@
 <template>
   <div class="form-group d-flex">
       <span v-if="hasRoll20" class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
-      <label class="p-1 mr-auto">{{this.item}}</label>
-      <input class="form-control text-center w-25" type="text" :id="this.item" :name="this.item" 
-        @change="$parent.setVal(`approaches.${this.item}`,  $event.target.value)" 
-        :value="$parent.getVal(`approaches.${this.item}`)" placeholder="+">			  
+      <label class="p-1 mr-auto">{{item}}</label>
+      <input class="form-control text-center w-25" type="text" :id="item" :name="item" 
+        @change="$parent.setVal(`approaches.${item}`,  $event.target.value)" 
+        :value="$parent.getVal(`approaches.${item}`)" placeholder="+">			  
     </div>
 </template>
 
@@ -31,7 +31,8 @@ export default {
     }
   },
   methods: { 
-    sendToRoll20() {      
+    sendToRoll20() {
+      if (!this.item) return;      
       let label = `approach ${this.item.toTitleCase()}`;
       this.$parent.sendToRoll20('diceroll', label, "approaches", this.item);
     }

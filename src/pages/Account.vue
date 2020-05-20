@@ -21,16 +21,22 @@
           </a>
         </div>
 
-         <div v-if="loaded && HasSubscription" class="form-group">                              
-          <button type="button" class="btn btn-primary" v-on:click="GotoManagePortal()">Manage Subscription</button>          
+        <div v-if="loaded && HasSubscription" class="form-group">
+          <label>Subscription: </label> <span>{{SubscriptionStatus}}</span>
+          <a href="#" v-on:click="GotoManagePortal($event)">[Manage]</a>
         </div>
        
         <div v-if="loaded && !HasSubscription" class="d-flex justify-content-center">          
-          <div class="card mx-1">
+          <div class="card mx-1 w-25">
             <div class="card-body">
               <h5 class="card-title">Monthly Subscription</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              
+              <p class="card-text">
+                Pay a low monthly fee to gain subscriber benefits.
+              </p>
+              <ul>
+                <li>Roll20 Integration</li>
+                <li>Coming soon</li>
+              </ul>                        
               <p>
                 <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
                 <button v-on:click="Subscribe('plan_HJ5iyg7r8S6mN8')"
@@ -44,14 +50,20 @@
             </div>
           </div>
 
-          <div class="card mx-1">       
+          <div class="card mx-1 w-25">       
             <div class="card-body">
               <h5 class="card-title">Yearly Subscription</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              
+              <p class="card-text">
+                 Pay a discounted rate by subscribing annually and gain subscriber benefits.
+              </p>
+              <ul class="">
+                <li>Roll20 Integration</li>
+                <li>Coming soon</li>
+              </ul>
+                          
               <p>
                 <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="subscribe('plan_HJ5jvo20YLp962')"
+                <button v-on:click="Subscribe('plan_HJ5jvo20YLp962')"
                   style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
                   id="checkout-button-plan_HJ5iyg7r8S6mN8"
                   role="link"
@@ -89,7 +101,7 @@ export default {
     userSvc = new UserService(this.$root);
     commonSvc = new CommonService(this.$root);
     subSvc = new SubService(this.$root, commonSvc, userSvc);    
-    setTimeout( () => {this.loaded = true;}, 1000);
+    setTimeout( () => {this.loaded = true;}, 2000);
   },   
   data () {
     return {
@@ -103,7 +115,10 @@ export default {
       'userId'  
     ]),   
     HasSubscription() {
-      return this.$store.state.hasActiveSubscription;      
+      return this.$store.state.hasActiveSubscription;
+    },
+    SubscriptionStatus() {
+      return this.$store.state.subscriptionStatus;
     }
   },
   methods: {      
@@ -118,7 +133,8 @@ export default {
                 
       })      
     },
-    GotoManagePortal() {
+    GotoManagePortal(e) {
+      e.preventDefault();
       userSvc.GetUserAttribute("custom:stripe_customer").then( id => {        
         subSvc.ManageAccount(id).then( account => {
           if (account.url) {

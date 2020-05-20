@@ -38,7 +38,7 @@ Vue.config.productionTip = false
 
 const store = new Vuex.Store({
   state: {
-    hasActiveSubscription: false,
+    hasActiveSubscription: null,
     customerId: null,
     roll20Enabled: true,
     roll20Installed: false,    
@@ -109,7 +109,9 @@ const store = new Vuex.Store({
       }      
       return state.hasActiveSubscription;
     },
-    roll20Enabled: (state, getters) => {     
+    roll20Enabled: (state, getters) => {
+      //don't show roll20 stuff on the creation screen, only saved characters
+      if (document.location.href.indexOf("/charactersheet") > -1) return false;
       let enabled = state.roll20Enabled && state.roll20Installed && getters.isSubscriber;
       return enabled;
     },

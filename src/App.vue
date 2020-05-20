@@ -47,8 +47,8 @@
                   <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
                 </div>
               </li>
-               <li class="nav-item" ref="el">
-                  <a class="nav-link" href="http://paypal.me/sheibeck" target="_blank"><i class="fas fa-coins"></i> Donate</a>
+               <li v-if="!HasSubscription" class="nav-item" ref="el">
+                  <a class="nav-link" href="/account"><i class="fas fa-coins"></i> Subscribe</a>
               </li>
           </ul>
 
@@ -122,6 +122,9 @@ export default {
       'isAuthenticated',
       'searchText'
     ]),
+    HasSubscription() {
+      return this.$store.state.hasActiveSubscription;
+    },
   },
   data () {
     return {

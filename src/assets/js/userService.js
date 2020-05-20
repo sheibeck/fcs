@@ -5,11 +5,10 @@ var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 
 
 export default class UserService {    
-  constructor(fcs, commonSvc, subSvc)
+  constructor(fcs, commonSvc)
   {
     this.fcs = fcs;
-    this.commonSvc = commonSvc || new CommonService(fcs);
-    this.subSvc = subSvc || new SubService(fcs);
+    this.commonSvc = commonSvc || new CommonService(fcs);    
   }
 
   Register = (email, password) => {
@@ -165,18 +164,21 @@ export default class UserService {
     });
   }
 
-  CheckSubscription = async () => {    
-    let customerId = await this.GetUserAttribute("custom:stripe_customer");
-    if (!customerId) {    
+  CheckSubscription = async () => {
+    if (this.fcs.$store.state.hasActiveSubscription == null)
+    {
+      let customerId = await this.GetUserAttribute("custom:stripe_customer");    
       this.fcs.$store.state.hasActiveSubscription = false;
-      let email = await this.GetUserAttribute("email");
-      //create a new customer in stripe for this user
-      let customer = await this.subSvc.CreateCustomer(email);    
-      this.SetUserAttribute("custom:stripe_customer", customer.id);
-    }
-    else {      
-      let customer = await this.subSvc.GetCustomer(customerId);
-      this.fcs.$store.state.hasActiveSubscription = customer.subscriptions.total_count > 0       
+      if (customerId) {
+        let subSvc = new SubService(this.fcs, this.commonSvc, this);
+        let customer = await subSvc.GetCustomer(customerId);
+        if (customer && customer.subscriptions && customer.subscriptions.total_count > 0) {
+          this.fcs.$store.state.subscriptionStatus = customer.subscriptions.data[0].status.toTitleCase();
+          if (customer.subscriptions.data[0].status.toLowerCase() == "active") {
+            this.fcs.$store.state.hasActiveSubscription = true;
+          }
+        }
+      }
     }
   }
 
@@ -202,6 +204,12 @@ export default class UserService {
     return groups.includes(groupName);
   }
 
+  GetCognitoUser = async(params) => {
+    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+    cognitoidentityserviceprovider.config.credentials = this.fcs.$store.state.credentials;
+    return await cognitoidentityserviceprovider.getUser(params).promise();    
+  }
+
   GetUserAttribute = async (attrName) => {    
     if (this.fcs.$store.state.userSession)
     {
@@ -213,26 +221,30 @@ export default class UserService {
        //might be a custom attribute, try getting it from cognito
         var params = {
           AccessToken: this.fcs.$store.state.cognito.CognitoUser.signInUserSession.accessToken.jwtToken
-        };
-        let result = await cognitoidentityserviceprovider.getUser(params, function(err, data) {
-          if (err) {
-            console.log(err, err.stack);
-            return null;
-          } // an error occurred
-          else {            
-            return data[attrName];
-          };
-        });
+        };               
+        let result = await this.GetCognitoUser(params)        
+        let attr =  result.UserAttributes.find( ({ Name }) => Name === attrName );
+        if (attr)
+        {
+          return attr.Value;
+        }
+        else {
+          return null;
+        }
+        
       }
     } else {
       return null;
     }
   }
 
-  SetUserAttribute = async (attrName, value) => {    
+  UpdateCognitoUser = async(params) => {
     var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
     cognitoidentityserviceprovider.config.credentials = this.fcs.$store.state.credentials;
+    return await cognitoidentityserviceprovider.updateUserAttributes(params).promise();        
+  }
 
+  SetUserAttribute = async (attrName, value) => {       
     var token = this.fcs.$store.state.cognito.CognitoUser.signInUserSession.accessToken.jwtToken;
     var params = {
       UserAttributes: [{
@@ -241,15 +253,9 @@ export default class UserService {
       }],
       AccessToken: token,      
     };
-    
-    let result = await cognitoidentityserviceprovider.updateUserAttributes(params, function(err, data) {      
-      if (err) {
-        console.log(err, err.stack); // an error occurred
-        return err.stack;
-      }
-      console.log(data);
-      return true;
-    });
+        
+    let result = await this.UpdateCognitoUser(params);    
+    return result;
   }
 
   Logout = () => {        

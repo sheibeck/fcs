@@ -4,11 +4,13 @@ import CommonService from './commonService';
 export default class SubService {
   stripe;
   commonSvc;
+  userSvc;
 
   constructor(fcs, commonSvc, userSvc){
     this.fcs = fcs;
     this.stripe = Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT');
-    this.commonSvc = commonSvc;  
+    this.commonSvc = commonSvc;
+    this.userSvc = userSvc; 
   }
 
   async CallLambda(params) {    
@@ -160,26 +162,54 @@ export default class SubService {
       }*/
    }
 
-   Checkout = async(pricePlan, customerId) => {
+  Checkout = async(pricePlan, customerId) => {
+    var lambda = new AWS.Lambda();
+    lambda.config.credentials = this.fcs.$store.state.credentials;      
 
-        var lambda = new AWS.Lambda();
-        lambda.config.credentials = this.fcs.$store.state.credentials;      
+      if (!customerId)
+      {
+        //double check that we really don't have a customer id
+        customerId = await this.userSvc.GetUserAttribute("custom:stripe_customer");
+        
+        if (!customerId) {
+          //once we start to checkout, we need a customer;
+          let email = await this.userSvc.GetUserAttribute("email")
+          
+          let customer = await this.CreateCustomer();
+          await this.userSvc.SetUserAttribute("custom:stripe_customer", customer.id);
+          customerId = customer.id;
 
-        var params = {
-          FunctionName: "FCSStripe", 
-          Payload: JSON.stringify({
-            environment: "development",
-            item: "checkout",
-            id: customerId,
-            pricePlan: pricePlan,
-            redirect: `${window.location.protocol}//${window.location.host}`            
-          }),
-        };
-            
-        const lambdaResult = await this.CallLambda(params);    
-        const resultObject = JSON.parse(lambdaResult.Payload)
+          if (!customerId) {
+            this.commonSvc.Notify("Cannot find customer id. Please try again.");
+            return null;
+          }            
+        }
+      }
+      
+      var params = {
+        FunctionName: "FCSStripe", 
+        Payload: JSON.stringify({
+          environment: "development",
+          item: "checkout",
+          id: customerId,
+          pricePlan: pricePlan,
+          redirect: `${window.location.protocol}//${window.location.host}`            
+        }),
+      };
+          
+      const lambdaResult = await this.CallLambda(params);    
+      const resultObject = JSON.parse(lambdaResult.Payload)
 
-       
+      if (resultObject.statusCode == 400)
+      {
+        this.commonSvc.Notify(resultObject.raw.message, "error");
+
+        //if we have an issue we can call this to reset the customer_id for stripe
+        //might be an one issue at this point.
+        //the user has been deleted, unset the stripe_customer
+        //await this.userSvc.SetUserAttribute("custom:stripe_customer", "");        
+        return;
+      }
 
       //this is from .js so it's ok here.
       var stripe = Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT');

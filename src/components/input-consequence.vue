@@ -29,6 +29,7 @@ export default {
   },
   methods: { 
     sendToRoll20() {      
+      if (!this.consequence || !this.consequence.label) return;
       let label = `consequence ${this.consequence.label}`;
       this.$parent.sendToRoll20('invoke', label, "consequences", this.consequence.obj);
     },
