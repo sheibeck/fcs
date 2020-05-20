@@ -205,7 +205,7 @@ export default class UserService {
   GetUserAttribute = async (attrName) => {    
     if (this.fcs.$store.state.userSession)
     {
-     let attr = this.fcs.$store.state.userSession.getIdToken().payload[attrName];
+     let attr = this.fcs.$store.state.userSession.getIdToken().payload[attrName];     
      if (attr) {
        return attr;
      }

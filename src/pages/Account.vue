@@ -21,15 +21,11 @@
           </a>
         </div>
 
-         <div class="form-group">          
-          <a href='/recover'>            
-            <form method="POST" :action="manageUrl">
-                <button type="submit" class="btn btn-primary">Manage Subscription</button>
-            </form>
-          </a>
+         <div v-if="loaded && HasSubscription" class="form-group">                              
+          <button type="button" class="btn btn-primary" v-on:click="GotoManagePortal()">Manage Subscription</button>          
         </div>
        
-        <div v-if="!HasSubscription" class="d-flex justify-content-center">          
+        <div v-if="loaded && !HasSubscription" class="d-flex justify-content-center">          
           <div class="card mx-1">
             <div class="card-body">
               <h5 class="card-title">Monthly Subscription</h5>
@@ -69,12 +65,7 @@
       
       </div>
 
-      </div>
-     
-        <div id="error-message"></div>
-
-      </div>
-    </div>
+    </div>              
   </div>
 </template>
 
@@ -98,18 +89,14 @@ export default {
     userSvc = new UserService(this.$root);
     commonSvc = new CommonService(this.$root);
     subSvc = new SubService(this.$root, commonSvc, userSvc);    
-  }, 
-  created() {    
-    this.GetBillingPortal();    
-  },
+    setTimeout( () => {this.loaded = true;}, 1000);
+  },   
   data () {
     return {
       title: "Account",
-      manageUrl: null,           
+      loaded: false,          
     }
-  },
-  watch: {   
-  },
+  },  
   computed: {
     ...mapGetters([
       'isAuthenticated',
@@ -121,21 +108,31 @@ export default {
   },
   methods: {      
     GetEmail() {      
-      return this.$store.state.userSession.getIdToken().payload['email'];      
+      return this.$store.state.userSession.getIdToken().payload['email'];
     },
-    Subscribe() {
-      //subSvc.Checkout();
+    Subscribe(planItem) {
+
+      userSvc.GetUserAttribute("custom:stripe_customer").then( id => {        
+        
+            subSvc.Checkout(planItem, id);
+                
+      })      
     },
-    async GetBillingPortal() { 
-      debugger;
-      let sv = new UserService(this.$root)
-      debugger;     
-      let id = await sv.GetUserAttribute("custom:stripe_customer").then( async(resp) => {
-      debugger;
-        let result = await subSvc.ManageAccount(id);
-        this.manageUrl = result;
-      });  
-    }
+    GotoManagePortal() {
+      userSvc.GetUserAttribute("custom:stripe_customer").then( id => {        
+        subSvc.ManageAccount(id).then( account => {
+          if (account.url) {
+            //let form = document.getElementById("billingPortal");
+            //form.action = account.url;
+            //form.submit();
+            document.location.href = account.url;
+          }
+          else {
+            commonSvc.Notify("Cannot find account management portal. Please try again.", "Error");
+          }
+        });
+      })
+    }    
   }
 }
 </script>

@@ -135,7 +135,8 @@ export default class SubService {
       Payload: JSON.stringify({
         environment: "development",
         item: "manage",
-        customer: id,
+        id: id,
+        redirect: `${window.location.protocol}//${window.location.host}/account`
       }),
     };
         
@@ -159,12 +160,34 @@ export default class SubService {
       }*/
    }
 
-   Checkout = async(pricePlan) => {
+   Checkout = async(pricePlan, customerId) => {
+
+        var lambda = new AWS.Lambda();
+        lambda.config.credentials = this.fcs.$store.state.credentials;      
+
+        var params = {
+          FunctionName: "FCSStripe", 
+          Payload: JSON.stringify({
+            environment: "development",
+            item: "checkout",
+            id: customerId,
+            pricePlan: pricePlan,
+            redirect: `${window.location.protocol}//${window.location.host}`            
+          }),
+        };
+            
+        const lambdaResult = await this.CallLambda(params);    
+        const resultObject = JSON.parse(lambdaResult.Payload)
+
+       
+
       //this is from .js so it's ok here.
       var stripe = Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT');
       // When the customer clicks on the button, redirect
       // them to Checkout.
       stripe.redirectToCheckout({
+        sessionId: resultObject.id
+        /*
         lineItems: [{price: pricePlan, quantity: 1}],
         mode: 'subscription',
         // Do not rely on the redirect to the successUrl for fulfilling
@@ -172,8 +195,8 @@ export default class SubService {
         // a successful payment.  
         // Instead use one of the strategies described in
         // https://stripe.com/docs/payments/checkout/fulfillment
-        successUrl: `${window.location.host}/success`,
-        cancelUrl: `${window.location.host}/cancelled`        
+        successUrl: `${window.location.protocol}//${window.location.host}/success`,
+        cancelUrl: `${window.location.protocol}//${window.location.host}/cancelled`*/   
       })
       .then(function (result) {        
         if (result.error) {
