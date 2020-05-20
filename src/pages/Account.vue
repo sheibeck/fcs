@@ -21,12 +21,12 @@
           </a>
         </div>
 
-        <div v-if="loaded && !HasSubscription" class="form-group">
+        <div v-if="loaded && HasSubscription" class="form-group">
           <label>Subscription: </label> <span>{{SubscriptionStatus}}</span>
           <a href="#" v-on:click="GotoManagePortal($event)">[Manage]</a>
         </div>
        
-        <div v-if="loaded && HasSubscription" class="d-md-flex justify-content-center">          
+        <div v-if="loaded && !HasSubscription" class="d-md-flex justify-content-center">          
           <div class="card col col-md-6">
             <div class="card-body">
                 <h5 class="card-title">Subscribe to Fate Character Sheet</h5>
