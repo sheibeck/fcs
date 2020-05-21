@@ -29,14 +29,17 @@
         <div v-if="loaded && !HasSubscription" class="d-md-flex justify-content-center">          
           <div class="card col col-md-6">
             <div class="card-body">
-                <h5 class="card-title">Subscribe to Fate Character Sheet</h5>
+                <h5 class="card-title">
+                  Subscribe to Fate Character Sheet<br/>
+                  <small>Includes 30 day free trial.</small>
+                </h5>
                 <p class="card-text">
                   Pay a low monthly fee or a get a discounted rate by subscribing yearly 
                   and you gain access to subscriber only benefits.
                 </p>
                 <ul class="list-unstyled font-weight-bold py-3">
-                  <li>Roll20 Integration</li>
-                  <li>Coming soon</li>
+                  <li>&mdash;Roll20 Integration</li>
+                  <li>&mdash;Coming soon</li>
                 </ul>
                 <p>
                   <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->

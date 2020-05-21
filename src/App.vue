@@ -16,7 +16,7 @@
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                     <a class="nav-link" v-bind:class="{active : isActive('character')}" href="/character"><i class="fas fa-user"></i> My Characters</a>
-                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>
+                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe-americas"></i> My Campaigns</a>
                  </div>
               </li>
               <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
@@ -27,7 +27,7 @@
               </li>
               <li class="nav-item dropdown">
                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <i class="fas fa-tools"></i> Tools
+                   <i class="fas fa-dungeon"></i> Tools
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                    <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
@@ -43,13 +43,16 @@
                   <span class="dice">O</span> Support
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-blog"></i> Blog</a>
-                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
+                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Fate-Character-Sheet"><i class="fas fa-hat-wizard"></i> FAQ</a>
+                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-scroll"></i> Blog</a>
+                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fas fa-dragon"></i> Report Issue</a>
                 </div>
               </li>
-               <li v-if="!HasSubscription" class="nav-item" ref="el">
-                  <a class="nav-link" href="/account"><i class="fas fa-coins"></i> Subscribe</a>
+              <li v-if="!HasSubscription" class="nav-item" ref="el">
+                  <a v-if="!isAuthenticated" class="nav-link" href="/register"><span class="dice">C</span> Register</a>
+                  <a v-if="isAuthenticated" class="nav-link" href="/account"><span class="dice">C</span> Subscribe</a>
               </li>
+              
           </ul>
 
           <div v-if="!isAuthenticated" class="navbar-nav">

@@ -4,8 +4,8 @@
       <div class="col-sm-12 h1">
         Register
       </div>
-      <div class="col-sm-12 h4">
-        Register your account
+      <div class="col-sm-12">
+        Register your account to get access to unlimited characters and campaigns. After you register, you can subscribe to get additional benefits!
       </div>
     </div>
     <div class="row m-4 justify-content-md-center">

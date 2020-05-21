@@ -23,7 +23,7 @@ export default class SubService {
     var params = {
       FunctionName: "FCSStripe", 
       Payload: JSON.stringify({         
-        environment: "development",
+        environment: this.fcs.$store.state.environment,
         item: "getcustomer",
         id: id,
       }),
@@ -59,7 +59,7 @@ export default class SubService {
     var params = {
       FunctionName: "FCSStripe", 
       Payload: JSON.stringify({         
-        environment: "development",
+        environment: this.fcs.$store.state.environment,
         item: "createcustomer",
         email: email,
       }),
@@ -135,7 +135,7 @@ export default class SubService {
     var params = {
       FunctionName: "FCSStripe", 
       Payload: JSON.stringify({
-        environment: "development",
+        environment: this.fcs.$store.state.environment,
         item: "manage",
         id: id,
         redirect: `${window.location.protocol}//${window.location.host}/account`
@@ -189,11 +189,12 @@ export default class SubService {
       var params = {
         FunctionName: "FCSStripe", 
         Payload: JSON.stringify({
-          environment: "development",
+          environment: this.fcs.$store.state.environment,
           item: "checkout",
           id: customerId,
           pricePlan: pricePlan,
-          redirect: `${window.location.protocol}//${window.location.host}`            
+          success_url: `${window.location.protocol}//${window.location.host}/thankyou`,
+          cancel_url: `${window.location.protocol}//${window.location.host}/cancel`
         }),
       };
           

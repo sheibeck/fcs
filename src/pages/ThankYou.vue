@@ -1,8 +1,8 @@
 <template>
 <div class="container mt-2">
     <div class="error">
-        <div class="dice">0000</div>
-        <h2>We're sorry to see you go.</h2>
+        <div class="dice">++++</div>
+        <h2>You've succeeded with style!</h2>
     </div>
 </div>
 </template>
@@ -11,10 +11,10 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Cancel',
+  name: 'ThankYou',
   metaInfo: {
       // if no subcomponents specify a metaInfo.title, this title will be used
-      title: 'Cancel',      
+      title: 'Thank You',      
   },
   data () {
     return {
