@@ -2,7 +2,7 @@ import CommonService from './commonService';
 
 export default class FateOf20 {
     // for local dev
-    devExtensionId = "pdackompknmfmhalbdbdoncafoeebbhp";    
+    devExtensionId = "ihebifhjieemlbahfbaalkblgnmkfbem";    
     extensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
     commonSvc = new CommonService();
 

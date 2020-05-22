@@ -35,6 +35,7 @@
           <div v-if="!isEmpty(item.aspects)">
             <h5 class='card-header py-0'>Aspects</h5>
             <p class='card-text px-4 my-0' v-for="aspect in item.aspects">
+              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'aspects', aspect)">C</span>
               <strong>{{fixLabel(aspect)}}</strong>
             </p>
           </div>
@@ -43,6 +44,7 @@
             <h5 class='card-header py-0'>Skills</h5>
 
             <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills">
+                <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('diceroll', 'skill', skill, skillIndex)">+</span>
                 <strong>{{skillIndex}}</strong> {{fixLabel(skill)}}
             </p>
           </div>
@@ -50,8 +52,9 @@
           <div v-if="!isEmpty(item.stunts)">
             <h5 class='card-header py-0'>Stunts &amp; Extras</h5>
 
-            <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts">
-                <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
+              <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts">
+              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('stuntextra', stuntIndex, stunt)">A</span>
+              <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
             </p>
           </div>
 
@@ -59,9 +62,10 @@
             <h5 class='card-header py-0'>Stress</h5>
 
             <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress">
+                <span v-if="hasRoll20" class="dice fo20">D</span>
                 <strong>{{stressMainIndex}}</strong>
                 <span v-for="(stressValue, stressIndex) in stressMain">
-                  <input type='checkbox' v-bind:value='stressValue'>{{stressValue}}
+                  <input type='checkbox' v-bind:value='stressValue' @change="sendToRoll20(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
                 </span>
             </p>
           </div>
@@ -69,8 +73,9 @@
           <div v-if="!isEmpty(item.consequences)">
             <h5 class='card-header py-0'>Consequences</h5>
 
-            <p class='card-text px-4 my-0' v-for="(con, conIndex) in item.consequences">
+            <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences">
                 <strong>{{conIndex}}</strong> {{fixLabel(con)}}
+                <input v-if="hasRoll20" class="ml-2 form-control input-sm" @change="sendToRoll20(`consequence`, `${con} ${conIndex}`, $event.target.value)">
             </p>
           </div>
 
@@ -89,9 +94,11 @@ import { mapGetters } from 'vuex'
 import Search from '../components/search'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import FateOf20 from '../assets/js/fateof20'
 
 let commonSvc = null;
 let dbSvc = null;
+let fateOf20 = null;
 
 export default {
   name: 'CharacterList',
@@ -101,6 +108,7 @@ export default {
   mounted(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
+    fateOf20 = new FateOf20();
 
     this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
   },
@@ -116,7 +124,8 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-      'searchText'
+      'searchText',
+      'roll20Enabled'
     ]),
     adversaryListDefault() {
       if ($cookies.get("fcsAdversaryListDefault"))
@@ -128,6 +137,9 @@ export default {
     },  
     commonSvc() {
       return commonSvc;
+    },
+    hasRoll20() {      
+      return this.isAuthenticated && this.roll20Enabled && this.adversaryId;
     }
   },
   watch: {
@@ -229,7 +241,47 @@ export default {
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
-    }
+    },
+    sendToRoll20(type, description, data, data2) { 
+      let character = this.adversaries[0].name;
+      let msg = null;
+      switch(type) {
+        case "diceroll":
+          let desc2 = "";
+          let rollModifier = 0;
+          var findModifier = data.match(/(\d)/);
+          if (findModifier) {
+            rollModifier = findModifier[0];
+            desc2 = data2;            
+          }
+          else {
+            findModifier = data2.match(/(\d)/);
+            if(findModifier) {
+              rollModifier = findModifier[0];
+            }
+            desc2 = data;
+          }
+
+          msg = fateOf20.MsgDiceRoll(character, `${description} ${desc2}`, rollModifier);
+          break;
+        case "invoke":
+          msg = fateOf20.MsgInvoke(character, description, data);
+          break;
+        case "stuntextra":          
+          msg = fateOf20.MsgStuntExtra(character, `${description}: ${data}`);
+          break;
+        case "fatepoint":          
+          msg = fateOf20.MsgFatePoint(character, description, data);
+          break;
+        case "stress":
+          msg = fateOf20.MsgStress(character, description, data);
+          break;
+        case "consequence":
+          msg = fateOf20.MsgConsequence(character, description, data);
+          break;      
+      }
+      fateOf20.SendMessage(msg);
+    },
   }
 }
 </script>

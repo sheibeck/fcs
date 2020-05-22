@@ -111,7 +111,7 @@ const store = new Vuex.Store({
     },
     roll20Enabled: (state, getters) => {
       //don't show roll20 stuff on the creation screen, only saved characters
-      if (document.location.href.indexOf("/charactersheet") > -1) return false;
+      if (document.location.href.indexOf("/charactersheet") > -1) return false;      
       let enabled = state.roll20Enabled && state.roll20Installed && getters.isSubscriber;
       return enabled;
     },

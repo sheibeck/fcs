@@ -69,7 +69,7 @@
 		<!-- stress -->
 		<div class="col-sm-6 col-md-4 fate-stress">
 			<div class="form-group">
-				<div for="" class="fate-header">Stress <span class='dice fo20 font-weight-normal small'>A</span></div>
+				<div for="" class="fate-header">Stress <span class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
 			<div class="d-flex">
@@ -81,7 +81,7 @@
 
 		<div class="col-sm-6 col-md-8 fate-consequences">
 			<div class="form-group">
-				<div class="fate-header col-12">Consequences <span class='dice fo20 font-weight-normal small'>A</span></div>
+				<div class="fate-header col-12">Consequences <span class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
 			<div v-for="consequence in consequences" :key="consequence.obj">

@@ -17,8 +17,8 @@ function handleListener(msg, sender, sendResponse) {
             subMessage = parseInt(msg.modifier) > 0 ? "Gained a Fate Point": "Spent a Fate Point";
             chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + subMessage +"}}";
             break;
-        case "stuntextra":            
-            let stuntextra = msg.stuntextra.match(/(.*):(.*)/);
+        case "stuntextra":
+            let stuntextra = msg.stuntextra.match(/(.*?):(.*)/);
             chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + stuntextra[1] + "}} {{Desc=" + stuntextra[2] +"}}";            
             break;
         case "stress":               
