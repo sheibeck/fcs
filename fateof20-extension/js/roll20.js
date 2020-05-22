@@ -6,8 +6,9 @@ function handleListener(msg, sender, sendResponse) {
     switch(msg.type) {         
         case "diceroll":    
             let thing = msg.skill.split(" ");            
-            let template = "&{template:default} {{name=" + msg.character + "}} {{" + thing[0] + "=" + thing[1] + "}} {{roll (4df+" + msg.modifier + ")=[[4df+(" + msg.modifier + "||0)]]}}";            
+            let template = "&{template:default} {{name=" + msg.character + "}} {{" + thing[0] + "=" + thing[1] + "}} {{roll (4df+" + msg.modifier + ")=[[4df+(" + (parseInt(msg.modifier)||0) + ")]]}}";            
             chatMessage = template;
+            console.log(template);
             break;
         case "invoke":      
             chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=Invoked an aspect}} {{aspect=" + msg.aspect +"}}";
@@ -16,8 +17,9 @@ function handleListener(msg, sender, sendResponse) {
             subMessage = parseInt(msg.modifier) > 0 ? "Gained a Fate Point": "Spent a Fate Point";
             chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + subMessage +"}}";
             break;
-        case "stuntextra":               
-            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=Used}} {{stunt=" + msg.stuntextra +"}}";
+        case "stuntextra":            
+            let stuntextra = msg.stuntextra.match(/(.*):(.*)/);
+            chatMessage = "&{template:default} {{name=" + msg.character + "}} {{action=" + stuntextra[1] + "}} {{Desc=" + stuntextra[2] +"}}";            
             break;
         case "stress":               
             subMessage = `${msg.stress ? "Took" : "Recovered"} ${msg.description} stress`;

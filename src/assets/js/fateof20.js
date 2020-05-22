@@ -1,8 +1,11 @@
+import CommonService from './commonService';
+
 export default class FateOf20 {
     // for local dev
     devExtensionId = "pdackompknmfmhalbdbdoncafoeebbhp";    
     extensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
-    
+    commonSvc = new CommonService();
+
     port = null;
 
     constructor() {        
@@ -84,12 +87,17 @@ export default class FateOf20 {
             type: "consequence",
             character: character,
             description: description,
-            consequence: consequence,            
+            consequence: consequence,
         }
     }
 
-    SendMessage = (msg) => {         
-        this.port.postMessage(msg);
+    SendMessage = (msg) => {
+        try {     
+            this.port.postMessage(msg);
+        } 
+        catch(e) {
+            this.commonSvc.Notify("Can't connect to Fate of 20 extension. Try refreshing your browser.");
+        }
     }
 
     HandleListener = (msg) => {

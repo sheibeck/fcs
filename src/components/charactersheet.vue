@@ -150,7 +150,7 @@ export default {
 
 	.fo20 {
     cursor: pointer;
-    color: green;
+    color: #007bff;
 	}
 
   @media print {

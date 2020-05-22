@@ -35,7 +35,7 @@ export default {
     }
   },
   methods: { 
-    sendToRoll20() {
+    sendToRoll20() {      
       if (!this.item.obj) return;      
       let label = `approach ${this.item.label ? this.$parent.getVal(`approaches.${this.item.label}`) : this.item.placeholder}`;
       this.$parent.sendToRoll20('diceroll', label, "approaches", this.item.obj);

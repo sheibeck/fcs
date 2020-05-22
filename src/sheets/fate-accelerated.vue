@@ -60,9 +60,8 @@
 	</div>
 
 	<div class="row">
-		<div class="col">
-			<div for="stunts" class="fate-header d-flex"><span class="mr-auto">Stunts &amp; Extras</span><a v-on:click="stuntEdit = !stuntEdit"><i class="fas fa-edit d-print-none"></i></a></div>
-			<inputstuntextra :item="stunts" :edit="stuntEdit" :rows="25" :border="true" />
+		<div class="col">			
+			<inputstuntextra :item="stunts" :rows="25" :border="true" header="Stunts &amp; Extras" />
 		</div>
 	</div>
 
@@ -124,8 +123,7 @@ export default {
    this.$parent.$parent.title = 'Fate Accelerated (Character Sheet)';
   },
   data () {
-    return {	
-		stuntEdit: false,			
+    return {				
 		approaches:  [
 			{placeholder:"Careful", obj:"careful"},
 			{placeholder:"Clever", obj:"clever"},
@@ -213,8 +211,8 @@ export default {
 	}
 
 	.fate-header {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+		font-family: 'Archivo Black', sans-serif;
+		text-transform: uppercase;
 		background-color: #000;
 		color: white;
 		font-weight: 700;
