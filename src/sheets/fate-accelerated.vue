@@ -15,7 +15,12 @@
 				</div>
 				<div class="col-6 text-center ">
 					<div for="fatepoints" class="fate-header">FP</div>
-					<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
+					<div class="input-group mb-2">
+						<div class="input-group-prepend fo20">
+							<div class="input-group-text"><span class='dice'>A</span></div>
+						</div>
+						<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
+					</div>					
 				</div>
 			</div>
 		</div>
@@ -59,10 +64,8 @@
 
 	<div class="row">
 		<div class="col">
-			<div class="form-group">
-				<div for="stunts" class="fate-header">Stunts &amp; Extras</div>
-				<textarea class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts &amp; Extras" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')"></textarea>
-			</div>
+			<div for="stunts" class="fate-header d-flex"><span class="mr-auto">Stunts &amp; Extras</span><a v-on:click="stuntEdit = !stuntEdit"><i class="fas fa-cog d-print-none"></i></a></div>
+			<inputstuntextra :item="stunts" :edit="stuntEdit" />
 		</div>
 	</div>
 
@@ -100,6 +103,7 @@ import InputAcceleratedApproach from '../components/input-accelerated-approach'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
 import InputAccleratedStress from '../components/input-accelerated-stress'
+import InputStuntExtra from '../components/input-stuntextra'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -109,6 +113,7 @@ export default {
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
 	"inputstress": InputAccleratedStress,
+	"inputstuntextra": InputStuntExtra,
   },
   props: {    
     character: Object,
@@ -124,7 +129,8 @@ export default {
    this.$parent.$parent.title = 'Fate Accelerated (Character Sheet)';
   },
   data () {
-    return {
+    return {	
+		stuntEdit: false,			
 		approaches: ["careful","clever","flashy","forceful","quick","sneaky"],
 		aspects: [
 			{label:"High Concept", obj:"highconcept"},
@@ -144,23 +150,24 @@ export default {
 			{label:"2", obj:"stress2"},
 			{label:"3", obj:"stress3"},			
 		],
+		stunts: "stunts"		
     }
   },
   methods: {
-	sendToRoll20(type, label, obj, item) {
+	sendToRoll20(type, label, obj, item) {		
 		switch(type)
 		{			
 			case "fatepoint":
 				this.$parent.sendToRoll20(type, this.character.name, null, item);
 			case "stress":
 			case "consequence":
+			case "stuntextra":
 				this.$parent.sendToRoll20(type, this.character.name, label, item);
-				break;			
 			default:
 				if (!this.character[obj] || !this.character[obj][item]) return;
 				this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
 		}
-    },
+	},	
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
@@ -184,6 +191,9 @@ export default {
 		}
 		this.$parent.setVal(this.character, arr, val);
 		this.$parent.$parent.save();
+	},	
+	toggleEdit(elem) {
+
 	}
   }
 }

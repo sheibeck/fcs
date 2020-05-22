@@ -1,6 +1,6 @@
 <template>
 	<div class="form-group d-flex">
-    <span v-if="hasRoll20" class="dice fo20 pt-1 pr-3" v-on:click="sendToRoll20('invoke', 'consequence', 'consequences', consequence.obj)">+</span>
+    <span v-if="hasRoll20" class="dice fo20 pt-1 pr-3" v-on:click="sendToRoll20('invoke', 'consequence', 'consequences', consequence.obj)">C</span>
     <label class="pr-3 mr-auto">{{consequence.value}}</label>
     <input type="text" class="form-control" :id="'consequences.' + consequence.obj" :name="'consequences.' + consequence.obj" @change="setVal(`consequences.${consequence.obj}`,  $event.target.value)" :value="$parent.getVal(`consequences.${consequence.obj}`)" :placeholder="consequence.label" />
   </div>

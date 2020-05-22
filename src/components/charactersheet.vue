@@ -1,6 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character"></component>
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet"></component>
      
   </div>
 </template>
@@ -73,6 +73,9 @@ export default {
         case "invoke":
           msg = fateOf20.MsgInvoke(character, description, data);
           break;
+        case "stuntextra":
+          msg = fateOf20.MsgStuntExtra(character, data);
+          break;
         case "fatepoint":          
           msg = fateOf20.MsgFatePoint(character, description, data);
           break;
@@ -81,9 +84,7 @@ export default {
           break;
         case "consequence":
           msg = fateOf20.MsgConsequence(character, description, data);
-          break;
-        case "stunt":        
-          break;
+          break;      
       }
       fateOf20.SendMessage(msg);
     },

@@ -53,6 +53,14 @@ export default class FateOf20 {
         }
     }
 
+    MsgStuntExtra = (character, stuntextra) => {
+        return {
+            type: "stuntextra",
+            character: character,            
+            stuntextra: stuntextra,
+        }
+    }
+
     MsgFatePoint = (character, description, modifier) => {
         return {
             type: "fatepoint",

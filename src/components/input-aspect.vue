@@ -1,6 +1,6 @@
 <template>
   <div class="form-group d-flex">
-    <span v-if="hasRoll20" class="dice fo20 pt-2 pr-3" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">+</span>
+    <span v-if="hasRoll20" class="dice fo20 pt-2 pr-1" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">C</span>
     <input type="text" class="form-control" :id="'aspects.' + aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(`aspects.${aspect.obj}`,  $event.target.value)" :value="$parent.getVal(`aspects.${aspect.obj}`)" :placeholder="aspect.label" />
   </div>
 </template>
