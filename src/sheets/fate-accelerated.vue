@@ -13,14 +13,11 @@
 					<div for="refresh" class="fate-header">Refresh</div>
 					<input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
 				</div>
-				<div class="col-6 text-center ">
-					<div for="fatepoints" class="fate-header">FP</div>
-					<div class="input-group mb-2">
-						<div class="input-group-prepend fo20">
-							<div class="input-group-text"><span class='dice'>A</span></div>
-						</div>
-						<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
-					</div>					
+				<div class="col-6 text-center ">					
+					<div for="fatepoints" class="fate-header">
+						FP <span class='dice fo20 font-weight-normal small'>A</span>
+					</div>	
+					<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />					
 				</div>
 			</div>
 		</div>
@@ -55,7 +52,7 @@
 				<div class="fate-header col-12">Approaches</div>
 			</div>
 
-			<div v-for="approach in approaches" :key="approach">
+			<div v-for="approach in approaches" :key="approach.obj">
 				<inputapproach :item="approach" />
 			</div>
 			
@@ -64,8 +61,8 @@
 
 	<div class="row">
 		<div class="col">
-			<div for="stunts" class="fate-header d-flex"><span class="mr-auto">Stunts &amp; Extras</span><a v-on:click="stuntEdit = !stuntEdit"><i class="fas fa-cog d-print-none"></i></a></div>
-			<inputstuntextra :item="stunts" :edit="stuntEdit" />
+			<div for="stunts" class="fate-header d-flex"><span class="mr-auto">Stunts &amp; Extras</span><a v-on:click="stuntEdit = !stuntEdit"><i class="fas fa-edit d-print-none"></i></a></div>
+			<inputstuntextra :item="stunts" :edit="stuntEdit" :rows="25" :border="true" />
 		</div>
 	</div>
 
@@ -73,7 +70,7 @@
 		<!-- stress -->
 		<div class="col-sm-6 col-md-4 fate-stress">
 			<div class="form-group">
-				<div for="" class="fate-header">Stress</div>
+				<div for="" class="fate-header">Stress <span class='dice fo20 font-weight-normal small'>A</span></div>
 			</div>
 
 			<div class="d-flex">
@@ -85,7 +82,7 @@
 
 		<div class="col-sm-6 col-md-8 fate-consequences">
 			<div class="form-group">
-				<div class="fate-header col-12">Consequences</div>
+				<div class="fate-header col-12">Consequences <span class='dice fo20 font-weight-normal small'>A</span></div>
 			</div>
 
 			<div v-for="consequence in consequences" :key="consequence.obj">
@@ -119,9 +116,7 @@ export default {
     character: Object,
   },
   computed: {
- 	...mapGetters([
-      'isAuthenticated',
-      'userId',
+ 	...mapGetters([      
       'roll20Enabled'
     ]),
   },
@@ -131,7 +126,14 @@ export default {
   data () {
     return {	
 		stuntEdit: false,			
-		approaches: ["careful","clever","flashy","forceful","quick","sneaky"],
+		approaches:  [
+			{placeholder:"Careful", obj:"careful"},
+			{placeholder:"Clever", obj:"clever"},
+			{placeholder:"Flashy", obj:"flashy"},
+			{placeholder:"Forceful", obj:"forceful"},
+			{placeholder:"Quick", obj:"quick"},
+			{placeholder:"Sneaky", obj:"sneaky"},
+		],
 		aspects: [
 			{label:"High Concept", obj:"highconcept"},
 			{label:"Trouble", obj:"trouble"},
@@ -153,7 +155,17 @@ export default {
 		stunts: "stunts"		
     }
   },
-  methods: {
+  methods: {	
+    getVal(graphPath, defaultValue) {
+    	return this.$parent.getVal(this.character, graphPath, defaultValue);
+    },
+    setVal(arr, val) {		
+		if (this.roll20Enabled && arr === 'fatepoints') {
+			this.roll20FatePoints(arr,val)
+		} else {
+			this.$parent.setVal(this.character, arr, val);
+		}
+	},
 	sendToRoll20(type, label, obj, item) {		
 		switch(type)
 		{			
@@ -166,16 +178,6 @@ export default {
 			default:
 				if (!this.character[obj] || !this.character[obj][item]) return;
 				this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
-		}
-	},	
-    getVal(graphPath, defaultValue) {
-    	return this.$parent.getVal(this.character, graphPath, defaultValue);
-    },
-    setVal(arr, val) {		
-		if (this.roll20Enabled && arr === 'fatepoints') {
-			this.roll20FatePoints(arr,val)
-		} else {
-			this.$parent.setVal(this.character, arr, val);
 		}
 	},
 	roll20FatePoints(arr,val) {
@@ -191,10 +193,7 @@ export default {
 		}
 		this.$parent.setVal(this.character, arr, val);
 		this.$parent.$parent.save();
-	},	
-	toggleEdit(elem) {
-
-	}
+	},		
   }
 }
 </script>

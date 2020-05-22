@@ -48,7 +48,7 @@
           </div>
 
           <div v-if="!isEmpty(item.stunts)">
-            <h5 class='card-header py-0'>Stunts & Extras</h5>
+            <h5 class='card-header py-0'>Stunts &amp; Extras</h5>
 
             <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts">
                 <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}

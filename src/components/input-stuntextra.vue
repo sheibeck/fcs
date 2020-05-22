@@ -1,7 +1,7 @@
 <template>    
 	<div class="form-group">    
-    <textarea v-if="edit" class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts &amp; Extras" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
-    <VueShowdown v-if="!edit" class="h-auto" :markdown="getMarkupVal(item)" />				
+    <textarea v-if="edit" class="form-control" id="stunts" name="stunts" :rows="rows" placeholder="Stunts &amp; Extras" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
+    <VueShowdown v-if="!edit" class="h-auto p-2" :class="{border: border}" :options="{ emoji: true }" :style="{ 'min-height': minHeight + 'px' }" :markdown="getMarkupVal(item)" />
   </div>  
 </template>
 
@@ -14,14 +14,19 @@ export default {
   props: {
     item: String,  
     edit: Boolean,  
+    rows: Number,
+    border: Boolean,
   },
   computed: {
  	  ...mapGetters([
-      'isAuthenticated',      
+      'isAuthenticated',
       'roll20Enabled'
     ]),
     hasRoll20() {
       return this.isAuthenticated && this.roll20Enabled;
+    },
+    minHeight() {
+      return this.rows * 28;
     }
   },
   data () {
