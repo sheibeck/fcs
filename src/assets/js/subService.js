@@ -165,7 +165,6 @@ export default class SubService {
   Checkout = async(pricePlan, customerId) => {
     var lambda = new AWS.Lambda();
     lambda.config.credentials = this.fcs.$store.state.credentials;      
-
       if (!customerId)
       {
         //double check that we really don't have a customer id
@@ -175,7 +174,8 @@ export default class SubService {
           //once we start to checkout, we need a customer;
           let email = await this.userSvc.GetUserAttribute("email")
           
-          let customer = await this.CreateCustomer();
+          let customer = await this.CreateCustomer(email);
+          console.log("CREATING CUSTOMER");
           await this.userSvc.SetUserAttribute("custom:stripe_customer", customer.id);
           customerId = customer.id;
 
@@ -194,7 +194,7 @@ export default class SubService {
           id: customerId,
           pricePlan: pricePlan,
           success_url: `${window.location.protocol}//${window.location.host}/thankyou`,
-          cancel_url: `${window.location.protocol}//${window.location.host}/cancel`
+          cancel_url: `${window.location.protocol}//${window.location.host}/account`
         }),
       };
           
@@ -205,7 +205,7 @@ export default class SubService {
       {
         this.commonSvc.Notify(resultObject.raw.message, "error");
 
-        //if we have an issue we can call this to reset the customer_id for stripe
+        //NOTE: if we have an issue we can call this to reset the customer_id for stripe
         //might be an one issue at this point.
         //the user has been deleted, unset the stripe_customer
         //await this.userSvc.SetUserAttribute("custom:stripe_customer", "");        

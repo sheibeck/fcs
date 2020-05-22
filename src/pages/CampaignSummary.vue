@@ -50,11 +50,9 @@
 <template>
   <div class="container mt-2">
 
-    <div class="d-flex justify-content-center" v-if="isLoading">
-      <div class="p-5 h2">Loading ... <i class="fas fa-cog fa-spin"></i></div>
-    </div>
+    <loading :loading="isLoading" />
 
-    <div v-else>     
+    <div v-if="!isLoading">     
       <div class="d-flex">
         <h3 class="mr-auto">{{campaign.name}} - Campaign Summary</h3>
       </div>
@@ -133,6 +131,7 @@ import VueShowdown, { showdown } from 'vue-showdown';
 import NamedRegExp from 'named-regexp-groups';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import Loading from '../components/loading';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -172,6 +171,9 @@ export default {
          { vmid: 'description', name: 'description', content: this.description }
        ]
      }
+  },
+  components: {    
+    loading: Loading
   },
   mounted(){
     commonSvc = new CommonService(this.$root);

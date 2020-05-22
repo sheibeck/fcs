@@ -56,11 +56,9 @@
 <template>
   <div class="container mt-2">
 
-    <div class="d-flex justify-content-center" v-if="isLoading">
-      <div class="p-5 h2">Loading ... <i class="fas fa-cog fa-spin"></i></div>
-    </div>
+    <loading :loading="isLoading" />
 
-    <div v-else>
+    <div v-if="!isLoading">
       <div class="d-flex flex-column flex-sm-row">
         <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-link"></i></a>
       </div>
@@ -267,6 +265,7 @@ import { Datetime } from 'vue-datetime';
 import NamedRegExp from 'named-regexp-groups';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import Loading from '../components/loading';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -311,7 +310,8 @@ export default {
      }
   },
   components: {
-  	datetime: Datetime
+    datetime: Datetime,
+    loading: Loading
   },
   mounted(){
     commonSvc = new CommonService(this.$root);

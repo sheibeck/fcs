@@ -4,33 +4,45 @@
       <a href='/campaign/create' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Campaign <i class='fa fa-globe-americas'></i></a>
       <search class=""></search>
     </div>
-    <div class='card-columns'>
-      <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
-        <div class='card-body'>
-          <h5 class='card-title campaign-name'>{{item.name}}</h5>
-          <div class='row'>
-            <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
-              <img v-bind:src="item.image_url" class='img-fluid' />
-            </p>
-            <p class='card-text col'>
-              {{ getShortText(item.description) }}
-            </p>
+
+    <loading :loading="isLoading" />
+    
+    <div v-if="!isLoading">
+
+      <div v-if="!hasCampaigns">
+        <h2>You have not created any campaigns.</h2>
+      </div>
+
+      <div>
+        <div class='card-columns'>
+          <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
+            <div class='card-body'>
+              <h5 class='card-title campaign-name'>{{item.name}}</h5>
+              <div class='row'>
+                <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
+                  <img v-bind:src="item.image_url" class='img-fluid' />
+                </p>
+                <p class='card-text col'>
+                  {{ getShortText(item.description) }}
+                </p>
+              </div>
+              <hr />
+              <div class="d-flex">
+                <a :href="`/campaign/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
+                <a :href="`/campaign-summary/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
+                <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
+              </div>
+            </div>
+            <div class='card-footer text-muted'>
+              <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
+              @ <span class=''>{{getNiceDate(item.date)}}</span>
+            </div>
           </div>
-          <hr />
-          <div class="d-flex">
-            <a :href="`/campaign/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-            <a :href="`/campaign-summary/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
-            <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
-          </div>
-        </div>
-        <div class='card-footer text-muted'>
-          <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
-          @ <span class=''>{{getNiceDate(item.date)}}</span>
         </div>
       </div>
     </div>
     <input id='copyUrl' class='hidden' />
-
+    
     <!-- delete confirmation modal-->
     <div class="modal fade" id="modalDeleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -57,6 +69,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import Search from '../components/search';
+import Loading from '../components/loading';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
@@ -71,13 +84,15 @@ export default {
   },
   components: {
     search: Search,
+    loading: Loading,
   },
   mounted(){    
     this.init();    
   },
   data () {
     return {
-      title: "Campaign List",
+      isLoading: true,
+      title: "Campaign List",      
     }
   },
   watch: {
@@ -93,6 +108,9 @@ export default {
       'filteredCampaigns',
       'searchText'
     ]),
+    hasCampaigns() {
+      return this.campaigns;
+    },
     commonSvc() {
       return commonSvc;
     },
@@ -123,7 +141,8 @@ export default {
       });  
     },  
     list : async function () {      
-      this.campaigns = await dbSvc.ListObjects("CAMPAIGN", this.userId);
+      this.campaigns = await dbSvc.ListObjects("CAMPAIGN", this.userId);      
+      this.isLoading = false;
     },
     deleteCampaign : function (event) {
       var campaignId = $(event.currentTarget).data('id');
