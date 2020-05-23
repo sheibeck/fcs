@@ -94,7 +94,7 @@
 
 <script>
 
-import InputAcceleratedApproach from '../components/input-accelerated-approach'
+import InputSkillColumn from '../components/input-skill-column'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
 import InputAccleratedStress from '../components/input-accelerated-stress'
@@ -104,7 +104,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'SheetFateAcceleratedCustom',
   components: {
-	"inputapproach": InputAcceleratedApproach,    
+	"inputapproach": InputSkillColumn,    
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
 	"inputstress": InputAccleratedStress,
@@ -124,25 +124,25 @@ export default {
   data () {
     return {		
 		approaches:  [
-			{placeholder:"Careful", obj:"approach1", label:"label1"},
-			{placeholder:"Clever", obj:"approach2", label:"label2"},
-			{placeholder:"Flashy", obj:"approach3", label:"label3"},
-			{placeholder:"Forceful", obj:"approach4", label:"label4"},
-			{placeholder:"Quick", obj:"approach5", label:"label5"},
-			{placeholder:"Sneaky", obj:"approach6", label:"label6"},
+			{placeholder:"Careful", obj:"approaches.approach1", label:"approaches.label1"},
+			{placeholder:"Clever", obj:"approaches.approach2", label:"approaches.label2"},
+			{placeholder:"Flashy", obj:"approaches.approach3", label:"approaches.label3"},
+			{placeholder:"Forceful", obj:"approaches.approach4", label:"approaches.label4"},
+			{placeholder:"Quick", obj:"approaches.approach5", label:"approaches.label5"},
+			{placeholder:"Sneaky", obj:"approaches.approach6", label:"approaches.label6"},
 		],
 		aspects: [
-			{label:"High Concept", obj:"highconcept"},
-			{label:"Trouble", obj:"trouble"},
-			{label:"Aspect", obj:"other1"},
-			{label:"Aspect", obj:"other2"},
-			{label:"Aspect", obj:"other3"},
-			{label:"Aspect", obj:"other4"},
+			{label:"High Concept", obj:"aspects.highconcept"},
+			{label:"Trouble", obj:"aspects.trouble"},
+			{label:"Aspect", obj:"aspects.other1"},
+			{label:"Aspect", obj:"aspects.other2"},
+			{label:"Aspect", obj:"aspects.other3"},
+			{label:"Aspect", obj:"aspects.other4"},
 		],
 		consequences: [
-			{label:"Mild", obj:"mild", value: "2"},
-			{label:"Moderate", obj:"moderate", value: "4"},
-			{label:"Severe", obj:"severe", value: "6"},			
+			{label:"Mild", obj:"consequences.mild", value: "2"},
+			{label:"Moderate", obj:"consequences.moderate", value: "4"},
+			{label:"Severe", obj:"consequences.severe", value: "6"},			
 		],
 		stresses: [
 			{label:"1", obj:"stress1"},
@@ -168,13 +168,17 @@ export default {
 		{			
 			case "fatepoint":
 				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
 				this.$parent.sendToRoll20(type, this.character.name, label, item);
-			default:
-				if (!this.character[obj] || !this.character[obj][item]) return;
-				this.$parent.sendToRoll20(type, this.character.name, label, this.character[obj][item]);
+				break;
+			default:				
+				if (this.getVal(item)) {
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+				}
+				break;
 		}
 	},
 	roll20FatePoints(arr,val) {
@@ -209,9 +213,9 @@ export default {
 		max-height: 130px;
 	}
 
-	.fate-header {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-header {
+    	font-family: 'Archivo Black', sans-serif;
+    	text-transform: uppercase;
 		background-color: #000;
 		color: white;
 		font-weight: 700;
@@ -232,7 +236,7 @@ export default {
 		margin-top: 3px;
 	}
 
-	input.approachlabel {
+	/deep/ input.inputlabel {
 		font-family: 'Archivo Black', sans-serif;
     	text-transform: uppercase;
 		font-size: 22px;
@@ -240,7 +244,7 @@ export default {
 		border: 0;
 		outline: 0;
 		background: transparent;
-		border-bottom: 1px solid lightgray;
+		border-bottom: 1px solid lightgray;		
 	}
 
 	.fate-aspects .form-group {
@@ -253,24 +257,23 @@ export default {
 		margin-top: 1px;
 	}
 
-	input[type=checkbox] {
+	/deep/ input[type=checkbox] {
 		height: 50px;
 		width: 50px;
 	}
 
-	.fate-consequences label {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-consequences label {
+		font-family: 'Archivo Black', sans-serif;
+		text-transform: uppercase;
 		font-weight: 700;
 		font-size: 28px;
 		padding-top: 0px;
-		padding-bottom: 0px;
-		padding-left: 25px;
+		padding-bottom: 0px;		
 	}
 
-	.fate-stress label {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-stress label {
+		font-family: 'Archivo Black', sans-serif;
+		text-transform: uppercase;
 		font-size: 30px;
 		font-weight: 700;
 		margin-left: -5px;

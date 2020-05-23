@@ -246,20 +246,24 @@ export default {
       let character = this.adversaries[0].name;
       let msg = null;
       switch(type) {
-        case "diceroll":
+        case "diceroll":          
           let desc2 = "";
-          let rollModifier = 0;
-          var findModifier = data.match(/(\d)/);
-          if (findModifier) {
-            rollModifier = findModifier[0];
-            desc2 = data2;            
-          }
-          else {
-            findModifier = data2.match(/(\d)/);
-            if(findModifier) {
+          let rollModifier = parseInt(data);  //try to match it straight up
+
+          if (rollModifier == 'NaN')
+          {
+            var findModifier = data.match(/(\d)/);
+            if (findModifier) {
               rollModifier = findModifier[0];
+              desc2 = data2;            
             }
-            desc2 = data;
+            else {
+              findModifier = data2.match(/(\d)/);
+              if(findModifier) {
+                rollModifier = findModifier[0];
+              }
+              desc2 = data;
+            }
           }
 
           msg = fateOf20.MsgDiceRoll(character, `${description} ${desc2}`, rollModifier);

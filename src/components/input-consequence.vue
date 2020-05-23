@@ -1,8 +1,10 @@
 <template>
 	<div class="form-group d-flex">
-    <span v-if="hasRoll20" class="dice fo20 pt-1 pr-1" v-on:click="sendToRoll20('invoke', 'consequence', 'consequences', consequence.obj)">C</span>
+    <span v-if="hasRoll20" class="dice fo20 pt-1 pr-1" v-on:click="sendToRoll20()">C</span>
     <label class="pr-3 mr-auto">{{consequence.value}}</label>
-    <input type="text" class="form-control" :id="'consequences.' + consequence.obj" :name="'consequences.' + consequence.obj" @change="setVal(`consequences.${consequence.obj}`,  $event.target.value)" :value="$parent.getVal(`consequences.${consequence.obj}`)" :placeholder="consequence.label" />
+    <input type="text" class="form-control" :id="consequence.obj" :name="consequence.obj" 
+      @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="consequence.label"
+      :disabled="!skillHasValue()" />
   </div>
 </template>
 
@@ -43,6 +45,11 @@ export default {
         this.$parent.setVal(arr, val);
       }
     },
+    skillHasValue() {      
+      if (!this.consequence.requirement) return true;      
+      let hasVal = this.$parent.skillHasValue(this.consequence.requirement.obj, this.consequence.requirement.val);      
+      return hasVal;
+    }
   }
 }
 </script>

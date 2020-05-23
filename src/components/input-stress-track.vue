@@ -10,7 +10,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'InputStressAccelerated',
+  name: 'InputStressTrack',
   props: {
     stress: Object,    
   },
@@ -41,6 +41,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

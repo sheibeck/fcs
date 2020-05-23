@@ -6,7 +6,7 @@ function handleListener(msg, sender, sendResponse) {
     switch(msg.type) {         
         case "diceroll":    
             let thing = msg.skill.split(" ");            
-            let template = "&{template:default} {{name=" + msg.character + "}} {{" + thing[0] + "=" + thing[1] + "}} {{roll (4df+" + msg.modifier + ")=[[4df+(" + (parseInt(msg.modifier)||0) + ")]]}}";            
+            let template = "&{template:default} {{name=" + msg.character + "}} {{" + thing[0] + "=" + thing[1] + "}} {{roll [4df+(" + msg.modifier + ")]=[[4df+(" + (parseInt(msg.modifier)||0) + ")]]}}";            
             chatMessage = template;
             console.log(template);
             break;

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div for="stunts" class="fate-header d-flex">
-      <span class="mr-auto">{{header}}</span>
-      <a v-on:click="stuntEdit = !stuntEdit">
+    <div class="fate-header d-flex">
+      <span :for="item" class="mr-auto">{{header}}</span>
+      <a v-on:click="toggleEdit()">
         <i class="fas d-print-none pr-2" :class="{ 'fa-check-circle' : stuntEdit, 'fa-edit' : !stuntEdit }"></i>
       </a>
     </div>
 
     <div class="form-group">    
-      <textarea v-if="stuntEdit" class="form-control" id="stunts" name="stunts" :rows="rows" placeholder="Stunts &amp; Extras" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
+      <textarea v-if="stuntEdit" class="form-control" :id="item" :name="item" :rows="rows" :placeholder="header" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
       <VueShowdown v-if="!stuntEdit" class="h-auto p-2" :class="{border: border}" :options="{ emoji: true }" :style="{ 'min-height': minHeight + 'px' }" :markdown="getMarkupVal(item)" />
     </div>  
   </div>
@@ -26,7 +26,7 @@ export default {
     rows: Number,
     border: Boolean,
     header: String,
-  },
+  },  
   computed: {
  	  ...mapGetters([
       'isAuthenticated',
@@ -36,15 +36,21 @@ export default {
       return this.isAuthenticated && this.roll20Enabled;
     },
     minHeight() {
-      return this.rows * 28;
-    }
+      return this.rows * 25;
+    },    
   },
   data () {
     return {  
-      stuntEdit: false,    
+      stuntEdit: null,
     }
   },
   methods: {
+    toggleEdit() {            
+      this.stuntEdit = !this.stuntEdit;     
+      if (!this.stuntEdit == true) {
+        this.$parent.$parent.$parent.save();
+      } 
+    },
     getMarkupVal(graphPath, defaultValue) {      
       let val = this.$parent.getVal(graphPath, defaultValue);
       if (this.roll20Enabled)        
@@ -59,21 +65,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  label {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
-    font-size: 22px;
-    font-weight: 700;
-  }
-
-  	.fate-header {
-		font-family: 'Archivo Black', sans-serif;
-		text-transform: uppercase;
-		background-color: #000;
-		color: white;
-		font-weight: 700;
-		padding: 3px;
-		margin-top: 5px;
-		font-size: 22px;
-	}
 </style>

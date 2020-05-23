@@ -1,7 +1,12 @@
 <template>
-  <div class="form-group d-flex">
-    <span v-if="hasRoll20" class="dice fo20 pt-2 pr-1" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">C</span>
-    <input type="text" class="form-control" :id="'aspects.' + aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(`aspects.${aspect.obj}`,  $event.target.value)" :value="$parent.getVal(`aspects.${aspect.obj}`)" :placeholder="aspect.label" />
+  <div class="form-group">    
+    <div v-if="showlabel">
+      <label v-if="showlabel">{{aspect.label}}</label>
+    </div>
+    <div class="d-flex">
+      <span v-if="hasRoll20" class="dice fo20 pt-2 pr-1" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">C</span>      
+      <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" :value="$parent.getVal(aspect.obj)" :placeholder="aspect.label" />
+    </div>
   </div>
 </template>
 
@@ -12,6 +17,7 @@ export default {
   name: 'InputAspects',
   props: {
     aspect: Object,    
+    showlabel: Boolean,
   },
   computed: {
  	  ...mapGetters([
@@ -37,10 +43,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  label {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
-    font-size: 22px;
-    font-weight: 700;
-  }
 </style>

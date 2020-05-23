@@ -19,7 +19,7 @@ chrome.runtime.onConnectExternal.addListener(function(port) {
     port.onMessage.addListener(function(msg) {         
         switch(msg.type) { 
             case "diceroll":                      
-                port.postMessage({result: `${msg.character} used ${msg.skill}: /roll 4df+${msg.modifier}`});                
+                port.postMessage({result: `${msg.character} used ${msg.skill}: /roll 4df+(${msg.modifier})`});
                 break;
             case "invoke":      
                 port.postMessage({result: `${msg.character} invoked ${msg.description}: ${msg.aspect}`});
