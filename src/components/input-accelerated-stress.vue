@@ -1,7 +1,7 @@
 <template>
-	<div class="px-2">
-    <label :for="stress.obj">{{stress.label}}</label>
-    <input type="checkbox" :value="stress.value" :id="`stress.${stress.obj}`" name="`stress.${stress.obj}`" @change="setVal(`stress.${stress.obj}`,  $event.target.checked)" :checked="$parent.getVal(`stress.${stress.obj}`)" />
+	<div class="px-1 d-flex justify-content-between">
+    <label class="px-1" :for="stress.obj">{{stress.label}}</label>
+    <input type="checkbox" :value="stress.value" :id="`${stress.obj}`" name="${stress.obj}" @change="setVal(stress.obj,  $event.target.checked)" :checked="$parent.getVal(stress.obj)" />
   </div>
 </template>
 

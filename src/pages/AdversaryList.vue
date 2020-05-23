@@ -278,6 +278,7 @@ export default {
           msg = fateOf20.MsgFatePoint(character, description, data);
           break;
         case "stress":
+        case "condition":
           msg = fateOf20.MsgStress(character, description, data);
           break;
         case "consequence":

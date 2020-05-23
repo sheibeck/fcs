@@ -98,7 +98,7 @@
 import InputSkillColumn from '../components/input-skill-column'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
-import InputAccleratedStress from '../components/input-accelerated-stress'
+import InputStressAccelerated from '../components/input-accelerated-stress'
 import InputStuntExtra from '../components/input-stuntextra'
 import { mapGetters } from 'vuex'
 
@@ -108,7 +108,7 @@ export default {
 	"inputapproach": InputSkillColumn,    
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
-	"inputstress": InputAccleratedStress,
+	"inputstress": InputStressAccelerated,
 	"inputstuntextra": InputStuntExtra,
   },
   props: {    

@@ -192,50 +192,12 @@
 			<div class="form-group">
 				<div for="" class="fate-header">Stress</div>
 			</div>
+			
 			<div class="row">
-				<div class="col">
-				  <label for="stress[stress1]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
+				<div v-for="stress in stresses" :key="stress.obj" class="col">
+					<inputstress :stress="stress" />
 				</div>
-
-				<div class="col">
-				  <label for="stress[stress2]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
-				</div>
-
-				<div class="col">
-				  <label class="" for="stress[stress3]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" />
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-				  <label for="stress[stress4]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :checked="getVal('stress.stress4')" />
-				</div>
-
-				<div class="col">
-				  <label for="stress[stress5]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress5]" name="stress[stress5]" @change="setVal('stress.stress5',  $event.target.checked)" :checked="getVal('stress.stress5')" />
-				</div>
-
-				<div class="col">
-				  <label class="" for="stress[stress6]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress6]" name="stress[stress6]" @change="setVal('stress.stress6',  $event.target.checked)" :checked="getVal('stress.stress6')" />
-				</div>
-			</div>
+			</div>	
 
 			<div class="row">
 				<label class="col-12 fate-otherstress-label">
@@ -244,25 +206,8 @@
 			</div>
 
 			<div class="row">
-				<div class="col">
-					<label for="stress[stressother1]">
-					1
-					</label>
-					<input type="checkbox" value="1" id="stress[stressother1]" name="stress[stressother1]" @change="setVal('stress.stressother1',  $event.target.checked)" :checked="getVal('stress.stressother1')" />
-				</div>
-
-				<div class="col">
-					<label for="stress[stressother2]">
-					1
-					</label>
-					<input type="checkbox" value="1" id="stress[stressother2]" name="stress[stressother2]" @change="setVal('stress.stressother2',  $event.target.checked)" :checked="getVal('stress.stressother2')" />
-				</div>
-
-				<div class="col">
-					<label class="" for="stress[stressother3]">
-					1
-					</label>
-					<input type="checkbox" value="1" id="stress[stressother3]" name="stress[stressother3]" @change="setVal('stress.stressother3',  $event.target.checked)" :checked="getVal('stress.stressother3')" />
+				<div v-for="stress in otherstresses" :key="stress.obj" class="col">
+					<inputstress :stress="stress" />
 				</div>
 			</div>
 		</div>
@@ -273,12 +218,12 @@
 				<div class="fate-header col-12">Conditions</div>
 			</div>		
 
-			<div class="d-flex">				
+			<div class="d-flex d-flex justify-content-between">				
 				<inputcondition :condition="conditions.inperil" />				
 				<inputcondition :condition="conditions.doomed" />					
 			</div>
 
-			<div class="">				
+			<div class="d-flex justify-content-between">				
 				<inputcondition :condition="conditions.indebted" />			
 			</div>
 
@@ -305,6 +250,7 @@ import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
 import InputCondition from '../components/input-condition'
 import InputStuntExtra from '../components/input-stuntextra'
+import InputStressAccelerated from '../components/input-accelerated-stress'
 import { mapGetters } from 'vuex'
 
 
@@ -316,6 +262,7 @@ export default {
 	"inputconsequence": InputConsequence,
 	"inputcondition": InputCondition,
 	"inputstuntextra": InputStuntExtra,
+	"inputstress": InputStressAccelerated,
   },
   props: {    
     character: Object,
@@ -390,8 +337,16 @@ export default {
 		},		
 		stresses: [
 			{label:"1", obj:"stress1"},
-			{label:"2", obj:"stress2"},
-			{label:"3", obj:"stress3"},			
+			{label:"1", obj:"stress2"},
+			{label:"1", obj:"stress3"},
+			{label:"1", obj:"stress4"},
+			{label:"1", obj:"stress5"},
+			{label:"1", obj:"stress6"}			
+		],
+		otherstresses: [
+			{label:"1", obj:"stressother1"},
+			{label:"1", obj:"stressother2"},
+			{label:"1", obj:"stressother3"},			
 		],
 		stunts: "stunts"		
     }
@@ -402,7 +357,26 @@ export default {
     },
     setVal(arr, val) {
     	this.$parent.setVal(this.character, arr, val);       
-    },
+	},
+	sendToRoll20(type, label, obj, item) {		
+		switch(type)
+		{			
+			case "fatepoint":
+				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				break;
+			case "stress":
+			case "consequence":
+			case "stuntextra":
+			case "condition":
+				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				break;
+			default:
+				if (this.getVal(item)) {
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+				}
+				break;
+		}
+	},
   }
 }
 </script>
