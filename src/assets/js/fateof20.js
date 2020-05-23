@@ -12,7 +12,14 @@ export default class FateOf20 {
         this.CheckForExtension();
     }
 
+    GetExtensionId() {       
+        let options = localStorage.getItem('fatecharactersheet_dev_extension_id');
+        return options;
+    }
+
     CheckForExtension = () => {
+        this.devExtensionId = this.GetExtensionId();
+
         // try to connect to the live app       
         chrome.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
             if (!response) {

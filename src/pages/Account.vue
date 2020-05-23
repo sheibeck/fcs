@@ -25,22 +25,27 @@
           <label>Subscription: </label> <span>{{SubscriptionStatus}}</span>
           <a href="#" v-on:click="GotoManagePortal($event)">[Manage]</a>
         </div>
+
+        <div v-if="loaded && HasSubscription" class="form-group">          
+          <label>Fate of 20 Extension Id:</label>
+          <input type="text" id="devextid" name="devextid" @change="SetExtensionId($event.target.value)" :value="GetExtensionId" /><button type="button" class="ml-1 btn-primary btn-sm btn">save</button>
+          <p class="small">Open chrome://extensions and copy the ID of Fate of 20 extension here.</p>
+        </div>
        
         <div v-if="loaded && !HasSubscription" class="d-md-flex justify-content-center">          
           <div class="card col col-md-6">
             <div class="card-body">
                 <h5 class="card-title">
                   Subscribe to Fate Character Sheet<br/>
-                  <small>Includes 30 day free trial.</small>
+                  <small><em>Includes 30 day free trial.</em></small>
                 </h5>
                 <p class="card-text">
                   Pay a low monthly fee or a get a discounted rate by subscribing yearly 
                   and you gain access to subscriber only benefits.
                 </p>
-                <ul class="list-unstyled font-weight-bold py-3">
-                  <li>&mdash;Roll20 Integration</li>
-                  <li>&mdash;Coming soon</li>
-                </ul>
+                <p class="font-weight-bold py-3">
+                  &mdash;Roll20 Integration<br /><span class="small">requires a Chrome only extension</span>
+                </p>
                 <p>
                   <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
                   <button v-on:click="Subscribe('plan_HJ5iyg7r8S6mN8')"
@@ -64,11 +69,8 @@
                 </p>              
               </div>
             </div>
-          </div>
-        </div>
-      
+          </div>        
       </div>
-
     </div>              
   </div>
 </template>
@@ -111,9 +113,15 @@ export default {
     },
     SubscriptionStatus() {
       return this.$store.state.subscriptionStatus;
+    },
+    GetExtensionId() {
+      return localStorage.getItem('fatecharactersheet_dev_extension_id');
     }
   },
-  methods: {      
+  methods: {
+    SetExtensionId(value) {
+      return localStorage.setItem('fatecharactersheet_dev_extension_id', value);
+    }, 
     GetEmail() {      
       return this.$store.state.userSession.getIdToken().payload['email'];
     },
