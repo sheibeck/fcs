@@ -274,12 +274,12 @@
 			</div>
 
 			<div class="form-group row">
-				<input class="col-3 col-sm-6 col-md-2" value="1" type="checkbox" name="condition[inperil]" id="condition[inperil]" @change="setVal('stress.stressother3',  $event.target.checked)" :checked="getVal('stress.inperil')" />
+				<input class="col-3 col-sm-6 col-md-2" value="1" type="checkbox" name="condition[inperil]" id="condition[inperil]" @change="setVal('conditions.inperil',  $event.target.checked)" :checked="getVal('conditions.inperil')" />
 				<label class="col-9 col-sm-6 col-md-4 col-form-label" for="condition[inperil]">
 					In Peril (p.117)
 				</label>
 
-				<input class="col-3 col-sm-6 col-md-2" value="1" type="checkbox" name="condition[doomed]" id="condition[doomed]" @change="setVal('stress.stressother3',  $event.target.checked)" :checked="getVal('stress.doomed')" />
+				<input class="col-3 col-sm-6 col-md-2" value="1" type="checkbox" name="condition[doomed]" id="condition[doomed]" @change="setVal('conditions.doomed',  $event.target.checked)" :checked="getVal('conditions.doomed')" />
 				<label class="col-9 col-sm-6 col-md-4 col-form-label" for="condition[doomed]">
 					Doomed (p.117)
 				</label>
