@@ -1,6 +1,6 @@
 <template>
 	<div class="px-1 d-flex justify-content-between">
-    <label class="px-1" :for="stress.obj">{{stress.label}}</label>
+    <label class="px-1 pt-1" :for="stress.obj">{{stress.label}}</label>
     <input type="checkbox" :value="stress.value" :id="`${stress.obj}`" name="${stress.obj}" @change="setVal(stress.obj,  $event.target.checked)" :checked="$parent.getVal(stress.obj)" />
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="d-md-flex">
-    <label class="form-check-label col-form-label order-md-2 pr-2" v-if="!condition.placeholder">
+    <label class="form-check-label col-form-label order-md-2 pr-2 pt-2 mt-1" v-if="!condition.placeholder">
       {{condition.label}}
     </label>
 

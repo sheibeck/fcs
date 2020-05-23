@@ -15,7 +15,7 @@
 				</div>
 				<div class="col-6 text-center ">
 					<div for="fatepoints" class="fate-header">
-						FP <span class='dice fo20 font-weight-normal small'>A</span>
+						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
 					</div>							
 					<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />					
 				</div>
@@ -67,7 +67,7 @@
 		<!-- stress -->
 		<div class="col-sm-6 col-md-4 fate-stress">
 			<div class="form-group">
-				<div for="" class="fate-header">Stress <span class='dice fo20 font-weight-normal small'>D</span></div>
+				<div for="" class="fate-header">Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
 			<div class="d-flex">
@@ -79,7 +79,7 @@
 
 		<div class="col-sm-6 col-md-8 fate-consequences">
 			<div class="form-group">
-				<div class="fate-header col-12">Consequences <span class='dice fo20 font-weight-normal small'>D</span></div>
+				<div class="fate-header col-12">Consequences <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
 			<div v-for="consequence in consequences" :key="consequence.obj">

@@ -2,14 +2,14 @@
   <div>
     <div class="fate-header d-flex">
       <span :for="item" class="mr-auto">{{header}}</span>
-      <a v-on:click="toggleEdit()">
+      <a v-if="!isNewCharacter" v-on:click="toggleEdit()">
         <i class="fas d-print-none pr-2" :class="{ 'fa-check-circle' : stuntEdit, 'fa-edit' : !stuntEdit }"></i>
       </a>
     </div>
 
     <div class="form-group">    
-      <textarea v-if="stuntEdit" class="form-control" :id="item" :name="item" :rows="rows" :placeholder="header" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
-      <VueShowdown v-if="!stuntEdit" class="h-auto p-2" :class="{border: border}" :options="{ emoji: true }" :style="{ 'min-height': minHeight + 'px' }" :markdown="getMarkupVal(item)" />
+      <textarea v-if="stuntEdit || isNewCharacter" class="form-control" :id="item" :name="item" :rows="rows" :placeholder="header" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
+      <VueShowdown v-if="!stuntEdit && !isNewCharacter" class="h-auto p-2" :class="{border: border}" :options="{ emoji: true }" :style="{ 'min-height': minHeight + 'px' }" :markdown="getMarkupVal(item)" />
     </div>  
   </div>
 </template>
@@ -38,6 +38,9 @@ export default {
     minHeight() {
       return this.rows * 25;
     },    
+    isNewCharacter() {      
+      return this.$route.name == "Character Sheet Detail";
+    }
   },
   data () {
     return {  
@@ -45,7 +48,7 @@ export default {
     }
   },
   methods: {
-    toggleEdit() {            
+    toggleEdit() {      
       this.stuntEdit = !this.stuntEdit;     
       if (!this.stuntEdit == true) {
         this.$parent.$parent.$parent.save();

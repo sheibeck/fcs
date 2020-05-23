@@ -25,46 +25,8 @@
 				<div class="fate-header col-12">Approaches</div>
 			</div>
 
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Flair</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[flair]" name="approach[flair]" @change="setVal('approaches.flair',  $event.target.value)" :value="getVal('approaches.flair')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Focus</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[focus]" name="approach[focus]" @change="setVal('approaches.focus',  $event.target.value)" :value="getVal('approaches.focus')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Force</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[force]" name="approach[force]" @change="setVal('approaches.force',  $event.target.value)" :value="getVal('approaches.force')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Guile</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[guile]" name="approach[guile]" @change="setVal('approaches.guile',  $event.target.value)" :value="getVal('approaches.guile')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Haste</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[haste]" name="approach[haste]" @change="setVal('approaches.haste',  $event.target.value)" :value="getVal('approaches.haste')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Intellect</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[intellect]" name="approach[intellect]" @change="setVal('approaches.intellect',  $event.target.value)" :value="getVal('approaches.intellect')" placeholder="+" />
-				</div>
+			<div v-for="approach in approaches" :key="approach.obj">
+				<inputapproach :item="approach" inputclass="round-input" labelclass="col-form-label mt-1" />
 			</div>
 		</div>
 
@@ -73,14 +35,8 @@
 			<div class="form-group">
 				<div for="" class="fate-header">Aspects</div>
 			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept',  $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
-			</div>
-			<div class="form-group">
-				<textarea type="text" class="form-control" id="aspect[other]" rows="8" name="aspect[other]" @change="setVal('aspects.other',  $event.target.value)" :value="getVal('aspects.other')" placeholder="Other Aspects"></textarea>
+			<div v-for="aspect in aspects" :key="aspect.obj">
+				<inputaspect :aspect="aspect" />
 			</div>
 		</div>
 	</div>
@@ -172,15 +128,16 @@
 				<textarea type="text" class="form-control" id="mantles" name="mantles" rows="2" placeholder="Mantles" @change="setVal('mantles',  $event.target.value)" :value="getVal('mantles')"></textarea>
 			</div>
 			<div class="form-group">
-				<div for="" class="fate-header">Stunts</div>
+				<inputstuntextra :item="stunts" :rows="13" :border="true" header="Stunts" />
 			</div>
-			<div class="form-group">
-				<textarea type="text" class="form-control" id="stunts" name="stunts" rows="13" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')" placeholder="Stunts"></textarea>
-			</div>
-			<div class="form-group row">
-				<label class="col-sm-12 col-md-9 col-form-label text-right">Refresh</label>
-				<div class="col-sm-12 col-md-3">
-					<input class="form-control text-center" type="text" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh">
+			<div class="form-group d-md-flex">
+				<div class="d-flex mr-auto">
+					<span v-if="roll20Enabled" class='dice fo20 pt-2'>A</span><label class="col-form-label pr-1">Fate Points</label>
+					<input class="form-control text-center w-25" type="number" id="refresh" name="refresh" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="FP" />
+				</div>
+				<div class="d-flex text-right">
+					<label class="col-form-label pr-1">Refresh</label>				
+					<input class="form-control text-center w-25" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />				
 				</div>
 			</div>
 		</div>
@@ -190,7 +147,7 @@
 		<!-- stress -->
 		<div class="col-sm-6 col-md-4 fate-stress">
 			<div class="form-group">
-				<div for="" class="fate-header">Stress</div>
+				<div for="" class="fate-header">Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
 			</div>
 			
 			<div class="row">
@@ -215,7 +172,7 @@
 		<!-- conditions -->
 		<div class="col-sm-6 col-md-8 fate-conditions">
 			<div class="form-group">
-				<div class="fate-header col-12">Conditions</div>
+				<div class="fate-header col-12">Conditions <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
 			</div>		
 
 			<div class="d-flex d-flex justify-content-between">				
@@ -278,20 +235,20 @@ export default {
   data () {
     return {
 		approaches:  [
-			{placeholder:"Careful", obj:"approaches.careful"},
-			{placeholder:"Clever", obj:"approaches.clever"},
-			{placeholder:"Flashy", obj:"approaches.flashy"},
-			{placeholder:"Forceful", obj:"approaches.forceful"},
-			{placeholder:"Quick", obj:"approaches.quick"},
-			{placeholder:"Sneaky", obj:"approaches.sneaky"},
+			{placeholder:"Flair", obj:"approaches.flair"},
+			{placeholder:"Focus", obj:"approaches.focus"},
+			{placeholder:"Force", obj:"approaches.force"},
+			{placeholder:"Guile", obj:"approaches.guile"},
+			{placeholder:"Haste", obj:"approaches.haste"},
+			{placeholder:"Intellect", obj:"approaches.intellect"},
 		],
 		aspects: [
 			{label:"High Concept", obj:"aspects.highconcept"},
 			{label:"Trouble", obj:"aspects.trouble"},
+			{label:"Aspect", obj:"aspects.other"},		
 			{label:"Aspect", obj:"aspects.other1"},
 			{label:"Aspect", obj:"aspects.other2"},
 			{label:"Aspect", obj:"aspects.other3"},
-			{label:"Aspect", obj:"aspects.other4"},
 		],
 		conditions: {
 			inperil:
@@ -355,8 +312,12 @@ export default {
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
-    setVal(arr, val) {
-    	this.$parent.setVal(this.character, arr, val);       
+    setVal(arr, val) {		
+		if (this.roll20Enabled && arr === 'fatepoints') {
+			this.roll20FatePoints(arr,val)
+		} else {
+			this.$parent.setVal(this.character, arr, val);
+		}
 	},
 	sendToRoll20(type, label, obj, item) {		
 		switch(type)
@@ -377,6 +338,20 @@ export default {
 				break;
 		}
 	},
+	roll20FatePoints(arr,val) {
+		if(arr === 'fatepoints')
+		{
+			let oldVal = this.character[arr];
+			if (!oldVal || (parseInt(oldVal) < parseInt(val))) {
+				this.sendToRoll20("fatepoint", null, arr, "1");
+			}
+			else {
+				this.sendToRoll20("fatepoint", null, arr, "-1");
+			}
+		}
+		this.$parent.setVal(this.character, arr, val);
+		this.$parent.$parent.save();
+	},	
   }
 }
 </script>
@@ -462,11 +437,11 @@ export default {
 		padding-top: 0px;
 	}
 
-	.round-input {
-		border-radius: 25px;
-		width: 50px;
-		height: 50px;
+	/deep/ .round-input {
+		border-radius: 45px;		
+		height: 40x;
 		font-size: 24px;
+		height: 47px !important;		
 	}
 
 	/deep/ .fate-consequences label {
@@ -496,5 +471,6 @@ export default {
 	/deep/ .fate-condition-label {
 		border: 0px;		
 		border-bottom: solid 1px #452f92;
+		padding-top: 10px;
 	}
 </style>
