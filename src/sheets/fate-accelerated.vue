@@ -143,7 +143,7 @@ export default {
 		consequences: [
 			{label:"Mild", obj:"consequences.mild", value: "2"},
 			{label:"Moderate", obj:"consequences.moderate", value: "4"},
-			{label:"Severe", obj:"consequences.severe", value: "6"},			
+			{label:"Severe", obj:"consequences.severe", value: "6"},
 		],
 		stresses: [
 			{label:"1", obj:"stress1"},
