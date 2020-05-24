@@ -5,7 +5,7 @@
     </label>
 
     <input v-if="condition.placeholder" class="order-md-2 fate-condition-label col-form-label" type="text" 
-      :name="condition.label" :id="condition.label" @change="setVal('conditions.condition1',  $event.target.value)" :value="$parent.getVal(condition.label)" :placeholder="condition.placeholder" />
+      :name="condition.label" :id="condition.label" @change="setVal(condition.label,  $event.target.value)" :value="$parent.getVal(condition.label)" :placeholder="condition.placeholder" />
 
     <div class="d-flex">       
       <span class="p-1 order-md-1 d-flex justify-content-between" v-for="box in condition.items" :key="box.obj">

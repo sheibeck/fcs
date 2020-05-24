@@ -25,9 +25,16 @@
 
 			<div class="fate-header mb-5 mb-sm-0">
 				<div class="d-flex">
-					<input class="refresh center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="3" /> <div class="pt-0">Refresh</div>
-				</div>
+					<input class="refresh center" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="3" /> <div class="pt-0">Refresh</div>
+				</div>				
 			</div>
+			<div style="height: 50px;"></div>
+			<div class="fate-header mb-5 mb-sm-0 d-flex">
+				<div class="mr-auto"></div>
+				<div class="d-flex" style="min-height: 50px;">
+					<div class="pt-0">Fate Points</div> <inputfatepoints inputclass="fatepoints" placeholder="-" />
+				</div>				
+			</div>					
 		</div>
 
 		<!-- Vitals and Skills -->
@@ -97,6 +104,7 @@ import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
 import InputStressTrack from '../components/input-stress-track'
 import InputStuntExtra from '../components/input-stuntextra'
+import InputFatePoints from '../components/input-fatepoints'
 
 export default {
   name: 'SheetFateCondensed',
@@ -106,6 +114,7 @@ export default {
 	"inputconsequence": InputConsequence,
 	"inputstress": InputStressTrack,
 	"inputstuntextra": InputStuntExtra,
+	"inputfatepoints": InputFatePoints,
   },
   props: {    
     character: Object,
@@ -296,13 +305,24 @@ export default {
 		text-transform: capitalize !important;		
 	}
 
-	input.refresh {
+	/deep/ input.refresh {
 		border: 4px solid black;
 		border-radius: 50px 50px;
 		width: 100px;
 		height: 100px;
 		text-align: center;
-		font-size: 55px; 		
+		font-size: 55px;
+		padding-left: 20px;		
+	}
+	/deep/ input.fatepoints {
+		border: 4px solid black;
+		border-radius: 50px 50px;
+		width: 100px;
+		height: 100px;
+		text-align: center;
+		font-size: 55px;
+		padding-left: 30px;	
+		margin-top: -60px;	
 	}
 
 	@media print {

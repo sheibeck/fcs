@@ -17,7 +17,7 @@
 					<div for="fatepoints" class="fate-header">
 						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
 					</div>	
-					<input type="number" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />					
+					<inputfatepoints />
 				</div>
 			</div>
 		</div>
@@ -72,7 +72,7 @@
 				<div for="" class="fate-header">Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
-			<div class="d-flex">
+			<div class="d-flex justify-content-between">
 				<div v-for="stress in stresses" :key="stress.obj">
 					<inputstress :stress="stress" />
 				</div>
@@ -98,8 +98,9 @@
 import InputSkillColumn from '../components/input-skill-column'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
-import InputStressAccelerated from '../components/input-accelerated-stress'
+import InputStress from '../components/input-stress'
 import InputStuntExtra from '../components/input-stuntextra'
+import InputFatePoints from '../components/input-fatepoints'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -108,8 +109,9 @@ export default {
 	"inputapproach": InputSkillColumn,    
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
-	"inputstress": InputStressAccelerated,
+	"inputstress": InputStress,
 	"inputstuntextra": InputStuntExtra,
+	"inputfatepoints": InputFatePoints,	
   },
   props: {    
     character: Object,
@@ -148,7 +150,7 @@ export default {
 		stresses: [
 			{label:"1", obj:"stress1"},
 			{label:"2", obj:"stress2"},
-			{label:"3", obj:"stress3"},			
+			{label:"3", obj:"stress3"},
 		],
 		stunts: "stunts"		
     }
@@ -158,11 +160,7 @@ export default {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {		
-		if (this.roll20Enabled && arr === 'fatepoints') {
-			this.roll20FatePoints(arr,val)
-		} else {
-			this.$parent.setVal(this.character, arr, val);
-		}
+		this.$parent.setVal(this.character, arr, val);		
 	},
 	sendToRoll20(type, label, obj, item) {		
 		switch(type)
@@ -181,21 +179,7 @@ export default {
 				}
 				break;
 		}
-	},
-	roll20FatePoints(arr,val) {
-		if(arr === 'fatepoints')
-		{
-			let oldVal = this.character[arr];
-			if (!oldVal || (parseInt(oldVal) < parseInt(val))) {
-				this.sendToRoll20("fatepoint", null, arr, "1");
-			}
-			else {
-				this.sendToRoll20("fatepoint", null, arr, "-1");
-			}
-		}
-		this.$parent.setVal(this.character, arr, val);
-		this.$parent.$parent.save();
-	},		
+	},	
   }
 }
 </script>

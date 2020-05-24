@@ -11,11 +11,13 @@
             <div class="row">
                 <div class="col-6 text-center">
                     <div for="refresh" class="fate-header">Refresh</div>
-                    <input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
+                    <input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
                 </div>
-                <div class="col-6 text-center ">
-                    <div for="fatepoints" class="fate-header">FP</div>
-                    <input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
+                <div class="col-6 text-center ">                    
+                    <div for="fatepoints" class="fate-header">
+						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
+					</div>                    
+                    <inputfatepoints />
                 </div>
             </div>
         </div>
@@ -38,21 +40,10 @@
             <div class="form-group">
                 <div for="" class="fate-header">Aspects</div>
             </div>
-            <div class="form-group">
-                <input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept', $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspects.trouble', $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]" @change="setVal('aspects.other1', $event.target.value)" :value="getVal('aspects.other1')" placeholder="Aspect" />
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]" @change="setVal('aspects.other2', $event.target.value)" :value="getVal('aspects.other2')" placeholder="Aspect" />
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" id="aspect[other3]" name="aspect[other3]" @change="setVal('aspects.other3', $event.target.value)" :value="getVal('aspects.other3')" placeholder="Aspect" />
-            </div>
+            
+            <div v-for="aspect in aspects" :key="aspect.obj" class="p-0 m-0">
+				<inputaspect :aspect="aspect" />
+			</div>    
         </div>
 
         <div class="col-sm-12 col-md-8 fate-skills">
@@ -209,16 +200,10 @@
 
     <div class="row">
         <div class="col-sm-12 col-md-6">
-            <div class="form-group">
-                <div for="stunts" class="fate-header">Stunts</div>
-                <textarea class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts" @change="setVal('stunts', $event.target.value)" :value="getVal('stunts')"></textarea>
-            </div>
+            <inputstuntextra :item="stunts" :rows="25" :border="true" header="Stunts" />
         </div>
         <div class="col-sm-12 col-md-6">
-            <div class="form-group">
-                <div for="stunts" class="fate-header">Extras</div>
-                <textarea class="form-control" id="extras" name="extras" rows="25" placeholder="Extras" @change="setVal('extras', $event.target.value)" :value="getVal('extras')"></textarea>
-            </div>
+           <inputstuntextra :item="extras" :rows="25" :border="true" header="Extras" />
         </div>
     </div>
 
@@ -228,101 +213,29 @@
             <div class="form-group">
                 <div for="" class="fate-header">Physical Stress</div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <label for="stress">
-                        1
-                    </label>
-                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1', $event.target.checked)" :checked="getVal('stress.stress1', false)" />
-                </div>
-
-                <div class="col">
-                    <label for="stress">
-                        2
-                    </label>
-                    <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2', $event.target.checked)" :checked="getVal('stress.stress2', false)" />
-                </div>
-
-                <div class="col">
-                    <label v-bind:class="{ 'stat-requirement': !skillHasValue('Physique', 1) }" for="stress">
-                        3
-                    </label>
-                    <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3', $event.target.checked)" :checked="getVal('stress.stress3', false)" :disabled="!skillHasValue('Physique', 1)" />
-                </div>
-
-                <div class="col">
-                    <label v-bind:class="{ 'stat-requirement': !skillHasValue('Physique', 3) }" for="stress">
-                        4
-                    </label>
-                    <input type="checkbox" value="3" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4', $event.target.checked)" :checked="getVal('stress.stress4', false)" :disabled="!skillHasValue('Physique', 3)" />
-                </div>
-            </div>
+             <div class="d-flex d-flex justify-content-between">
+				<div v-for="stress in physicalstress" :key="stress.obj">
+					<inputstress :stress="stress" stresstype="Physical" />
+				</div>
+			</div>
 
             <!-- mental stress -->
             <div class="form-group">
                 <div for="" class="fate-header">Mental Stress</div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <label for="stress">
-                        1
-                    </label>
-                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1', $event.target.checked)" :checked="getVal('stress.mental1', false)" />
-                </div>
-
-                <div class="col">
-                    <label for="stress">
-                        2
-                    </label>
-                    <input type="checkbox" value="2" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2', $event.target.checked)" :checked="getVal('stress.mental2', false)" />
-                </div>
-
-                <div class="col">
-                    <label v-bind:class="{ 'stat-requirement': !skillHasValue('Will', 1) }" for="stress">
-                        3
-                    </label>
-                    <input type="checkbox" value="3" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3', $event.target.checked)" :checked="getVal('stress.mental3', false)" :disabled="!skillHasValue('Will', 1)" />
-                </div>
-
-                <div class="col">
-                    <label v-bind:class="{ 'stat-requirement': !skillHasValue('Will', 3) }" for="stress">
-                        4
-                    </label>
-                    <input type="checkbox" value="3" id="stress[mental4]" name="stress[mental4]"  @change="setVal('stress.mental4', $event.target.checked)" :checked="getVal('stress.mental4', false)" :disabled="!skillHasValue('Will', 3)" />
-                </div>
-            </div>
+            <div class="d-flex justify-content-between">
+				<div v-for="stress in mentalstress" :key="stress.obj">
+					<inputstress :stress="stress" stresstype="Mental" />
+				</div>
+			</div>
         </div>
         <div class="col-md-6 col-sm-12 fate-consequences">
             <div class="form-group">
                 <div class="fate-header col-12">Consequences</div>
             </div>
 
-            <div class="form-group row">
-                <label class="col-2 col-form-label">2</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequences.mild', $event.target.value)" :value="getVal('consequences.mild')" />
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-2 col-form-label">4</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequences.moderate', $event.target.value)" :value="getVal('consequences.moderate')" />
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-2 col-form-label">6</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequences.severe', $event.target.value)" :value="getVal('consequences.severe')" />
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-2 col-form-label" v-bind:class="{ 'stat-requirement': !skillHasValue('Physique|Will', 5) }">2</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" placeholder="Mild" @change="setVal('consequences.mild2', $event.target.value)" :value="getVal('consequences.mild2')" :disabled="!this.skillHasValue('Physique|Will', 5)" />
-                </div>
+            <div v-for="consequence in consequences" :key="consequence.obj">
+                <inputconsequence :consequence="consequence" />
             </div>
         </div>
 
@@ -331,38 +244,102 @@
 </template>
 
 <script>
+
+import InputAspect from '../components/input-aspect'
+import InputConsequence from '../components/input-consequence'
+import InputStress from '../components/input-stress'
+import InputStuntExtra from '../components/input-stuntextra'
+import InputFatePoints from '../components/input-fatepoints'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'SheetFateCore',
+  components: {	   
+	"inputaspect": InputAspect,
+	"inputconsequence": InputConsequence,
+	"inputstress": InputStress,
+    "inputstuntextra": InputStuntExtra,
+    "inputfatepoints": InputFatePoints,
+  },
   props: {
     character: Object,
   }, 
   mounted() {      
       this.$parent.$parent.title = 'Fate Core (Character Sheet)';
   },
-  computed: {   
+  computed: {
+ 	...mapGetters([  
+      'roll20Enabled'
+    ]),
   },
   data () {
     return {
         skills: 
             ['', 'Athletics', 'Burglary', 'Contacts', 'Crafts', 'Deceive', 'Drive', 'Empathy'
                 , 'Fight', 'Investigate', 'Lore', 'Notice', 'Physique', 'Provoke', 'Rapport'
-                , 'Resources', 'Shoot', 'Stealth', 'Will'],       
+                , 'Resources', 'Shoot', 'Stealth', 'Will'],
+
+        aspects: [
+			{label:"High Concept", obj:"aspects.highconcept"},
+			{label:"Trouble", obj:"aspects.trouble"},
+			{label:"Aspect", obj:"aspects.other1"},
+			{label:"Aspect", obj:"aspects.other2"},
+			{label:"Aspect", obj:"aspects.other3"},
+		],
+		consequences: [
+			{label:"Mild", obj:"consequences.mild", value: "2"},
+			{label:"Moderate", obj:"consequences.moderate", value: "4"},
+            {label:"Severe", obj:"consequences.severe", value: "6"},
+            {label:"Mild", obj:"consequences.mild2", value: "2", requirement: {obj:"physique|will", val:"5" }},
+		],
+		physicalstress: [
+			{label:"1", obj:"stress1"},
+			{label:"2", obj:"stress2"},
+            {label:"3", obj:"stress3", requirement: {obj:"physique", val:"1" }},
+            {label:"4", obj:"stress4", requirement: {obj:"physique", val:"3" }},						
+        ],
+        mentalstress: [
+			{label:"1", obj:"mental1"},
+			{label:"2", obj:"mental2"},
+            {label:"3", obj:"mental3", requirement: {obj:"will", val:"1" }},
+            {label:"4", obj:"mental4", requirement: {obj:"will", val:"3" }},						
+		],
+        stunts: "stunts",
+        extras: "extras"    
     }
   },
   methods: {  
     getVal(graphPath, defaultValue) {
         return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
-    setVal(arr, val) {
-        this.$parent.setVal(this.character, arr, val);       
+    setVal(arr, val) {        
+        this.$parent.setVal(this.character, arr, val);        
     },
+    sendToRoll20(type, label, obj, item) {        
+		switch(type)
+		{			
+			case "fatepoint":
+				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				break;
+			case "stress":
+			case "consequence":
+			case "stuntextra":
+				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				break;
+			default:				
+				if (this.getVal(item)) {
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+				}
+				break;
+		}
+	},
     skillHasValue(skillList, value) {        
-        try {           
+        try {            
             // this will only find one instance of the skill, not all.
             // we expect that each skill only shows up once.
             let skillArray = skillList.split("|");
 
-            function getPath(obj, value) {
+            function getPath(obj, value) {                
                 if(obj.constructor !== Object) {
                     throw new TypeError('getPath() can only operate on object with Object as constructor');
                 }
@@ -372,7 +349,8 @@ export default {
                 function search(haystack) {
                     for (var key in haystack) {
                     path.push(key);
-                    if(haystack[key] === value) {
+                    let curVal = haystack[key];
+                    if(typeof curVal === "string" && curVal.toLowerCase() === value) {
                         found = true;
                         break;
                     }
@@ -425,7 +403,7 @@ export default {
         max-height: 130px;
     }
 
-    .fate-header {
+    /deep/ .fate-header {
         font-family: 'Archivo Black', sans-serif;
         text-transform: uppercase;
         background-color: #000;
@@ -436,7 +414,7 @@ export default {
         font-size: 22px;
     }
 
-    .col-form-label {
+    /deep/ .col-form-label {
         font-family: 'Archivo Black', sans-serif;
         text-transform: uppercase;
         font-size: 22px;
@@ -465,22 +443,21 @@ export default {
         margin-top: 1px;
     }
 
-    input[type=checkbox] {
+    /deep/ input[type=checkbox] {
         height: 50px;
         width: 50px;
     }
 
-    .fate-consequences label {
+    /deep/ .fate-consequences label {
         font-family: 'Archivo Black', sans-serif;
         text-transform: uppercase;
         font-weight: 700;
         font-size: 28px;
         padding-top: 0px;
-        padding-bottom: 0px;
-        padding-left: 25px;
+        padding-bottom: 0px;        
     }
 
-    .fate-stress label {
+    /deep/ .fate-stress label {
         font-family: 'Archivo Black', sans-serif;
         text-transform: uppercase;
         font-size: 30px;

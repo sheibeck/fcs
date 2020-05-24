@@ -1,7 +1,7 @@
 <template>
 	<div class="form-group d-flex">
     <span v-if="hasRoll20" class="dice fo20 pt-1 pr-1" v-on:click="sendToRoll20()">C</span>
-    <label class="pr-3 mr-auto">{{consequence.value}}</label>
+    <label class="pr-3">{{consequence.value}}</label>
     <input type="text" class="form-control" :id="consequence.obj" :name="consequence.obj" 
       @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="consequence.label"
       :disabled="!skillHasValue()" />

@@ -130,15 +130,11 @@
 			<div class="form-group">
 				<inputstuntextra :item="stunts" :rows="13" :border="true" header="Stunts" />
 			</div>
-			<div class="form-group d-md-flex">
-				<div class="d-flex mr-auto">
-					<span v-if="roll20Enabled" class='dice fo20 pt-2'>A</span><label class="col-form-label pr-1">Fate Points</label>
-					<input class="form-control text-center w-25" type="number" id="refresh" name="refresh" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="FP" />
-				</div>
-				<div class="d-flex text-right">
-					<label class="col-form-label pr-1">Refresh</label>				
-					<input class="form-control text-center w-25" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />				
-				</div>
+			<div class="form-group d-md-flex justify-content-between">
+				<span v-if="roll20Enabled" class='dice fo20 pt-2'>A</span><label class="col-form-label pr-1">FP</label>
+				<inputfatepoints class="w-25" />							
+				<label class="col-form-label pr-1 w-25">Refresh</label>				
+				<input class="form-control text-center w-25" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />							
 			</div>
 		</div>
 	</div>
@@ -162,7 +158,7 @@
 				</label>
 			</div>
 
-			<div class="row">
+			<div class="row justify-content-between">
 				<div v-for="stress in otherstresses" :key="stress.obj" class="col">
 					<inputstress :stress="stress" />
 				</div>
@@ -207,7 +203,8 @@ import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
 import InputCondition from '../components/input-condition'
 import InputStuntExtra from '../components/input-stuntextra'
-import InputStressAccelerated from '../components/input-accelerated-stress'
+import InputStress from '../components/input-stress'
+import InputFatePoints from '../components/input-fatepoints'
 import { mapGetters } from 'vuex'
 
 
@@ -219,7 +216,8 @@ export default {
 	"inputconsequence": InputConsequence,
 	"inputcondition": InputCondition,
 	"inputstuntextra": InputStuntExtra,
-	"inputstress": InputStressAccelerated,
+	"inputstress": InputStress,
+	"inputfatepoints": InputFatePoints,
   },
   props: {    
     character: Object,
@@ -313,11 +311,7 @@ export default {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {		
-		if (this.roll20Enabled && arr === 'fatepoints') {
-			this.roll20FatePoints(arr,val)
-		} else {
-			this.$parent.setVal(this.character, arr, val);
-		}
+		this.$parent.setVal(this.character, arr, val);		
 	},
 	sendToRoll20(type, label, obj, item) {		
 		switch(type)
@@ -337,21 +331,7 @@ export default {
 				}
 				break;
 		}
-	},
-	roll20FatePoints(arr,val) {
-		if(arr === 'fatepoints')
-		{
-			let oldVal = this.character[arr];
-			if (!oldVal || (parseInt(oldVal) < parseInt(val))) {
-				this.sendToRoll20("fatepoint", null, arr, "1");
-			}
-			else {
-				this.sendToRoll20("fatepoint", null, arr, "-1");
-			}
-		}
-		this.$parent.setVal(this.character, arr, val);
-		this.$parent.$parent.save();
-	},	
+	}	
   }
 }
 </script>
