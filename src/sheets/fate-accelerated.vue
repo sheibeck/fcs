@@ -209,7 +209,7 @@ export default {
 		font-size: 22px;
 	}
 
-	.col-form-label {
+	/deep/ .col-form-label {
 		font-family: 'Archivo Black', sans-serif;
 		text-transform: uppercase;
 		font-size: 22px;

@@ -213,7 +213,7 @@
             <div class="form-group">
                 <div for="" class="fate-header">Physical Stress</div>
             </div>
-             <div class="d-flex d-flex justify-content-between">
+            <div class="d-flex d-flex justify-content-between">
 				<div v-for="stress in physicalstress" :key="stress.obj">
 					<inputstress :stress="stress" stresstype="Physical" />
 				</div>

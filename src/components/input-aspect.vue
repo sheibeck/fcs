@@ -21,7 +21,7 @@ export default {
   },
   computed: {
  	  ...mapGetters([
-      'isAuthenticated',      
+      'isAuthenticated',
       'roll20Enabled'
     ]),
     hasRoll20() {

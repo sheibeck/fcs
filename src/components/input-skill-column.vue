@@ -4,7 +4,7 @@
       <span v-if="hasRoll20" class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
 
       <!--non-custom labels-->
-      <label v-if="!item.label" class="p-1 w-100 mr-auto inputlabel" :class="labelclass">{{item.placeholder}}</label>
+      <label v-if="!item.label" class="p-1 w-100 mr-auto col-form-label inputlabel" :class="labelclass">{{item.placeholder}}</label>
 
       <!--custom labels-->
      	<input v-if="item.label" class="px-2 py-2 w-100 mr-auto inputlabel" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 

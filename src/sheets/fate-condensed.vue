@@ -21,7 +21,7 @@
 				</div>
 			</div>
 			
-			<inputstuntextra :item="stunts" :rows="30" :border="false" header="Stunts" />
+			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" />
 
 			<div class="fate-header mb-5 mb-sm-0">
 				<div class="d-flex">
@@ -48,29 +48,27 @@
 				</div>
 
 				<!-- physical stress -->
-				<div class="d-flex flex-row ">
+				<div class="d-md-flex flex-row pb-2">
 					<div class="form-group font-weight-bold pr-2 pt-2 mr-auto">
 						PHYSICAL
 					</div>
-					<input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
-					<input type="checkbox" value="1" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
-					<input type="checkbox" value="1" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" />
-					<input type="checkbox" value="1" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :checked="getVal('stress.stress4')" :disabled="!skillHasValue('skill13', 1)" />
-					<input type="checkbox" value="1" id="stress[stress5]" name="stress[stress5]" @change="setVal('stress.stress5',  $event.target.checked)" :checked="getVal('stress.stress5')" :disabled="!skillHasValue('skill13', 3)" />
-					<input type="checkbox" value="1" id="stress[stress6]" name="stress[stress6]" @change="setVal('stress.stress6',  $event.target.checked)" :checked="getVal('stress.stress6')" :disabled="!skillHasValue('skill13', 3)" />
+					<div class="d-flex justify-content-between">
+						<div v-for="stress in physicalstress" :key="stress.obj">
+							<inputstress :stress="stress" stresstype="Physical" hidelabel="true" />
+						</div>
+					</div>
 				</div>
 
 				<!-- mental stress -->
-				<div class="d-flex flex-row">
+				<div class="d-md-flex flex-row">
 					<div class="form-group font-weight-bold pr-3 pt-2 mr-auto">
 						MENTAL
 					</div>
-					<input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1',  $event.target.checked)" :checked="getVal('stress.mental1')" />
-					<input type="checkbox" value="1" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2',  $event.target.checked)" :checked="getVal('stress.mental2')" />
-					<input type="checkbox" value="1" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3',  $event.target.checked)" :checked="getVal('stress.mental3')" />
-					<input type="checkbox" value="1" id="stress[mental4]" name="stress[mental4]" @change="setVal('stress.mental4',  $event.target.checked)" :checked="getVal('stress.mental4')" :disabled="!skillHasValue('skill19', 1)" />
-					<input type="checkbox" value="1" id="stress[mental5]" name="stress[mental5]" @change="setVal('stress.mental5',  $event.target.checked)" :checked="getVal('stress.mental5')" :disabled="!skillHasValue('skill19', 3)" />
-					<input type="checkbox" value="1" id="stress[mental6]" name="stress[mental6]" @change="setVal('stress.mental6',  $event.target.checked)" :checked="getVal('stress.mental6')" :disabled="!skillHasValue('skill19', 3)" />
+					<div class="d-flex justify-content-between">
+						<div v-for="stress in mentalstress" :key="stress.obj">
+							<inputstress :stress="stress" stresstype="Mental" hidelabel="true" />
+						</div>
+					</div>
 				</div>
 
 				<!-- consequences -->
@@ -102,7 +100,7 @@ import { mapGetters } from 'vuex'
 import InputSkillColumn from '../components/input-skill-column'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
-import InputStressTrack from '../components/input-stress-track'
+import InputStress from '../components/input-stress'
 import InputStuntExtra from '../components/input-stuntextra'
 import InputFatePoints from '../components/input-fatepoints'
 
@@ -112,7 +110,7 @@ export default {
 	"inputskill": InputSkillColumn,    
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
-	"inputstress": InputStressTrack,
+	"inputstress": InputStress,
 	"inputstuntextra": InputStuntExtra,
 	"inputfatepoints": InputFatePoints,
   },
@@ -163,8 +161,24 @@ export default {
 			{label:"Moderate", obj:"consequences.moderate", value: "4"},
 			{label:"Severe", obj:"consequences.severe", value: "6"},
 			{label:"Mild", obj:"consequences.mild2", value: "2", requirement: {obj:"skill13|skill19", val:"5" } },
-		],	
-		stunts: "stunts"
+		],
+		physicalstress: [
+			{label:"1", obj:"stress1"},
+			{label:"2", obj:"stress2"},
+			{label:"3", obj:"stress3"},
+            {label:"4", obj:"stress4", requirement: {obj:"skill13", val:"1" }},
+			{label:"5", obj:"stress5", requirement: {obj:"skill13", val:"3" }},
+			{label:"6", obj:"stress6", requirement: {obj:"skill13", val:"3" }},
+        ],
+         mentalstress: [
+			{label:"1", obj:"mental1"},
+			{label:"2", obj:"mental2"},
+			{label:"3", obj:"mental3"},
+            {label:"4", obj:"mental4", requirement: {obj:"skill19", val:"1" }},
+			{label:"5", obj:"mental5", requirement: {obj:"skill19", val:"3" }},
+			{label:"6", obj:"mental6", requirement: {obj:"skill19", val:"3" }},						
+		],        
+		
     }
   },
   methods: {  
@@ -265,8 +279,8 @@ export default {
 	}
 
 	/deep/ input[type=checkbox] {
-		height: 50px;
-		width: 50px;
+		height: 38px;
+		width: 38px;
 	}
 
 	/deep/ .fate-conditions label {

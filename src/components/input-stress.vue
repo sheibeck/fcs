@@ -1,7 +1,7 @@
 <template>
 	<div class="px-1 d-flex">
-    <label class="px-1 pt-1" :for="stress.obj">{{stress.label}}</label>
-    <input type="checkbox" :value="stress.value" :id="`${stress.obj}`" name="${stress.obj}" @change="setVal(stress.obj,  $event.target.checked)" 
+    <label class="px-1 pt-1" :class="{ 'd-none' : labelHidden }" :for="stress.obj">{{stress.label}}</label>
+    <input type="checkbox" :value="stress.value" :id="stress.obj" :name="stress.obj" @change="setVal(stress.obj,  $event.target.checked)" 
       :checked="$parent.getVal(stress.obj)" :disabled="!skillHasValue()" />
   </div>
 </template>
@@ -14,7 +14,8 @@ export default {
   name: 'InputStress',
   props: {
     stress: Object,
-    stresstype: String
+    stresstype: String,
+    hidelabel: String,
   },
   computed: {
  	  ...mapGetters([
@@ -23,6 +24,9 @@ export default {
     ]),
     hasRoll20() {
       return this.isAuthenticated && this.roll20Enabled;
+    },
+    labelHidden() {      
+      return this.hidelabel && this.hidelabel == "true" ? true : false;
     }
   },
   data () {
@@ -32,7 +36,7 @@ export default {
   methods: {    
     setVal(arr, val) {
       if (this.roll20Enabled) {      
-        let label = this.stresstype ? `${this.stresstype} ${this.stress.label}` : this.stress.label;
+        let label = this.stresstype ? `${this.stress.label} ${this.stresstype}` : this.stress.label;
         this.$parent.sendToRoll20("stress", label, arr, val);
         this.$parent.setVal(arr, val);
         this.$parent.$parent.$parent.save();
