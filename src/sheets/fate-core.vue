@@ -46,155 +46,8 @@
 			</div>    
         </div>
 
-        <div class="col-sm-12 col-md-8 fate-skills">
-            <div class="form-group mt-0">
-                <div class="fate-header">Skills</div>
-            </div>
-
-            <div class="form-group row mr-0">
-                <label class="col-xs-12 pr-md-0 col-md-2 col-form-label ">Superb (+5)</label>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s1]" name="skill[superb][s1]" @change="setVal('skills.superb.s1', $event.target.value)" :value="getVal('skills.superb.s1')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>                    
-                    </select>                   
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s2]" name="skill[superb][s2]" @change="setVal('skills.superb.s2', $event.target.value)" :value="getVal('skills.superb.s2')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s3]" name="skill[superb][s3]" @change="setVal('skills.superb.s3', $event.target.value)" :value="getVal('skills.superb.s3')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                                        </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s4]" name="skill[superb][s4]" @change="setVal('skills.superb.s4', $event.target.value)" :value="getVal('skills.superb.s4')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[superb][s5]" name="skill[superb][s5]" @change="setVal('skills.superb.s5', $event.target.value)" :value="getVal('skills.superb.s5')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group row mr-0">
-                <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Great (+4)</label>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s1]" name="skill[great][s1]" @change="setVal('skills.great.s1', $event.target.value)" :value="getVal('skills.great.s1')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s2]" name="skill[great][s2]" @change="setVal('skills.great.s2', $event.target.value)" :value="getVal('skills.great.s2')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s3]" name="skill[great][s3]" @change="setVal('skills.great.s3', $event.target.value)" :value="getVal('skills.great.s3')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s4]" name="skill[great][s4]" @change="setVal('skills.great.s4', $event.target.value)" :value="getVal('skills.great.s4')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[great][s5]" name="skill[great][s5]" @change="setVal('skills.great.s5', $event.target.value)" :value="getVal('skills.great.s5')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group row mr-0">
-                <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Good (+3)</label>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s1]" name="skill[good][s1]" @change="setVal('skills.good.s1', $event.target.value)" :value="getVal('skills.good.s1')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s2]" name="skill[good][s2]" @change="setVal('skills.good.s2', $event.target.value)" :value="getVal('skills.good.s2')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s3]" name="skill[good][s3]" @change="setVal('skills.good.s3', $event.target.value)" :value="getVal('skills.good.s3')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s4]" name="skill[good][s4]" @change="setVal('skills.good.s4', $event.target.value)" :value="getVal('skills.good.s4')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[good][s5]" name="skill[good][s5]" @change="setVal('skills.good.s5', $event.target.value)" :value="getVal('skills.good.s5')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group row mr-0">
-                <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Fair (+2)</label>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s1]" name="skill[fair][s1]" @change="setVal('skills.fair.s1', $event.target.value)" :value="getVal('skills.fair.s1')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s2]" name="skill[fair][s2]" @change="setVal('skills.fair.s2', $event.target.value)" :value="getVal('skills.fair.s2')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s3]" name="skill[fair][s3]" @change="setVal('skills.fair.s3', $event.target.value)" :value="getVal('skills.fair.s3')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s4]" name="skill[fair][s4]" @change="setVal('skills.fair.s4', $event.target.value)" :value="getVal('skills.fair.s4')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[fair][s5]" name="skill[fair][s5]" @change="setVal('skills.fair.s5', $event.target.value)" :value="getVal('skills.fair.s5')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group row mr-0">
-                <label class="col-xs-12 pr-md-0 col-md-2 col-form-label">Average (+1)</label>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s1]" name="skill[average][s1]" @change="setVal('skills.average.s1', $event.target.value)" :value="getVal('skills.average.s1')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s2]" name="skill[average][s2]" @change="setVal('skills.average.s2', $event.target.value)" :value="getVal('skills.average.s2')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s3]" name="skill[average][s3]" @change="setVal('skills.average.s3', $event.target.value)" :value="getVal('skills.average.s3')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s4]" name="skill[average][s4]" @change="setVal('skills.average.s4', $event.target.value)" :value="getVal('skills.average.s4')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-2 p-md-0">
-                    <select class="form-control" id="skill[average][s5]" name="skill[average][s5]" @change="setVal('skills.average.s5', $event.target.value)" :value="getVal('skills.average.s5')" placeholder="">
-                        <option v-for="skill in skills" :value="skill">{{skill}}</option>
-                    </select>
-                </div>
-            </div>
+        <div class="col-sm-12 col-md-8 fate-skills">                       
+            <inputskillpyramid :skills="skills" header="Skills" :skillList="skillList" />            
         </div>
     </div>
 
@@ -245,6 +98,7 @@
 
 <script>
 
+import InputSkillPyramid from '../components/input-skill-pyramid'
 import InputAspect from '../components/input-aspect'
 import InputConsequence from '../components/input-consequence'
 import InputStress from '../components/input-stress'
@@ -260,6 +114,7 @@ export default {
 	"inputstress": InputStress,
     "inputstuntextra": InputStuntExtra,
     "inputfatepoints": InputFatePoints,
+    "inputskillpyramid": InputSkillPyramid,
   },
   props: {
     character: Object,
@@ -274,11 +129,18 @@ export default {
   },
   data () {
     return {
-        skills: 
+        skillList: 
             ['', 'Athletics', 'Burglary', 'Contacts', 'Crafts', 'Deceive', 'Drive', 'Empathy'
                 , 'Fight', 'Investigate', 'Lore', 'Notice', 'Physique', 'Provoke', 'Rapport'
                 , 'Resources', 'Shoot', 'Stealth', 'Will'],
-
+        
+        skills: [
+            {label: "Superb", value:"+5", obj:"skills.superb",  items:["s1", "s2", "s3", "s4", "s5"] },
+            {label: "Great", value:"+4", obj:"skills.great",  items:["s1", "s2", "s3", "s4", "s5"] },
+            {label: "Good", value:"+3", obj:"skills.good",  items:["s1", "s2", "s3", "s4", "s5"] },
+            {label: "Fair", value:"+2", obj:"skills.fair",  items:["s1", "s2", "s3", "s4", "s5"] },
+            {label: "Average", value:"+1", obj:"skills.average",  items:["s1", "s2", "s3", "s4", "s5"] }			
+        ],
         aspects: [
 			{label:"High Concept", obj:"aspects.highconcept"},
 			{label:"Trouble", obj:"aspects.trouble"},
@@ -325,8 +187,11 @@ export default {
 			case "consequence":
 			case "stuntextra":
 				this.$parent.sendToRoll20(type, this.character.name, label, item);
-				break;
-			default:				
+                break;
+            case "skill":
+                this.$parent.sendToRoll20("diceroll", this.character.name, label, item);
+                break;
+			default:			
 				if (this.getVal(item)) {
 					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
 				}
@@ -421,12 +286,7 @@ export default {
         font-weight: 700;
     }
 
-    .fate-skills .form-group {
-        margin-bottom: 12px;
-        margin-top: 12px;
-    }
-
-    .fate-skills .col-form-label {
+    /deep/ .fate-skills .col-form-label {
         font-family: 'Archivo Black', sans-serif;
         font-size: 10px;
         font-weight: 600;
