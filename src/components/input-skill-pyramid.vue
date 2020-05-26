@@ -7,7 +7,7 @@
       </a>      
     </div>
 
-    <div v-if="editing">
+    <div v-if="editing || isNewCharacter">
       <div v-for="skill in skills" :key="skill.obj">
         <div class="d-flex">
           <label class="pr-2 col-form-label">{{skill.value}}</label>
