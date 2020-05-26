@@ -21,10 +21,10 @@ export default class FateOf20 {
         this.devExtensionId = this.GetExtensionId();
 
         // try to connect to the live app       
-        chrome.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
+        browser.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
             if (!response) {
                 //try local
-                chrome.runtime.sendMessage(this.devExtensionId, { message: "installed?" }, null, response => {
+                browser.runtime.sendMessage(this.devExtensionId, { message: "installed?" }, null, response => {
                     if (!response) {                        
                         fcs.$store.state.roll20Installed = false;
                         return;
@@ -40,7 +40,7 @@ export default class FateOf20 {
 
     ConnectToExtension(id) {
         fcs.$store.state.roll20Installed = true;
-        this.port = chrome.runtime.connect(id);
+        this.port = browser.runtime.connect(id);
         this.port.onMessage.addListener(this.HandleListener);
     }
 

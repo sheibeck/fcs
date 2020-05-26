@@ -1,21 +1,27 @@
 ROLL20_URL = "*://app.roll20.net/editor/";
 
+window.browser = (function () {
+    return window.msBrowser ||
+      window.browser ||
+      window.chrome;
+  })();
+
 function sendMessageTo(url, request) {
-    chrome.tabs.query({ url }, (tabs) => {        
+    browser.tabs.query({ url }, (tabs) => {        
         for (let tab of tabs) {            
-            chrome.tabs.sendMessage(tab.id, request);
+            browser.tabs.sendMessage(tab.id, request);
         }
     })
 }
 
-chrome.runtime.onMessageExternal.addListener(function(request, sender, respond) {    
+browser.runtime.onMessageExternal.addListener(function(request, sender, respond) {    
     if(request.message == "installed?") {
      respond(true)
    } });
 
 // For simple requests:
 // For simple requests:
-chrome.runtime.onConnectExternal.addListener(function(port) {
+browser.runtime.onConnectExternal.addListener(function(port) {
     port.onMessage.addListener(function(msg) {   
         debugger;      
         switch(msg.type) { 

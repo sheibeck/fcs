@@ -43,7 +43,7 @@
 				"css/fateof20.css"
 			],
 			"js": [		
-				"js/roll20.js"
+				"js/roll20.client.js"
 			]
 		}
   ]

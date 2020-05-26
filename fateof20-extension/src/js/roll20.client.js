@@ -1,5 +1,11 @@
-console.log("loaded roll20.js");
+console.log("loaded roll20.client.js");
 
+window.browser = (function () {
+    return window.msBrowser ||
+      window.browser ||
+      window.chrome;
+  })();
+  
 function handleListener(msg, sender, sendResponse) {    
     let chatMessage = "";
     let subMessage = "";   
@@ -66,4 +72,4 @@ function roll20ChatMessage(message, character = null) {
     speakingas.value = old_as;
 }
 
-chrome.runtime.onMessage.addListener(handleListener);
+browser.runtime.onMessage.addListener(handleListener);
