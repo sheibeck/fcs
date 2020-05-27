@@ -1,5 +1,4 @@
 <template>
-
 <div class="sheet">
     <div class="row">
         <div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
@@ -16,96 +15,16 @@
         <!-- aspects -->
         <div class="col-sm-6 col-md-8 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
             <div for="" class="fate-header">Aspects</div>
-            <div class="px-3">
-                <div class="form-group mb-0">
-                    <div class="row">
-                        <div class="col-8 col-md-10">
-                            <label>High Concept</label>
-                            <input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept',  $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
-                        </div>
-                        <div class="col-4 col-md-2 text-center">
-                            <label>Corrupted?</label>
-                            <div class="text-center">
-                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[highconcept]" name="aspect_corrupted[highconcept]" @change="setVal('aspect_corrupted.highconcept',  $event.target.checked)" :checked="getVal('aspect_corrupted.highconcept')"  />
-                                <div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-8 col-md-10">
-                            <label>Trouble</label>
-                            <input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]"  @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
-                        </div>
-                        <div class="col-4 col-md-2 text-center pt-4">
-                            <div class="text-center">
-                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[trouble]"  name="aspect_corrupted[trouble]" @change="setVal('aspect_corrupted.trouble',  $event.target.checked)" :checked="getVal('aspect_corrupted.trouble')" />
-                                <div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-8 col-md-10">
-                            <label>Relationship</label>
-                            <input type="text" class="form-control" id="aspect[relationship]" name="aspect[relationship]"  @change="setVal('aspects.relationship',  $event.target.value)" :value="getVal('aspects.relationship')" placeholder="Relationship" />
-                        </div>
-                        <div class="col-4 col-md-2 text-center pt-4">
-                            <div class="text-center">
-                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[relationship]" name="aspect_corrupted[relationship]" @change="setVal('aspect_corrupted.relationship',  $event.target.checked)" :checked="getVal('aspect_corrupted.relationship')"  />
-                                <div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-8 col-md-10">
-                            <label>Other Aspect</label>
-                            <input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]"  @change="setVal('aspects.other1',  $event.target.value)" :value="getVal('aspects.other1')" placeholder="Other Aspect" />
-                        </div>
-                        <div class="col-4 col-md-2 text-center pt-4">
-                            <div class="text-center">
-                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[other1]"  name="aspect_corrupted[other1]" @change="setVal('aspect_corrupted.other1',  $event.target.checked)" :checked="getVal('aspect_corrupted.other1')"  />
-                                <div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-8 col-md-10">
-                            <label>Other Aspect</label>
-                            <input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]"  @change="setVal('aspects.other2',  $event.target.value)" :value="getVal('aspects.other2')" placeholder="Other Aspect" />
-                        </div>
-                        <div class="col-4 col-md-2 text-center pt-4">
-                            <div class="text-center">
-                                <input type="checkbox" class="form-control corrupted-checkbox" value="1" id="aspect_corrupted[other2]" name="aspect_corrupted[other2]" @change="setVal('aspect_corrupted.other2',  $event.target.checked)" :checked="getVal('aspect_corrupted.other2')" />
-                                <div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div v-for="aspect in aspects" :key="aspect.obj">
+                <inputaspect :aspect="aspect" />
+            </div>         
+
+            <div class="">
+              <inputstuntextra item="stunts" :rows="18" :border="false" header="Regular Stunts" />
             </div>
-
-            <div for="" class="fate-header">Regular Stunts</div>
-
-            <div class="px-3">
-                <div class="form-group mb-0 pb-4">
-                    <div class="small text-muted font-italic">Start with two stunts for free. You may buy additional stunts for 1 Refresh each, so long as your Refresh remains at or above 1.</div>
-                    <textarea class="form-control" id="stunts" name="stunts" rows="14" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')" placeholder="Regular Stunts"></textarea>
-                </div>
-
-            </div>
-            
-            <div for="" class="fate-header">Corrupted Stunts</div>      
-            <div class="px-3">
-                <div class="form-group mb-0">
-                    <div class="small text-muted font-italic">Whenever one of your aspects becomes corrupted, you also gain a corruption stunt at the next minor milestone.</div>
-                    <textarea class="form-control" id="stunts_corrupted" name="stunts_corrupted" rows="14" @change="setVal('stunts_corrupted',  $event.target.value)" :value="getVal('stunts_corrupted')" placeholder="Corrupted Stunts"></textarea>
-                </div>
+                         
+            <div class="">
+              <inputstuntextra item="stunts_corrupted" :rows="14" :border="false" header="Corrupted Stunts" />
             </div>
         </div>
 
@@ -114,226 +33,72 @@
         <div class="col-sm-6 col-md-4 fate-skills px-0">
             <div class="fate-header col-12">Vitals</div>
 
-            <div class="px-3">
+            <div class="pl-3">
                 <!-- Stress -->
                 <div class="form-group text-center font-weight-bold d-flex flex-row">
                     <div class="col-6">REFRESH</div>
                     <div class="col-6">CORRUPTION</div>
                 </div>
 
-                <div class="form-group text-center font-weight-bold d-flex flex-row">
-                    <div class="form-group mx-4">
-                        <input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
+                <div class="form-group text-center font-weight-bold d-flex">
+                    <div class="form-group w-50">
+                        <input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />                        
+                        <span v-if="roll20Enabled" class='dice fo20'>A</span>
+                        <span>FP</span>                    
+                        <inputfatepoints inputclass="fatepoints" placeholder="-" />
                     </div>
-                    <div class="form-group">
-                        <input type="checkbox" class="form-control-sm" value="1" id="corruption[corruption1]" name="corruption[corruption1]" @change="setVal('corruption.corruption1',  $event.target.checked)" :checked="getVal('corruption.corruption1')" />
-                        <input type="checkbox" class="form-control-sm" value="1" id="corruption[corruption2]" name="corruption[corruption2]" @change="setVal('corruption.corruption2',  $event.target.checked)" :checked="getVal('corruption.corruption2')" />
-                        <input type="checkbox" class="form-control-sm" value="1" id="corruption[corruption3]" name="corruption[corruption3]" @change="setVal('corruption.corruption3',  $event.target.checked)" :checked="getVal('corruption.corruption3')" />
-                        <input type="checkbox" class="form-control-sm" value="1" id="corruption[corruption4]" name="corruption[corruption4]" @change="setVal('corruption.corruption4',  $event.target.checked)" :checked="getVal('corruption.corruption4')" />
+                    <div class="form-group w-50 d-flex flex-wrap justify-content-center">
+                       <div v-for="stress in corruption" :key="stress.obj">
+					        <inputstress :stress="stress" stresstype="Corruption" hidelabel="true" />
+				        </div>
                     </div>
                 </div>
 
                 <!-- Stress -->
-                <div class="form-group text-center font-weight-bold">
+                <div class="form-group text-center font-weight-bold pt-2">
                     <div class="col-12">STRESS</div>
                 </div>
 
                 <!-- physical stress -->
                 <div class="d-flex flex-row">
-                    <div class="form-group font-weight-bold  pr-2 pt-2">
+                    <div class="form-group font-weight-bold  pr-2">
                         PHYSICAL
                     </div>
-                    <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
-                    <input type="checkbox" value="1" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
-                    <input type="checkbox" value="1" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" />
-                    <input type="checkbox" value="1" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :checked="getVal('stress.stress4')" :disabled="!skillHasValue('physique', 1)" />
-                    <input type="checkbox" value="1" id="stress[stress5]" name="stress[stress5]" @change="setVal('stress.stress5',  $event.target.checked)" :checked="getVal('stress.stress5')" :disabled="!skillHasValue('physique', 3)" />
-                    <input type="checkbox" value="1" id="stress[stress6]" name="stress[stress6]" @change="setVal('stress.stress6',  $event.target.checked)" :checked="getVal('stress.stress6')" :disabled="!skillHasValue('physique', 3)" />
+                    <div class="d-flex justify-content-between stressbox">
+						<div v-for="stress in physicalstress" :key="stress.obj">
+							<inputstress :stress="stress" stresstype="Physical" hidelabel="true" />
+						</div>
+					</div>
                 </div>
 
                 <!-- mental stress -->
-                <div class="d-flex flex-row">
-                    <div class="form-group font-weight-bold pr-3 pt-2">
+                <div class="d-flex flex-row pt-2">
+                    <div class="form-group font-weight-bold pr-3">
                         MENTAL
                     </div>
-                    <input type="checkbox" value="1" id="stress[mental1]" name="stress[mental1]" @change="setVal('stress.mental1',  $event.target.checked)" :checked="getVal('stress.mental1')" />
-                    <input type="checkbox" value="1" id="stress[mental2]" name="stress[mental2]" @change="setVal('stress.mental2',  $event.target.checked)" :checked="getVal('stress.mental2')" />
-                    <input type="checkbox" value="1" id="stress[mental3]" name="stress[mental3]" @change="setVal('stress.mental3',  $event.target.checked)" :checked="getVal('stress.mental3')" />
-                    <input type="checkbox" value="1" id="stress[mental4]" name="stress[mental4]" @change="setVal('stress.mental4',  $event.target.checked)" :checked="getVal('stress.mental4')" :disabled="!skillHasValue('will', 1)" />
-                    <input type="checkbox" value="1" id="stress[mental5]" name="stress[mental5]" @change="setVal('stress.mental5',  $event.target.checked)" :checked="getVal('stress.mental5')" :disabled="!skillHasValue('will', 3)" />
-                    <input type="checkbox" value="1" id="stress[mental6]" name="stress[mental6]" @change="setVal('stress.mental6',  $event.target.checked)" :checked="getVal('stress.mental6')" :disabled="!skillHasValue('will', 3)" />
+                   <div class="d-flex justify-content-between stressbox">
+						<div v-for="stress in mentalstress" :key="stress.obj">
+							<inputstress :stress="stress" stresstype="Mental" hidelabel="true" />
+						</div>
+					</div>
                 </div>
 
                 <!-- consequences -->
-                <div class="form-group text-center font-weight-bold">
+                <div class="form-group text-center font-weight-bold pt-2">
                     <div class="col-12">CONSEQUENCES</div>
                 </div>
-
-                <div class="form-group row">
-                    <label class="col-2 col-form-label">2</label>
-                    <div class="col-10">
-                        <input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" @change="setVal('consequences.mild',  $event.target.value)" :value="getVal('consequences.mild')" placeholder="Mild">
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-2 col-form-label">4</label>
-                    <div class="col-10">
-                        <input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" @change="setVal('consequences.moderate',  $event.target.value)" :value="getVal('consequences.moderate')" placeholder="Moderate">
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-2 col-form-label">6</label>
-                    <div class="col-10">
-                        <input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" @change="setVal('consequences.severe',  $event.target.value)" :value="getVal('consequences.severe')" placeholder="Severe">
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-2 col-form-label stat-requirement">2</label>
-                    <div class="col-10">
-                        <input class="form-control" type="text" id="consequence[mild2]" name="consequence[mild2]" @change="setVal('consequences.mild2',  $event.target.value)" :value="getVal('consequences.mild2')" placeholder="Mild" :disabled="!skillHasValue('physique|will', 5)" />
-                    </div>
-                </div>
+                <div v-for="consequence in consequences" :key="consequence.obj">
+					<inputconsequence :consequence="consequence" />
+				</div>
             </div>
 
             <!-- Skills -->
             <div class="fate-header col-12">Skills</div>
 
-            <div class="px-3">
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[academics]" name="skill[academics]" @change="setVal('skills.academics',  $event.target.value)" :value="getVal('skills.academics')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Academics</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[athletics]" name="skill[athletics]" @change="setVal('skills.athletics',  $event.target.value)" :value="getVal('skills.athletics')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Athletics</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[burglary]" name="skill[burglary]" @change="setVal('skills.burglary',  $event.target.value)" :value="getVal('skills.burglary')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Burglary</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[contacts]" name="skill[contacts]" @change="setVal('skills.contacts',  $event.target.value)" :value="getVal('skills.contacts')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Contacts</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[crafts]" name="skill[crafts]" @change="setVal('skills.crafts',  $event.target.value)" :value="getVal('skills.crafts')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Crafts</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[deceive]" name="skill[deceive]" @change="setVal('skills.deceive',  $event.target.value)" :value="getVal('skills.deceive')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Deceive</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[drive]" name="skill[drive]" @change="setVal('skills.drive',  $event.target.value)" :value="getVal('skills.drive')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Drive</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[empathy]" name="skill[empathy]" @change="setVal('skills.empathy',  $event.target.value)" :value="getVal('skills.empathy')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Empathy</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[fight]" name="skill[fight]" @change="setVal('skills.fight',  $event.target.value)" :value="getVal('skills.fight')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Fight</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[investigate]" name="skill[investigate]" @change="setVal('skills.investigate',  $event.target.value)" :value="getVal('skills.investigate')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Investigate</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[lore]" name="skill[lore]" @change="setVal('skills.lore',  $event.target.value)" :value="getVal('skills.lore')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Lore</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[notice]" name="skill[notice]" @change="setVal('skills.notice',  $event.target.value)" :value="getVal('skills.notice')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Notice</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[physique]" name="skill[physique]" @change="setVal('skills.physique',  $event.target.value)" :value="getVal('skills.physique')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Physique</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[provoke]" name="skill[provoke]" @change="setVal('skills.provoke',  $event.target.value)" :value="getVal('skills.provoke')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Provoke</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[rapport]" name="skill[rapport]" @change="setVal('skills.rapport',  $event.target.value)" :value="getVal('skills.rapport')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Rapport</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[resources]" name="skill[resources]" @change="setVal('skills.resources',  $event.target.value)" :value="getVal('skills.resources')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Resources</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[shoot]" name="skill[shoot]" @change="setVal('skills.shoot',  $event.target.value)" :value="getVal('skills.shoot')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Shoot</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[stealth]" name="skill[stealth]" @change="setVal('skills.stealth',  $event.target.value)" :value="getVal('skills.stealth')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Stealth</label>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-3">
-                        <input class="form-control text-center" type="text" id="skill[will]" name="skill[will]" @change="setVal('skills.will',  $event.target.value)" :value="getVal('skills.will')" placeholder="+" />
-                    </div>
-                    <label class="col-9 col-form-label">Will</label>
-                </div>
+            <div class="pl-3">
+                <div class="pt-1" v-for="skill in skills" :key="skill.obj">
+					<inputskill :item="skill" />
+				</div>
             </div>
         </div>
     </div>
@@ -341,16 +106,93 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import InputSkillColumn from '../components/input-skill-column'
+import InputAspect from '../components/input-aspect-cthulhu'
+import InputConsequence from '../components/input-consequence'
+import InputStress from '../components/input-stress'
+import InputStuntExtra from '../components/input-stuntextra'
+import InputFatePoints from '../components/input-fatepoints'
+
 export default {
   name: 'SheetFateOfCthulhu',
+  components: {
+	"inputskill": InputSkillColumn,    
+	"inputaspect": InputAspect,
+	"inputconsequence": InputConsequence,
+	"inputstress": InputStress,
+	"inputstuntextra": InputStuntExtra,
+	"inputfatepoints": InputFatePoints,
+  },
   props: {    
     character: Object,
+  },
+  computed: {
+ 	...mapGetters([  
+      'roll20Enabled'
+    ]),
   },
   mounted() {
    this.$parent.$parent.title = 'Fate of Cthulhu (Character Sheet)';
   },
   data () {
     return {
+        skills:  [
+			{placeholder:"ACADEMICS", obj:"skills.academics"},
+            {placeholder:"ATHLETICS", obj:"skills.athletics"},
+            {placeholder:"BURGLARY", obj:"skills.burglary"},
+            {placeholder:"CONTACTS", obj:"skills.contacts"},
+            {placeholder:"CRAFTS", obj:"skills.crafts"},
+            {placeholder:"DECEIVE", obj:"skills.deceive"},
+            {placeholder:"DRIVE", obj:"skills.drive"},
+            {placeholder:"EMPATHY", obj:"skills.empathy"},
+            {placeholder:"FIGHT", obj:"skills.fight"},
+            {placeholder:"INVESTIGATE", obj:"skills.investigate"},
+            {placeholder:"LORE", obj:"skills.lore"},
+            {placeholder:"NOTICE", obj:"skills.notice"},
+            {placeholder:"PHYSIQUE", obj:"skills.physique"},
+            {placeholder:"PROVOKE", obj:"skills.provoke"},
+            {placeholder:"RAPPORT", obj:"skills.rapport"},
+            {placeholder:"RESOURCES", obj:"skills.resources"},
+            {placeholder:"SHOOT", obj:"skills.shoot"},
+            {placeholder:"STEALTH", obj:"skills.stealth"},
+            {placeholder:"WILL", obj:"skills.will"},
+		],
+		aspects: [
+			{label:"High Concept", obj:"aspects.highconcept", corrupted_obj:"aspect_corrupted.highconcept"},
+			{label:"Trouble", obj:"aspects.trouble", corrupted_obj:"aspect_corrupted.trouble"},
+			{label:"Relationship", obj:"aspects.relationship", corrupted_obj:"aspect_corrupted.relationship"},
+			{label:"Aspect", obj:"aspects.other1", corrupted_obj:"aspect_corrupted.other1"},
+			{label:"Aspect", obj:"aspects.other2", corrupted_obj:"aspect_corrupted.other2"},			
+		],
+		consequences: [
+			{label:"Mild", obj:"consequences.mild", value: "2"},
+			{label:"Moderate", obj:"consequences.moderate", value: "4"},
+			{label:"Severe", obj:"consequences.severe", value: "6"},
+			{label:"Mild", obj:"consequences.mild2", value: "2", requirement: {obj:"physique|will", val:"5" } },
+		],
+		physicalstress: [
+			{label:"1", obj:"stress1"},
+			{label:"2", obj:"stress2"},
+			{label:"3", obj:"stress3"},
+            {label:"4", obj:"stress4", requirement: {obj:"physique", val:"1" }},
+			{label:"5", obj:"stress5", requirement: {obj:"physique", val:"3" }},
+			{label:"6", obj:"stress6", requirement: {obj:"physique", val:"3" }},
+        ],
+        mentalstress: [
+			{label:"1", obj:"mental1"},
+			{label:"2", obj:"mental2"},
+			{label:"3", obj:"mental3"},
+            {label:"4", obj:"mental4", requirement: {obj:"will", val:"1" }},
+			{label:"5", obj:"mental5", requirement: {obj:"will", val:"3" }},
+			{label:"6", obj:"mental6", requirement: {obj:"will", val:"3" }},						
+        ],
+        corruption: [
+			{label:"1", obj:"corruption1"},
+			{label:"1", obj:"corruption2"},
+            {label:"1", obj:"corruption3"},
+            {label:"1", obj:"corruption4"},
+        ],
     }
   },
   methods: {  
@@ -372,7 +214,25 @@ export default {
         });
 
 		return result;
-    },    
+    },
+    sendToRoll20(type, label, obj, item) {		
+		switch(type)
+		{			
+			case "fatepoint":
+				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				break;
+			case "stress":
+			case "consequence":
+			case "stuntextra":
+				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				break;
+			default:
+				if (this.getVal(item)) {
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+				}
+				break;
+		}
+	},
   }
 }
 </script>
@@ -391,7 +251,7 @@ export default {
         max-height: 130px;
     }
 
-    .fate-header {
+    /deep/ .fate-header {
         font-family: 'Open Sans', sans-serif;
         text-transform: uppercase;
         background-color: #3A5224;
@@ -404,7 +264,7 @@ export default {
     }
 
 
-    .col-form-label {
+    /deep/ .col-form-label {
         font-family: 'Open Sans', sans-serif;
         text-transform: uppercase;
         font-size: 22px;
@@ -425,12 +285,17 @@ export default {
         margin-top: 0px;
     }
 
-    input[type=checkbox] {
+    /deep/ div .stressbox input[type=checkbox] {
+        height: 25px;
+        width: 25px;
+    }
+
+    /deep/ input[type=checkbox] {
         height: 50px;
         width: 50px;
     }
 
-    .fate-conditions label {
+    /deep/ .fate-conditions label {
         font-family: 'IM Fell English', sans-serif;
         text-transform: uppercase;
         font-size: 30px;
@@ -444,12 +309,12 @@ export default {
         padding-top: 10px;
     }
 
-    .small {
+    /deep/ .small {
         color: #888;
     }
 
     /* HIDE CHECKBOX */
-    .corrupted-checkbox {
+    /deep/ .corrupted-checkbox {
         position: absolute;
         opacity: 0;
         width: 0;
@@ -458,7 +323,7 @@ export default {
     }
 
     /* IMAGE STYLES */
-    .corrupted-checkbox + div {
+    /deep/ .corrupted-checkbox + div {
         min-width: 50px;
         min-height: 50px;
         background-repeat: no-repeat;
@@ -468,11 +333,11 @@ export default {
     }
 
     /* CHECKED STYLES */
-    .corrupted-checkbox:checked + div {
+    /deep/ .corrupted-checkbox:checked + div {
         background-image: url('/static/sheets/fate-of-cthulhu/corrupted-checkbox-checked.png');
     }
 
-    textarea {
+    /deep/ textarea {
         border: 0 !important;
     }
 </style>

@@ -32,7 +32,7 @@
 			<div class="fate-header mb-5 mb-sm-0 d-flex">
 				<div class="mr-auto"></div>
 				<div class="d-flex" style="min-height: 50px;">
-					<div class="pt-0">Fate Points</div> <inputfatepoints inputclass="fatepoints" placeholder="-" />
+					<span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div> <inputfatepoints inputclass="fatepoints" placeholder="-" />
 				</div>				
 			</div>					
 		</div>
@@ -75,7 +75,6 @@
 				<div class="form-group text-center font-weight-bold">
 					<div class="col-12">CONSEQUENCES</div>
 				</div>
-
 				<div v-for="consequence in consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
 				</div>
@@ -146,8 +145,7 @@ export default {
 			{placeholder:"RESOURCES", obj:"skills.skill16", label:"skills.label16"},
 			{placeholder:"SHOOT", obj:"skills.skill17", label:"skills.label17"},
 			{placeholder:"STEALTH", obj:"skills.skill18", label:"skills.label18"},
-			{placeholder:"WILL", obj:"skills.skill19", label:"skills.label19"},
-			
+			{placeholder:"WILL", obj:"skills.skill19", label:"skills.label19"},			
 		],
 		aspects: [
 			{label:"High Concept", obj:"aspects.highconcept"},
@@ -170,7 +168,7 @@ export default {
 			{label:"5", obj:"stress5", requirement: {obj:"skill13", val:"3" }},
 			{label:"6", obj:"stress6", requirement: {obj:"skill13", val:"3" }},
         ],
-         mentalstress: [
+        mentalstress: [
 			{label:"1", obj:"mental1"},
 			{label:"2", obj:"mental2"},
 			{label:"3", obj:"mental3"},

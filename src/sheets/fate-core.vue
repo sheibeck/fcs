@@ -16,7 +16,7 @@
                 <div class="col-6 text-center ">                    
                     <div for="fatepoints" class="fate-header">
 						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
-					</div>                    
+					</div>
                     <inputfatepoints />
                 </div>
             </div>
@@ -39,8 +39,7 @@
         <div class="col-sm-12 col-md-4 fate-aspects">
             <div class="form-group">
                 <div for="" class="fate-header">Aspects</div>
-            </div>
-            
+            </div>            
             <div v-for="aspect in aspects" :key="aspect.obj" class="p-0 m-0">
 				<inputaspect :aspect="aspect" />
 			</div>    
@@ -53,10 +52,10 @@
 
     <div class="row">
         <div class="col-sm-12 col-md-6">
-            <inputstuntextra :item="stunts" :rows="25" :border="true" header="Stunts" />
+            <inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
         </div>
         <div class="col-sm-12 col-md-6">
-           <inputstuntextra :item="extras" :rows="25" :border="true" header="Extras" />
+           <inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
         </div>
     </div>
 
@@ -86,7 +85,6 @@
             <div class="form-group">
                 <div class="fate-header col-12">Consequences</div>
             </div>
-
             <div v-for="consequence in consequences" :key="consequence.obj">
                 <inputconsequence :consequence="consequence" />
             </div>
@@ -165,9 +163,7 @@ export default {
 			{label:"2", obj:"mental2"},
             {label:"3", obj:"mental3", requirement: {obj:"will", val:"1" }},
             {label:"4", obj:"mental4", requirement: {obj:"will", val:"3" }},						
-		],
-        stunts: "stunts",
-        extras: "extras"    
+		],        
     }
   },
   methods: {  
@@ -324,10 +320,6 @@ export default {
         font-weight: 700;
         margin-left: -5px;
         margin-right: -5px;
-    }
-
-    .stat-requirement {
-        color: #ccc
     }
 
     select {

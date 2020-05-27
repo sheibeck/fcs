@@ -11,26 +11,28 @@
       <div v-for="skill in skills" :key="skill.obj">
         <div class="d-flex">
           <label class="pr-2 col-form-label">{{skill.value}}</label>
-          <div v-for="item in skill.items" :key="item" class="d-flex justify-content-between py-1 px-1">           
-            <select v-if="skillList"  class="form-control" :id="`${skill.obj}.${item}`" name="`${skill.obj}.${item}`" @change="$parent.setVal(`${skill.obj}.${item}`, $event.target.value)" :value="$parent.getVal(`${skill.obj}.${item}`)" placeholder="">
+          <div v-for="item in skill.items" :key="item" class="d-flex justify-content-between py-1 px-1">
+            <select v-if="skillList" class="form-control" :id="`${skill.obj}.${item}`" name="`${skill.obj}.${item}`" @change="$parent.setVal(`${skill.obj}.${item}`, $event.target.value)" :value="$parent.getVal(`${skill.obj}.${item}`)" placeholder="">
                 <option v-for="thing in skillList" :value="thing" :key="thing">{{thing}}</option>                    
-            </select>                   
+            </select>
+            <input v-if="!skillList" class="form-control" :id="`${skill.obj}.${item}`" name="`${skill.obj}.${item}`" @change="$parent.setVal(`${skill.obj}.${item}`, $event.target.value)" :value="$parent.getVal(`${skill.obj}.${item}`)" placeholder="" />
           </div>
         </div>
       </div> 
     </div>  
     <div v-else>
       <div v-for="skill in skills" :key="skill.obj">
-        <div class="d-flex py-1">
+        <div class="d-md-flex py-1">
           <label class="pr-2 col-form-label">{{skill.label}} {{skill.value}}:</label>
 
-          <div v-for="item in skill.items" :key="item" class="d-flex justify-content-between py-1 px-1 my-1">
-            <div v-if="$parent.getVal(`${skill.obj}.${item}`)">
+          <span v-for="(item,index) in skill.items" :key="item" class="d-md-flex justify-content-between py-1 my-1">
+            <span v-if="$parent.getVal(`${skill.obj}.${item}`)">
               <!--roll20-->
+              <span v-if="index != 0">,</span>
               <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20($parent.getVal(`${skill.obj}.${item}`), skill.value)">+</span>
-              <span>{{$parent.getVal(`${skill.obj}.${item}`)}},</span>
-            </div>
-          </div>
+              <span>{{$parent.getVal(`${skill.obj}.${item}`)}}</span>
+            </span>
+          </span>
         </div>
       </div> 
     </div>  
