@@ -66,7 +66,7 @@
 
     <div class="row fate-conditions">
         <div class="col-12 form-group">
-            <div for="" class="fate-header">Conditions</div>
+            <div for="" class="fate-header">Conditions <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
         </div>
 
         <div class="col-sm-12 col-md-6">            

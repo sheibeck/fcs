@@ -1,10 +1,10 @@
 import CommonService from './commonService';
 
-export default class FateOf20 {
-    // for local dev
-    devExtensionId = "ihebifhjieemlbahfbaalkblgnmkfbem";    
+export default class FateOf20 {  
+    //for manual installation of extension
+    devExtensionId = "";    
     extensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
-    commonSvc = new CommonService();
+    commonSvc = new CommonService();      
 
     port = null;
 
@@ -23,31 +23,40 @@ export default class FateOf20 {
         return options;
     }
 
-    CheckForExtension = () => {
-        this.devExtensionId = this.GetExtensionId();
-        
-        // try to connect to the live app       
-        browser.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
-            if (!response) {
-                //try local
-                browser.runtime.sendMessage(this.devExtensionId, { message: "installed?" }, null, response => {
-                    if (!response) {                        
-                        fcs.$store.state.roll20Installed = false;
-                        return;
-                    }                    
-                    this.ConnectToExtension(this.devExtensionId);
-                  });            
-            }
-            else {                
-                this.ConnectToExtension(this.extensionId);
-            }
-          });
+    CheckForRoll20IsRunning = () => {        
+        this.port.postMessage({ message: "roll20Running?" });            
     }
 
-    ConnectToExtension(id) {
-        fcs.$store.state.roll20Installed = true;
+    CheckForExtension = () => {               
+        try {        
+            // try to connect to the live app       
+            browser.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
+                if (!response) {
+                    //try local
+                    this.devExtensionId = this.GetExtensionId();
+                    browser.runtime.sendMessage(this.devExtensionId, { message: "installed?" }, null, response => {
+                        if (!response) {                        
+                            fcs.$store.state.roll20Installed = false;
+                            return;
+                        }                    
+                        this.ConnectToExtension(this.devExtensionId);
+                    });
+                }
+                else {                
+                    this.ConnectToExtension(this.extensionId);
+                }
+            });
+        } catch(e) {
+            return;
+        }
+    }
+
+    ConnectToExtension = async (id) => {        
         this.port = browser.runtime.connect(id);
         this.port.onMessage.addListener(this.HandleListener);
+
+        this.CheckForRoll20IsRunning();
+        fcs.$store.state.roll20Installed = true;
     }
 
     /* message types */
@@ -113,7 +122,10 @@ export default class FateOf20 {
         }
     }
 
-    HandleListener = (msg) => {
+    HandleListener = (msg) => {        
+        if (msg.result.roll20Connect) {
+            fcs.$store.state.roll20Running = msg.result.roll20Connect;
+        }
         console.log(msg.result);
     }
 

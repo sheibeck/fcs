@@ -41,7 +41,8 @@ const store = new Vuex.Store({
     hasActiveSubscription: null,
     customerId: null,
     roll20Enabled: true,
-    roll20Installed: false,    
+    roll20Installed: false,
+    roll20Running: false,    
     sessions: [],
     filteredSessions: [],
     campaigns: [],
@@ -102,7 +103,7 @@ const store = new Vuex.Store({
     }
   },
   getters: {
-    isSubscriber : state => {      
+    isSubscriber : state => {
       var groups = state.userSession.getIdToken().payload['cognito:groups'];
       if (groups && groups.includes("super-user")) {
         return true;
@@ -110,9 +111,9 @@ const store = new Vuex.Store({
       return state.hasActiveSubscription;
     },
     roll20Enabled: (state, getters) => {
-      //don't show roll20 stuff on the creation screen, only saved characters
+      //don't show roll20 stuff on the creation screen, only saved characters      
       if (document.location.href.indexOf("/charactersheet") > -1) return false;      
-      let enabled = state.roll20Enabled && state.roll20Installed && getters.isSubscriber;
+      let enabled = state.roll20Enabled && state.roll20Installed && getters.isSubscriber && state.roll20Running;
       return enabled;
     },
     isAuthenticated: state => {

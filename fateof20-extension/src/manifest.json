@@ -10,7 +10,8 @@
   "externally_connectable": {
     "matches": [
       "*://*.fatecharactersheet.com/*",
-      "*://*.fatecharactersheet.s3-website-us-east-1.amazonaws.com/*"      
+      "*://*.fatecharactersheet.s3-website-us-east-1.amazonaws.com/*",
+      "*://localhost/*"
     ]
   },
   "homepage_url": "https://github.com/sheibeck/fcs-vtt-extension",

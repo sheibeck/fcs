@@ -5,7 +5,7 @@ window.browser = (function () {
       window.browser ||
       window.chrome;
   })();
-  
+
 function handleListener(msg, sender, sendResponse) {    
     let chatMessage = "";
     let subMessage = "";   
@@ -73,3 +73,8 @@ function roll20ChatMessage(message, character = null) {
 }
 
 browser.runtime.onMessage.addListener(handleListener);
+
+browser.extension.sendMessage({ message: "roll20IsRunning" }, function(response) {
+    //code to initialize my extension
+    console.log("fate of 20 extension initialized.")
+});
