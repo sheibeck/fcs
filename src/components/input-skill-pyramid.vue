@@ -9,8 +9,8 @@
 
     <div v-if="editing || isNewCharacter">
       <div v-for="skill in skills" :key="skill.obj">
-        <div class="d-flex">
-          <label class="pr-2 col-form-label">{{skill.value}}</label>
+        <div class="d-md-flex">
+          <label class="pr-2 col-form-label mr-auto"><span class="d-md-none">{{skill.label}} </span>{{skill.value}}</label>
           <div v-for="item in skill.items" :key="item" class="d-flex justify-content-between py-1 px-1">
             <select v-if="skillList" class="form-control" :id="`${skill.obj}.${item}`" name="`${skill.obj}.${item}`" @change="$parent.setVal(`${skill.obj}.${item}`, $event.target.value)" :value="$parent.getVal(`${skill.obj}.${item}`)" placeholder="">
                 <option v-for="thing in skillList" :value="thing" :key="thing">{{thing}}</option>                    

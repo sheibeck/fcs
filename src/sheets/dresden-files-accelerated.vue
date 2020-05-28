@@ -339,14 +339,8 @@ export default {
 <style lang="scss" scoped>  
     @import url('https://fonts.googleapis.com/css?family=Aldrich');
 
-  body {
+  	body {
 		color: #452f92;
-	}
-
-	.sheet {
-		margin: 20px;
-		margin-top: 40px;
-		max-width: 1024px;
 	}
 
 	.fate-logo {

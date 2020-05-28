@@ -9,6 +9,12 @@ export default class FateOf20 {
     port = null;
 
     constructor() {        
+        window.browser = (function () {         
+            return window.msBrowser ||
+              window.browser ||
+              window.chrome;
+        })();   
+
         this.CheckForExtension();
     }
 
@@ -19,7 +25,7 @@ export default class FateOf20 {
 
     CheckForExtension = () => {
         this.devExtensionId = this.GetExtensionId();
-
+        
         // try to connect to the live app       
         browser.runtime.sendMessage(this.extensionId, { message: "installed?" }, null, response => {                      
             if (!response) {

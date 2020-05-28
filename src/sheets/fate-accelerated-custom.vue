@@ -59,7 +59,11 @@
 
 	<div class="row">
 		<div class="col">		
-			<inputstuntextra :item="stunts" :rows="25" :border="true" header="Stunts &amp; Extras" />
+			<inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
+		</div>
+
+		<div class="col">		
+			<inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
 		</div>
 	</div>
 
@@ -138,8 +142,7 @@ export default {
 			{label:"Trouble", obj:"aspects.trouble"},
 			{label:"Aspect", obj:"aspects.other1"},
 			{label:"Aspect", obj:"aspects.other2"},
-			{label:"Aspect", obj:"aspects.other3"},
-			{label:"Aspect", obj:"aspects.other4"},
+			{label:"Aspect", obj:"aspects.other3"},			
 		],
 		consequences: [
 			{label:"Mild", obj:"consequences.mild", value: "2"},
@@ -150,8 +153,7 @@ export default {
 			{label:"1", obj:"stress1"},
 			{label:"2", obj:"stress2"},
 			{label:"3", obj:"stress3"},			
-		],
-		stunts: "stunts"
+		]		
     }
   },
   methods: {   
@@ -185,12 +187,6 @@ export default {
 
 <style lang="scss" scoped>
   @import url('https://fonts.googleapis.com/css?family=Archivo+Black');
-
-	.sheet {
-		margin: 20px;
-		margin-top: 40px;
-		max-width: 1024px;
-	}
 
 	.fate-logo {
 		margin-top: -27px;

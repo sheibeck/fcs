@@ -70,11 +70,11 @@
         </div>
 
         <div class="col-sm-12 col-md-6">            
-			<inputcondition :condition="stress.conditions" vertical="true" />
+			<inputcondition :condition="stress.conditions" />
         </div>
 
         <div class="col-sm-12 col-md-6">
-             <inputcondition :condition="stress.consequences" showvalue="true" vertical="true" />	
+            <inputcondition :condition="stress.consequences" showvalue="true" />	
         </div>
 
     </div>
@@ -90,7 +90,7 @@ import InputConsequence from '../components/input-consequence'
 import InputStress from '../components/input-stress'
 import InputStuntExtra from '../components/input-stuntextra'
 import InputFatePoints from '../components/input-fatepoints'
-import InputConditionMiddleEarth from '../components/input-condition-middleearth'
+import InputConditionExtended from '../components/input-condition-extended'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -102,7 +102,7 @@ export default {
 	"inputstress": InputStress,
 	"inputstuntextra": InputStuntExtra,
     "inputfatepoints": InputFatePoints,	
-    "inputcondition": InputConditionMiddleEarth,
+    "inputcondition": InputConditionExtended,
   },
   props: {    
     character: Object,
@@ -118,12 +118,12 @@ export default {
   data () {
     return {
         approaches:  [
-			{placeholder:"PERSONALITY", obj:"approaches.personality", description:"AWE, INSPIRE, PERSUADE"},
-			{placeholder:"MOVEMENT", obj:"approaches.movement", description:"ATHLETICS, TRAVEL, STEALTH"},
-			{placeholder:"PERCEPTION", obj:"approaches.perception", description:"AWARENESS, INSIGHT, SEARCH"},
-			{placeholder:"SURVIVAL", obj:"approaches.survival", description:"EXPLORE, HEALING, HUNTING"},
-			{placeholder:"CUSTOM", obj:"approaches.custom", description:"SONG, COURTESY, RIDDLE"},
-			{placeholder:"VOCATION", obj:"approaches.vocation", description:"CRAFT, BATTLE, LORE"},
+			{placeholder:"Personality", obj:"approaches.personality", description:"AWE, INSPIRE, PERSUADE"},
+			{placeholder:"Movement", obj:"approaches.movement", description:"ATHLETICS, TRAVEL, STEALTH"},
+			{placeholder:"Perception", obj:"approaches.perception", description:"AWARENESS, INSIGHT, SEARCH"},
+			{placeholder:"Survival", obj:"approaches.survival", description:"EXPLORE, HEALING, HUNTING"},
+			{placeholder:"Custom", obj:"approaches.custom", description:"SONG, COURTESY, RIDDLE"},
+			{placeholder:"Vocation", obj:"approaches.vocation", description:"CRAFT, BATTLE, LORE"},
 		],
 		aspects: [
 			{label:"High Concept", obj:"aspects.highconcept"},
@@ -134,22 +134,21 @@ export default {
 		],
         
         stress: {
-            conditions:{ 
-                        
+            conditions:{                         
                 items: [
-                    {label:"HOPEFUL", obj:"conditions.hopeful", description:"Effect: While this box is checked you have a +2 on rolls against despair and fear. You may uncheck this box in combat to soak 1 stress. Recover: Spend at least one full day in a warm, safe place with acceptable food and be in the company of close friends.", defaultValue:"true"},
-                    {label: "WEARY", obj:"conditions.weary", description:"Effect: You may check this box in combat to soak 1 stress. Recover: You must have a few hours of rest."},
-                    {label: "MISEARABLE", obj:"conditions.miserable", description:"Effect: You may check this box in combat to soak 1 stress. Recover: You must have a warm dry place to rest and a meal."},
-                    {label: "FRIGHTENED", obj:"conditions.frightened", description:"Effect: While checked, you must attempt to get away from the source of your fear. Recover: At the beginning of any scene where you are no longer in the presence of the source of your fear."},
-                    {label: "POISONED", obj:"conditions.poisoned", description:"Effect: checked you have the 'Poisoned' aspect. Recover: Receive medical care and have ample time to rest and eat."},
+                    {label:"Hopeful", obj:"conditions.hopeful", description:"Effect: While this box is checked you have a +2 on rolls against despair and fear. You may uncheck this box in combat to soak 1 stress. Recover: Spend at least one full day in a warm, safe place with acceptable food and be in the company of close friends.", defaultValue:"true"},
+                    {label:"Weary", obj:"conditions.weary", description:"Effect: You may check this box in combat to soak 1 stress. Recover: You must have a few hours of rest."},
+                    {label:"Miserable", obj:"conditions.miserable", description:"Effect: You may check this box in combat to soak 1 stress. Recover: You must have a warm dry place to rest and a meal."},
+                    {label:"Frightened", obj:"conditions.frightened", description:"Effect: While checked, you must attempt to get away from the source of your fear. Recover: At the beginning of any scene where you are no longer in the presence of the source of your fear."},
+                    {label:"Poisoned", obj:"conditions.poisoned", description:"Effect: checked you have the 'Poisoned' aspect. Recover: Receive medical care and have ample time to rest and eat."},
                 ],            
             },
 
             consequences:{
                 items: [
-                    {label:"INJURED", obj:"consequences.injured", value: "2", description:"Effect: A minor injury. Recover: Uncheck this box after the end of the next scene."},
-                    {label:"WOUNDED", obj:"consequences.wounded", value: "4", description:"Effect: A lasting wound that affects your abilities. Recover: requires medical attention. Uncheck this box at the beginning of the next game session."},
-                    {label:"DYING", obj:"consequences.dying", value: "6", description:"Effect:A dire wound that will dramatically altar your life — if you survive. Recover: Requires medical attention as well as a long recovery in a safe place with ample food and rest."},
+                    {label:"Injured", obj:"consequences.injured", value: "2", description:"Effect: A minor injury. Recover: Uncheck this box after the end of the next scene."},
+                    {label:"Wounded", obj:"consequences.wounded", value: "4", description:"Effect: A lasting wound that affects your abilities. Recover: requires medical attention. Uncheck this box at the beginning of the next game session."},
+                    {label:"Dying", obj:"consequences.dying", value: "6", description:"Effect:A dire wound that will dramatically altar your life — if you survive. Recover: Requires medical attention as well as a long recovery in a safe place with ample food and rest."},
                 ],
             }
         }
@@ -188,12 +187,6 @@ export default {
 <style lang="scss" scoped>
   @import url('https://fonts.googleapis.com/css?family=Quintessential');
 
-    .sheet {
-        margin: 20px;
-        margin-top: 40px;
-        max-width: 1024px;
-    }
-
     .fate-logo {
         margin-top: -27px;
         max-height: 130px;
@@ -230,12 +223,6 @@ export default {
     /deep/ .fate-skills label {
         padding-bottom: 0px;
         margin-bottom: 0px;
-    }
-
-    /deep/ .fate-skills .skill-desc {
-        margin-top: -10px;
-        font-size: 10px;
-        font-weight: 600;
     }
 
     /deep/ .fate-aspects .form-group {

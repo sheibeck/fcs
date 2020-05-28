@@ -4,9 +4,9 @@
       {{condition.label}}
     </label>
     
-    <div>
+    <div class="w-100">
       <div class="p-1 order-md-1 d-flex justify-content-between" v-for="box in condition.items" :key="box.obj">
-        <div class="pr-1 px-0">
+        <div class="pr-1 px-0 mr-auto">
           <label v-if="box.label" :for="box.obj">{{box.label}}</label><br/>
           <div class="help-text" v-if="box.description">{{box.description}}</div>
         </div>
@@ -24,7 +24,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'InputConditionMiddleEarth',
+  name: 'InputConditionExtended',
   props: {
     condition: Object,
     vertical: String,

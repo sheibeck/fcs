@@ -133,13 +133,13 @@ export default {
        return true; 
       }
       
-      return false;      
+      return false;
     },  
     commonSvc() {
       return commonSvc;
     },
     hasRoll20() {      
-      return this.isAuthenticated && this.roll20Enabled && this.adversaryId;
+      return this.roll20Enabled && this.adversaryId;
     }
   },
   watch: {
@@ -242,11 +242,13 @@ export default {
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },
-    sendToRoll20(type, description, data, data2) { 
+    sendToRoll20(type, description, data, data2) {       
+      if (!this.hasRoll20) return;
+
       let character = this.adversaries[0].name;
       let msg = null;
       switch(type) {
-        case "diceroll":          
+        case "diceroll":
           let desc2 = "";
           let rollModifier = parseInt(data);  //try to match it straight up
 

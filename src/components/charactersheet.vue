@@ -149,6 +149,11 @@ export default {
 
 <style lang="scss">
 
+	.sheet {
+    margin-top: 30px;    
+	}
+
+
 	.fo20 {
     cursor: pointer;
     color: #007bff;
@@ -158,6 +163,12 @@ export default {
     .fo20 {
       display: none;
     }
+
+    .sheet {
+			margin: 20px;
+			margin-top: 40px;
+			max-width: 1024px;
+		}
   }
 
 </style>

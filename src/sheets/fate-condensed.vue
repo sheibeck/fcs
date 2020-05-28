@@ -25,15 +25,16 @@
 
 			<div class="fate-header mb-5 mb-sm-0">
 				<div class="d-flex">
-					<input class="refresh center" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="3" /> <div class="pt-0">Refresh</div>
+					<input class="refresh pl-md-3" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="3" /> <div class="pt-0">Refresh</div>
 				</div>				
 			</div>
 			<div style="height: 50px;"></div>
 			<div class="fate-header mb-5 mb-sm-0 d-flex">
 				<div class="mr-auto"></div>
 				<div class="d-flex" style="min-height: 50px;">
-					<span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div> <inputfatepoints inputclass="fatepoints" placeholder="-" />
-				</div>				
+					<span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
+					<inputfatepoints inputclass="fatepoints" placeholder="-" />
+				</div>
 			</div>					
 		</div>
 
@@ -44,7 +45,7 @@
 			<div class="px-3">				
 				<!-- Stress -->
 				<div class="form-group text-center font-weight-bold">
-					<div class="col-12">STRESS</div>
+					<div class="col-12">STRESS  <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 
 				<!-- physical stress -->
@@ -73,7 +74,7 @@
 
 				<!-- consequences -->
 				<div class="form-group text-center font-weight-bold">
-					<div class="col-12">CONSEQUENCES</div>
+					<div class="col-12">CONSEQUENCES <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 				<div v-for="consequence in consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
@@ -85,7 +86,7 @@
 
 			<div class="px-3 skills">
 				<div class="small text-muted font-italic">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
-				<div v-for="skill in skills" :key="skill.obj">
+				<div v-for="skill in skills" :key="skill.obj" class="py-1">
 					<inputskill :item="skill" />
 				</div>
 			</div>
@@ -231,12 +232,6 @@ export default {
 <style lang="scss" scoped>
   @import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
 
-	.sheet {
-		margin: 20px;
-		margin-top: 40px;
-		max-width: 1024px;
-	}
-
 	.fate-logo {
 		margin-top: -27px;
 		max-height: 80px;
@@ -323,8 +318,7 @@ export default {
 		width: 100px;
 		height: 100px;
 		text-align: center;
-		font-size: 55px;
-		padding-left: 20px;		
+		font-size: 55px;		
 	}
 	/deep/ input.fatepoints {
 		border: 4px solid black;
@@ -333,15 +327,8 @@ export default {
 		height: 100px;
 		text-align: center;
 		font-size: 55px;
-		padding-left: 30px;	
+		padding-left: 20px;	
 		margin-top: -60px;	
 	}
 
-	@media print {
-		.sheet {
-			margin: 20px;
-			margin-top: 20px;
-			max-width: 1024px;
-		}
-	}
 </style>

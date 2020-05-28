@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-    <input type="number" class="form-control text-center" :class="inputclass" id="fatepoints" name="fatepoints"
+    <input type="number" class="form-control text-center pr-md-0 pl-3" :class="inputclass" id="fatepoints" name="fatepoints"
        @change="setVal('fatepoints',  $event.target.value)" :value="$parent.getVal('fatepoints')" :placeholder="getPlaceHolder" />
   </div>
 </template>
@@ -32,8 +32,8 @@ export default {
     }
   },
   methods: {    
-    setVal(arr, val) {          
-      if (this.roll20Enabled) {
+    setVal(arr, val) {      
+      if (this.roll20Enabled) {        
         let oldVal = this.$parent.character[arr];
         if (!oldVal || (parseInt(oldVal) < parseInt(val))) {
           this.$parent.sendToRoll20("fatepoint", null, arr, "1");
@@ -41,10 +41,14 @@ export default {
         else {
           this.$parent.sendToRoll20("fatepoint", null, arr, "-1");
         }
-      }
-     
-      this.$parent.setVal(arr, val);
-      this.$parent.$parent.$parent.save();    
+ 
+        this.$parent.setVal(arr, val);
+        this.$parent.$parent.$parent.save();
+      } 
+      else 
+      {
+        this.$parent.setVal(arr, val);
+      }   
     },   
   }
 }

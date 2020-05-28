@@ -42,7 +42,7 @@
 
                 <div class="form-group text-center font-weight-bold d-flex">
                     <div class="form-group w-50">
-                        <input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />                        
+                        <input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />                        
                         <span v-if="roll20Enabled" class='dice fo20'>A</span>
                         <span>FP</span>                    
                         <inputfatepoints inputclass="fatepoints" placeholder="-" />
@@ -56,12 +56,12 @@
 
                 <!-- Stress -->
                 <div class="form-group text-center font-weight-bold pt-2">
-                    <div class="col-12">STRESS</div>
+                    <div class="col-12">STRESS <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
                 </div>
 
                 <!-- physical stress -->
-                <div class="d-flex flex-row">
-                    <div class="form-group font-weight-bold  pr-2">
+                <div class="d-md-flex flex-row pb-2">
+                    <div class="form-group font-weight-bold pr-2 mr-auto">
                         PHYSICAL
                     </div>
                     <div class="d-flex justify-content-between stressbox">
@@ -72,8 +72,8 @@
                 </div>
 
                 <!-- mental stress -->
-                <div class="d-flex flex-row pt-2">
-                    <div class="form-group font-weight-bold pr-3">
+                <div class="d-md-flex flex-row">
+                    <div class="form-group font-weight-bold pr-3 mr-auto">
                         MENTAL
                     </div>
                    <div class="d-flex justify-content-between stressbox">
@@ -85,7 +85,7 @@
 
                 <!-- consequences -->
                 <div class="form-group text-center font-weight-bold pt-2">
-                    <div class="col-12">CONSEQUENCES</div>
+                    <div class="col-12">CONSEQUENCES <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
                 </div>
                 <div v-for="consequence in consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
@@ -240,12 +240,6 @@ export default {
 <style lang="scss" scoped>
   @import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
 
-    .sheet {
-        margin: 20px;
-        margin-top: 40px;
-        max-width: 1024px;
-    }
-
     .fate-logo {
         margin-top: -27px;
         max-height: 130px;
@@ -286,8 +280,8 @@ export default {
     }
 
     /deep/ div .stressbox input[type=checkbox] {
-        height: 25px;
-        width: 25px;
+        height: 28px;
+        width: 28px;
     }
 
     /deep/ input[type=checkbox] {

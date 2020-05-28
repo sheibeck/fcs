@@ -4,15 +4,18 @@
     <span v-if="hasRoll20" class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
 
     <!--non-custom labels-->
-    <label v-if="!item.label" class="p-1 w-100 mr-auto col-form-label inputlabel" :class="labelclass">{{item.placeholder}}</label>
+    <div v-if="!item.label" class="w-100 mr-auto d-flex flex-column" :class="{ 'pt-1' : item.description }">
+      <label class="col-form-label inputlabel p-1" :class="labelclass">{{item.placeholder}}</label>
+      <small v-if="item.description" class="skill-desc">{{item.description}}</small>
+    </div>
 
     <!--custom labels-->
-    <input v-if="item.label" class="px-2 py-2 w-100 mr-auto inputlabel" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 
+    <input v-if="item.label" class="w-100 mr-auto inputlabel" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 
       @change="$parent.setVal(`${item.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${item.label}`)" :placeholder="item.placeholder" />
       
     <!--input-->
-    <input class="form-control text-center col-3" :class="inputclass" type="text" :id="item.obj" :name="item.obj"  
+    <input class="form-control text-center col-3 pr-3 pr-md-0" :class="inputclass" type="number" :id="item.obj" :name="item.obj"  
       @change="$parent.setVal(`${item.obj}`,  $event.target.value)" 
       :value="$parent.getVal(`${item.obj}`)" :placeholder="'+'">			  
   </div>
@@ -55,4 +58,7 @@ export default {
 </script>
 
 <style lang="scss" scoped> 
+  .skill-desc {
+      margin-top:-12px;
+  }
 </style>

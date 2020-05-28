@@ -73,7 +73,7 @@
         <div class="col-sm-12 col-md-6 fate-stress">
             <!-- physical stress -->
             <div class="form-group">
-                <div for="" class="fate-header">Physical Stress</div>
+                <div for="" class="fate-header">Physical Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex justify-content-between">
 				<div v-for="stress in physicalstress" :key="stress.obj">
@@ -83,7 +83,7 @@
 
             <!-- mental stress -->
             <div class="form-group">
-                <div for="" class="fate-header">Mental Stress</div>
+                <div for="" class="fate-header">Mental Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex d-flex justify-content-between">
 				<div v-for="stress in mentalstress" :key="stress.obj">
@@ -93,7 +93,7 @@
 
             <!-- corruption -->
             <div class="form-group">
-                <div for="" class="fate-header">Corruption</div>
+                <div for="" class="fate-header">Corruption <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex d-flex justify-content-between">
 				<div v-for="stress in corruption" :key="stress.obj">
@@ -103,7 +103,7 @@
         </div>
         <div class="col-md-6 col-sm-12 fate-consequences">
             <div class="form-group pb-2">
-                <div class="fate-header col-12">Consequences</div>
+                <div class="fate-header col-12">Consequences <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
 
             <div v-for="consequence in consequences" :key="consequence.obj">
@@ -235,12 +235,6 @@ export default {
 
 <style lang="scss" scoped>
  @import url('https://fonts.googleapis.com/css?family=Trade+Winds');
-
-	.sheet {
-		margin: 20px;
-		margin-top: 40px;
-		max-width: 1024px;
-	}
 
 	.fate-logo {
 		max-height: 130px;
