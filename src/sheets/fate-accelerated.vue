@@ -61,7 +61,7 @@
 
 	<div class="row">
 		<div class="col">			
-			<inputstuntextra :item="stunts" :rows="25" :border="true" header="Stunts &amp; Extras" />
+			<inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts &amp; Extras" />
 		</div>
 	</div>
 
@@ -151,8 +151,7 @@ export default {
 			{label:"1", obj:"stress1"},
 			{label:"2", obj:"stress2"},
 			{label:"3", obj:"stress3"},
-		],
-		stunts: "stunts"		
+		]			
     }
   },
   methods: {	
