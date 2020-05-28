@@ -1,6 +1,6 @@
 {
   "name": "Fate of 20",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "manifest_version": 2,
   "description": "This extension allows you to use FateCharacterSheet.com along with Roll20 for Fate-based roll20 Campaigns",
   "permissions": [
@@ -10,8 +10,7 @@
   "externally_connectable": {
     "matches": [
       "*://*.fatecharactersheet.com/*",
-      "*://*.fatecharactersheet.s3-website-us-east-1.amazonaws.com/*",      
-      "*://localhost/*"
+      "*://*.fatecharactersheet.s3-website-us-east-1.amazonaws.com/*"      
     ]
   },
   "homepage_url": "https://github.com/sheibeck/fcs-vtt-extension",

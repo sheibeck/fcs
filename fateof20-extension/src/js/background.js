@@ -23,7 +23,6 @@ browser.runtime.onMessageExternal.addListener(function(request, sender, respond)
 // For simple requests:
 browser.runtime.onConnectExternal.addListener(function(port) {
     port.onMessage.addListener(function(msg) {   
-        debugger;      
         switch(msg.type) { 
             case "diceroll":               
                 port.postMessage({result: `${msg.character} used ${msg.skill}: /roll 4df+(${msg.modifier})`});
