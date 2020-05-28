@@ -10,9 +10,8 @@ function handleListener(msg, sender, sendResponse) {
     let chatMessage = "";
     let subMessage = "";   
     switch(msg.type) {         
-        case "diceroll":    
-            let thing = msg.skill.split(" ");            
-            let template = "&{template:default} {{name=" + msg.character + "}} {{" + thing[0] + "=" + thing[1] + "}} {{roll [4df+(" + msg.modifier + ")]=[[4df+(" + (parseInt(msg.modifier)||0) + ")]]}}";            
+        case "diceroll":                                 
+            let template = "&{template:default} {{name=" + msg.character + "}} {{" + msg.skillType + "=" + msg.skill + "}} {{roll [4df+(" + msg.modifier + ")]=[[4df+(" + (parseInt(msg.modifier)||0) + ")]]}}";            
             chatMessage = template;
             console.log(template);
             break;

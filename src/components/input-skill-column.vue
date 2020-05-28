@@ -50,8 +50,8 @@ export default {
       if (!this.item.obj) return;      
       let plural = this.item.obj.indexOf("skill") > -1 ? "skills" : "approaches";
       let singular = plural == "skills" ? "skill" : "approach";
-      let label = `${singular} ${this.item.label ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
-      this.$parent.sendToRoll20('diceroll', label, plural, this.item.obj);
+      let label = `${this.item.label ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
+      this.$parent.sendToRoll20("diceroll", label, plural, this.item.obj, singular);
     }
   }
 }

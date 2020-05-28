@@ -211,7 +211,7 @@ export default {
 
         return result;
     },
-    sendToRoll20(type, label, obj, item) {		
+    sendToRoll20(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
@@ -224,7 +224,7 @@ export default {
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

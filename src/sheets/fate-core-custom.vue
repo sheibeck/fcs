@@ -168,7 +168,7 @@ computed: {
     setVal(arr, val) {
        this.$parent.setVal(this.character, arr, val);       
     },
-    sendToRoll20(type, label, obj, item) {        
+    sendToRoll20(type, label, obj, item, skillType) {        
 		switch(type)
 		{			
 			case "fatepoint":
@@ -180,11 +180,11 @@ computed: {
 				this.$parent.sendToRoll20(type, this.character.name, label, item);
                 break;
             case "skill":
-                this.$parent.sendToRoll20("diceroll", this.character.name, label, item);
+                this.$parent.sendToRoll20("diceroll", this.character.name, label, item, skillType);
                 break;
 			default:			
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

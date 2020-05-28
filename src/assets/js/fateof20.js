@@ -60,10 +60,11 @@ export default class FateOf20 {
     }
 
     /* message types */
-    MsgDiceRoll = (character, skill, modifier) => {
+    MsgDiceRoll = (character, skillType, skill, modifier) => {
         return {
             type: "diceroll",
             character: character,
+            skillType: skillType,
             skill: skill,
             modifier: modifier           
         }

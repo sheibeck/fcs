@@ -242,17 +242,17 @@ export default {
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },
-    sendToRoll20(type, description, data, data2) {       
+    sendToRoll20(type, description, data, data2) {  
       if (!this.hasRoll20) return;
 
       let character = this.adversaries[0].name;
       let msg = null;
       switch(type) {
         case "diceroll":
-          let desc2 = "";
+          let desc2 = data2;
           let rollModifier = parseInt(data);  //try to match it straight up
 
-          if (rollModifier == 'NaN')
+          if (isNaN(rollModifier))
           {
             var findModifier = data.match(/(\d)/);
             if (findModifier) {
@@ -268,7 +268,7 @@ export default {
             }
           }
 
-          msg = fateOf20.MsgDiceRoll(character, `${description} ${desc2}`, rollModifier);
+          msg = fateOf20.MsgDiceRoll(character, description, desc2, rollModifier);
           break;
         case "invoke":
           msg = fateOf20.MsgInvoke(character, description, data);

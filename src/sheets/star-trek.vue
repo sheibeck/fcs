@@ -269,7 +269,7 @@ export default {
     setVal(arr, val) {
     	this.$parent.setVal(this.character, arr, val);       
 	},
-	sendToRoll20(type, label, obj, item) {		
+	sendToRoll20(type, label, obj, item, skillType) {		
 		let characterName = obj.indexOf("ship") > -1 || (typeof(item) == "string" && item.indexOf("ship") > -1) ? this.character.ship_name : this.character.name;
 		switch(type)
 		{			
@@ -283,7 +283,7 @@ export default {
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, characterName, label, this.getVal(item));
+					this.$parent.sendToRoll20(type, characterName, label, this.getVal(item), skillType);
 				}
 				break;
 		}

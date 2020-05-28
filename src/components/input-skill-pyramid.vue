@@ -75,9 +75,8 @@ export default {
       } 
     },
     sendToRoll20(skillName, modifier) {      
-      if (!skillName) return;    
-      let label = `skill ${skillName}`;
-      this.$parent.sendToRoll20('skill', label, null, modifier);
+      if (!skillName) return;      
+      this.$parent.sendToRoll20('skill', skillName, null, modifier, 'skill');
     }
   }
 }

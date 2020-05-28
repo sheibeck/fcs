@@ -145,12 +145,12 @@ components: {
   data () {
     return {
 		approaches:  [
-			{placeholder:"FIGHTER", obj:"approaches.fighter"},
-			{placeholder:"HEALER", obj:"approaches.healer"},
-			{placeholder:"HUNTER", obj:"approaches.hunter"},
-			{placeholder:"SCOUT", obj:"approaches.scout"},
-			{placeholder:"ORATOR", obj:"approaches.orator"},
-			{placeholder:"CRAFTSMOUSE", obj:"approaches.craftsmouse"},
+			{placeholder:"Fighter", obj:"approaches.fighter"},
+			{placeholder:"Healer", obj:"approaches.healer"},
+			{placeholder:"Hunter", obj:"approaches.hunter"},
+			{placeholder:"Scout", obj:"approaches.scout"},
+			{placeholder:"Orator", obj:"approaches.orator"},
+			{placeholder:"Craftsmouse", obj:"approaches.craftsmouse"},
 		],
 		aspects: [
 			{label:"High Concept", obj:"aspects.highconcept"},
@@ -194,7 +194,7 @@ components: {
     getPortrait() {		
         return this.character.image_url || "/static/sheets/mouse-guard/portrait.jpg";
 	},
-	sendToRoll20(type, label, obj, item) {		
+	sendToRoll20(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
@@ -208,7 +208,7 @@ components: {
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item));
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

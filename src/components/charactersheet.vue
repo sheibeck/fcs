@@ -64,11 +64,11 @@ export default {
     }
   },
   methods: {
-    sendToRoll20(type, character, description, data) {         
+    sendToRoll20(type, character, description, data, skillType) {         
       let msg = null;      
       switch(type) {
-        case "diceroll":      
-          msg = fateOf20.MsgDiceRoll(character, description, data);
+        case "diceroll":          
+          msg = fateOf20.MsgDiceRoll(character, skillType, description, data);
           break;
         case "invoke":
           msg = fateOf20.MsgInvoke(character, description, data);
