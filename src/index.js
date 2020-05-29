@@ -104,16 +104,18 @@ const store = new Vuex.Store({
   },
   getters: {
     isSubscriber : state => {
+      /*
+      * we can pause payments to give people access, no need for super-user group at this point
       var groups = state.userSession.getIdToken().payload['cognito:groups'];
       if (groups && groups.includes("super-user")) {
         return true;
-      }      
+      }*/     
       return state.hasActiveSubscription;
     },
     roll20Enabled: (state, getters) => {
       //don't show roll20 stuff on the creation screen, only saved characters      
       if (document.location.href.indexOf("/charactersheet") > -1) return false;      
-      let enabled = state.roll20Enabled && state.roll20Installed && getters.isSubscriber && state.roll20Running;
+      let enabled = getters.isSubscriber && state.roll20Enabled && state.roll20Installed && state.roll20Running;
       return enabled;
     },
     isAuthenticated: state => {
