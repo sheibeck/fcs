@@ -24,13 +24,7 @@
         <div v-if="loaded && HasSubscription" class="form-group">
           <label>Subscription: </label> <span>{{SubscriptionStatus}}</span>
           <a href="#" v-on:click="GotoManagePortal($event)">[Manage]</a>
-        </div>
-
-        <div v-if="loaded && HasSubscription" class="form-group">          
-          <label>Fate of 20 Extension Id:</label>
-          <input type="text" id="devextid" name="devextid" @change="SetExtensionId($event.target.value)" :value="GetExtensionId" /><button type="button" class="ml-1 btn-primary btn-sm btn">save</button>
-          <p class="small">Open browser extensions and copy the ID of <strong>Fate of 20 extension</strong> here.</p>
-        </div>
+        </div>  
        
         <div v-if="loaded" class="d-md-flex justify-content-center">          
           <div class="card col col-md-6">
@@ -74,7 +68,17 @@
                 </div>            
               </div>
             </div>
-          </div>        
+          </div>
+
+          <div v-if="loaded && HasSubscription" class="pt-3">
+            <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#extension" aria-expanded="true" aria-controls="extension">
+                Manual Extension Installation <i class="fas fa-cog"></i>
+            </button>
+            <div class="pt-2 collapse" id="extension">             
+              <p class="small">Open browser extensions and copy the ID of <strong>Fate of 20 extension</strong> here.</p>
+              <input type="text" id="devextid" name="devextid" @change="SetExtensionId($event.target.value)" :value="GetExtensionId" /><button type="button" class="ml-1 btn-primary btn-sm btn">save</button>              
+            </div>
+          </div>
       </div>
     </div>              
   </div>

@@ -43,9 +43,9 @@
                   <span class="dice">O</span> Support
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Fate-Character-Sheet"><i class="fas fa-hat-wizard"></i> FAQ</a>
-                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-scroll"></i> Blog</a>
+                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Fate-Character-Sheet"><i class="fas fa-hat-wizard"></i> Help &amp; FAQ</a>                  
                   <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fas fa-dragon"></i> Report Issue</a>
+                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-scroll"></i> Blog</a>
                 </div>
               </li>
               <li v-if="!HasSubscription" class="nav-item" ref="el">
