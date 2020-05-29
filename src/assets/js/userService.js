@@ -171,10 +171,11 @@ export default class UserService {
       this.fcs.$store.state.hasActiveSubscription = false;
       if (customerId) {
         let subSvc = new SubService(this.fcs, this.commonSvc, this);
-        let customer = await subSvc.GetCustomer(customerId);
+        let customer = await subSvc.GetCustomer(customerId);          
         if (customer && customer.subscriptions && customer.subscriptions.total_count > 0) {
-          this.fcs.$store.state.subscriptionStatus = customer.subscriptions.data[0].status.toTitleCase();
-          if (customer.subscriptions.data[0].status.toLowerCase() == "active") {
+          let status = customer.subscriptions.data[0].status.toLowerCase();
+          this.fcs.$store.state.subscriptionStatus = status.toTitleCase();
+          if ( status == "active" || status == "trialing" ) {
             this.fcs.$store.state.hasActiveSubscription = true;
           }
         }

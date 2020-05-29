@@ -3,6 +3,8 @@
     <div class="error">
         <div class="dice">++++</div>
         <h2>You've succeeded with style!</h2>
+
+        <h4>Thank you for subscribing!</h4>
     </div>
 </div>
 </template>
