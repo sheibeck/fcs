@@ -34,15 +34,23 @@
 
           <div v-if="!isEmpty(item.aspects)">
             <h5 class='card-header py-0'>Aspects</h5>
-            <p class='card-text px-4 my-0' v-for="aspect in item.aspects">              
-              <strong v-html="fixLabel(aspect, 'aspect')"></strong>
+            <p class='card-text px-4 my-0' v-if="item.aspects.high_concept">
+              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'aspect', item.aspects.high_concept)">A</span>
+              <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept)"></span>
+            </p>
+            <p class='card-text px-4 my-0' v-if="item.aspects.trouble">
+              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'aspect', item.aspects.trouble)">A</span>
+              <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble)"></span>
+            </p>
+           <p class='card-text px-4 my-0' v-if="item.aspects.other_aspects">
+              <strong>Aspects</strong> <span v-html="fixLabel(item.aspects.other_aspects, 'aspect')"></span>
             </p>
           </div>
 
           <div v-if="!isEmpty(item.skills)">
             <h5 class='card-header py-0'>Skills</h5>
 
-            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills">                
+            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills" :key="skillIndex">                
                 <strong>{{skillIndex}}</strong> <span v-html="fixLabel(skill, 'skill', skillIndex)"></span>
             </p>
           </div>
@@ -50,30 +58,30 @@
           <div v-if="!isEmpty(item.stunts)">
             <h5 class='card-header py-0'>Stunts &amp; Extras</h5>
 
-              <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts">
+              <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex">
               <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('stuntextra', stuntIndex, stunt)">A</span>
               <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
             </p>
           </div>
 
           <div v-if="!isEmpty(item.stress)">
-            <h5 class='card-header py-0'>Stress</h5>
+            <h5 class='card-header py-0'>Stress <span v-if="hasRoll20" class='dice fo20 font-weight-normal'>D</span></h5>
 
-            <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress">
-                <span v-if="hasRoll20" class="dice fo20">D</span>
+            <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress" :key="stressMainIndex">                
                 <strong>{{stressMainIndex}}</strong>
-                <span v-for="(stressValue, stressIndex) in stressMain">
+                <span v-for="(stressValue, stressIndex) in stressMain" :key="stressIndex">
                   <input type='checkbox' v-bind:value='stressValue' @change="sendToRoll20(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
                 </span>
             </p>
           </div>
 
           <div v-if="!isEmpty(item.consequences)">
-            <h5 class='card-header py-0'>Consequences</h5>
+            <h5 class='card-header py-0'>Consequences <span v-if="hasRoll20" class='dice fo20 font-weight-normal'>D</span></h5>
 
-            <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences">
-                <strong>{{conIndex}}</strong> {{fixLabel(con)}}
-                <input v-if="hasRoll20" class="ml-2 form-control input-sm" @change="sendToRoll20(`consequence`, `${con} ${conIndex}`, $event.target.value)">
+            <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex">
+              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'invoke', consequences[conIndex])">A</span>
+              <strong>{{conIndex}}</strong> <span v-html="fixLabel(con)"></span>
+              <input v-if="hasRoll20" class="ml-2 form-control input-sm" @change="sendToRoll20(`consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
             </p>
           </div>
 
@@ -153,7 +161,7 @@ export default {
       adversaries: [],
       title: "Adversary List",
       description: "Fate Adversaries",
-    
+      consequences: [],
     }
   },
   methods : {
@@ -219,8 +227,8 @@ export default {
               r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('diceroll', 'skill', '${item.replace(/\'/,'')}', '${data}')">+</span>`
               r20result += item;
               break;
-            case "aspect":             
-              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('invoke', 'aspect', '${item.replace(/\'/,'')}')">+</span>`
+            case "aspect":            
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('invoke', ${type}, '${item.replace(/\'/,'')}')">A</span>`
               r20result += item;            
               break;                         
           }
@@ -296,6 +304,7 @@ export default {
           msg = fateOf20.MsgDiceRoll(character, description, desc2, rollModifier);
           break;
         case "invoke":
+          if (!data) return;
           msg = fateOf20.MsgInvoke(character, description, data);
           break;
         case "stuntextra":          
@@ -307,8 +316,11 @@ export default {
         case "stress":
         case "condition":
           msg = fateOf20.MsgStress(character, description, data);
-          break;
+          break;        
         case "consequence":
+          //when dealing with consequences, we'll give them a temporary space for 
+          // the value of the consequence so we can invoke it         
+          this.consequences[data2] = data;
           msg = fateOf20.MsgConsequence(character, description, data);
           break;      
       }
