@@ -34,18 +34,16 @@
 
           <div v-if="!isEmpty(item.aspects)">
             <h5 class='card-header py-0'>Aspects</h5>
-            <p class='card-text px-4 my-0' v-for="aspect in item.aspects">
-              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'aspects', aspect)">C</span>
-              <strong>{{fixLabel(aspect)}}</strong>
+            <p class='card-text px-4 my-0' v-for="aspect in item.aspects">              
+              <strong v-html="fixLabel(aspect, 'aspect')"></strong>
             </p>
           </div>
 
           <div v-if="!isEmpty(item.skills)">
             <h5 class='card-header py-0'>Skills</h5>
 
-            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills">
-                <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('diceroll', 'skill', skill, skillIndex)">+</span>
-                <strong>{{skillIndex}}</strong> {{fixLabel(skill)}}
+            <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills">                
+                <strong>{{skillIndex}}</strong> <span v-html="fixLabel(skill, 'skill', skillIndex)"></span>
             </p>
           </div>
 
@@ -204,8 +202,35 @@ export default {
           this.description = "Fate Adversaries";
       }        
     },
-    fixLabel: function (val) {
-        return val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });;
+    fixLabel: function (val, type, data) {
+      let result = val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+      
+      if (this.hasRoll20 && type) {
+        let r20result = "";
+        let separator = type == "aspect" ? ";" : ",";
+        let items = result.split(separator);
+
+        items.forEach( function (item, index) {
+          item = item.trim();
+          if (index > 0) r20result+=", ";
+          
+          switch(type) {
+            case "skill":              
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('diceroll', 'skill', '${item.replace(/\'/,'')}', '${data}')">+</span>`
+              r20result += item;
+              break;
+            case "aspect":             
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('invoke', 'aspect', '${item.replace(/\'/,'')}')">+</span>`
+              r20result += item;            
+              break;                         
+          }
+        });
+
+        return r20result;
+      }
+      else {
+        return result;
+      }
     },
     isEmpty: function(obj) {
       return commonSvc.IsEmpty(obj);
