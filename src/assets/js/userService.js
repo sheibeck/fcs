@@ -167,7 +167,8 @@ export default class UserService {
   CheckSubscription = async () => {
     if (this.fcs.$store.state.hasActiveSubscription == null)
     {
-      let customerId = await this.GetUserAttribute("custom:stripe_customer");    
+      let customerId = await this.GetUserAttribute("custom:stripe_customer");
+      
       this.fcs.$store.state.hasActiveSubscription = false;
       if (customerId) {
         let subSvc = new SubService(this.fcs, this.commonSvc, this);
@@ -177,6 +178,13 @@ export default class UserService {
           this.fcs.$store.state.subscriptionStatus = status.toTitleCase();
           if ( status == "active" || status == "trialing" ) {
             this.fcs.$store.state.hasActiveSubscription = true;
+          }
+
+          //if this user has a subscription, then make sure we don't let them abuse trials
+          let hadSubscription = await this.GetUserAttribute("custom:stripe_had_trial");
+                    
+          if (hadSubscription == null || hadSubscription == "0") {
+            this.SetUserAttribute("custom:stripe_had_trial", "1");
           }
         }
       }

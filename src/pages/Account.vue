@@ -46,23 +46,23 @@
                 <div v-if="!HasSubscription">
                   <p>
                     <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                    <button v-on:click="Subscribe('plan_HJ5iyg7r8S6mN8')"
+                    <button v-on:click="Subscribe('price_HOMWmJWkyXR9TS')"
                       style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
                       id="checkout-button-plan_HJ5iyg7r8S6mN8"
                       role="link"
                     >
-                      $2.99 per Month
+                      $1.99 per Month
                     </button>
                   </p>
                   <p> &mdash; OR &mdash;</p>
                   <p>
                     <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                    <button v-on:click="Subscribe('plan_HJ5jvo20YLp962')"
+                    <button v-on:click="Subscribe('price_HOMXjW196sGTUI')"
                       style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
                       id="checkout-button-plan_HJ5iyg7r8S6mN8"
                       role="link"
                     >
-                      $24.99 per Year
+                      $14.99 per Year
                     </button>
                   </p>  
                 </div>            

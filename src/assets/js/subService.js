@@ -164,12 +164,14 @@ export default class SubService {
 
   Checkout = async(pricePlan, customerId) => {
     var lambda = new AWS.Lambda();
+    
+
     lambda.config.credentials = this.fcs.$store.state.credentials;      
       if (!customerId)
       {
         //double check that we really don't have a customer id
         customerId = await this.userSvc.GetUserAttribute("custom:stripe_customer");
-        
+
         if (!customerId) {
           //once we start to checkout, we need a customer;
           let email = await this.userSvc.GetUserAttribute("email")
@@ -185,6 +187,8 @@ export default class SubService {
           }            
         }
       }
+
+      let customerHadTrial = await this.userSvc.GetUserAttribute("custom:stripe_had_trial") ?? 0;      
       
       var params = {
         FunctionName: "FCSStripe", 
@@ -193,6 +197,7 @@ export default class SubService {
           item: "checkout",
           id: customerId,
           pricePlan: pricePlan,
+          hadTrial: customerHadTrial,
           success_url: `${window.location.protocol}//${window.location.host}/thankyou`,
           cancel_url: `${window.location.protocol}//${window.location.host}/account`
         }),
@@ -229,13 +234,13 @@ export default class SubService {
         successUrl: `${window.location.protocol}//${window.location.host}/success`,
         cancelUrl: `${window.location.protocol}//${window.location.host}/cancelled`*/   
       })
-      .then(function (result) {        
+      .then(function (result) {
         if (result.error) {
           // If `redirectToCheckout` fails due to a browser or network
           // error, display the localized error message to your customer.
           var displayError = document.getElementById('error-message');
           displayError.textContent = result.error.message;
-        }
+        }       
       });      
    }   
 }
