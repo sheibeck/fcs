@@ -25,7 +25,7 @@
         <div class="small">
           Password must be atleast 8 characters long and contain atleast one number, uppercase letter and lowercase letter.
         </div>
-        <button type="button" class="btn btn-primary col-sm-12 col-md-5 mt-1 mb-1 mt-2" v-on:click="register">
+        <button type="button" class="btn btn-primary col-sm-12 col-md-5 mt-1 mb-1 mt-2 btn-register" v-on:click="register">
             Register <i class="fas fa-user-plus"></i>
         </button>
       </div>

@@ -11,8 +11,7 @@
           <div class="card card m-2">
             <div class="card-body">
               <h5 class="card-title">Become a Subscriber</h5>
-              <p class="card-text">Creating an account is free and gives you unlimited characters, adversaries, and campaigns.
-                Becoming a subscriber will give you access to even more coolness.</p>
+              <p class="card-text">Subscribing will give you access to great features like Roll20 integration. Register for free and get your game on!</p>
               <a v-if="!isAuthenticated" href="register" class="btn btn-primary">Create a Free Account <span class='dice'>C</span></a>
               <a v-if="isAuthenticated" href="account" type="button" class="btn btn-primary">
                   Become a Subscriber <span class='dice'>C</span>
@@ -36,7 +35,7 @@
           <div class="card card m-2">
             <div class="card-body">
               <h5 class="card-title">View Your Campaigns</h5>
-              <p class="card-text">Create and manage a campaign setting. Build your world and start playing!</p>
+              <p class="card-text">Create and manage a campaign setting. Record session notes and share them with your players. Build your world and start playing!</p>
               <a href="campaign" class="btn btn-primary requires-auth hidden">Play a Campaign <i class="fas fa-globe-americas"></i></a>
               <a href="login" type="button" class="btn btn-primary requires-noauth">
                   Login to View Your Campaigns <i class="fas fa-globe-americas"></i>
@@ -48,7 +47,7 @@
           <div class="card card m-2">
             <div class="card-body">
               <h5 class="card-title">Find a Fate Character Sheet</h5>
-              <p class="card-text">Find and print a character sheet for the setting you want. We have form-fillable Fate Core, Fate Accelerated and other setting character sheets.</p>
+              <p class="card-text">Find a character sheet for the setting you want. We have form-fillable Fate Core, Fate Accelerated and other setting character sheets.</p>
               <a href="charactersheet" class="btn btn-primary">Find a Character Sheet <span class='dice'>D</span></a>
             </div>
           </div>
