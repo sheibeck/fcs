@@ -303,7 +303,7 @@ export default {
   name: 'CampaignDetail',
   metaInfo() {
     return {
-       title: this.name,
+       title: `${this.campaign ? this.campaign.name : this.title}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]

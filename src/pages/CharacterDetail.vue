@@ -47,9 +47,9 @@ export default {
   components: {
     "charactersheet": CharacterSheet,    
   },
-  metaInfo() {
+  metaInfo() {    
     return {
-       title: this.title,
+       title: `${this.characterData ? this.characterData.name : this.title}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]

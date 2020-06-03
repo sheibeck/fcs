@@ -120,7 +120,7 @@ export default {
   },
   metaInfo() {
     return {
-       title: this.title,
+       title: `${this.adversaries.length == 1 ? this.adversaries[0].name : this.title}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
