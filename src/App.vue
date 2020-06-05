@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app">    
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="/">
           <img src='/static/img/logo.png' alt="Logo"/>
@@ -70,6 +70,8 @@
           </div>
       </div>
     </nav>
+    
+    <div id="alert_placeholder" class="m-0"></div>
 
     <router-view></router-view>
 
@@ -77,7 +79,7 @@
       <div class="container">
         <div class='d-flex justify-content-between'>
           <div>
-            <span class="dice">C</span> <span class="d-none d-md-inline">Built by</span> Darktier Studios, LLC.
+            <span class="dice">C</span> <span class="d-none d-md-inline">Built by</span> Darktier Studios, LLC.            
           </div>
           <div class="d-none d-sm-block">
             <span class="dice">A</span> Powered by Fate
@@ -142,7 +144,7 @@ export default {
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
     },
-    init: function() {     
+    init: function() {  
       /* extend some libraries */
       $.expr[":"].contains = $.expr.createPseudo(function (arg) {
         return function (elem) {
@@ -183,6 +185,8 @@ export default {
       AWS.config.region = 'us-east-1';      
       
       userSvc.Authenticate();
+
+      commonSvc.CheckVersion();
     }
   }
 }
