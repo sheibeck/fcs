@@ -73,7 +73,7 @@
           <div class="card-body">
             <div class="form-group">
               <label for="name">Name</label>
-              <input class="form-control" type="text" id="name" name="name" aria-describedby="titleHelp" placeholder="Campaign name" v-model="campaign.name" @change="slugify">
+              <input class="form-control" type="text" id="name" name="name" placeholder="Campaign name" v-model="campaign.name" @change="slugify">
             </div>
             <div class="form-group">
               <label for="scale">Scale</label>
@@ -104,7 +104,7 @@
         <div class="col-12 col-md-7 col-lg-8 order-2 order-md-1" id="logs">
           <div class="header d-flex">
             <span class="h4">Session Log</span>
-              <i class="fas fa-question-circle pl-1 pt-1 mr-auto" data-toggle="modal" data-target="#modalInstructions"></i>
+              <a class="pl-1 pt-1 mr-auto" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Fate-Character-Sheet#campaigns"><i class="fas fa-question-circle"></i></a>
             <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
             <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fas fa-book"></i> Add Session</button>
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
@@ -202,57 +202,6 @@
                   </div>
               </div>
           </div>
-      </div>
-
-      <!-- instruction modal -->
-      <div class="modal fade" id="modalInstructions" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Instructions</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                <h5>Public Sessions</h5>
-                <p>
-                  Marking a session as public will make the session show up on the Public Campaign Summary page. Any <b>extra details</b> (see below) will not
-                  show up in the campaign summary which will allow you to add these details but keep them for the GM's eyes only.
-                </p>
-                <h5>Session Editing</h5>
-                <p>
-                  The sessions can use markdown to format the text you type. This website uses ShodownJs for rendering markdown. The full list of supported
-                  markdown can be found at <a href="https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax" target="_blank">ShowdownJs</a>.
-                </p>
-                <p>
-                  Additionally, there are custom tags specific to Fate Character Sheet. These tags will automatically populate
-                  the Important Things section when you use them. This allows you to see important things about your campaign at a glance.
-                  Currently supported tags are:
-                </p>
-                <ul>
-                  <li><strong class="text-danger">#"</strong>Character Name<strong class="text-danger">"</strong></li>
-                  <li><strong class="text-danger">~"</strong>Campaign Aspect<strong class="text-danger">"</strong></li>
-                  <li><strong class="text-danger">!"</strong>Issue Description<strong class="text-danger">"</strong></li>
-                  <li><strong class="text-danger">@"</strong>Face or Place Name<strong class="text-danger">"</strong></li>
-                </ul>
-                <p>Additionally, you can associate <b>extra details</b> to any tag by enclosing the text in square brackets and making sure it come right
-                  after the tagged item (be sure to include the space between the tag and the brackets). For example:</p>
-                <blockquote> <strong class="text-danger">!"</strong>An impending issue<strong class="text-danger">"</strong> <strong class="text-danger">[</strong>this issue becomes active if the characters mess up<strong class="text-danger">]</strong></blockquote>
-
-                <h5>Important Things</h5>
-                <ul>
-                  <li>Copy a tag to your clipboard by clicking on the tagged item</li>
-                  <li>Filter your sessions logs by clicking on the Filter icon (<i class="fas fa-filter"></i>)</li>
-                  <li>The badge with the number (<span class="badge badge-secondary">x3</span>) is how many times this tag has been used in your session logs (this does not include tags used inside extra info)</li>
-                  <li>Hilighted items (<mark>that look like this</mark>) are a list of all the extra details that have been added to this tag. These items will not show up in the public campaign summary</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
