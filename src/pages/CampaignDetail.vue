@@ -547,7 +547,7 @@ export default {
       fcs.$options.filters.filterSessions();
 
       let session = {
-        id: commonSvc.GenerateUUID(),
+        id: commonSvc.SetId("LOG", commonSvc.GenerateUUID()),
         object_type: "LOG",
         date: this.getFormattedDate(new Date()),
         description: "Details...",
@@ -557,7 +557,6 @@ export default {
       this.sessions.unshift(session);
 
       this.setCurrentSession(session.id);
-
       this.jumpTo(`#editor-${commonSvc.GetId(session.id)}`);
     },
     getNiceDate : function(date) {
