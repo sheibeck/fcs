@@ -56,12 +56,43 @@ export default {
     },
     getMarkupVal(graphPath, defaultValue) {      
       let val = this.$parent.getVal(graphPath, defaultValue);
-      if (this.roll20Enabled)        
-      {
-        let roll20Btn = `<span class='dice fo20' onclick='fcs.$children[0].$children[0].$children[0].$refs.charactersheet.sendToRoll20("stuntextra", "Stunt", null, "$1")'>C</span> $1`;        
-        val = val.replace(/'/g,'').replace(/(.*:.*)/g,`${roll20Btn}`);
-      }
-      return val;
+      
+      var replacement = "";
+      var eachLineExp = /\s*((?:.|\r\n)*)/g;
+      var lineMatches = val.match(eachLineExp);
+
+      if (!lineMatches) return val;
+      
+      //iterate over each line
+      lineMatches.forEach( (lineMatch) => {
+        
+        //now try to find the name and the description separated by a colon
+        var itemExp = /(.*):(.*)/;
+        var itemMatch = itemExp.exec(lineMatch);
+    
+        if (!itemMatch) {
+          replacement += lineMatch;
+        }
+        else {
+          if (itemMatch[1] && itemMatch[2]) {            
+            if (this.roll20Enabled) {                      
+              var roll20Message = itemMatch[0].trim().replace(/\'/g,"").replace(/"/g,'\\\"');
+              let roll20Btn = `<span class='dice fo20' onclick='fcs.$children[0].$children[0].$children[0].$refs.charactersheet.sendToRoll20(\"stuntextra\", \"Stunt\", null, \"${roll20Message}\")'>C</span>`;
+              replacement += `${roll20Btn}<strong>${itemMatch[1].trim()}</strong>:${itemMatch[2]}`;
+            }
+            else {
+              replacement += `<strong>${itemMatch[1].trim()}</strong>:${itemMatch[2]}`;
+            }
+          }
+          else {  
+            replacement += itemMatch[0];
+          }
+        }  
+        
+        replacement += "<br/>"
+      })
+     
+      return replacement;
     },
   }
 }
