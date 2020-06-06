@@ -142,10 +142,10 @@ export default class CommonService {
   
   // help out with dev tasks by switching environments up based on the URL
   SetupForEnvironment = () => {
-      if (this.fcs.$store.state.environment !== 'production')
+      if (`${process.env.NODE_ENV}` !== "production")
       {
         let environmentLabel = "BETA";
-        if (window.location.host == 'localhost:8080')
+        if (window.location.host == "localhost:8080")
         {
           environmentLabel = "LOCAL";
         }        

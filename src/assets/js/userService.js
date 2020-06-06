@@ -219,7 +219,11 @@ export default class UserService {
     return await cognitoidentityserviceprovider.getUser(params).promise();    
   }
 
-  GetUserAttribute = async (attrName) => {    
+  GetUserAttribute = async (attrName) => {
+    if (attrName.indexOf("stripe") > -1 ) {
+      attrName = `${attrName}${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+    }
+
     if (this.fcs.$store.state.userSession)
     {
      let attr = this.fcs.$store.state.userSession.getIdToken().payload[attrName];     
@@ -253,7 +257,11 @@ export default class UserService {
     return await cognitoidentityserviceprovider.updateUserAttributes(params).promise();        
   }
 
-  SetUserAttribute = async (attrName, value) => {       
+  SetUserAttribute = async (attrName, value) => {
+    if (attrName.indexOf("stripe") > -1 ) {
+      attrName = `${attrName}${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+    }    
+
     var token = this.fcs.$store.state.cognito.CognitoUser.signInUserSession.accessToken.jwtToken;
     var params = {
       UserAttributes: [{
