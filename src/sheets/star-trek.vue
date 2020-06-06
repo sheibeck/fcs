@@ -91,89 +91,6 @@
 			</div>
 		</div>
 	</div>
-
-	<hr />
-
-	<div class="page">
-		<div class="row">
-			<div class="col-sm-6 col-md-4 order-md-2">
-				<div class="row">
-					<div class="col text-center">
-						<img alt="Star Trek Ship" class="img-fluid fate-ship-logo" src="/static/sheets/star-trek/ship-logo.png" />
-					</div>
-				</div>
-			</div>
-
-			<div class="col-sm-6 col-md-8 order-md-1">
-				<div class="form-group">
-					<div for="name" class="fate-header">Ship Name</div>
-					<input type="text" class="form-control" id="ship_name" name="ship_name" @change="setVal('ship_name', $event.target.value)" :value="getVal('ship_name')" placeholder="Ship Name" />
-				</div>
-
-				<div class="form-group">
-					<textarea class="form-control" id="ship_description" name="ship_description" rows="3" @change="setVal('ship_description', $event.target.value)" :value="getVal('ship_description')" placeholder="Description"></textarea>
-				</div>
-			</div>
-		</div>
-
-		<div class="row">
-			<!-- aspects -->
-			<div class="col-sm-6 col-md-8 fate-aspects">
-				<div class="form-group">
-					<div for="" class="fate-header">Aspects</div>
-				</div>
-				<div v-for="aspect in shipaspects" :key="aspect.obj">
-					<inputaspect :aspect="aspect" />
-				</div>
-			</div>
-
-			<!-- aspects -->
-			<div class="col-sm-6 col-md-4 fate-approaches">
-				<div class="form-group">
-					<div class="fate-header col-12">Approaches</div>
-				</div>
-
-				<div v-for="approach in shipapproaches" :key="approach.obj">
-					<inputapproach :item="approach" />
-				</div>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-12 col-md-6">
-				<inputstuntextra item="ship_stunts" :rows="25" :border="true" header="Stunts" />
-			</div>
-			<div class="col-12 col-md-6">
-				<inputstuntextra item="ship_extras" :rows="25" :border="true" header="Extras" />
-			</div>
-		</div>
-
-		<div class="row">
-			<!-- stress -->
-			<div class="col-sm-6 col-md-4 fate-stress">
-				<div class="form-group">
-					<div for="" class="fate-header">Stress</div>
-				</div>
-				<div class="d-flex justify-content-between">
-					<div v-for="stress in shipstresses" :key="stress.obj">
-						<inputstress :stress="stress" />
-					</div>
-				</div>
-			</div>
-
-			<div class="col-sm-6 col-md-8 fate-consequences">
-				<div class="form-group">
-					<div class="fate-header col-12">Consequences</div>
-				</div>
-
-				<div v-for="consequence in shipconsequences" :key="consequence.obj">
-					<inputconsequence :consequence="consequence" />
-				</div>
-			</div>
-		</div>
-
-	</div>
-
 </div>
 </template>
 
@@ -233,33 +150,7 @@ export default {
 			{label:"1", obj:"stress1"},
 			{label:"2", obj:"stress2"},
 			{label:"3", obj:"stress3"},
-		],
-
-		shipapproaches:  [
-			{placeholder:"Engines", obj:"ship_approaches.engines"},
-			{placeholder:"Computers", obj:"ship_approaches.computers"},
-			{placeholder:"Weapons", obj:"ship_approaches.weapons"},
-			{placeholder:"Structure", obj:"ship_approaches.structure"},
-			{placeholder:"Sensors", obj:"ship_approaches.sensors"},
-			{placeholder:"Communications", obj:"ship_approaches.communications"},
-		],
-		shipaspects: [
-			{label:"High Concept", obj:"ship_aspects.highconcept"},
-			{label:"Trouble", obj:"ship_aspects.trouble"},
-			{label:"Aspect", obj:"ship_aspects.other1"},
-			{label:"Aspect", obj:"ship_aspects.other2"},
-			{label:"Aspect", obj:"ship_aspects.other3"},			
-		],
-		shipconsequences: [
-			{label:"Mild", obj:"ship_consequences.mild", value: "2"},
-			{label:"Moderate", obj:"ship_consequences.moderate", value: "4"},
-			{label:"Severe", obj:"ship_consequences.severe", value: "6"},
-		],
-		shipstresses: [
-			{label:"1", obj:"ship_stress1"},
-			{label:"2", obj:"ship_stress2"},
-			{label:"3", obj:"ship_stress3"},
-		]			
+		]	
     }
   },
   methods: {  
@@ -270,9 +161,9 @@ export default {
     	this.$parent.setVal(this.character, arr, val);       
 	},
 	sendToRoll20(type, label, obj, item, skillType) {		
-		let characterName = obj.indexOf("ship") > -1 || (typeof(item) == "string" && item.indexOf("ship") > -1) ? this.character.ship_name : this.character.name;
+		let characterName = this.character.name;
 		switch(type)
-		{			
+		{
 			case "fatepoint":
 				this.$parent.sendToRoll20(type, characterName, null, item);
 				break;

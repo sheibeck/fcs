@@ -109,7 +109,7 @@ export default {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "star-trek",
-        "description": "Fate Accelerated with custom approaches for Star Trek. Includes ship sheet.",
+        "description": "Fate Accelerated with custom approaches for Star Trek.",
         "id": "CHARACTERSHEET|star-trek",
         "name": "Star Trek Accelerated",
         "sort": 6,

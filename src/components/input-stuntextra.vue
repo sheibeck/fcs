@@ -2,8 +2,13 @@
   <div>
     <div class="fate-header d-flex">
       <span :for="item" class="mr-auto">{{header}}</span>
-      <a v-if="!isNewCharacter" v-on:click="toggleEdit()">
-        <i class="fas d-print-none pr-2" :class="{ 'fa-check-circle' : stuntEdit, 'fa-edit' : !stuntEdit }"></i>
+      <a v-if="!isNewCharacter">
+        <i class="fas d-print-none pr-2" v-on:click="addStunt(item)" :class="{ 'fa-plus' : stuntEdit, 'd-none' : !stuntEdit }"></i>
+        <i class="fas d-print-none pr-2" v-on:click="toggleEdit()" :class="{ 'fa-check-circle' : stuntEdit, 'fa-edit' : !stuntEdit }"></i>
+      </a>
+
+      <a v-if="isNewCharacter">
+        <i class="fas d-print-none fa-plus pr-2" v-on:click="addStunt(item)"></i>
       </a>
     </div>
 
@@ -54,11 +59,19 @@ export default {
         this.$parent.$parent.$parent.save();
       } 
     },
+    addStunt(item) {      
+      let val = this.$parent.getVal(item);      
+      let label = `${item.indexOf("extras")>-1 ? "Extra" : "Stunt"}`;
+      let newStuntTemplate = `${label} Name: ${label} Description.\r`;
+      val += newStuntTemplate;
+
+      this.$parent.setVal(item, val);
+    },
     getMarkupVal(graphPath, defaultValue) {      
       let val = this.$parent.getVal(graphPath, defaultValue);
       
       var replacement = "";
-      var eachLineExp = /\s*((?:.|\r\n)*)/g;
+      var eachLineExp = /\s*((?:.)*)/gm;
       var lineMatches = val.match(eachLineExp);
 
       if (!lineMatches) return val;

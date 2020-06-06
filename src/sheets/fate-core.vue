@@ -168,7 +168,8 @@ export default {
   },
   methods: {  
     getVal(graphPath, defaultValue) {
-        return this.$parent.getVal(this.character, graphPath, defaultValue);
+        let val = this.$parent.getVal(this.character, graphPath, defaultValue);
+        return val;
     },
     setVal(arr, val) {        
         this.$parent.setVal(this.character, arr, val);        
