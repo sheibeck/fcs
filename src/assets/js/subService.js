@@ -8,7 +8,7 @@ export default class SubService {
 
   constructor(fcs, commonSvc, userSvc){
     this.fcs = fcs;
-    this.stripe = Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT');
+    this.stripe = `${process.env.NODE_ENV}` !== "production" ? Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT') : Stripe('pk_live_9lzUOIAo2Vfo3dMmVIyL3wam');
     this.commonSvc = commonSvc;
     this.userSvc = userSvc; 
   }
@@ -127,12 +127,10 @@ export default class SubService {
         //await this.userSvc.SetUserAttribute("custom:stripe_customer", "");        
         return;
       }
-
-      //this is from .js so it's ok here.
-      var stripe = Stripe('pk_test_11a5BiXqoQRiau0JYwmZ6oLT');
+      
       // When the customer clicks on the button, redirect
       // them to Checkout.
-      stripe.redirectToCheckout({
+      this.stripe.redirectToCheckout({
         sessionId: resultObject.id
       })
       .then(function (result) {
