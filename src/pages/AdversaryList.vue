@@ -228,7 +228,7 @@ export default {
               r20result += item;
               break;
             case "aspect":            
-              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('invoke', ${type}, '${item.replace(/\'/,'')}')">A</span>`
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('invoke', '${type}', '${item.replace(/\'/,'')}')">A</span>`
               r20result += item;            
               break;                         
           }
@@ -279,7 +279,7 @@ export default {
       if (!this.hasRoll20) return;
 
       let character = this.adversaries[0].name;
-      let msg = null;
+      let msg = null;      
       switch(type) {
         case "diceroll":
           let desc2 = data2;
