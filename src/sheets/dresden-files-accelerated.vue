@@ -25,46 +25,8 @@
 				<div class="fate-header col-12">Approaches</div>
 			</div>
 
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Flair</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[flair]" name="approach[flair]" @change="setVal('approaches.flair',  $event.target.value)" :value="getVal('approaches.flair')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Focus</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[focus]" name="approach[focus]" @change="setVal('approaches.focus',  $event.target.value)" :value="getVal('approaches.focus')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Force</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[force]" name="approach[force]" @change="setVal('approaches.force',  $event.target.value)" :value="getVal('approaches.force')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Guile</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[guile]" name="approach[guile]" @change="setVal('approaches.guile',  $event.target.value)" :value="getVal('approaches.guile')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Haste</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[haste]" name="approach[haste]" @change="setVal('approaches.haste',  $event.target.value)" :value="getVal('approaches.haste')" placeholder="+" />
-				</div>
-			</div>
-
-			<div class="form-group row">
-				<label class="col-9 col-form-label">Intellect</label>
-				<div class="col-3">
-				<input class="form-control text-center round-input" type="text" id="approach[intellect]" name="approach[intellect]" @change="setVal('approaches.intellect',  $event.target.value)" :value="getVal('approaches.intellect')" placeholder="+" />
-				</div>
+			<div v-for="approach in approaches" :key="approach.obj">
+				<inputapproach :item="approach" inputclass="round-input" labelclass="col-form-label mt-1" />
 			</div>
 		</div>
 
@@ -73,14 +35,8 @@
 			<div class="form-group">
 				<div for="" class="fate-header">Aspects</div>
 			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept',  $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
-			</div>
-			<div class="form-group">
-				<textarea type="text" class="form-control" id="aspect[other]" rows="8" name="aspect[other]" @change="setVal('aspects.other',  $event.target.value)" :value="getVal('aspects.other')" placeholder="Other Aspects"></textarea>
+			<div v-for="aspect in aspects" :key="aspect.obj">
+				<inputaspect :aspect="aspect" />
 			</div>
 		</div>
 	</div>
@@ -172,16 +128,13 @@
 				<textarea type="text" class="form-control" id="mantles" name="mantles" rows="2" placeholder="Mantles" @change="setVal('mantles',  $event.target.value)" :value="getVal('mantles')"></textarea>
 			</div>
 			<div class="form-group">
-				<div for="" class="fate-header">Stunts</div>
+				<inputstuntextra :item="stunts" :rows="13" :border="true" header="Stunts" />
 			</div>
-			<div class="form-group">
-				<textarea type="text" class="form-control" id="stunts" name="stunts" rows="13" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')" placeholder="Stunts"></textarea>
-			</div>
-			<div class="form-group row">
-				<label class="col-sm-12 col-md-9 col-form-label text-right">Refresh</label>
-				<div class="col-sm-12 col-md-3">
-					<input class="form-control text-center" type="text" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh">
-				</div>
+			<div class="form-group d-md-flex justify-content-between">
+				<span v-if="roll20Enabled" class='dice fo20 pt-2'>A</span><label class="col-form-label pr-1">FP</label>
+				<inputfatepoints class="w-25" />							
+				<label class="col-form-label pr-1 w-25">Refresh</label>				
+				<input class="form-control text-center w-25" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />							
 			</div>
 		</div>
 	</div>
@@ -190,52 +143,14 @@
 		<!-- stress -->
 		<div class="col-sm-6 col-md-4 fate-stress">
 			<div class="form-group">
-				<div for="" class="fate-header">Stress</div>
+				<div for="" class="fate-header">Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
 			</div>
+			
 			<div class="row">
-				<div class="col">
-				  <label for="stress[stress1]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
+				<div v-for="stress in stresses" :key="stress.obj" class="col">
+					<inputstress :stress="stress" />
 				</div>
-
-				<div class="col">
-				  <label for="stress[stress2]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
-				</div>
-
-				<div class="col">
-				  <label class="" for="stress[stress3]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" />
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-				  <label for="stress[stress4]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress4]" name="stress[stress4]" @change="setVal('stress.stress4',  $event.target.checked)" :checked="getVal('stress.stress4')" />
-				</div>
-
-				<div class="col">
-				  <label for="stress[stress5]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress5]" name="stress[stress5]" @change="setVal('stress.stress5',  $event.target.checked)" :checked="getVal('stress.stress5')" />
-				</div>
-
-				<div class="col">
-				  <label class="" for="stress[stress6]">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress6]" name="stress[stress6]" @change="setVal('stress.stress6',  $event.target.checked)" :checked="getVal('stress.stress6')" />
-				</div>
-			</div>
+			</div>	
 
 			<div class="row">
 				<label class="col-12 fate-otherstress-label">
@@ -243,100 +158,38 @@
 				</label>
 			</div>
 
-			<div class="row">
-				<div class="col">
-					<label for="stress[stressother1]">
-					1
-					</label>
-					<input type="checkbox" value="1" id="stress[stressother1]" name="stress[stressother1]" @change="setVal('stress.stressother1',  $event.target.checked)" :checked="getVal('stress.stressother1')" />
-				</div>
-
-				<div class="col">
-					<label for="stress[stressother2]">
-					1
-					</label>
-					<input type="checkbox" value="1" id="stress[stressother2]" name="stress[stressother2]" @change="setVal('stress.stressother2',  $event.target.checked)" :checked="getVal('stress.stressother2')" />
-				</div>
-
-				<div class="col">
-					<label class="" for="stress[stressother3]">
-					1
-					</label>
-					<input type="checkbox" value="1" id="stress[stressother3]" name="stress[stressother3]" @change="setVal('stress.stressother3',  $event.target.checked)" :checked="getVal('stress.stressother3')" />
+			<div class="row justify-content-between">
+				<div v-for="stress in otherstresses" :key="stress.obj" class="col">
+					<inputstress :stress="stress" />
 				</div>
 			</div>
 		</div>
 
 		<!-- conditions -->
 		<div class="col-sm-6 col-md-8 fate-conditions">
-			<div class="form-group row">
-				<div class="fate-header col-12">Conditions</div>
+			<div class="form-group">
+				<div class="fate-header col-12">Conditions <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+			</div>		
+
+			<div class="d-flex d-flex justify-content-between">				
+				<inputcondition :condition="conditions.inperil" />				
+				<inputcondition :condition="conditions.doomed" />					
 			</div>
 
-			<div class="form-group row">
-				<input class="col-3 col-sm-6 col-md-2" value="1" type="checkbox" name="condition[inperil]" id="condition[inperil]" @change="setVal('conditions.inperil',  $event.target.checked)" :checked="getVal('conditions.inperil')" />
-				<label class="col-9 col-sm-6 col-md-4 col-form-label" for="condition[inperil]">
-					In Peril (p.117)
-				</label>
-
-				<input class="col-3 col-sm-6 col-md-2" value="1" type="checkbox" name="condition[doomed]" id="condition[doomed]" @change="setVal('conditions.doomed',  $event.target.checked)" :checked="getVal('conditions.doomed')" />
-				<label class="col-9 col-sm-6 col-md-4 col-form-label" for="condition[doomed]">
-					Doomed (p.117)
-				</label>
+			<div class="d-flex justify-content-between">				
+				<inputcondition :condition="conditions.indebted" />			
 			</div>
 
-			<div class="row">
-				<div class="col-sm-12 col-md-6 order-md-2">
-					<label class="form-check-label col-form-label" for="condition[indebted]">
-						indebted (p.117)
-					</label>
-				</div>
-				<div class="col-sm-12 col-md-6 order-md-1">
-					<input type="checkbox" value="1" name="condition[indebtedcheck1]" id="condition[indebtedcheck1]" @change="setVal('conditions.indebtedcheck1',  $event.target.checked)" :checked="getVal('conditions.indebtedcheck1')" />
-					<input type="checkbox" value="2" name="condition[indebtedcheck2]" id="condition[indebtedcheck2]" @change="setVal('conditions.indebtedcheck2',  $event.target.checked)" :checked="getVal('conditions.indebtedcheck2')" />
-					<input type="checkbox" value="3" name="condition[indebtedcheck3]" id="condition[indebtedcheck3]" @change="setVal('conditions.indebtedcheck3',  $event.target.checked)" :checked="getVal('conditions.indebtedcheck3')" />
-					<input type="checkbox" value="4" name="condition[indebtedcheck4]" id="condition[indebtedcheck4]" @change="setVal('conditions.indebtedcheck4',  $event.target.checked)" :checked="getVal('conditions.indebtedcheck4')" />
-					<input type="checkbox" value="5" name="condition[indebtedcheck5]" id="condition[indebtedcheck5]" @change="setVal('conditions.indebtedcheck5',  $event.target.checked)" :checked="getVal('conditions.indebtedcheck5')" />
-				</div>
+			<div class="">
+				<inputcondition :condition="conditions.condition1" />	
 			</div>
 
-			<div class="row">
-				<div class="col-sm-12 col-md-6 order-md-2">
-					<input type="text" class="fate-condition-label col-form-label" name="condition[condition1]" id="condition[condition1]" @change="setVal('conditions.condition1',  $event.target.value)" :value="getVal('conditions.condition1')" placeholder="Condition Name" />
-				</div>
-				<div class="col-sm-12 col-md-6 order-md-1">
-					<input type="checkbox" value="1" name="condition[condition1check1]" id="condition[condition1check1]" @change="setVal('conditions.condition1check1',  $event.target.checked)" :checked="getVal('conditions.condition1check1')" />
-					<input type="checkbox" value="2" name="condition[condition1check2]" id="condition[condition1check2]" @change="setVal('conditions.condition1check2',  $event.target.checked)" :checked="getVal('conditions.condition1check2')" />
-					<input type="checkbox" value="3" name="condition[condition1check3]" id="condition[condition1check3]" @change="setVal('conditions.condition1check3',  $event.target.checked)" :checked="getVal('conditions.condition1check3')" />
-					<input type="checkbox" value="4" name="condition[condition1check4]" id="condition[condition1check4]" @change="setVal('conditions.condition1check4',  $event.target.checked)" :checked="getVal('conditions.condition1check4')" />
-					<input type="checkbox" value="5" name="condition[condition1check5]" id="condition[condition1check5]" @change="setVal('conditions.condition1check5',  $event.target.checked)" :checked="getVal('conditions.condition1check5')" />
-				</div>
+			<div class="">
+				<inputcondition :condition="conditions.condition2" />
 			</div>
 
-			<div class="row">
-				<div class="col-sm-12 col-md-6 order-md-2">
-					<input type="text" class="fate-condition-label col-form-label" name="condition[condition2]" id="condition[condition2]" @change="setVal('conditions.condition2',  $event.target.value)" :value="getVal('conditions.condition2')" placeholder="Condition Name"/>
-				</div>
-				<div class="col-sm-12 col-md-6 order-md-1">
-					<input type="checkbox" value="1" name="condition[condition2check1]" id="condition[condition2check1]" @change="setVal('conditions.condition2check1',  $event.target.checked)" :checked="getVal('conditions.condition2check1')" />
-					<input type="checkbox" value="2" name="condition[condition2check2]" id="condition[condition2check2]" @change="setVal('conditions.condition2check2',  $event.target.checked)" :checked="getVal('conditions.condition2check2')" />
-					<input type="checkbox" value="3" name="condition[condition2check3]" id="condition[condition2check3]" @change="setVal('conditions.condition2check3',  $event.target.checked)" :checked="getVal('conditions.condition2check3')" />
-					<input type="checkbox" value="4" name="condition[condition2check4]" id="condition[condition2check4]" @change="setVal('conditions.condition2check4',  $event.target.checked)" :checked="getVal('conditions.condition2check4')" />
-					<input type="checkbox" value="5" name="condition[condition2check5]" id="condition[condition2check5]" @change="setVal('conditions.condition2check5',  $event.target.checked)" :checked="getVal('conditions.condition2check5')" />
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-sm-12 col-md-6 order-md-2">
-					<input type="text" class="fate-condition-label col-form-label" name="condition[condition3]" id="condition[condition3]" @change="setVal('conditions.condition3',  $event.target.value)" :value="getVal('conditions.condition3')" placeholder="Condition Name"/>
-				</div>
-				<div class="col-sm-12 col-md-6 order-md-1">
-					<input type="checkbox" value="1" name="condition[condition3check1]" id="condition[condition3check1]" @change="setVal('conditions.condition3check1',  $event.target.checked)" :checked="getVal('conditions.condition3check1')" />
-					<input type="checkbox" value="2" name="condition[condition3check2]" id="condition[condition3check2]" @change="setVal('conditions.condition3check2',  $event.target.checked)" :checked="getVal('conditions.condition3check2')" />
-					<input type="checkbox" value="3" name="condition[condition3check3]" id="condition[condition3check3]" @change="setVal('conditions.condition3check3',  $event.target.checked)" :checked="getVal('conditions.condition3check3')" />
-					<input type="checkbox" value="4" name="condition[condition3check4]" id="condition[condition3check4]" @change="setVal('conditions.condition3check4',  $event.target.checked)" :checked="getVal('conditions.condition3check4')" />
-					<input type="checkbox" value="5"  name="condition[condition3check5]" id="condition[condition3check5]" @change="setVal('conditions.condition3check5',  $event.target.checked)" :checked="getVal('conditions.condition3check5')" />
-				</div>
+			<div class="">
+				<inputcondition :condition="conditions.condition3" />
 			</div>
 		</div>
 	</div>
@@ -344,25 +197,141 @@
 </template>
 
 <script>
+
+import InputSkillColumn from '../components/input-skill-column'
+import InputAspect from '../components/input-aspect'
+import InputConsequence from '../components/input-consequence'
+import InputCondition from '../components/input-condition'
+import InputStuntExtra from '../components/input-stuntextra'
+import InputStress from '../components/input-stress'
+import InputFatePoints from '../components/input-fatepoints'
+import { mapGetters } from 'vuex'
+
+
 export default {
   name: 'SheetDresdenFilesAccelerated',
+  components: {
+	"inputapproach": InputSkillColumn,    
+	"inputaspect": InputAspect,
+	"inputconsequence": InputConsequence,
+	"inputcondition": InputCondition,
+	"inputstuntextra": InputStuntExtra,
+	"inputstress": InputStress,
+	"inputfatepoints": InputFatePoints,
+  },
   props: {    
     character: Object,
+  },
+  computed: {
+ 	...mapGetters([      
+      'roll20Enabled'
+    ]),
   },
   mounted() {
    this.$parent.$parent.title = 'Dresden Files Accelerated (Character Sheet)';
   },
   data () {
     return {
+		approaches:  [
+			{placeholder:"Flair", obj:"approaches.flair"},
+			{placeholder:"Focus", obj:"approaches.focus"},
+			{placeholder:"Force", obj:"approaches.force"},
+			{placeholder:"Guile", obj:"approaches.guile"},
+			{placeholder:"Haste", obj:"approaches.haste"},
+			{placeholder:"Intellect", obj:"approaches.intellect"},
+		],
+		aspects: [
+			{label:"High Concept", obj:"aspects.highconcept"},
+			{label:"Trouble", obj:"aspects.trouble"},
+			{label:"Aspect", obj:"aspects.other"},		
+			{label:"Aspect", obj:"aspects.other1"},
+			{label:"Aspect", obj:"aspects.other2"},
+			{label:"Aspect", obj:"aspects.other3"},
+		],
+		conditions: {
+			inperil:
+				{label: "In Peril (p.117)", items: [
+					{obj:"conditions.inperil"}				
+				]},
+			doomed:
+				{label: "Doomed (p.117)", items: [
+					{obj:"conditions.doomed"}				
+				]},	
+			indebted:
+				{label: "Indebted (p.117)", items: [
+					{obj:"conditions.indebtedcheck1"},
+					{obj:"conditions.indebtedcheck2"},
+					{obj:"conditions.indebtedcheck3"},
+					{obj:"conditions.indebtedcheck4"},
+					{obj:"conditions.indebtedcheck5"},	
+				]},			
+			condition1:
+				{label: "conditions.condition1", placeholder: "Condition Name", items: [
+					{obj:"conditions.condition1check1", label:""},
+					{obj:"conditions.condition1check2"},
+					{obj:"conditions.condition1check3"},
+					{obj:"conditions.condition1check4"},
+					{obj:"conditions.condition1check5"},	
+				]},
+			condition2:
+				{label: "conditions.condition2", placeholder: "Condition Name", items: [
+					{obj:"conditions.condition2check1", label:""},
+					{obj:"conditions.condition2check2"},
+					{obj:"conditions.condition2check3"},
+					{obj:"conditions.condition2check4"},
+					{obj:"conditions.condition2check5"},	
+				]},
+			condition3:
+				{label: "conditions.condition3", placeholder: "Condition Name", items: [
+					{obj:"conditions.condition3check1", label:""},
+					{obj:"conditions.condition3check2"},
+					{obj:"conditions.condition3check3"},
+					{obj:"conditions.condition3check4"},
+					{obj:"conditions.condition3check5"},	
+				]},
+		},		
+		stresses: [
+			{label:"1", obj:"stress1"},
+			{label:"1", obj:"stress2"},
+			{label:"1", obj:"stress3"},
+			{label:"1", obj:"stress4"},
+			{label:"1", obj:"stress5"},
+			{label:"1", obj:"stress6"}			
+		],
+		otherstresses: [
+			{label:"1", obj:"stressother1"},
+			{label:"1", obj:"stressother2"},
+			{label:"1", obj:"stressother3"},			
+		],
+		stunts: "stunts"		
     }
   },
   methods: {  
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
-    setVal(arr, val) {
-    	this.$parent.setVal(this.character, arr, val);       
-    },
+    setVal(arr, val) {		
+		this.$parent.setVal(this.character, arr, val);		
+	},
+	sendToRoll20(type, label, obj, item, skillType) {		
+		switch(type)
+		{			
+			case "fatepoint":
+				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				break;
+			case "stress":
+			case "consequence":
+			case "stuntextra":
+			case "condition":
+				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				break;
+			default:
+				if (this.getVal(item)) {
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+				}
+				break;
+		}
+	}	
   }
 }
 </script>
@@ -370,14 +339,8 @@ export default {
 <style lang="scss" scoped>  
     @import url('https://fonts.googleapis.com/css?family=Aldrich');
 
-  body {
+  	body {
 		color: #452f92;
-	}
-
-	.sheet {
-		margin: 20px;
-		margin-top: 40px;
-		max-width: 1024px;
 	}
 
 	.fate-logo {
@@ -387,9 +350,9 @@ export default {
 		text-transform: uppercase;
 	}
 
-	.fate-header {
-    font-family: 'Aldrich', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-header {
+		font-family: 'Aldrich', sans-serif;
+		text-transform: uppercase;
 		background-color: #452f92;
 		color: white;
 		font-weight: 700;
@@ -398,9 +361,9 @@ export default {
 		font-size: 22px;
 	}
 
-	.col-form-label {
-    font-family: 'Aldrich', sans-serif;
-    text-transform: uppercase;
+	/deep/ .col-form-label {
+    	font-family: 'Aldrich', sans-serif;
+    	text-transform: uppercase;
 		font-size: 22px;
 		font-weight: 700;
 	}
@@ -424,20 +387,20 @@ export default {
 
 	input[type=radio] {
 		height: 25px;
-    width: 25px;
-    margin-top: 3px;
+		width: 25px;
+		margin-top: 3px;
 	}
 
-	.fate-conditions input[type=checkbox] {
+	/deep/ .fate-conditions input[type=checkbox] {
 		height: 50px;
 		width: 50px;
 	}
 
-	.fate-conditions .form-check label {
+	/deep/ .fate-conditions .form-check label {
 		margin-left: 20px;
 	}
 
-	input[type=checkbox] {
+	/deep/ input[type=checkbox] {
 		height: 50px;
 		width: 50px;
 	}
@@ -448,16 +411,16 @@ export default {
 		padding-top: 0px;
 	}
 
-	.round-input {
-			border-radius: 25px;
-			width: 50px;
-			height: 50px;
-			font-size: 24px;
+	/deep/ .round-input {
+		border-radius: 45px;		
+		height: 40x;
+		font-size: 24px;
+		height: 47px !important;		
 	}
 
-	.fate-consequences label {
-    font-family: 'Aldrich', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-consequences label {
+		font-family: 'Aldrich', sans-serif;
+		text-transform: uppercase;
 		font-weight: 700;
 		font-size: 28px;
 		padding-top: 0px;
@@ -465,23 +428,23 @@ export default {
 		padding-left: 25px;
 	}
 
-	.fate-stress label {
-    font-family: 'Aldrich', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-stress label {
+		font-family: 'Aldrich', sans-serif;
+		text-transform: uppercase;
 		font-size: 30px;
 		font-weight: 700;
 		margin-left: -5px;
 		margin-right: -5px;
 	}
 
-	.fate-otherstress-label {
+	/deep/ .fate-otherstress-label {
 		font-size: 16px !important;
 		text-align: center;
 	}
 
-	.fate-condition-label {
-		border: 0px;
-		width: 100%;
+	/deep/ .fate-condition-label {
+		border: 0px;		
 		border-bottom: solid 1px #452f92;
+		padding-top: 10px;
 	}
 </style>

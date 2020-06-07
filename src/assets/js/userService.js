@@ -1,13 +1,14 @@
 import CommonService from "./commonService";
+import SubService from "./subService";
 import AWS from 'aws-sdk';
 var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 
 
 export default class UserService {    
-  constructor(fcs, commonSvc = new CommonService())
+  constructor(fcs, commonSvc)
   {
     this.fcs = fcs;
-    this.commonSvc = commonSvc;
+    this.commonSvc = commonSvc || new CommonService(fcs);    
   }
 
   Register = (email, password) => {
@@ -58,7 +59,7 @@ export default class UserService {
 
     let CognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
     CognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
+      onSuccess: (result) => {        
         console.log('access token + ' + result.getAccessToken().getJwtToken());
 
         //AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -101,7 +102,7 @@ export default class UserService {
     let userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     let CognitoUser = userPool.getCurrentUser();
 
-    if (CognitoUser != null) {
+    if (CognitoUser != null) {      
       CognitoUser.getSession( (err, session) => {
         this.fcs.$store.commit("CognitoUser", CognitoUser);
         this.SetupAuthSession(err, session);
@@ -130,7 +131,7 @@ export default class UserService {
     }
   }
 
-  SetupAuthSession = async(err, session) => {
+  SetupAuthSession = async(err, session) => {    
     if (err) {
       this.commonSvc.Notify(err.message || JSON.stringify(err));
       return;
@@ -148,7 +149,8 @@ export default class UserService {
 
     this.fcs.$store.commit("userSession", session);
     this.fcs.$store.commit("credentials", credentials);
-    
+
+    this.CheckSubscription();
 
     await this.fcs.$store.state.credentials.refresh((error) => {
       if (error) {
@@ -160,6 +162,33 @@ export default class UserService {
           this.SetupAuthorizedUser(session);
       }
     });
+  }
+
+  CheckSubscription = async () => {
+    if (this.fcs.$store.state.hasActiveSubscription == null)
+    {
+      let customerId = await this.GetUserAttribute("custom:stripe_customer");
+      
+      this.fcs.$store.state.hasActiveSubscription = false;
+      if (customerId) {
+        let subSvc = new SubService(this.fcs, this.commonSvc, this);
+        let customer = await subSvc.GetCustomer(customerId);          
+        if (customer && customer.subscriptions && customer.subscriptions.total_count > 0) {
+          let status = customer.subscriptions.data[0].status.toLowerCase();
+          this.fcs.$store.state.subscriptionStatus = status.toTitleCase();
+          if ( status == "active" || status == "trialing" ) {
+            this.fcs.$store.state.hasActiveSubscription = true;
+          }
+
+          //if this user has a subscription, then make sure we don't let them abuse trials
+          let hadSubscription = await this.GetUserAttribute("custom:stripe_had_trial");
+                    
+          if (hadSubscription == null || hadSubscription == "0") {
+            this.SetUserAttribute("custom:stripe_had_trial", "1");
+          }
+        }
+      }
+    }
   }
 
   SetupUnAuthorizedUser = () => {    
@@ -174,6 +203,76 @@ export default class UserService {
 
     $('.requires-auth').removeClass('hidden');
     $('.requires-noauth').addClass('hidden');    
+  }
+
+  IsUserInGroup(groupName) {
+    var groups = this.fcs.$store.state.userSession.getIdToken().payload['cognito:groups'];
+    if (!groups) {
+      return false
+    }
+    return groups.includes(groupName);
+  }
+
+  GetCognitoUser = async(params) => {
+    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+    cognitoidentityserviceprovider.config.credentials = this.fcs.$store.state.credentials;
+    return await cognitoidentityserviceprovider.getUser(params).promise();    
+  }
+
+  GetUserAttribute = async (attrName) => {
+    if (attrName.indexOf("stripe") > -1 ) {
+      attrName = `${attrName}${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+    }
+
+    if (this.fcs.$store.state.userSession)
+    {
+     let attr = this.fcs.$store.state.userSession.getIdToken().payload[attrName];     
+     if (attr) {
+       return attr;
+     }
+     else {
+       //might be a custom attribute, try getting it from cognito
+        var params = {
+          AccessToken: this.fcs.$store.state.cognito.CognitoUser.signInUserSession.accessToken.jwtToken
+        };               
+        let result = await this.GetCognitoUser(params)        
+        let attr =  result.UserAttributes.find( ({ Name }) => Name === attrName );
+        if (attr)
+        {
+          return attr.Value;
+        }
+        else {
+          return null;
+        }
+        
+      }
+    } else {
+      return null;
+    }
+  }
+
+  UpdateCognitoUser = async(params) => {
+    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+    cognitoidentityserviceprovider.config.credentials = this.fcs.$store.state.credentials;
+    return await cognitoidentityserviceprovider.updateUserAttributes(params).promise();        
+  }
+
+  SetUserAttribute = async (attrName, value) => {
+    if (attrName.indexOf("stripe") > -1 ) {
+      attrName = `${attrName}${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+    }    
+
+    var token = this.fcs.$store.state.cognito.CognitoUser.signInUserSession.accessToken.jwtToken;
+    var params = {
+      UserAttributes: [{
+        Name: attrName,
+        Value: value
+      }],
+      AccessToken: token,      
+    };
+        
+    let result = await this.UpdateCognitoUser(params);    
+    return result;
   }
 
   Logout = () => {        

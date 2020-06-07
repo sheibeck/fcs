@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app">    
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="/">
           <img src='/static/img/logo.png' alt="Logo"/>
@@ -16,7 +16,7 @@
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                     <a class="nav-link" v-bind:class="{active : isActive('character')}" href="/character"><i class="fas fa-user"></i> My Characters</a>
-                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe"></i> My Campaigns</a>
+                    <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe-americas"></i> My Campaigns</a>
                  </div>
               </li>
               <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
@@ -27,7 +27,7 @@
               </li>
               <li class="nav-item dropdown">
                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   <i class="fas fa-tools"></i> Tools
+                   <i class="fas fa-dungeon"></i> Tools
                  </a>
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                    <a class="nav-link" target="_blank" href="https://fate-srd.com/"><span class="dice">+</span> Fate SRD</a>
@@ -43,25 +43,35 @@
                   <span class="dice">O</span> Support
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-blog"></i> Blog</a>
-                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fa fa-bug"></i> Report Issue</a>
+                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Fate-Character-Sheet"><i class="fas fa-hat-wizard"></i> Help &amp; FAQ</a>                  
+                  <a class="nav-link" target="_blank" href="https://github.com/sheibeck/fcs/issues"><i class="fas fa-dragon"></i> Report Issue</a>
+                  <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-scroll"></i> Blog</a>
                 </div>
               </li>
-               <li class="nav-item" ref="el">
-                  <a class="nav-link" href="http://paypal.me/sheibeck" target="_blank"><i class="fas fa-coins"></i> Donate</a>
+              <li v-if="!HasSubscription" class="nav-item" ref="el">
+                  <a v-if="!isAuthenticated" class="nav-link" href="/register"><span class="dice">C</span> Register</a>
+                  <a v-if="isAuthenticated" class="nav-link" href="/account"><span class="dice">C</span> Subscribe</a>
               </li>
+              
           </ul>
 
-          <div v-if="!isAuthenticated" class="form-inline login-button">
-              <a href="/login" type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0">
-                  Login <i class="fas fa-sign-in-alt"></i>
+          <div v-if="!isAuthenticated" class="navbar-nav">
+              <a href="/login" type="button" class="nav-link">
+                  <i class="fas fa-sign-in-alt"></i> Sign in
               </a>
           </div>
-          <div v-if="isAuthenticated" class="form-inline mx-1 mb-sm-1">
-              <button type="button" class="btn btn-primary mr-sm-1 mb-sm-1 mb-md-0" v-on:click="logout">Logout</button>
+          <div v-if="isAuthenticated" class="navbar-nav">               
+              <a class="nav-link" href="/account">
+                <i class="fas fa-user-cog"></i> Account 
+              </a>
+              <a href="#" class="nav-link" v-on:click="logout">
+                <i class="fas fa-sign-out-alt"></i> Sign out 
+              </a>
           </div>
       </div>
     </nav>
+    
+    <div id="alert_placeholder" class="m-0"></div>
 
     <router-view></router-view>
 
@@ -69,7 +79,7 @@
       <div class="container">
         <div class='d-flex justify-content-between'>
           <div>
-            <span class="dice">C</span> <span class="d-none d-md-inline">Built by</span> Darktier Studios, LLC.
+            <span class="dice">C</span> <span class="d-none d-md-inline">Built by</span> Darktier Studios, LLC.            
           </div>
           <div class="d-none d-sm-block">
             <span class="dice">A</span> Powered by Fate
@@ -117,6 +127,9 @@ export default {
       'isAuthenticated',
       'searchText'
     ]),
+    HasSubscription() {
+      return this.$store.state.hasActiveSubscription;
+    },
   },
   data () {
     return {
@@ -131,7 +144,7 @@ export default {
     isActive : function(val) {
       return val === document.location.pathname.split('/')[1];
     },
-    init: function() {     
+    init: function() {  
       /* extend some libraries */
       $.expr[":"].contains = $.expr.createPseudo(function (arg) {
         return function (elem) {
@@ -157,8 +170,8 @@ export default {
       
       String.prototype.toTitleCase = function () {
         return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-      };   
-      
+      };       
+
       commonSvc.SetupForEnvironment();
 
       // initialize the application
@@ -172,6 +185,8 @@ export default {
       AWS.config.region = 'us-east-1';      
       
       userSvc.Authenticate();
+
+      commonSvc.CheckVersion();
     }
   }
 }

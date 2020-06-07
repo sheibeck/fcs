@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="name" class="col-sm-12 col-md-2 col-form-label">Stunts & Extras</label>
+                    <label for="name" class="col-sm-12 col-md-2 col-form-label">Stunts &amp; Extras</label>
                     <div class="col-sm-12 col-md-10">
                         <div class="row js-stunts">
                             <div class="col-12">

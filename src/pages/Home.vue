@@ -7,14 +7,26 @@
   </div>
 
   <div class="row">
+        <div v-if="!HasSubscription" class="col-sm-6">
+          <div class="card card m-2">
+            <div class="card-body">
+              <h5 class="card-title">Become a Subscriber</h5>
+              <p class="card-text">Subscribing will give you access to great features like Roll20 integration. Register for free and get your game on!</p>
+              <a v-if="!isAuthenticated" href="register" class="btn btn-primary">Create a Free Account <span class='dice'>C</span></a>
+              <a v-if="isAuthenticated" href="account" type="button" class="btn btn-primary">
+                  Become a Subscriber <span class='dice'>C</span>
+              </a>
+            </div>
+          </div>
+        </div>
         <div class="col-sm-6">
           <div class="card m-2">
             <div class="card-body">
               <h5 class="card-title">View Your Fate Characters</h5>
               <p class="card-text">Create and manage all of your fate characters online. You can store and edit as many characters as you want using any of our Fate Character Sheets.</p>
-              <a href="character" class="btn btn-primary requires-auth hidden">Play a Fate Character <span class='dice'>C</span></a>
+              <a href="character" class="btn btn-primary requires-auth hidden">Play a Fate Character <i class="fas fa-user"></i></a>
               <a href="login" type="button" class="btn btn-primary requires-noauth">
-                  Login to View Your Characters <span class='dice'>C</span>
+                  Login to View Your Characters <i class="fas fa-user"></i>
               </a>
             </div>
           </div>
@@ -23,10 +35,10 @@
           <div class="card card m-2">
             <div class="card-body">
               <h5 class="card-title">View Your Campaigns</h5>
-              <p class="card-text">Create and manage a campaign setting. Build your world and start playing!</p>
-              <a href="campaign" class="btn btn-primary requires-auth hidden">Play a Campaign <i class="fas fa-globe"></i></a>
+              <p class="card-text">Create and manage a campaign setting. Record session notes and share them with your players. Build your world and start playing!</p>
+              <a href="campaign" class="btn btn-primary requires-auth hidden">Play a Campaign <i class="fas fa-globe-americas"></i></a>
               <a href="login" type="button" class="btn btn-primary requires-noauth">
-                  Login to View Your Campaigns <i class="fas fa-globe"></i>
+                  Login to View Your Campaigns <i class="fas fa-globe-americas"></i>
               </a>
             </div>
           </div>
@@ -35,7 +47,7 @@
           <div class="card card m-2">
             <div class="card-body">
               <h5 class="card-title">Find a Fate Character Sheet</h5>
-              <p class="card-text">Find and print a character sheet for the setting you want. We have form-fillable Fate Core, Fate Accelerated and other setting character sheets.</p>
+              <p class="card-text">Find a character sheet for the setting you want. We have form-fillable Fate Core, Fate Accelerated and other setting character sheets.</p>
               <a href="charactersheet" class="btn btn-primary">Find a Character Sheet <span class='dice'>D</span></a>
             </div>
           </div>
@@ -80,6 +92,9 @@ export default {
       'isAuthenticated',
       'userId',
     ]),
+    HasSubscription() {
+      return this.$store.state.hasActiveSubscription;
+    },
   },
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character"></component>
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet"></component>
      
   </div>
 </template>
@@ -8,6 +8,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService"
+import FateOf20 from '../assets/js/fateof20'
 
 //sheets
 import SheetFateAccelerated from "./../sheets/fate-accelerated"
@@ -23,6 +24,7 @@ import SheetMouseGuard from "./../sheets/mouse-guard"
 import SheetStarTrek from "./../sheets/star-trek"
 
 let commonSvc = null;
+let fateOf20 = null;
 
 export default {
   name: 'CharacterSheet',
@@ -30,6 +32,7 @@ export default {
     if (!commonSvc) { 
       commonSvc = new CommonService(this.$root);
     }
+    fateOf20 = new FateOf20();
   },
   components: {
     "fate-accelerated": SheetFateAccelerated,
@@ -61,6 +64,31 @@ export default {
     }
   },
   methods: {
+    sendToRoll20(type, character, description, data, skillType) {         
+      let msg = null;      
+      switch(type) {
+        case "diceroll":          
+          msg = fateOf20.MsgDiceRoll(character, skillType, description, data);
+          break;
+        case "invoke":
+          msg = fateOf20.MsgInvoke(character, description, data);
+          break;
+        case "stuntextra":
+          msg = fateOf20.MsgStuntExtra(character, data);
+          break;
+        case "fatepoint":          
+          msg = fateOf20.MsgFatePoint(character, description, data);
+          break;
+        case "stress":
+        case "condition":
+          msg = fateOf20.MsgStress(character, description, data);
+          break;
+        case "consequence":
+          msg = fateOf20.MsgConsequence(character, description, data);
+          break;      
+      }
+      fateOf20.SendMessage(msg);
+    },
     getVal(obj, graphPath, defaultValue){
       var parts = graphPath.split(".");
       var root = obj;
@@ -77,7 +105,7 @@ export default {
 
       return eval(`obj.${graphPath}`);
     },
-    setVal(obj, arr, val) {
+    setVal(obj, arr, val) {      
       arr = arr.split(".");
       
       if (arr.length == 1)
@@ -119,6 +147,28 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+
+	.sheet {
+    margin-top: 30px;    
+	}
+
+
+	.fo20 {
+    cursor: pointer;
+    color: #007bff;
+	}
+
+  @media print {
+    .fo20 {
+      display: none;
+    }
+
+    .sheet {
+			margin: 20px;
+			margin-top: 40px;
+			max-width: 1024px;
+		}
+  }
 
 </style>

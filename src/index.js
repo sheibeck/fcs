@@ -37,7 +37,12 @@ window.Vue = Vue;
 Vue.config.productionTip = false
 
 const store = new Vuex.Store({
-  state: {    
+  state: {
+    hasActiveSubscription: null,
+    customerId: null,
+    roll20Enabled: true,
+    roll20Installed: false,
+    roll20Running: false,    
     sessions: [],
     filteredSessions: [],
     campaigns: [],
@@ -98,6 +103,21 @@ const store = new Vuex.Store({
     }
   },
   getters: {
+    isSubscriber : state => {
+      /*
+      * we can pause payments to give people access, no need for super-user group at this point
+      var groups = state.userSession.getIdToken().payload['cognito:groups'];
+      if (groups && groups.includes("super-user")) {
+        return true;
+      }*/     
+      return state.hasActiveSubscription;
+    },
+    roll20Enabled: (state, getters) => {
+      //don't show roll20 stuff on the creation screen, only saved characters      
+      if (document.location.href.indexOf("/charactersheet") > -1) return false;      
+      let enabled = getters.isSubscriber && state.roll20Enabled && state.roll20Installed && state.roll20Running;
+      return enabled;
+    },
     isAuthenticated: state => {
       return state.isAuthenticated;
     },

@@ -5,6 +5,8 @@ import shortid from 'shortid'
 import * as Sentry from '@sentry/browser';
 
 export default class CommonService {
+  latestVersion = "1.5";
+
   constructor(fcs){
     this.fcs = fcs;
   }
@@ -140,10 +142,10 @@ export default class CommonService {
   
   // help out with dev tasks by switching environments up based on the URL
   SetupForEnvironment = () => {
-      if (this.fcs.$store.state.environment !== 'production')
+      if (`${process.env.NODE_ENV}` !== "production")
       {
         let environmentLabel = "BETA";
-        if (window.location.host == 'localhost:8080')
+        if (window.location.host == "localhost:8080")
         {
           environmentLabel = "LOCAL";
         }        
@@ -175,5 +177,23 @@ export default class CommonService {
   SetId = function(type, id) {
     //ids are in the format of TYPE|ID, this will return just the id portion    
     return `${type.toUpperCase()}|${id}`;
+  }
+
+
+  CheckVersion = () => {    
+    var currentVersion = localStorage.getItem("fcsVersion");
+
+    if (currentVersion === null || currentVersion !== this.latestVersion) {
+      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/v${this.latestVersion}">v${this.latestVersion}</a>`;
+      let dismiss = `localStorage.setItem('fcsVersion', '${this.latestVersion}')`;
+      this.ShowAlert(msg, "info", dismiss);
+    } 
+  }
+
+  ShowAlert = function(msg, type, dismiss) {    
+    type = type ?? "info";
+    let alertMsg = `<div id="alertdiv" class="d-print-none alert alert-${type}">
+                      <a class="close" onclick="eval(${dismiss})" style="cursor:pointer;" data-dismiss="alert">×</a><span>${msg}</span></div>`;
+    $('#alert_placeholder').append(alertMsg);
   }
 }

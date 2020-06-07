@@ -6,7 +6,7 @@ export default class DbService {
     TableName = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
 
     constructor(fcs){        
-        this.fcs = fcs;        
+        this.fcs = fcs;
         this.commonSvc = new CommonService(fcs);
     }
 

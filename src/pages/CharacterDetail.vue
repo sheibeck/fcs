@@ -1,6 +1,5 @@
 <template>
-  <div class="container mt-2">
-
+  <div class="container mt-2">    
     <form>
       <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" />
 
@@ -48,18 +47,18 @@ export default {
   components: {
     "charactersheet": CharacterSheet,    
   },
-  metaInfo() {
+  metaInfo() {    
     return {
-       title: this.title,
+       title: `${this.characterData ? this.characterData.name : this.title}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
      }
   },
   mounted(){    
-    commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);    
-    
+    commonSvc = new CommonService(this.$root);    
+    dbSvc = new DbService(this.$root); 
+     
     this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.sheetname);
     this.characterId = commonSvc.SetId("CHARACTER", this.$route.params.id);
   },
@@ -88,16 +87,14 @@ export default {
       characterData: null,        
     }
   },
-  methods : {
+  methods : {   
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
     async show() {     
-      this.characterData = await dbSvc.GetObject(this.characterId);      
+      this.characterData = await dbSvc.GetObject(this.characterId);
       if (this.characterData == null) {
-        commonSvc.Notify(`Could not find character with id <b>${commonSvc.GetId(this.characterId)}</b>`, 'error', 2000, () => {
-          document.location = '/character';
-        });
+        commonSvc.Notify(`Could not find character with id <b>${commonSvc.GetId(this.characterId)}</b>`, 'error', 2000);
       }     
     },   
     async save() {

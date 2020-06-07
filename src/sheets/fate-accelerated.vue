@@ -11,11 +11,13 @@
 			<div class="row">
 				<div class="col-6 text-center">
 					<div for="refresh" class="fate-header">Refresh</div>
-					<input type="text" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
+					<input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
 				</div>
-				<div class="col-6 text-center ">
-					<div for="fatepoints" class="fate-header">FP</div>
-					<input type="text" class="form-control text-center" id="fatepoints" name="fatepoints" @change="setVal('fatepoints',  $event.target.value)" :value="getVal('fatepoints')" placeholder="Fate Points" />
+				<div class="col-6 text-center ">					
+					<div for="fatepoints" class="fate-header">
+						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
+					</div>	
+					<inputfatepoints />
 				</div>
 			</div>
 		</div>
@@ -38,23 +40,9 @@
 			<div class="form-group">
 				<div for="" class="fate-header">Aspects</div>
 			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[highconcept]" name="aspect[highconcept]" @change="setVal('aspects.highconcept',  $event.target.value)" :value="getVal('aspects.highconcept')" placeholder="High Concept" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[trouble]" name="aspect[trouble]" @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" placeholder="Trouble" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other1]" name="aspect[other1]" @change="setVal('aspects.other1',  $event.target.value)" :value="getVal('aspects.other1')" placeholder="Aspect" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other2]" name="aspect[other2]" @change="setVal('aspects.other2',  $event.target.value)" :value="getVal('aspects.other2')" placeholder="Aspect" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other3]" name="aspect[other3]" @change="setVal('aspects.other3',  $event.target.value)" :value="getVal('aspects.other3')" placeholder="Aspect" />
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control" id="aspect[other4]" name="aspect[other4]" @change="setVal('aspects.other4',  $event.target.value)" :value="getVal('aspects.other4')" placeholder="Aspect" />
+
+			<div v-for="aspect in aspects" :key="aspect.obj">
+				<inputaspect :aspect="aspect" />
 			</div>
 		</div>
 
@@ -64,68 +52,19 @@
 				<div class="fate-header col-12">Approaches</div>
 			</div>
 
-			<div class="form-group row">
-				<div class="col-9">
-				  <label class="col-9 col-form-label">Careful</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[careful]" name="approach[careful]" @change="setVal('approaches.careful',  $event.target.value)" :value="getVal('approaches.careful')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Clever</label>
-				</div>
-				<div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[clever]" name="approach[clever]" @change="setVal('approaches.clever',  $event.target.value)" :value="getVal('approaches.clever')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Flashy</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[flashy]" name="approach[flashy]" @change="setVal('approaches.flashy',  $event.target.value)" :value="getVal('approaches.flashy')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-					<label class="col-9 col-form-label">Forceful</label>
-				</div>
-				<div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[forceful]" name="approach[forceful]" @change="setVal('approaches.forceful',  $event.target.value)" :value="getVal('approaches.forceful')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Quick</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[quick]" name="approach[quick]" @change="setVal('approaches.quick',  $event.target.value)" :value="getVal('approaches.quick')" placeholder="+">
-			  </div>
-			</div>
-
-			<div class="form-group row">
-				<div class="col-9">
-			  		<label class="col-9 col-form-label">Sneaky</label>
-				</div>
-			  <div class="col-3">
-					<input class="form-control text-center" type="text" id="approach[sneaky]" name="approach[sneaky]" @change="setVal('approaches.sneaky',  $event.target.value)" :value="getVal('approaches.sneaky')" placeholder="+">
-			  </div>
-			</div>
+			<div v-for="approach in approaches" :key="approach.obj">
+				<inputapproach :item="approach" />
+			</div>			
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="col">
-			<div class="form-group">
-				<div for="stunts" class="fate-header">Stunts & Extras</div>
-				<textarea class="form-control" id="stunts" name="stunts" rows="25" placeholder="Stunts & Extras" @change="setVal('stunts',  $event.target.value)" :value="getVal('stunts')"></textarea>
-			</div>
+		<div class="col">		
+			<inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
+		</div>
+
+		<div class="col">		
+			<inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
 		</div>
 	</div>
 
@@ -133,57 +72,25 @@
 		<!-- stress -->
 		<div class="col-sm-6 col-md-4 fate-stress">
 			<div class="form-group">
-				<div for="" class="fate-header">Stress</div>
+				<div for="" class="fate-header">Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
-			<div class="row">
-				<div class="col">
-				  <label for="stress">
-					1
-				  </label>
-				  <input type="checkbox" value="1" id="stress[stress1]" name="stress[stress1]" @change="setVal('stress.stress1',  $event.target.checked)" :checked="getVal('stress.stress1')" />
-				</div>
 
-				<div class="col">
-				  <label for="stress">
-					2
-				  </label>
-				  <input type="checkbox" value="2" id="stress[stress2]" name="stress[stress2]" @change="setVal('stress.stress2',  $event.target.checked)" :checked="getVal('stress.stress2')" />
-				</div>
-
-				<div class="col">
-				  <label class="" for="stress">
-					3
-				  </label>
-				  <input type="checkbox" value="3" id="stress[stress3]" name="stress[stress3]" @change="setVal('stress.stress3',  $event.target.checked)" :checked="getVal('stress.stress3')" />
+			<div class="d-flex justify-content-between">
+				<div v-for="stress in stresses" :key="stress.obj">
+					<inputstress :stress="stress" />
 				</div>
 			</div>
 		</div>
 
 		<div class="col-sm-6 col-md-8 fate-consequences">
 			<div class="form-group">
-				<div class="fate-header col-12">Consequences</div>
+				<div class="fate-header col-12">Consequences <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">2</label>
-			  <div class="col-10">
-				<input class="form-control" type="text" id="consequence[mild]" name="consequence[mild]" placeholder="Mild" @change="setVal('consequence.mild',  $event.target.value)" :value="getVal('consequence.mild')" />
-			  </div>
+			<div v-for="consequence in consequences" :key="consequence.obj">
+				<inputconsequence :consequence="consequence" />
 			</div>
 
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">4</label>
-			  <div class="col-10">
-				<input class="form-control" type="text" id="consequence[moderate]" name="consequence[moderate]" placeholder="Moderate" @change="setVal('consequence.moderate',  $event.target.value)" :value="getVal('consequence.moderate')" />
-			  </div>
-			</div>
-
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">6</label>
-			  <div class="col-10">
-				<input class="form-control" type="text" id="consequence[severe]" name="consequence[severe]" placeholder="Severe" @change="setVal('consequence.severe',  $event.target.value)" :value="getVal('consequence.severe')" />
-			  </div>
-			</div>
 		</div>
 	</div>
 
@@ -191,25 +98,89 @@
 </template>
 
 <script>
+import InputSkillColumn from '../components/input-skill-column'
+import InputAspect from '../components/input-aspect'
+import InputConsequence from '../components/input-consequence'
+import InputStress from '../components/input-stress'
+import InputStuntExtra from '../components/input-stuntextra'
+import InputFatePoints from '../components/input-fatepoints'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'SheetFateAccelerated',
+  components: {
+	"inputapproach": InputSkillColumn,    
+	"inputaspect": InputAspect,
+	"inputconsequence": InputConsequence,
+	"inputstress": InputStress,
+	"inputstuntextra": InputStuntExtra,
+	"inputfatepoints": InputFatePoints,	
+  },
   props: {    
     character: Object,
+  },
+  computed: {
+ 	...mapGetters([      
+      'roll20Enabled'
+    ]),
   },
   mounted() {
    this.$parent.$parent.title = 'Fate Accelerated (Character Sheet)';
   },
   data () {
-    return {
+    return {				
+		approaches:  [
+			{placeholder:"Careful", obj:"approaches.careful"},
+			{placeholder:"Clever", obj:"approaches.clever"},
+			{placeholder:"Flashy", obj:"approaches.flashy"},
+			{placeholder:"Forceful", obj:"approaches.forceful"},
+			{placeholder:"Quick", obj:"approaches.quick"},
+			{placeholder:"Sneaky", obj:"approaches.sneaky"},
+		],
+		aspects: [
+			{label:"High Concept", obj:"aspects.highconcept"},
+			{label:"Trouble", obj:"aspects.trouble"},
+			{label:"Aspect", obj:"aspects.other1"},
+			{label:"Aspect", obj:"aspects.other2"},
+			{label:"Aspect", obj:"aspects.other3"},			
+		],
+		consequences: [
+			{label:"Mild", obj:"consequences.mild", value: "2"},
+			{label:"Moderate", obj:"consequences.moderate", value: "4"},
+			{label:"Severe", obj:"consequences.severe", value: "6"},
+		],
+		stresses: [
+			{label:"1", obj:"stress1"},
+			{label:"2", obj:"stress2"},
+			{label:"3", obj:"stress3"},
+		]			
     }
   },
-  methods: {  
+  methods: {	
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
-    setVal(arr, val) {
-    	this.$parent.setVal(this.character, arr, val);       
-    },
+    setVal(arr, val) {		
+		this.$parent.setVal(this.character, arr, val);		
+	},
+	sendToRoll20(type, label, obj, item, skillType) {		
+		switch(type)
+		{			
+			case "fatepoint":
+				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				break;
+			case "stress":
+			case "consequence":
+			case "stuntextra":
+				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				break;
+			default:
+				if (this.getVal(item)) {
+					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+				}
+				break;
+		}
+	},	
   }
 }
 </script>
@@ -217,20 +188,14 @@ export default {
 <style lang="scss" scoped>
   @import url('https://fonts.googleapis.com/css?family=Archivo+Black');
 
-	.sheet {
-		margin: 20px;
-		margin-top: 40px;
-		max-width: 1024px;
-	}
-
 	.fate-logo {
 		margin-top: -27px;
 		max-height: 130px;
 	}
 
-	.fate-header {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-header {
+		font-family: 'Archivo Black', sans-serif;
+		text-transform: uppercase;
 		background-color: #000;
 		color: white;
 		font-weight: 700;
@@ -239,22 +204,11 @@ export default {
 		font-size: 22px;
 	}
 
-	.col-form-label {
+	/deep/ .col-form-label {
 		font-family: 'Archivo Black', sans-serif;
 		text-transform: uppercase;
 		font-size: 22px;
 		font-weight: 700;
-	}
-
-	input.approachlabel {
-		font-family: 'Archivo Black', sans-serif;
-		text-transform: uppercase;
-		font-size: 22px;
-		font-weight: 700;
-		border: 0;
-		outline: 0;
-		background: transparent;
-		border-bottom: 1px solid lightgray;
 	}
 
 	.fate-approaches .form-group {
@@ -262,15 +216,14 @@ export default {
 		margin-top: 3px;
 	}
 
-	input.approachlabel {
+	/deep/ .inputlabel {
 		font-family: 'Archivo Black', sans-serif;
     	text-transform: uppercase;
 		font-size: 22px;
 		font-weight: 700;
 		border: 0;
 		outline: 0;
-		background: transparent;
-		border-bottom: 1px solid lightgray;
+		background: transparent;		
 	}
 
 	.fate-aspects .form-group {
@@ -283,28 +236,26 @@ export default {
 		margin-top: 1px;
 	}
 
-	input[type=checkbox] {
+	/deep/ input[type=checkbox] {
 		height: 50px;
 		width: 50px;
 	}
 
-	.fate-consequences label {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-consequences label {
+		font-family: 'Archivo Black', sans-serif;
+		text-transform: uppercase;
 		font-weight: 700;
 		font-size: 28px;
 		padding-top: 0px;
-		padding-bottom: 0px;
-		padding-left: 25px;
+		padding-bottom: 0px;		
 	}
 
-	.fate-stress label {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
+	/deep/ .fate-stress label {
+		font-family: 'Archivo Black', sans-serif;
+		text-transform: uppercase;
 		font-size: 30px;
 		font-weight: 700;
 		margin-left: -5px;
 		margin-right: -5px;
 	}
-
 </style>
