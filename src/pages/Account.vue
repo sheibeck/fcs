@@ -28,57 +28,59 @@
        
         <div v-if="loaded" class="d-md-flex justify-content-center">          
           <div class="card col col-md-6">
-            <div class="card-body">
-                <h5 class="card-title">
-                  Subscribe to Fate Character Sheet<br/>
-                  <small><em>Includes 30 day free trial.</em></small>
-                </h5>
-                <p class="card-text">
-                  Pay a low monthly fee or a get a discounted rate by subscribing yearly 
-                  and you gain access to subscriber only benefits.
-                </p>
-                <p class="font-weight-bold py-3">
-                  &mdash;Roll20 Integration<br /><span class="small">requires a browser that can run Chrome extensions (Chrome, Opera, Edge)</span>
-                </p>
-                <div v-if="HasSubscription">
-                  You are a subscriber, thank you!    
-                </div>
-                <div v-if="!HasSubscription">
-                  <p>
-                    <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                    <button v-on:click="Subscribe('price_HOMWmJWkyXR9TS')"
-                      style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
-                      id="checkout-button-plan_HJ5iyg7r8S6mN8"
-                      role="link"
-                    >
-                      $1.99 per Month
-                    </button>
-                  </p>
-                  <p> &mdash; OR &mdash;</p>
-                  <p>
-                    <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                    <button v-on:click="Subscribe('price_HOMXjW196sGTUI')"
-                      style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
-                      id="checkout-button-plan_HJ5iyg7r8S6mN8"
-                      role="link"
-                    >
-                      $14.99 per Year
-                    </button>
-                  </p>  
-                </div>            
-              </div>
-            </div>
-          </div>
 
-          <div v-if="loaded && HasSubscription" class="pt-3">
-            <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#extension" aria-expanded="true" aria-controls="extension">
-                Manual Extension Installation <i class="fas fa-cog"></i>
-            </button>
-            <div class="pt-2 collapse" id="extension">             
-              <p class="small">Open browser extensions and copy the ID of <strong>Fate of 20 extension</strong> here.</p>
-              <input type="text" id="devextid" name="devextid" @change="SetExtensionId($event.target.value)" :value="GetExtensionId" /><button type="button" class="ml-1 btn-primary btn-sm btn">save</button>              
+            <div v-if="HasSubscription" class="card-body">
+              <p>You are a subscriber, thank you!</p>
+              <p>For information on installing the Roll20 integration feature please visit the
+                <a href="https://github.com/sheibeck/fcs/wiki/Fate-of-20" target="_blank">Fate of 20 Page</a>.
+              </p>
             </div>
+
+            <div v-if="!HasSubscription" class="card-body">
+              <h5 class="card-title">
+                Subscribe to Fate Character Sheet<br/>
+                <small><em>Includes 30 day free trial.</em></small>
+              </h5>
+              <p class="card-text">
+                Pay a low monthly fee or a get a discounted rate by subscribing yearly 
+                and you gain access to subscriber only benefits.
+              </p>
+              <p class="font-weight-bold py-3">
+                &mdash;Roll20 Integration<br /><span class="small">requires a browser that can run Chrome extensions (Chrome, Opera, Edge)</span>
+              </p>              
+              <p>
+                <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
+                <button v-on:click="Subscribe('price_HOMWmJWkyXR9TS')"
+                  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
+                  id="checkout-button-plan_HJ5iyg7r8S6mN8"
+                  role="link"
+                >
+                  $1.99 per Month
+                </button>
+              </p>
+              <p> &mdash; OR &mdash;</p>
+              <p>
+                <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
+                <button v-on:click="Subscribe('price_HOMXjW196sGTUI')"
+                  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
+                  id="checkout-button-plan_HJ5iyg7r8S6mN8"
+                  role="link"
+                >
+                  $14.99 per Year
+                </button>
+              </p>       
+            </div>            
           </div>
+        </div>
+        <div v-if="loaded && HasSubscription" class="pt-3">
+          <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#extension" aria-expanded="true" aria-controls="extension">
+              Manual Extension Installation <i class="fas fa-cog"></i>
+          </button>
+          <div class="pt-2 collapse" id="extension">             
+            <p class="small">Open browser extensions and copy the ID of <strong>Fate of 20 extension</strong> here.</p>
+            <input type="text" id="devextid" name="devextid" @change="SetExtensionId($event.target.value)" :value="GetExtensionId" /><button type="button" class="ml-1 btn-primary btn-sm btn">save</button>              
+          </div>
+        </div>
       </div>
     </div>              
   </div>
