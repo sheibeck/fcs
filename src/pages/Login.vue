@@ -25,7 +25,7 @@
             Register <i class="fas fa-user-plus"></i>
         </a>
         <a href='/recover' class="col-sm-12 col-md-5 mt-1 mb-1">
-            Recover Password
+            Forgot your password?
         </a>
       </div>
     </div>
