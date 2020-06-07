@@ -50,7 +50,7 @@
               </p>              
               <p>
                 <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="Subscribe('price_HOMWmJWkyXR9TS')"
+                <button v-on:click="Subscribe('monthly')"
                   style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
                   id="checkout-button-plan_HJ5iyg7r8S6mN8"
                   role="link"
@@ -61,7 +61,7 @@
               <p> &mdash; OR &mdash;</p>
               <p>
                 <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="Subscribe('price_HOMXjW196sGTUI')"
+                <button v-on:click="Subscribe('yearly')"
                   style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
                   id="checkout-button-plan_HJ5iyg7r8S6mN8"
                   role="link"
@@ -136,7 +136,16 @@ export default {
     GetEmail() {      
       return this.$store.state.userSession.getIdToken().payload['email'];
     },
-    Subscribe(planItem) {
+    Subscribe(subLength) {
+
+      let planItem = "";
+      
+      if (subLength == "monthly") {
+        planItem = `${process.env.NODE_ENV}` !== "production" ? "price_HOMWmJWkyXR9TS" : "price_HOMa3VIaTQkjXg";
+      }
+      else if (subLength == "yearly") {
+        planItem = `${process.env.NODE_ENV}` !== "production" ? "price_HOMXjW196sGTUI" : "price_HOMadKCDuNeMKJ";
+      }
 
       userSvc.GetUserAttribute("custom:stripe_customer").then( id => {        
         
