@@ -58,11 +58,11 @@
 	</div>
 
 	<div class="row">
-		<div class="col">		
+		<div class="col-12 col-md-6">		
 			<inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
 		</div>
 
-		<div class="col">		
+		<div class="col-md-6">		
 			<inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
 		</div>
 	</div>
