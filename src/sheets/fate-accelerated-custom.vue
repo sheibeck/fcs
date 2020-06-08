@@ -62,7 +62,7 @@
 			<inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
 		</div>
 
-		<div class="col-md-6">		
+		<div class="col-12 col-md-6">		
 			<inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
 		</div>
 	</div>
