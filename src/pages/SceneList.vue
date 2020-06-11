@@ -4,31 +4,29 @@
     
     <div v-if="!loading">
       <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-md-flex">
-        <a href='/charactersheet' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Character <i class='fa fa-user'></i></a>
+        <a href='/scene/create' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Scene <i class="fas fa-book-open"></i></a>
         <search class=""></search>
       </div>
-      <div v-if="!hasCharacters">
-        <h2>You have not created any characters.</h2>
+      <div v-if="!hasScenes">
+        <h2>You have not created any scenes.</h2>
       </div>
-      <div v-if="hasCharacters" class='card-columns'>
-        <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
+      <div v-if="hasScenes" class='card-columns'>
+        <div v-for="item in scenes" v-bind:key="item.id" class='card'>
           <div class='card-body'>
-            <h5 class='card-title character-name'>{{item.name}}</h5>
+            <h5 class='card-title'>{{item.name}}</h5>
             <div class='row'>
               <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
                 <img v-bind:src="item.image_url" class='img-fluid' />
               </p>
               <p class='card-text col'>
-                <label class='h6'>High Concept</label>: {{item.aspects ? item.aspects.highconcept : ""}}<br>
-                <label class='h6'>Trouble</label>: {{item.aspects ? item.aspects.trouble : ""}}
-              </p>
+                {{ getShortText(item.description) }}
+              </p>           
             </div>
             <hr />
-            <div class="d-flex">
-              <a :href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-              <a :href='slugify[index]' class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
-              <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
-            </div>
+             <div class="d-flex">
+                <a :href="`/scene/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>                
+                <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
+              </div>
           </div>
           <div class='card-footer text-muted'>
             <div v-if="item.description" class='small'>
@@ -43,20 +41,20 @@
       <input id='copyUrl' class='hidden' />
 
       <!-- delete confirmation modal-->
-      <div class="modal fade" id="modalDeleteCharacterConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+      <div class="modal fade" id="modalDeleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="deleteLabel">Confirm Character Delete</h5>
+                      <h5 class="modal-title" id="deleteLabel">Confirm Scene Delete</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
                   </div>
                   <div class="modal-body">
-                      <p>Are you sure you want to delete this character?</p>
+                      <p>Are you sure you want to delete this scene?</p>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-danger js-delete-character" v-on:click="deleteCharacter">Delete</button>
+                      <button type="button" class="btn btn-danger js-delete" v-on:click="deleteScene">Delete</button>
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                   </div>
               </div>
@@ -77,10 +75,10 @@ let commonSvc = null;
 let dbSvc = null;
 
 export default {
-  name: 'CharacterList',
+  name: 'SceneList',
   metaInfo: {
       // if no subcomponents specify a metaInfo.title, this title will be used
-      title: 'My Characters',
+      title: 'My Scenes',
   },
   components: {
     search: Search,
@@ -90,12 +88,12 @@ export default {
     this.init();
   },
   computed: {
-    hasCharacters() {
-      return this.characters.length > 0;
+    hasScenes() {
+      return this.scenes.length > 0;
     },
     slugify: function() {
-      return this.characters.map(function(item) {
-          return '/character/' + commonSvc.GetId(item.related_id) + '/' + commonSvc.GetId(item.id) + '/' + commonSvc.Slugify(item.name);
+      return this.scenes.map(function(item) {
+          return '/scene/' + commonSvc.GetId(item.id) + '/' + commonSvc.Slugify(item.name);
       });
     },
     ...mapGetters([
@@ -118,8 +116,8 @@ export default {
   },
   data () {
     return {
-      title: "Character List",
-      characters: {},
+      title: "Scene List",
+      scenes: {},
       loading: true,
     }
   },
@@ -128,27 +126,25 @@ export default {
       commonSvc = new CommonService(this.$root);
       dbSvc = new DbService(this.$root);
 
-      $(document).on('show.bs.modal', '#modalDeleteCharacterConfirm', function (event) {        
-        var button = $(event.relatedTarget) // Button that triggered the modal
-        var characterId = button.data('id') // Extract info from data-* attributes
-        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      $(document).on('show.bs.modal', '#modalDeleteConfirm', function (event) {        
+        var button = $(event.relatedTarget);
+        var sceneId = button.data('id');      
         var modal = $(this);
-        $(modal.find('.js-delete-character')).data('id', characterId);
+        $(modal.find('.js-delete')).data('id', sceneId);
       });
     },
 
     list : async function (searchText) {      
-      this.characters = await dbSvc.ListObjects("CHARACTER", this.$store.state.userId, searchText);
+      this.scenes = await dbSvc.ListObjects("SCENE", this.$store.state.userId, searchText);
       this.loading = false;         
     },
 
-    deleteCharacter : function (event) {
-      var characterId = $(event.currentTarget).data('id');           
-      dbSvc.DeleteObject(  this.userId, characterId ).then( (response) => {  
+    deleteScene : function (event) {
+      var sceneId = $(event.currentTarget).data('id');           
+      dbSvc.DeleteObject(  this.userId, sceneId ).then( (response) => {  
         if (response) {    
-          $('#modalDeleteCharacterConfirm').modal('hide');            
-          commonSvc.Notify('Character deleted.', 'success');
+          $('#modalDeleteConfirm').modal('hide');            
+          commonSvc.Notify('Scene deleted.', 'success');
           this.list();   
         }   
       });

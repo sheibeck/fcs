@@ -17,6 +17,7 @@
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                     <a class="nav-link" v-bind:class="{active : isActive('character')}" href="/character"><i class="fas fa-user"></i> My Characters</a>
                     <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe-americas"></i> My Campaigns</a>
+                    <a class="nav-link" v-bind:class="{active : isActive('scene')}" href="/scene"><i class="fas fa-book-open"></i> My Scenes</a>
                  </div>
               </li>
               <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
