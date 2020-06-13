@@ -6,10 +6,27 @@
     <!-- details -->
     <div class="mr-auto">
       <header>
-        <label>{{zone.name.toUpperCase()}}</label>   
-        <span v-if="zone.aspects.length">&mdash; <em>Aspects</em></span>
+        <!-- name -->        
+        <label v-if="!editing" @click="editing=true">{{zone.name.toUpperCase()}}</label>
+        <div class="input-group" v-if="editing">  
+          <input class="form-control-sm" v-model="zone.name" />                    
+          <div class="input-group-append">              
+              <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
+          </div>          
+        </div>
+
+        <span v-if="zone.aspects.length">&mdash; <em>Aspects</em></span>        
         <div v-for="aspect in zone.aspects" v-bind:key="aspect.id" class="pl-1 ml-1 badge badge-warning">      
-          <span>{{aspect.name}}</span>
+          <span v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
+
+          <div class="input-group" v-if="aspect.editing">  
+            <input class="form-control-sm" v-model="aspect.name"  />
+            <div class="input-group-append">              
+                <button type="button" class="input-group-text" @click="aspect.editing = false"><i class="fas fa-check-circle text-success"></i></button>
+            </div>          
+          </div>
+          
+
           <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" />      
           <button type="button" class="btn btn-link p-0 m-0" @click="addInvoke(aspect.id)"><i class="fas fas fa-plus-circle fa-sm"></i></button>
           <button type="button" class="btn btn-link p-0 m-0" @click="removeInvoke(aspect.id)"><i class="fas fas fa-minus-circle fa-sm"></i></button>
@@ -22,12 +39,11 @@
       </draggable>      
     </div>
 
-    <div class="d-flex flex-column bg-light pl-1">
-      <button type="button" class="btn btn-link p-0" @click="editZone()"><i class="fas fa-pen-square"></i></button>
-      <button type="button" class="btn btn-link p-0" @click="addZoneObject()"><i class="fas fa-plus-circle"></i></button>      
-      <button type="button" class="btn btn-link p-0" @click="moveForward()"><i class="fas fa-chevron-circle-up"></i></button>
-      <button type="button" class="btn btn-link p-0" @click="moveBackward()"><i class="fas fa-chevron-circle-down"></i></button>
-      <button type="button" class="btn btn-link p-0" @click="removeZone()"><i class="fas fa-trash-alt"></i></button>
+    <div class="d-flex flex-column bg-light pl-1">      
+      <button type="button" class="btn btn-link p-0" data-toggle="tooltip" title="Add thing" @click="addZoneObject()"><i class="fas fa-plus-circle"></i></button>      
+      <button type="button" class="btn btn-link p-0" @click="moveForward()" data-toggle="tooltip" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
+      <button type="button" class="btn btn-link p-0" @click="moveBackward()" data-toggle="tooltip" title="Move zone backward"><i class="fas fa-chevron-circle-down"></i></button>
+      <button type="button" class="btn btn-link p-0" @click="removeZone()" data-toggle="tooltip" title="Delete zone"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 </template>
@@ -61,10 +77,13 @@ export default {
   },
   data () {
     return {
-      id: 1,    
+      editing: false,   
     }
   },
-  methods: {     
+  methods: {
+    editZone() {
+      this.editing = !this.editing;
+    }, 
     moveForward() {      
       const maxArray = this.$parent.$parent.highestZone();
       const found = maxArray.find(element => element.id == this.zone.id);

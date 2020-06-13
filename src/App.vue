@@ -181,7 +181,7 @@ export default {
         if (event.keyCode === 13) {
             $("#search-button").click();
         }
-      });
+      });          
 
       AWS.config.region = 'us-east-1';      
       

@@ -108,8 +108,8 @@ export default {
             id: "ZONE|1",
             name: "my zone",
             aspects: [
-              {id:"1", name: "Bad", invokes: [{id:1, used: false}, {id:2, used: false}]},
-              {id:"2", name: "Rough", invokes: [{id:1, used: true}]}
+              {id:"1", name: "Bad", editing: false, invokes: [{id:1, used: false}, {id:2, used: false}]},
+              {id:"2", name: "Rough", editing: false, invokes: [{id:1, used: true}]}
             ],
             sceneobjects : [
               {domId: '120', id: 'ADVERSARY|1', name: 'Obstacle', type: 'ADVERSARY'},
@@ -121,8 +121,8 @@ export default {
             id: "ZONE|2",
             name: "this place",
               aspects: [
-              {id:"1", name: "Watery", invokes: []},
-              {id:"2", name: "swampy", invokes: []}
+              {id:"1", name: "Watery", editing: false, invokes: []},
+              {id:"2", name: "swampy", editing: false, invokes: []}
             ],
             sceneobjects : [
               {domId: '123', id: 'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
@@ -136,8 +136,8 @@ export default {
             id: "ZONE|3",
             name: "this place",
               aspects: [
-              {id:"1", name: "This place is on fire", invokes: []},
-              {id:"2", name: "Billowy smoke", invokes: []},
+              {id:"1", name: "This place is on fire", editing: false, invokes: []},
+              {id:"2", name: "Billowy smoke", editing: false, invokes: []},
             ],
             sceneobjects : [
               {domId: '127', id: 'ADVERSARY|1', name: 'Bad Guy', type: 'ADVERSARY'},
