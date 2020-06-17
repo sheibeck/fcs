@@ -25,11 +25,10 @@
         <div class='card' v-for="item in adversaries" v-bind:key="item.id">
           <img v-if="item.image_url" class="card-img-top img-fluid img-thumbnail" style="object-fit: cover; object-position:top; max-height: 180px;" v-bind:src="item.image_url" v-bind:alt="item.name + 'Image'">
 
-          <h4 class='card-header adversary-name bg-light'>
-            <a v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}`" style="text-decoration:none;">{{item.name}}</a>
-            <small v-if="isOwner(item.owner_id)">
-              <a v-if="isOwner(item.owner_id)" v-bind:href="`/adversary/edit/${commonSvc.GetId(item.id)}`" class='d-print-none' style="color: #888 !important;"><i class='fa fa-edit'></i></a>
-            </small>
+          <h4 class='card-header adversary-name bg-light d-flex'>
+            <a v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}`" class="mr-auto" style="text-decoration:none;">{{item.name}}</a>            
+            <a v-if="isAuthenticated" v-bind:href="`/adversary/copy/${commonSvc.GetId(item.id)}`" class='d-print-none' title="Copy Adversary" style="color: #888 !important;"><i class="fas fa-copy fa-xs"></i></a>
+            <a v-if="isOwner(item.owner_id)" v-bind:href="`/adversary/edit/${commonSvc.GetId(item.id)}`" title="Edit Adversary" class='d-print-none pl-1' style="color: #888 !important;"><i class='fa fa-edit fa-xs'></i></a>
           </h4>
 
           <div v-if="!isEmpty(item.aspects)">

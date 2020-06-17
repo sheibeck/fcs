@@ -375,7 +375,7 @@ export default {
       }      
     }, 
     copyThingToClipboard : function(text) {
-      commonSvc.CopyTextToClipboard(text);      
+      commonSvc.CopyTextToClipboard(text);
     },
     getCampaign : async function(id) {
 

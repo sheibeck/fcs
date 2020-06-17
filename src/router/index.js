@@ -40,7 +40,7 @@ export default new Router({
     { path: '/campaign-summary/:id/:name?', name: 'Campaign Summary', component: CampaignSummary, props: true },
     { path: '/charactersheet', component: CharacterSheetList },    
     { path: '/charactersheet/:id', name: 'Character Sheet Detail', component: CharacterSheetDetail, props: true },
-    { path: '/adversary/edit/:id?', component: AdversaryDetail, props: true },
+    { path: '/adversary/:action/:id?', component: AdversaryDetail, props: true },
     { path: '/adversary/:id?/:name?', component: AdversaryList, props: true },
     { path: '*', component: Error }
   ]
