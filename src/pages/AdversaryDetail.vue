@@ -236,6 +236,7 @@ export default {
         this.adversary.id = "";
         this.adversary.ownerId = "";
         this.adversary.is_private = true;
+        this.adversary.name = `Copy of ${this.adversary.name}`;
       }
       else {
         await this.getAdversary(this.adversaryId, this.userId);
