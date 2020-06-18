@@ -8,7 +8,7 @@
             Login to Create an Adversary <span class='dice'>A</span>
         </a>
 
-        <a v-if="isAuthenticated" role="button" href="/adversary/edit" class="btn btn-success js-create-adversary mb-1 mb-md-0">
+        <a v-if="isAuthenticated" role="button" href="/adversary/create/new-adversary/edit" class="btn btn-success js-create-adversary mb-1 mb-md-0">
           Create Adversary <i class='fa fa-plus'></i>
         </a>
 
@@ -19,6 +19,11 @@
 
         <search class=""></search>
       </div>
+      <div v-else class="mb-2">
+        <a role="button" href="/adversary" class="btn btn-success js-create-adversary mb-1 mb-md-0 d-print-none">
+          <i class="fas fa-chevron-circle-left"></i> Adversary List
+        </a>
+      </div>
     </div>
 
       <div class='card-columns' id="adversaryDetail">
@@ -27,8 +32,8 @@
 
           <h4 class='card-header adversary-name bg-light d-flex'>
             <a v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}`" class="mr-auto" style="text-decoration:none;">{{item.name}}</a>            
-            <a v-if="isAuthenticated" v-bind:href="`/adversary/copy/${commonSvc.GetId(item.id)}`" class='d-print-none' title="Copy Adversary" style="color: #888 !important;"><i class="fas fa-copy fa-xs"></i></a>
-            <a v-if="isOwner(item.owner_id)" v-bind:href="`/adversary/edit/${commonSvc.GetId(item.id)}`" title="Edit Adversary" class='d-print-none pl-1' style="color: #888 !important;"><i class='fa fa-edit fa-xs'></i></a>
+            <a v-if="isAuthenticated" v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}/copy`" class='d-print-none' title="Copy Adversary" style="color: #888 !important;"><i class="fas fa-copy fa-xs"></i></a>
+            <a v-if="isOwner(item.owner_id)" v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}/edit`" title="Edit Adversary" class='d-print-none pl-1' style="color: #888 !important;"><i class='fa fa-edit fa-xs'></i></a>
           </h4>
 
           <div v-if="!isEmpty(item.aspects)">

@@ -149,7 +149,7 @@
             </div>
         </div>
         <button class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>
-        <a href='/adversary' role="button" class="btn btn-secondary">Cancel <i class='fa fa-times-circle'></i></a>
+        <button type="button" @click="cancel()" role="button" class="btn btn-secondary">Cancel <i class='fa fa-times-circle'></i></button>
         <a v-if="action == 'edit'" href='#' class='btn btn-danger' data-toggle='modal' data-target='#modalDeleteAdversaryConfirm'> Delete <i class='fa fa-trash'></i></a>
     </form>
 
@@ -211,7 +211,7 @@ export default {
       adversary: {},
       title: "",
       description: "",
-      action: this.$route.params.action,
+      action: this.$route.params.action,      
     }
   },
   computed: {
@@ -237,6 +237,7 @@ export default {
         this.adversary.ownerId = "";
         this.adversary.is_private = true;
         this.adversary.name = `Copy of ${this.adversary.name}`;
+        this.adversary.slug = commonSvc.Slugify(this.adversary.name);
       }
       else {
         await this.getAdversary(this.adversaryId, this.userId);
@@ -339,7 +340,7 @@ export default {
             commonSvc.Notify('Adversary saved.', 'success', null, () => {
               if (isNew)
               {
-                location.href = `/adversary/edit/${commonSvc.GetId(result['id'])}`;
+                location.href = `/adversary/${commonSvc.GetId(result['id'])}/${result['slug']}/edit`;
               }
             });
           }          
@@ -500,7 +501,10 @@ export default {
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
-    }   
+    },
+    cancel() {      
+      document.location.href = `/adversary/${commonSvc.GetId(this.adversary.id)}/${this.adversary.slug}`;
+    }
   }
 }
 </script>
