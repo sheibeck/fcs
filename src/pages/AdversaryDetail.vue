@@ -7,8 +7,12 @@
             <div class="col-sm-12 col-md-8">
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Name</label>
-                    <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="text" value="" id="name" name="name">
+                    <div class="col-sm-12 col-md-10 d-flex">                      
+                      <input class="form-control mr-auto" type="text" value="" id="name" name="name">                      
+                      <div class="w-25 pt-2 ml-2 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_private" name="is_private">
+                          <label class="form-check-label" for="is_private" title="Don't show this adversary in the public adversary list.">Is Private?</label>  
+                      </div>
                     </div>
                 </div>                
                 <div class="form-group row">
@@ -145,8 +149,8 @@
             </div>
         </div>
         <button class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>
-        <a href='/adversary' role="button" class="btn btn-secondary">Close <i class='fa fa-times-circle'></i></a>
-        <a href='#' class='btn btn-danger' data-toggle='modal' data-target='#modalDeleteAdversaryConfirm'> Delete <i class='fa fa-trash'></i></a>
+        <button type="button" @click="cancel()" role="button" class="btn btn-secondary">Cancel <i class='fa fa-times-circle'></i></button>
+        <a v-if="action == 'edit'" href='#' class='btn btn-danger' data-toggle='modal' data-target='#modalDeleteAdversaryConfirm'> Delete <i class='fa fa-trash'></i></a>
     </form>
 
 
@@ -207,6 +211,7 @@ export default {
       adversary: {},
       title: "",
       description: "",
+      action: this.$route.params.action,      
     }
   },
   computed: {
@@ -216,65 +221,81 @@ export default {
     ]),
   },
   methods: {
-    init : function() {      
+    init : async function() {      
       $(document).on('click', '.js-delete-item', function (eve) {
           $(this).parent().parent().remove();
       });
 
       this.adversaryId = commonSvc.SetId("ADVERSARY", this.$route.params.id);
+            
+      if (this.action == "copy")
+      {
+        await this.getAdversary(this.adversaryId);
+
+        //make a copy of this adversary      
+        this.adversary.id = "";        
+        this.adversary.ownerId = "";
+        this.adversary.is_private = true;
+        this.adversary.name = `Copy of ${this.adversary.name}`;
+        this.adversary.slug = commonSvc.Slugify(this.adversary.name);
+      }
+      else {
+        await this.getAdversary(this.adversaryId, this.userId);
+      }
 
       this.editAdversary();
     },
-    editAdversary : function() {                
-      //we only edit if we have a valid slug for an id
-      if (!this.adversaryId) return;
-      
-      let adversary = dbSvc.GetObject(this.adversaryId, this.userId).then( (data) => {
-        this.adversary = data;
-        //if we find an adversary, then we're editing, otherwise we are creating
-        if (this.adversary) {
-          this.clearAdversaryForm();
-          this.populateAdversaryForm(this.adversary);
+    getAdversary : async function(id, ownerId) {      
+      let adversary = await dbSvc.GetObject(this.adversaryId, ownerId);
+      this.adversary = adversary;      
+    },   
+    editAdversary : function() {
+      //if we find an adversary, then we're editing, otherwise we are creating
+      if (this.adversary) {
+        this.clearAdversaryForm();
+        this.populateAdversaryForm(this.adversary);
 
-          this.title = this.adversary.name + ' (Adversary)';
-          this.description = this.adversary.type;
-        }    
-      });     
+        this.title = this.adversary.name + ' (Adversary)';
+        this.description = this.adversary.type;
+      }          
     },
-    save : async function() {
+    save : async function() {      
       if (!$("#name").val())
       {
         commonSvc.Notify('You must enter a name', 'error');
         return;
       }
 
-      var data = $('#adversaryForm').serializeArray();
+      var data = $('#adversaryForm').serializeArray();            
 
       var result = {};
       var currentKey;
       $.each(data, function () {
-          if (this.name !== '') {
-              if (this.name.indexOf('[name]') > -1)
-              {
-                  var label = this.name.replace('[name]',''); //get the name of the parent property
-                  if (!result[label]) {
-                      result[label] = {};
-                  }
-                  currentKey = this.value; //get the value that needs to be appened to the parent
-                  result[label][this.value] = null;
+        if (this.name !== '') {
+          if (this.name.indexOf('[name]') > -1)
+          {
+              var label = this.name.replace('[name]',''); //get the name of the parent property
+              if (!result[label]) {
+                  result[label] = {};
               }
-
-              else if (this.name.indexOf('[value]') > -1)
-              {
-                  var label = this.name.replace('[value]', '');//get the name of the parent property
-                  result[label][currentKey] = this.value; //get the last name we stored, should be in order so we assume the previous name is paired with this
-                  currentKey = '';
-              }
-
-              else {
-                  result[this.name] = this.value;
-              }
+              currentKey = this.value; //get the value that needs to be appened to the parent
+              result[label][this.value] = null;
           }
+          else if (this.name.indexOf('[value]') > -1)
+          {
+              var label = this.name.replace('[value]', '');//get the name of the parent property
+              result[label][currentKey] = this.value; //get the last name we stored, should be in order so we assume the previous name is paired with this
+              currentKey = '';
+          }
+          else if (this.name.indexOf('is_private') > -1)
+          {
+            //use true/false instead of on/off
+            result[this.name] = this.value == "on" ? true : false;
+          }
+          else {
+              result[this.name] = this.value;
+          }
+        }
       });
 
       if (result.stress) {
@@ -319,7 +340,7 @@ export default {
             commonSvc.Notify('Adversary saved.', 'success', null, () => {
               if (isNew)
               {
-                location.href = `${location.href}/${commonSvc.GetId(result['id'])}`;
+                location.href = `/adversary/${commonSvc.GetId(result['id'])}/${result['slug']}/edit`;
               }
             });
           }          
@@ -362,7 +383,7 @@ export default {
                 $.each(val, function(n, t) {
                   $('input[name="aspects[name]"][data-name=' + n + ']').next().val(t);
                 });
-                break;
+                break;             
               default:
                 var objName = name.replace('_', '-');
                 for(var i=0;i<Object.keys(val).length-1;i++) {
@@ -381,8 +402,11 @@ export default {
             var type = $el.attr('type');
 
             switch(type){
-                default:
-                    $el.val(val);
+              case "checkbox":
+                $el[0].checked = val;
+                break;
+              default:
+                $el.val(val);
             }
           }
       });      
@@ -477,7 +501,16 @@ export default {
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
-    }   
+    },
+    cancel() {      
+      if (this.adversary.id) {
+        //if go back to the original if we cancel and haven't saved yet
+        document.location.href = `/adversary/${commonSvc.GetId(this.adversary.id)}/${this.adversary.slug}`;
+      } else {
+        //go back to the list if we were copying but cancelled
+        document.location.href = `/adversary`;
+      }
+    }
   }
 }
 </script>

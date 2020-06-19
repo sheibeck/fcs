@@ -124,22 +124,29 @@ export default class DbService {
             IndexName: "type",
             KeyConditionExpression: 'object_type = :item_type',
             ExpressionAttributeValues: {
-              ':item_type': itemType
-            }
+              ':item_type': itemType,
+              ':one': "1"
+            },            
+            FilterExpression: ":one = :one",
         }
 
         //if we know the owner then use the sort key, too
         if (ownerId) {
             params.KeyConditionExpression += ' AND owner_id = :owner_id';
             params.ExpressionAttributeValues[':owner_id'] = ownerId;
+        } else {
+            //if the user isn't looking at their own stuff, then they are looking at the
+            //public list. don't show private_only items in the public list
+            params.FilterExpression += ' AND is_private <> :is_private';
+            params.ExpressionAttributeValues[':is_private'] = true;
         }
 
         //add some search parameters
         if (filter) {
             this.GetSearchFilters(filter, params);
-        }
+        }        
              
-        const queryAll = async (params) => {
+        const queryAll = async (params) => {            
             let lastEvaluatedKey = 'dummy'; // string must not be empty
             const itemsAll = [];
             while (lastEvaluatedKey) {
@@ -156,7 +163,7 @@ export default class DbService {
                         lastEvaluatedKey = null;                    
                     });
                 }
-                catch(ex) {
+                catch(ex) {                    
                     this.commonSvc.Notify(ex, 'error');
                     break;
                 }                
@@ -238,7 +245,7 @@ export default class DbService {
     }
     
     GetSearchFilters(searchText, params) {
-        let FilterExpression = '( contains (#object_name, :an)';
+        let FilterExpression = ' AND ( contains (#object_name, :an)';
 
         FilterExpression += ' OR contains (#object_name, :anl)';
         FilterExpression += ' OR contains (#object_name, :anu)';
@@ -303,11 +310,16 @@ export default class DbService {
         }
 
         Object.keys(filterParms.ExpressionAttributeValues).forEach(function (item) {
+            if (!params.ExpressionAttributeValues) params.ExpressionAttributeValues = {};
             params.ExpressionAttributeValues[item] = filterParms.ExpressionAttributeValues[item];
         });
         
-        params.ExpressionAttributeNames = filterParms.ExpressionAttributeNames;
-        params.FilterExpression = filterParms.FilterExpression;   
+        Object.keys(filterParms.ExpressionAttributeNames).forEach(function (item) {
+            if (!params.ExpressionAttributeNames) params.ExpressionAttributeNames = {};
+            params.ExpressionAttributeNames[item] = filterParms.ExpressionAttributeNames[item];
+        });
+                
+        params.FilterExpression += filterParms.FilterExpression;   
         
         return params;
     }
