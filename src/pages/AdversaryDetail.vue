@@ -233,7 +233,7 @@ export default {
         await this.getAdversary(this.adversaryId);
 
         //make a copy of this adversary      
-        this.adversary.id = "";
+        this.adversary.id = "";        
         this.adversary.ownerId = "";
         this.adversary.is_private = true;
         this.adversary.name = `Copy of ${this.adversary.name}`;
@@ -503,7 +503,13 @@ export default {
       return this.userId === ownerId;
     },
     cancel() {      
-      document.location.href = `/adversary/${commonSvc.GetId(this.adversary.id)}/${this.adversary.slug}`;
+      if (this.adversary.id) {
+        //if go back to the original if we cancel and haven't saved yet
+        document.location.href = `/adversary/${commonSvc.GetId(this.adversary.id)}/${this.adversary.slug}`;
+      } else {
+        //go back to the list if we were copying but cancelled
+        document.location.href = `/adversary`;
+      }
     }
   }
 }
