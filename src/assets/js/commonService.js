@@ -5,7 +5,7 @@ import shortid from 'shortid'
 import * as Sentry from '@sentry/browser';
 
 export default class CommonService {
-  latestVersion = "1.5";
+  latestVersion = "1.5.2";
 
   constructor(fcs){
     this.fcs = fcs;
