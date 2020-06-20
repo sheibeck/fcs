@@ -1,7 +1,7 @@
 <template>
   <div class="m-1 p-1 bg-light border d-flex" :id="`SCENEOBJECT|${objectdata.domId}`">
-    <div class="bg-secondary text-white mr-1 p-1">
-      <i class="handle fas fa-bars"></i>
+    <div class="bg-secondary text-white mr-1 p-1 objectHandle">
+      <i class="fas fa-bars"></i>
     </div>
 
     <div class="mr-auto w-100">      

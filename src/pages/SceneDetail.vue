@@ -4,7 +4,13 @@
   }
 
   #scene-canvas {
-    min-height: 768px;    
+    min-height: 1536px;
+    min-width: 2048px;
+    border: solid 2px black;
+  }
+   
+  footer {
+    display: none;
   }
 </style>
 
@@ -18,11 +24,9 @@
         <h3 class="mr-auto">{{scene.name}} &mdash; Scene</h3> <button type="button" class="btn btn-primary" @click="addZone()">Add Zone</button>
       </div>
 
-      <div id="scene-canvas">
-        <!-- zones -->
-        <draggable v-show="!isNewScene" v-model="scene.zones" group="zone" @start="drag=true" @end="drag=false" class="mt-2 d-flex">          
-          <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="bg-white" />
-        </draggable>        
+      <div id="scene-canvas" class="bg-light mt-2">
+        <!-- zones -->        
+        <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" />        
       </div>
 
       <!-- properties -->
@@ -53,6 +57,27 @@
       </div>
 
     </div>
+
+    <!-- add scene object -->
+    <div class="modal" id="modalSceneObject" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Add Scene Object</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Scene Objects
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -63,6 +88,7 @@ import DbService from '../assets/js/dbService';
 import Loading from '../components/loading';
 import SceneZone from '../components/scene-zone';
 import draggable from 'vuedraggable';
+import { dragscroll } from 'vue-dragscroll'
 
 let commonSvc = null;
 let dbSvc = null;
@@ -77,8 +103,11 @@ export default {
        ]
      }
   },
+  directives: {
+    dragscroll
+  },
   components: {
-    draggable,  
+    draggable,      
     loading: Loading,
     scenezone: SceneZone    
   },
@@ -162,7 +191,6 @@ export default {
     commonSvc() {
       return commonSvc;
     },
-
   },
   methods: {
     init() {
@@ -175,6 +203,8 @@ export default {
         $(modal.find('.js-delete')).data('id', id);
       });
             
+      //hide the footer for a better game table experience
+      document.getElementsByTagName("footer")[0].className += " d-none";
     },   
     getScene : function(ownerId, id) {
       var $component = this;

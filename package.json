@@ -37,7 +37,11 @@
     "taggle": "^1.15.0",
     "vue": "^2.6.11",
     "vue-cookies": "^1.7.0",
+    "vue-draggable-resizable": "^2.2.0",
+    "vue-dragscroll": "^2.1.0",
+    "vue-nestable": "^2.5.3",
     "vue-router": "^3.1.5",
+    "vue-smooth-dnd": "^0.8.1",
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
