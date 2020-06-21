@@ -9,7 +9,7 @@
       </div>          
     </div>
 
-    <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" />
+    <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="invoke($event, invoke.id)" />
     <button type="button" class="btn btn-link p-0 m-0" title="Add invoke" @click="addInvoke()"><i class="fas fas fa-plus-circle fa-xs"></i></button>
     <button type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>
     <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
@@ -63,6 +63,10 @@ export default {
             return obj.id !== $component.aspect.id;
           });
       }
+    },
+    invoke(event, id) {      
+      let idx = this.aspect.invokes.findIndex(x => x.id === id);
+      this.aspect.invokes[idx].used = event.target.checked;
     }
   }
 

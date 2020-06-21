@@ -17,8 +17,8 @@
         Stress [] [] []
       </div>
 
-      <div>
-        <div>Created Aspects &amp; Boosts</div>
+      <div >
+        <div class="mt-1 mb-1 separator"></div>
         <aspect :aspect="aspect" v-for="aspect in objectdata.caAndBoost" v-bind:key="aspect.id" />
       </div>
      
@@ -26,7 +26,7 @@
 
     <div class="d-flex flex-column bg-light ml-1 border">
       <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>            
-      <button type="button" class="btn btn-link p-0" @click="removeObject(objectdata.domId)"><i class="fas fa-trash-alt"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.domId)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 </template>
@@ -86,4 +86,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .objectHandle {
+    cursor:grab;
+  }
+
+  .separator {
+    border-top: solid 1px #ccc; border-width: thin;
+  }
 </style>

@@ -1,6 +1,7 @@
 <template>  
   <vue-draggable-resizable :id="`SCENEZONE|${zone.id}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" :style="`z-index:${zone.zindex}`" 
-        drag-handle=".dragHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'">
+        drag-handle=".dragHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'"  :x="zone.x" :y="zone.y"
+        :w="zone.width" :h="zone.height" @dragging="onDrag" @resizing="onResize">
     <!-- drag handle -->
     <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white dragHandle" :id="`handle-zone-${zone.domId}`"></i>
 
@@ -127,6 +128,16 @@ export default {
       if (z > 1) z--;
       this.zone.zindex = z;
     },
+    onDrag: function (x, y) {
+      this.zone.x = x;
+      this.zone.y = y;
+    },
+    onResize: function (x, y, width, height) {      
+      this.zone.x = x;
+      this.zone.y = y;
+      this.zone.width = width
+      this.zone.height = height
+    },
   }
 
 }
@@ -135,7 +146,15 @@ export default {
 <style lang="scss" scoped>
   .zone {
     min-height: 300px;
-    min-width: 400px;
+    min-width: 400px;    
+  }
+
+  .dragHandle {
+    cursor: drag !important;
+  }
+
+  .cancelZoneDrag {
+    cursor:default;
   }
 
   .drop-preview {

@@ -4,9 +4,11 @@
   }
 
   #scene-canvas {
-    min-height: 1536px;
-    min-width: 2048px;
+    position:relative;
+    height: 80vh;    
     border: solid 2px black;
+    overflow: scroll;   
+    cursor:grab; 
   }
    
   footer {
@@ -15,21 +17,22 @@
 </style>
 
 <template>
-  <div class="container-fluid mt-2">
+  <div class="m-2">
    
     <loading :loading="isLoading" />
 
     <div v-show="!isLoading">
       <div class="d-flex flex-column flex-sm-row">
-        <h3>{{scene.name}} &mdash; Scene</h3> 
-        <div class="mr-auto mt-2 ml-2">
+        <div class="h4">{{scene.name}}</div>
+        <div class="mr-auto ml-2">
           (<label><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</label>
-          <sceneaspect :aspect="aspect" location="scene" v-for="aspect in aspects" v-bind:key="aspect.id" />)
+          <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />)
         </div>
-        <button type="button" class="btn btn-primary" @click="addZone()">Add Zone</button>        
+        <button type="button" class="btn-sm btn btn-primary" @click="addZone()">Add Zone</button>
+        <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()">Save Scene</button>
       </div>
 
-      <div id="scene-canvas" class="bg-light mt-2">
+      <div id="scene-canvas" v-dragscroll:nochilddrag class="bg-light mt-2">
         <!-- zones -->        
         <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" />        
       </div>
@@ -136,52 +139,7 @@ export default {
       description: "",
       loading: true,
       scene : {},
-      id: this.$route.params.id,
-      aspects: [],     
-      zones: [
-          {
-            domId: "1",
-            zindex: "1",
-            id: "ZONE|1",
-            name: "my zone",
-            aspects: [
-              {id:"1", name: "Bad", editing: false, invokes: [{id:1, used: false}, {id:2, used: false}]},
-              {id:"2", name: "Rough", editing: false, invokes: [{id:1, used: true}]}
-            ],
-            sceneobjects : [
-              {domId: '120', id: 'ADVERSARY|1', name: 'Obstacle', type: 'ADVERSARY'},
-            ]
-          },
-          {
-            domId: "2",
-            zindex: "1",
-            id: "ZONE|2",
-            name: "this place",
-              aspects: [
-              {id:"1", name: "Watery", editing: false, invokes: []},
-              {id:"2", name: "swampy", editing: false, invokes: []}
-            ],
-            sceneobjects : [
-              {domId: '123', id:'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
-              {domId: '122', id:'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
-              {domId: '121', id:'ADVERSARY|2', name: 'Adversary 2', type: 'ADVERSARY'},
-            ]
-          },
-          {
-            domId: "3",
-            zindex: "1",
-            id: "ZONE|3",
-            name: "this place",
-              aspects: [
-              {id:"1", name: "This place is on fire", editing: false, invokes: []},
-              {id:"2", name: "Billowy smoke", editing: false, invokes: []},
-            ],
-            sceneobjects : [
-              {domId: '127', id: 'ADVERSARY|1', name: 'Bad Guy', type: 'ADVERSARY'},
-              {domId: '126', id: 'ADVERSARY|1', name: 'Hord of Bad Guys', type: 'ADVERSARY'},              
-            ]
-          }
-        ]
+      id: this.$route.params.id,      
     }
   },
   computed: {
@@ -235,9 +193,7 @@ export default {
           //draw scene objects
 
           $component.name = $component.scene.name + ' (SCENE)';
-          $component.description = $component.scene.description || "";
-
-          this.scene.zones = this.zones;          
+          $component.description = $component.scene.description || "";    
         }
 
         $component.loading = false;    
@@ -291,6 +247,8 @@ export default {
         zindex: "2",
         id: `ZONE|${id}`,
         name: "New Zone",
+        x: 0,
+        y: 0,
         aspects: [         
         ],
         sceneobjects : [          
@@ -301,7 +259,10 @@ export default {
     },
     addAspect() {
       let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
-      this.aspects.push(aspect);
+      if (!this.scene.aspects) {             
+        this.$set(this.scene, 'aspects', new Array());
+      }
+      this.scene.aspects.push(aspect);
     },
     highestZone() {      
       var max = Math.max.apply(Math, this.scene.zones.map(function(o) { return o.zindex; }));
