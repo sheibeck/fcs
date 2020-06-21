@@ -20,6 +20,7 @@
     </div>
 
     <div class="d-flex flex-column bg-light ml-1 border">
+      <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>      
       <button type="button" class="btn btn-link p-0" @click="editObject(objectdata.domId)"><i class="fas fa-plus-circle"></i></button>      
       <button type="button" class="btn btn-link p-0" @click="removeObject(objectdata.domId)"><i class="fas fa-trash-alt"></i></button>
     </div>
@@ -27,10 +28,14 @@
 </template>
 
 <script>
+import SceneAspect from './scene-aspect';
 export default {
   name: 'SceneObject',
   props: {
     objectdata: Object,
+  },
+  components: {
+    aspect: SceneAspect
   },
   created() {    
   },

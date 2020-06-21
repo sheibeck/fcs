@@ -17,34 +17,22 @@
         </div>
 
         <span v-if="zone.aspects.length">&mdash; <em>Aspects</em></span>        
-        <div v-for="aspect in zone.aspects" v-bind:key="aspect.id" class="pl-1 ml-1 badge badge-warning">      
-          <span v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
-
-          <div class="input-group" v-if="aspect.editing">  
-            <input class="form-control-sm" v-model="aspect.name"  />
-            <div class="input-group-append">              
-                <button type="button" class="input-group-text" @click="aspect.editing = false"><i class="fas fa-check-circle text-success"></i></button>
-            </div>          
-          </div>
-          
-
-          <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" />
-          <button type="button" class="btn btn-link p-0 m-0" @click="addInvoke(aspect.id)"><i class="fas fas fa-plus-circle fa-sm"></i></button>
-          <button type="button" class="btn btn-link p-0 m-0" @click="removeInvoke(aspect.id)"><i class="fas fas fa-minus-circle fa-sm"></i></button>
-          <button type="button" class="btn btn-link p-0 m-0" @click="removeAspect(aspect.id)"><i class="fas fa-trash-alt fa-sm"></i></button>
-        </div>
+        <sceneaspect :aspect="aspect" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />       
       </header>
 
       <Container :get-child-payload="getChildPayload" drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(zone.domId, $event)"
         drag-class="card-ghost" drop-class="card-ghost-drop" :drop-placeholder="dropPlaceholderOptions">            
         <Draggable v-for="item in zone.sceneobjects" :key="item.domId">
-          <sceneobject :objectdata="item"></sceneobject>
+          <sceneobject :objectdata="item" />
         </Draggable>
       </Container>      
     </div>
 
     <div class="d-flex flex-column bg-light pl-1">      
-      <button type="button" class="btn btn-link p-0" title="Add Scene Object" data-toggle="modal" data-target="#modalSceneObject"><i class="fas fa-plus-circle"></i></button>      
+      <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>            
+      <button type="button" class="btn btn-link p-0" title="Add Adversary" @click="addZoneObject('adversary')"><i class="fas fa-theater-masks"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></button>
+      <hr/>
       <button type="button" class="btn btn-link p-0" @click="moveForward()" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
       <button type="button" class="btn btn-link p-0" @click="moveBackward()" title="Move zone backward"><i class="fas fa-chevron-circle-down"></i></button>
       <button type="button" class="btn btn-link p-0" @click="removeZone()" title="Delete zone"><i class="fas fa-trash-alt"></i></button>
@@ -54,11 +42,15 @@
 
 <script>
 import SceneObject from './scene-object';
+import SceneAspect from './scene-aspect';
 import draggable from 'vuedraggable';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
 import { VueNestable, VueNestableHandle } from 'vue-nestable';
 import { Container, Draggable } from "vue-smooth-dnd";
+import CommonService from '../assets/js/commonService';
+
+let commonSvc = null;
 
 export default {
   name: 'SceneObject',
@@ -69,12 +61,14 @@ export default {
     draggable, 
     'vue-draggable-resizable': VueDraggableResizable,
     sceneobject: SceneObject,
+    sceneaspect: SceneAspect,
     VueNestable,
     VueNestableHandle,
     Container,
     Draggable
   },
-  mounted() {   
+  mounted() {
+    commonSvc = new CommonService(this.$$root);
   },  
   data () {
     return {
@@ -105,8 +99,13 @@ export default {
         zone.sceneobjects.splice(dropResult.removedIndex, 1);
       }
     },  
-    addZoneObject() {
-
+    addZoneObject(type) {      
+      switch(type) {
+        case "aspect":
+          let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
+          this.zone.aspects.push(aspect);
+          break;
+      }
     },
     editZone() {
       this.editing = !this.editing;
