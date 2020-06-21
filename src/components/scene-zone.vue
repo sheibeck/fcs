@@ -1,5 +1,5 @@
 <template>  
-  <vue-draggable-resizable :id="`SCENEZONE|${zone.id}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" :style="`z-index:${zone.zindex}`" 
+  <vue-draggable-resizable :id="`${zone.domId}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" :style="`z-index:${zone.zindex}`" 
         drag-handle=".dragHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'"  :x="zone.x" :y="zone.y"
         :w="zone.width" :h="zone.height" @dragging="onDrag" @resizing="onResize">
     <!-- drag handle -->
@@ -21,7 +21,8 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <Container :get-child-payload="getChildPayload" drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(zone.domId, $event)"
+      <Container id="drag-container" :get-ghost-parent="getGhostParent" :get-child-payload="getChildPayload" 
+        drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(zone.domId, $event)"
         drag-class="card-ghost" drop-class="card-ghost-drop" :drop-placeholder="dropPlaceholderOptions">            
         <Draggable v-for="item in zone.sceneobjects" :key="item.domId">
           <sceneobject :objectdata="item" />
@@ -76,7 +77,7 @@ export default {
       editing: false,
       loading: true,     
       dropPlaceholderOptions: {
-        className: 'drop-preview',
+        className: '.drop-preview',
         animationDuration: '150',
         showOnTop: true
       } 
@@ -88,16 +89,22 @@ export default {
     },
     onZoneDrop (collection, dropResult) { 
       //get array      
-      var zone = this.$parent.zones.find(obj => {
+      var zone = this.$parent.$data.scene.zones.find(obj => {
         return obj.domId === collection;
       });
       
-      if (dropResult.addedIndex != null) {        
-        zone.sceneobjects.splice(dropResult.addedIndex, 0, dropResult.payload)
+      //if we re-ordered in the same container
+      if (dropResult.addedIndex != null && dropResult.removedIndex != null) {        
+        zone.sceneobjects.move(dropResult.removedIndex, dropResult.addedIndex);
       }
-      
-      if (dropResult.removedIndex != null) {
-        zone.sceneobjects.splice(dropResult.removedIndex, 1);
+      else {
+        if (dropResult.addedIndex != null) {
+          zone.sceneobjects.splice(dropResult.addedIndex, 0, dropResult.payload)
+        }
+        
+        if (dropResult.removedIndex != null) {
+          zone.sceneobjects.splice(dropResult.removedIndex, 1);
+        }
       }
     },  
     addZoneObject(type) {      
@@ -127,6 +134,9 @@ export default {
       let z = parseInt(this.zone.zindex) ?? 1;
       if (z > 1) z--;
       this.zone.zindex = z;
+    },
+    getGhostParent() {
+      return document.getElementById("scene-canvas");
     },
     onDrag: function (x, y) {
       this.zone.x = x;
@@ -165,11 +175,12 @@ export default {
   
   .card-ghost {
     transition: transform 0.18s ease;
-    transform: rotateZ(5deg)
+    transform: rotateZ(5deg);    
   }
 
   .card-ghost-drop {
     transition: transform 0.18s ease-in-out;
-    transform: rotateZ(0deg)
+    transform: rotateZ(0deg);
+    z-index: 999;    
   }
 </style>

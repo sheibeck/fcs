@@ -259,7 +259,7 @@ export default {
     },
     addAspect() {
       let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
-      if (!this.scene.aspects) {             
+      if (!this.scene.aspects) {        
         this.$set(this.scene, 'aspects', new Array());
       }
       this.scene.aspects.push(aspect);
