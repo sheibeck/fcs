@@ -1,6 +1,6 @@
 <template>
   <div class="pl-1 ml-1 badge badge-warning" :id="aspect.id">
-    <span v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
+    <span title="Click to edit" v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
 
     <div class="input-group" v-if="aspect.editing">  
       <input class="form-control-sm" v-model="aspect.name"  />
@@ -24,6 +24,7 @@ export default {
   name: 'SceneAspect',
   props: {
     aspect: Object,
+    location: String,
   },
   created() { 
     commonSvc = new CommonService(this.$root);   
@@ -42,12 +43,26 @@ export default {
     removeInvoke() {      
       this.aspect.invokes.pop();
     },
-    removeAspect() {
+    removeAspect() {      
       let $component = this;
-      this.$parent.$parent.$props.zone.aspects = this.$parent.$parent.$props.zone.aspects.filter(function( obj ) {
-        return obj.id !== $component.aspect.id;
-      });
-      
+      switch(this.location)
+      {        
+        case "scene":
+          debugger;
+          this.$parent.$data.aspects = this.$parent.$data.aspects.filter(function( obj ) {
+            return obj.id !== $component.aspect.id;
+          });      
+          break;
+        case "zone":
+          this.$parent.$parent.$props.zone.aspects = this.$parent.$parent.$props.zone.aspects.filter(function( obj ) {
+            return obj.id !== $component.aspect.id;
+          });      
+          break;
+        default:
+          this.$parent.$props.objectdata.caAndBoost = this.$parent.$props.objectdata.caAndBoost.filter(function( obj ) {
+            return obj.id !== $component.aspect.id;
+          });
+      }
     }
   }
 

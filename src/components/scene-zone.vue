@@ -8,16 +8,16 @@
     <div class="mr-auto cancelZoneDrag">
       <header>
         <!-- name -->        
-        <label v-if="!editing" @click="editing=true">{{zone.name.toUpperCase()}}</label>
+        <label title="Click to edit" v-if="!editing" @click="editing=true">{{zone.name.toUpperCase()}}</label>
         <div class="input-group" v-if="editing">  
           <input class="form-control-sm" v-model="zone.name" />                    
           <div class="input-group-append">              
               <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
-          </div>          
+          </div>
         </div>
 
         <span v-if="zone.aspects.length">&mdash; <em>Aspects</em></span>        
-        <sceneaspect :aspect="aspect" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />       
+        <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
       <Container :get-child-payload="getChildPayload" drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(zone.domId, $event)"
@@ -29,7 +29,7 @@
     </div>
 
     <div class="d-flex flex-column bg-light pl-1">      
-      <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>            
+      <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>
       <button type="button" class="btn btn-link p-0" title="Add Adversary" @click="addZoneObject('adversary')"><i class="fas fa-theater-masks"></i></button>
       <button type="button" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></button>
       <hr/>
@@ -61,7 +61,7 @@ export default {
     draggable, 
     'vue-draggable-resizable': VueDraggableResizable,
     sceneobject: SceneObject,
-    sceneaspect: SceneAspect,
+    zoneaspect: SceneAspect,
     VueNestable,
     VueNestableHandle,
     Container,

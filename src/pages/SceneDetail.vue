@@ -21,7 +21,12 @@
 
     <div v-show="!isLoading">
       <div class="d-flex flex-column flex-sm-row">
-        <h3 class="mr-auto">{{scene.name}} &mdash; Scene</h3> <button type="button" class="btn btn-primary" @click="addZone()">Add Zone</button>
+        <h3>{{scene.name}} &mdash; Scene</h3> 
+        <div class="mr-auto mt-2 ml-2">
+          (<label><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</label>
+          <sceneaspect :aspect="aspect" location="scene" v-for="aspect in aspects" v-bind:key="aspect.id" />)
+        </div>
+        <button type="button" class="btn btn-primary" @click="addZone()">Add Zone</button>        
       </div>
 
       <div id="scene-canvas" class="bg-light mt-2">
@@ -88,7 +93,8 @@ import DbService from '../assets/js/dbService';
 import Loading from '../components/loading';
 import SceneZone from '../components/scene-zone';
 import draggable from 'vuedraggable';
-import { dragscroll } from 'vue-dragscroll'
+import SceneAspect from '../components/scene-aspect';
+import { dragscroll } from 'vue-dragscroll';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -109,7 +115,8 @@ export default {
   components: {
     draggable,      
     loading: Loading,
-    scenezone: SceneZone    
+    scenezone: SceneZone,
+    sceneaspect: SceneAspect,
   },
   mounted(){    
     commonSvc = new CommonService(this.$root);
@@ -129,7 +136,8 @@ export default {
       description: "",
       loading: true,
       scene : {},
-      id: this.$route.params.id,     
+      id: this.$route.params.id,
+      aspects: [],     
       zones: [
           {
             domId: "1",
@@ -154,9 +162,9 @@ export default {
               {id:"2", name: "swampy", editing: false, invokes: []}
             ],
             sceneobjects : [
-              {domId: '123', id: 'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
-              {domId: '122', id: 'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
-              {domId: '121', id: 'ADVERSARY|2', name: 'Adversary 2', type: 'ADVERSARY'},
+              {domId: '123', id:'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
+              {domId: '122', id:'ADVERSARY|1', name: 'Adverasary', type: 'ADVERSARY'},
+              {domId: '121', id:'ADVERSARY|2', name: 'Adversary 2', type: 'ADVERSARY'},
             ]
           },
           {
@@ -290,6 +298,10 @@ export default {
       };
       this.scene.zones.push(zone);
       this.$forceUpdate();
+    },
+    addAspect() {
+      let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
+      this.aspects.push(aspect);
     },
     highestZone() {      
       var max = Math.max.apply(Math, this.scene.zones.map(function(o) { return o.zindex; }));

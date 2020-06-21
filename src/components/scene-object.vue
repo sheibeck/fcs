@@ -1,27 +1,31 @@
 <template>
-  <div class="m-1 p-1 bg-light border d-flex" :id="`SCENEOBJECT|${objectdata.domId}`">
+  <div class="m-1 p-1 bg-light border d-flex" :id="objectdata.domId">
     <div class="bg-secondary text-white mr-1 p-1 objectHandle">
       <i class="fas fa-bars"></i>
     </div>
 
-    <div class="mr-auto w-100">      
-     
-        <div class="w-100" :class="getBgForType(objectdata.type)">
-          <strong class="px-1">{{objectdata.name}}</strong>    
-        </div>      
-        
-        <div>        
-          Aspects<br/>          
-        </div>
-        <div>
-          Stress [] [] []
-        </div>
+    <div class="mr-auto w-100">          
+      <div class="w-100" :class="getBgForType(objectdata.type)">
+        <strong class="px-1">{{objectdata.name}}</strong>
+      </div>      
+      
+      <div>
+        <div>Aspects</div>        
+      </div>
+
+      <div>
+        Stress [] [] []
+      </div>
+
+      <div>
+        <div>Created Aspects &amp; Boosts</div>
+        <aspect :aspect="aspect" v-for="aspect in objectdata.caAndBoost" v-bind:key="aspect.id" />
+      </div>
      
     </div>
 
     <div class="d-flex flex-column bg-light ml-1 border">
-      <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>      
-      <button type="button" class="btn btn-link p-0" @click="editObject(objectdata.domId)"><i class="fas fa-plus-circle"></i></button>      
+      <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>            
       <button type="button" class="btn btn-link p-0" @click="removeObject(objectdata.domId)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
@@ -29,6 +33,10 @@
 
 <script>
 import SceneAspect from './scene-aspect';
+import CommonService from '../assets/js/commonService';
+
+let commonSvc = null;
+
 export default {
   name: 'SceneObject',
   props: {
@@ -37,7 +45,8 @@ export default {
   components: {
     aspect: SceneAspect
   },
-  created() {    
+  created() { 
+    commonSvc = new CommonService(this.$$root);   
   },
   computed: {    
   },
@@ -46,6 +55,23 @@ export default {
     }
   },
   methods: {
+    removeObject(domId) {
+      let $component = this;           
+      this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects = this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.filter(function( obj ) {
+        return obj.domId !== $component.objectdata.domId;
+      });
+    },
+    addThingToObject(type) {       
+      switch(type) {
+        case "aspect":
+          let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
+          if (!this.objectdata.caAndBoost) {             
+            this.$set(this.objectdata, 'caAndBoost', new Array());
+          }
+          this.objectdata.caAndBoost.push(aspect);
+          break;
+      }
+    },
     getBgForType(type) {
       switch(type) {
         case "ADVERSARY":
