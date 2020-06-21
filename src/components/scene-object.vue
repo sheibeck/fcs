@@ -10,7 +10,8 @@
       </div>      
       
       <div>
-        <div>Aspects</div>        
+        <div>Aspects</div>
+        <aspect :aspect="aspect" v-for="aspect in objectdata.aspects" v-bind:key="aspect.id" />
       </div>
 
       <div>

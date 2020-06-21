@@ -30,10 +30,26 @@
       </Container>      
     </div>
 
-    <div class="d-flex flex-column bg-light pl-1">      
-      <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>
-      <button type="button" class="btn btn-link p-0" title="Add Adversary" @click="addZoneObject('adversary')"><i class="fas fa-theater-masks"></i></button>
-      <button type="button" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></button>
+    <div class="d-flex flex-column bg-light pl-1">
+      <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>    
+      <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
+      <b-popover :target="`add-adversary-${this.zone.id}`" triggers="click blur">
+        <template v-slot:title>Add Adversary</template>
+        <autocomplete  :search="searchAdversaries"
+          placeholder="Search Adversaries"
+          aria-label="Search Adversaries"
+          :get-result-value="getAdversaryResultValue"
+          @submit="selectAdversaryResult"></autocomplete>
+      </b-popover>
+      <b-button :id="`add-character-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></b-button>  
+      <b-popover :target="`add-character-${this.zone.id}`" triggers="click blur">
+        <template v-slot:title>Add Character</template>
+        <autocomplete  :search="searchCharacters"
+          placeholder="Search Characters"
+          aria-label="Search Characters"
+          :get-result-value="getCharacterResultValue"
+          @submit="selectCharacterResult"></autocomplete>
+      </b-popover>    
       <hr/>
       <button type="button" class="btn btn-link p-0" @click="moveForward()" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
       <button type="button" class="btn btn-link p-0" @click="moveBackward()" title="Move zone backward"><i class="fas fa-chevron-circle-down"></i></button>
@@ -51,14 +67,17 @@ import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
 import { VueNestable, VueNestableHandle } from 'vue-nestable';
 import { Container, Draggable } from "vue-smooth-dnd";
 import CommonService from '../assets/js/commonService';
+import Autocomplete from '@trevoreyre/autocomplete-vue'
+import DbService from '../assets/js/dbService';
 
 let commonSvc = null;
+let dbSvc = null;
 
 export default {
   name: 'SceneObject',
   props: {
     zone: Object,
-  },
+  },  
   components: {   
     draggable, 
     'vue-draggable-resizable': VueDraggableResizable,
@@ -67,10 +86,13 @@ export default {
     VueNestable,
     VueNestableHandle,
     Container,
-    Draggable
-  },
+    Draggable,
+    Autocomplete
+  },  
   mounted() {
-    commonSvc = new CommonService(this.$$root);
+    commonSvc = new CommonService(this.$root);
+    dbSvc = new DbService(this.$root);
+    this.init();
   },  
   data () {
     return {
@@ -80,10 +102,58 @@ export default {
         className: '.drop-preview',
         animationDuration: '150',
         showOnTop: true
-      } 
+      },
+      adversarySearch: '',
+      adversaries: [],      
+      selectedAdversary: null,      
     }
   },
   methods: {
+    init() {         
+    },  
+
+    /* adversary search */
+    searchAdversaries(query) {      
+      return new Promise((resolve) => {
+        if (query.length < 3) {
+          return resolve([])
+        }
+
+        dbSvc.ListObjects("ADVERSARY", null, query)          
+          .then((data) => {            
+            resolve(data)
+          })
+      })
+    },
+    getAdversaryResultValue(result) {
+      return result.name;
+    },    
+    selectAdversaryResult(result) {
+      this.zone.sceneobjects.push(result);
+    },    
+    /* end adversary search */
+
+    /* character search */
+    searchCharacters(query) {      
+      return new Promise((resolve) => {
+        if (query.length < 3) {
+          return resolve([])
+        }
+
+        dbSvc.ListObjects("CHARACTER", null, query)          
+          .then((data) => {            
+            resolve(data)
+          })
+      })
+    },
+    getCharacterResultValue(result) {
+      return result.name;
+    },    
+    selectCharacterResult(result) {
+      this.zone.sceneobjects.push(result);
+    },    
+    /* end character search */
+
     getChildPayload (index) {      
       return this.zone.sceneobjects[index];      
     },

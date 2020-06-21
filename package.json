@@ -22,9 +22,11 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@sentry/browser": "^5.15.5",
+    "@trevoreyre/autocomplete-vue": "^2.2.0",
     "amazon-cognito-identity-js": "^4.2.3",
     "aws-sdk": "^2.672.0",
     "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.15.0",
     "draggable-vue-directive": "^2.1.0",
     "jquery": "^3.5.1",
     "jquery-serializeobject": "^1.0.0",
