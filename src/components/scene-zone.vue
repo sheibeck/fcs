@@ -141,7 +141,7 @@ export default {
           return resolve([])
         }
 
-        dbSvc.ListObjects("CHARACTER", null, query)          
+        dbSvc.ListObjects("CHARACTER", this.$store.state.userId, query)          
           .then((data) => {            
             resolve(data)
           })
@@ -201,7 +201,7 @@ export default {
     addZoneObject(type) {      
       switch(type) {
         case "aspect":
-          let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
+          let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: []};
           this.zone.aspects.push(aspect);
           break;
       }
