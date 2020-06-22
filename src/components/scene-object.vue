@@ -5,13 +5,15 @@
     </div>
 
     <div class="mr-auto w-100">          
-      <div class="w-100" :class="getBgForType(objectdata.type)">
+      <div class="w-100" :class="getBgForType(objectdata)">
         <strong class="px-1">{{objectdata.name}}</strong>
       </div>      
       
       <div>
         <div>Aspects</div>
-        <aspect :aspect="aspect" v-for="aspect in objectdata.aspects" v-bind:key="aspect.id" />
+        <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
+          <aspect :aspect="aspect" location="thing"  />
+        </div>
       </div>
 
       <div>
@@ -27,7 +29,7 @@
 
     <div class="d-flex flex-column bg-light ml-1 border">
       <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>            
-      <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.domId)"><i class="fas fa-trash-alt"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 </template>
@@ -47,7 +49,7 @@ export default {
     aspect: SceneAspect
   },
   created() { 
-    commonSvc = new CommonService(this.$$root);   
+    commonSvc = new CommonService(this.$root);   
   },
   computed: {    
   },
@@ -56,10 +58,10 @@ export default {
     }
   },
   methods: {
-    removeObject(domId) {
-      let $component = this;           
+    removeObject(id) {
+      let $component = this;       
       this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects = this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.filter(function( obj ) {
-        return obj.domId !== $component.objectdata.domId;
+        return obj.id !== id;
       });
     },
     addThingToObject(type) {       
@@ -73,10 +75,20 @@ export default {
           break;
       }
     },
-    getBgForType(type) {
-      switch(type) {
+    getBgForType(obj) {
+      
+      switch(obj.object_type) {
         case "ADVERSARY":
-          return "bg-danger";
+          switch(obj.type.toLowerCase()) {
+            case "obstacle":
+              return "bg-dark text-white";
+            case "constraint":
+              return "bg-primary";
+            case "other":
+              return "bg-info";
+            default:
+              return "bg-danger text-white";
+          }
         case "CHARACTER":
           return "bg-success";        
       }

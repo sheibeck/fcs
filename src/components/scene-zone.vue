@@ -129,6 +129,7 @@ export default {
       return result.name;
     },    
     selectAdversaryResult(result) {
+      result.aspects = this.convertAspectsToGameObject(result.aspects, "ADVERSARY");
       this.zone.sceneobjects.push(result);
     },    
     /* end adversary search */
@@ -150,10 +151,30 @@ export default {
       return result.name;
     },    
     selectCharacterResult(result) {
+      result.aspects = this.convertAspectsToGameObject(result.aspects, "CHARACTER");
       this.zone.sceneobjects.push(result);
     },    
     /* end character search */
 
+    convertAspectsToGameObject(array, type) {
+      let aspects = new Array();
+
+      for (let [key, value] of Object.entries(array)) {
+        if (type == "adversary") {
+          var subAspects = value.split(";");
+          subAspects.forEach( item => {
+            let aspect = {editing: false, id: commonSvc.GenerateUUID(), invokes: [], name: item, label: key, object_type: type };
+            aspects.push(aspect);
+          });
+        } else {
+          let aspect = {editing: false, id: commonSvc.GenerateUUID(), invokes: [], name: value, label: key, object_type: type };
+          aspects.push(aspect);
+        }
+        
+      };
+
+      return aspects;
+    },
     getChildPayload (index) {      
       return this.zone.sceneobjects[index];      
     },

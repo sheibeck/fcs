@@ -1,15 +1,15 @@
 <template>
-  <div class="pl-1 ml-1 badge badge-warning" :id="aspect.id">
+  <div class="pl-1 ml-1 badge" :class="getColor(aspect.type)" :id="aspect.id">
     <span title="Click to edit" v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
 
     <div class="input-group" v-if="aspect.editing">  
       <input class="form-control-sm" v-model="aspect.name"  />
       <div class="input-group-append">              
           <button type="button" class="input-group-text" @click="aspect.editing = false"><i class="fas fa-check-circle text-success"></i></button>
-      </div>          
+      </div>
     </div>
 
-    <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="invoke($event, invoke.id)" />
+    <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="invokeAspect($event, invoke.id)" />
     <button type="button" class="btn btn-link p-0 m-0" title="Add invoke" @click="addInvoke()"><i class="fas fas fa-plus-circle fa-xs"></i></button>
     <button type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>
     <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
@@ -24,7 +24,7 @@ export default {
   name: 'SceneAspect',
   props: {
     aspect: Object,
-    location: String,
+    location: String,    
   },
   created() { 
     commonSvc = new CommonService(this.$root);   
@@ -35,7 +35,16 @@ export default {
     return {      
     }
   },
-  methods: {   
+  methods: {  
+    getColor() {      
+      switch(this.aspect.object_type) {
+        case "CHARACTER":
+        case "ADVERSARY":
+          return "badge-light";
+        default:
+          return "badge-warning";
+      }
+    },
     addInvoke() {
       let invoke = {id:commonSvc.GenerateUUID(), used: false};
       this.aspect.invokes.push(invoke);
@@ -47,8 +56,7 @@ export default {
       let $component = this;
       switch(this.location)
       {        
-        case "scene":
-          debugger;
+        case "scene":          
           this.$parent.$data.aspects = this.$parent.$data.aspects.filter(function( obj ) {
             return obj.id !== $component.aspect.id;
           });      
@@ -64,7 +72,7 @@ export default {
           });
       }
     },
-    invoke(event, id) {      
+    invokeAspect(event, id) {      
       let idx = this.aspect.invokes.findIndex(x => x.id === id);
       this.aspect.invokes[idx].used = event.target.checked;
     }

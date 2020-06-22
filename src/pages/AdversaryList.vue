@@ -200,7 +200,7 @@ export default {
         if (onlyShowMyAdversaries) {
           this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, searchText);
         }
-        else{      
+        else{
           this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, searchText);
         }
 
