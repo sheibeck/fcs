@@ -242,8 +242,7 @@ export default {
     },      
     addZone() {
       let id = commonSvc.GenerateUUID();
-      let zone = {
-        domId: id,
+      let zone = {        
         zindex: "2",
         id: `ZONE|${id}`,
         name: "New Zone",

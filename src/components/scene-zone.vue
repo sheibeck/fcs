@@ -1,9 +1,9 @@
 <template>  
-  <vue-draggable-resizable :id="`${zone.domId}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" :style="`z-index:${zone.zindex}`" 
-        drag-handle=".dragHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'"  :x="zone.x" :y="zone.y"
+  <vue-draggable-resizable :id="`zone-${commonSvc.GetId(zone.id)}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" :style="`z-index:${zone.zindex}`" 
+        drag-handle=".zoneHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'"  :x="zone.x" :y="zone.y"
         :w="zone.width" :h="zone.height" @dragging="onDrag" @resizing="onResize">
     <!-- drag handle -->
-    <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white dragHandle" :id="`handle-zone-${zone.domId}`"></i>
+    <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white zoneHandle"></i>
 
     <!-- details -->
     <div class="mr-auto cancelZoneDrag">
@@ -22,9 +22,9 @@
       </header>
 
       <Container id="drag-container" :get-ghost-parent="getGhostParent" :get-child-payload="getChildPayload" 
-        drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(zone.domId, $event)"
+        drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(commonSvc.GetId(zone.id), $event)"
         drag-class="card-ghost" drop-class="card-ghost-drop" :drop-placeholder="dropPlaceholderOptions">            
-        <Draggable v-for="item in zone.sceneobjects" :key="item.domId">
+        <Draggable v-for="item in zone.sceneobjects" :key="item.id">
           <sceneobject :objectdata="item" />
         </Draggable>
       </Container>      
@@ -70,7 +70,6 @@ import CommonService from '../assets/js/commonService';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import DbService from '../assets/js/dbService';
 
-let commonSvc = null;
 let dbSvc = null;
 
 export default {
@@ -89,13 +88,13 @@ export default {
     Draggable,
     Autocomplete
   },  
-  mounted() {
-    commonSvc = new CommonService(this.$root);
+  created() {    
     dbSvc = new DbService(this.$root);
     this.init();
   },  
   data () {
     return {
+      commonSvc: new CommonService(fcs),
       editing: false,
       loading: true,     
       dropPlaceholderOptions: {
@@ -129,7 +128,12 @@ export default {
       return result.name;
     },    
     selectAdversaryResult(result) {
-      result.aspects = this.convertAspectsToGameObject(result.aspects, "ADVERSARY");
+      result.aspects = this.convertThingToGameObject(result.aspects, "ADVERSARY", "ASPECT");
+      result.stress = this.convertThingToGameObject(result.stress, "ADVERSARY", "STRESS");
+      
+      result.originalId = result.id; // note the original id so we have a link back to the adversary object in the db
+      result.id = this.commonSvc.GenerateUUID(); // now make sure we hae a unique id in case we add multiples of the same
+            
       this.zone.sceneobjects.push(result);
     },    
     /* end adversary search */
@@ -151,29 +155,40 @@ export default {
       return result.name;
     },    
     selectCharacterResult(result) {
-      result.aspects = this.convertAspectsToGameObject(result.aspects, "CHARACTER");
+      result.aspects = this.convertThingToGameObject(result.aspects, "CHARACTER", "ASPECT");      
       this.zone.sceneobjects.push(result);
     },    
     /* end character search */
 
-    convertAspectsToGameObject(array, type) {
-      let aspects = new Array();
+    convertThingToGameObject(array, thing, type) {
+      let gameObject = new Array();
 
-      for (let [key, value] of Object.entries(array)) {
-        if (type == "adversary") {
-          var subAspects = value.split(";");
-          subAspects.forEach( item => {
-            let aspect = {editing: false, id: commonSvc.GenerateUUID(), invokes: [], name: item, label: key, object_type: type };
-            aspects.push(aspect);
-          });
-        } else {
-          let aspect = {editing: false, id: commonSvc.GenerateUUID(), invokes: [], name: value, label: key, object_type: type };
-          aspects.push(aspect);
-        }
-        
+      switch(type) {
+        case "ASPECT":
+          for (let [key, value] of Object.entries(array)) {
+            if (thing == "ADVERSARY") {
+              var subAspects = value.split(";");
+              subAspects.forEach( item => {
+                let aspect = {editing: false, id: this.commonSvc.GenerateUUID(), invokes: [], name: item, label: key, object_type: thing };
+                gameObject.push(aspect);
+              });                        
+            } else {              
+              let aspect = {editing: false, id: this.commonSvc.GenerateUUID(), invokes: [], name: value, label: key, object_type: thing };
+              gameObject.push(aspect);                            
+            }
+          }
+          break;
+        case "STRESS":
+          for (let [key, value] of Object.entries(array)) {
+            let stress = {editing: false, id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };
+            for (let [skey, svalue] of Object.entries(value)) {
+              stress.boxes.push({id: this.commonSvc.GenerateUUID(), used: false, label: svalue})
+            }          
+            gameObject.push(stress);
+          }
       };
 
-      return aspects;
+      return gameObject;
     },
     getChildPayload (index) {      
       return this.zone.sceneobjects[index];      
@@ -181,7 +196,7 @@ export default {
     onZoneDrop (collection, dropResult) { 
       //get array      
       var zone = this.$parent.$data.scene.zones.find(obj => {
-        return obj.domId === collection;
+        return this.commonSvc.GetId(obj.id) === collection;
       });
       
       //if we re-ordered in the same container
@@ -201,7 +216,7 @@ export default {
     addZoneObject(type) {      
       switch(type) {
         case "aspect":
-          let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: []};
+          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: []};
           this.zone.aspects.push(aspect);
           break;
       }

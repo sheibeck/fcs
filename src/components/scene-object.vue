@@ -1,13 +1,19 @@
 <template>
-  <div class="m-1 p-1 bg-light border d-flex" :id="objectdata.domId">
+  <div class="m-1 p-1 bg-light border d-flex" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`">
     <div class="bg-secondary text-white mr-1 p-1 objectHandle">
       <i class="fas fa-bars"></i>
     </div>
 
-    <div class="mr-auto w-100">          
+    <div class="mr-auto w-100">
       <div class="w-100" :class="getBgForType(objectdata)">
-        <strong class="px-1">{{objectdata.name}}</strong>
-      </div>      
+        <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
+        <div class="input-group" v-if="editing">  
+          <input class="form-control-sm" v-model="objectdata.name" />                    
+          <div class="input-group-append">              
+              <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
+          </div>
+        </div>
+      </div>
       
       <div>
         <div>Aspects</div>
@@ -17,7 +23,10 @@
       </div>
 
       <div>
-        Stress [] [] []
+        <div>Stress</div>
+        <div v-for="stress in objectdata.stress" v-bind:key="stress.constructor.name">
+          <stress :stress="stress" location="thing"  />
+        </div>
       </div>
 
       <div >
@@ -27,8 +36,9 @@
      
     </div>
 
-    <div class="d-flex flex-column bg-light ml-1 border">
-      <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>            
+    <div class="d-flex flex-column bg-light ml-1 border toolbar">
+      <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>
+      <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
       <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
@@ -36,9 +46,8 @@
 
 <script>
 import SceneAspect from './scene-aspect';
+import SceneStress from './scene-stress';
 import CommonService from '../assets/js/commonService';
-
-let commonSvc = null;
 
 export default {
   name: 'SceneObject',
@@ -46,15 +55,13 @@ export default {
     objectdata: Object,
   },
   components: {
-    aspect: SceneAspect
-  },
-  created() { 
-    commonSvc = new CommonService(this.$root);   
-  },
-  computed: {    
-  },
+    aspect: SceneAspect,
+    stress: SceneStress
+  },    
   data () {
-    return {      
+    return {
+      editing: false,
+      commonSvc: new CommonService(fcs),      
     }
   },
   methods: {
@@ -67,13 +74,18 @@ export default {
     addThingToObject(type) {       
       switch(type) {
         case "aspect":
-          let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
+          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:this.commonSvc.GenerateUUID(), used: false}]};
           if (!this.objectdata.caAndBoost) {             
             this.$set(this.objectdata, 'caAndBoost', new Array());
           }
           this.objectdata.caAndBoost.push(aspect);
           break;
       }
+    },  
+    copyObject() {
+      let objCopy = Object.assign({}, this.objectdata);
+      objCopy.id = this.commonSvc.GenerateUUID();      
+      this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.push(objCopy);
     },
     getBgForType(obj) {
       

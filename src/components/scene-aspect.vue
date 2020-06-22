@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-1 ml-1 badge" :class="getColor(aspect.type)" :id="aspect.id">
+  <div class="pl-1 ml-1 badge" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">
     <span title="Click to edit" v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
 
     <div class="input-group" v-if="aspect.editing">  
@@ -11,33 +11,30 @@
 
     <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="invokeAspect($event, invoke.id)" />
     <button type="button" class="btn btn-link p-0 m-0" title="Add invoke" @click="addInvoke()"><i class="fas fas fa-plus-circle fa-xs"></i></button>
-    <button type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>
-    <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
+    <button v-if="aspect.invokes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>
+    <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
   </div>
 </template>
 
 <script>
 import CommonService from '../assets/js/commonService';
-let commonSvc = null;
 
 export default {
   name: 'SceneAspect',
   props: {
     aspect: Object,
     location: String,    
-  },
-  created() { 
-    commonSvc = new CommonService(this.$root);   
-  },
+  },  
   computed: {    
   },
   data () {
-    return {      
+    return { 
+      commonSvc: new CommonService(),
     }
   },
   methods: {  
-    getColor() {      
-      switch(this.aspect.object_type) {
+    getColor(aspect) {  
+      switch(aspect.object_type) {
         case "CHARACTER":
         case "ADVERSARY":
           return "badge-light";
@@ -46,7 +43,7 @@ export default {
       }
     },
     addInvoke() {
-      let invoke = {id:commonSvc.GenerateUUID(), used: false};
+      let invoke = {id:this.commonSvc.GenerateUUID(), used: false};
       this.aspect.invokes.push(invoke);
     },
     removeInvoke() {      
