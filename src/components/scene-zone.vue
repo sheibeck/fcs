@@ -128,8 +128,10 @@ export default {
       return result.name;
     },    
     selectAdversaryResult(result) {
+      if (!result) return;
       result.aspects = this.convertThingToGameObject(result.aspects, "ADVERSARY", "ASPECT");
       result.stress = this.convertThingToGameObject(result.stress, "ADVERSARY", "STRESS");
+      result.consequences = this.convertThingToGameObject(result.consequences, "ADVERSARY", "CONSEQUENCE");
       
       result.originalId = result.id; // note the original id so we have a link back to the adversary object in the db
       result.id = this.commonSvc.GenerateUUID(); // now make sure we hae a unique id in case we add multiples of the same
@@ -155,7 +157,10 @@ export default {
       return result.name;
     },    
     selectCharacterResult(result) {
-      result.aspects = this.convertThingToGameObject(result.aspects, "CHARACTER", "ASPECT");      
+      if (!result) return;
+      result.aspects = this.convertThingToGameObject(result.aspects, "CHARACTER", "ASPECT");
+      result.stress = this.convertThingToGameObject(result.stress, "CHARACTER", "STRESS");
+      result.consequences = this.convertThingToGameObject(result.consequences, "CHARACTER", "CONSEQUENCE");      
       this.zone.sceneobjects.push(result);
     },    
     /* end character search */
@@ -163,29 +168,36 @@ export default {
     convertThingToGameObject(array, thing, type) {
       let gameObject = new Array();
 
-      switch(type) {
+      switch(type) {        
         case "ASPECT":
           for (let [key, value] of Object.entries(array)) {
             if (thing == "ADVERSARY") {
               var subAspects = value.split(";");
               subAspects.forEach( item => {
-                let aspect = {editing: false, id: this.commonSvc.GenerateUUID(), invokes: [], name: item, label: key, object_type: thing };
+                let aspect = {id: this.commonSvc.GenerateUUID(), invokes: [], name: item, label: key, object_type: thing };
                 gameObject.push(aspect);
               });                        
             } else {              
-              let aspect = {editing: false, id: this.commonSvc.GenerateUUID(), invokes: [], name: value, label: key, object_type: thing };
-              gameObject.push(aspect);                            
+              let aspect = {id: this.commonSvc.GenerateUUID(), invokes: [], name: value, label: key, object_type: thing };
+              gameObject.push(aspect);
             }
           }
           break;
         case "STRESS":
           for (let [key, value] of Object.entries(array)) {
-            let stress = {editing: false, id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };
+            let stress = {id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };
             for (let [skey, svalue] of Object.entries(value)) {
               stress.boxes.push({id: this.commonSvc.GenerateUUID(), used: false, label: svalue})
             }          
             gameObject.push(stress);
           }
+          break;
+        case "CONSEQUENCE":          
+          for (let [key, value] of Object.entries(array)) {
+            let consequence = {id: this.commonSvc.GenerateUUID(), invokes: [], name: key, label: value, value:'', object_type: type };            
+            gameObject.push(consequence);
+          }
+          break;
       };
 
       return gameObject;

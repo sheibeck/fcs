@@ -9,7 +9,7 @@
         <div class="mr-auto">
           <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
           <div class="input-group" v-if="editing">  
-            <input class="form-control-sm" v-model="objectdata.name" />                    
+            <input class="form-control-sm" v-model="objectdata.name" />
             <div class="input-group-append">              
                 <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
             </div>
@@ -32,6 +32,13 @@
         </div>
       </div>
 
+      <div>
+        <div class="header">Consequence</div>
+        <div v-for="consequence in objectdata.consequences" v-bind:key="consequence.constructor.name">
+          <consequence :consequence="consequence" location="thing"  />
+        </div>
+      </div>
+
       <div >
         <div class="mt-1 mb-1 separator"></div>
         <aspect :aspect="aspect" v-for="aspect in objectdata.caAndBoost" v-bind:key="aspect.id" />
@@ -50,6 +57,7 @@
 <script>
 import SceneAspect from './scene-aspect';
 import SceneStress from './scene-stress';
+import SceneConsequence from './scene-consequence';
 import CommonService from '../assets/js/commonService';
 
 export default {
@@ -59,7 +67,8 @@ export default {
   },
   components: {
     aspect: SceneAspect,
-    stress: SceneStress
+    stress: SceneStress,
+    consequence: SceneConsequence,
   },    
   data () {
     return {

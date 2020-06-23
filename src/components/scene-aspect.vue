@@ -1,34 +1,41 @@
 <template>
   <div class="pl-1 ml-1 badge" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">
-    <span title="Click to edit" v-if="!aspect.editing" @click="aspect.editing = true">{{aspect.name}}</span>
+    <span title="Click to edit" v-if="!editing" @click="editing = true">{{aspect.name}}</span>
 
-    <div class="input-group" v-if="aspect.editing">  
+    <div class="input-group" v-if="editing">  
       <input class="form-control-sm" v-model="aspect.name"  />
       <div class="input-group-append">              
-          <button type="button" class="input-group-text" @click="aspect.editing = false"><i class="fas fa-check-circle text-success"></i></button>
+          <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
       </div>
     </div>
 
-    <input type="checkbox" v-for="invoke in aspect.invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="invokeAspect($event, invoke.id)" />
-    <button type="button" class="btn btn-link p-0 m-0" title="Add invoke" @click="addInvoke()"><i class="fas fas fa-plus-circle fa-xs"></i></button>
-    <button v-if="aspect.invokes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>
-    <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
+    <div class="d-flex">
+      <invoke :invokes="aspect.invokes" />
+      <span>
+        <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
+      </span>
+    </div>
   </div>
 </template>
 
 <script>
+import SceneInvoke from './scene-invoke';
 import CommonService from '../assets/js/commonService';
 
 export default {
   name: 'SceneAspect',
   props: {
     aspect: Object,
-    location: String,    
-  },  
+    location: String,        
+  },
+  components: {
+    invoke: SceneInvoke,
+  },
   computed: {    
   },
   data () {
     return { 
+      editing: false,
       commonSvc: new CommonService(),
     }
   },
@@ -41,14 +48,7 @@ export default {
         default:
           return "badge-warning";
       }
-    },
-    addInvoke() {
-      let invoke = {id:this.commonSvc.GenerateUUID(), used: false};
-      this.aspect.invokes.push(invoke);
-    },
-    removeInvoke() {      
-      this.aspect.invokes.pop();
-    },
+    },  
     removeAspect() {      
       let $component = this;
       switch(this.location)
@@ -68,10 +68,6 @@ export default {
             return obj.id !== $component.aspect.id;
           });
       }
-    },
-    invokeAspect(event, id) {      
-      let idx = this.aspect.invokes.findIndex(x => x.id === id);
-      this.aspect.invokes[idx].used = event.target.checked;
     }
   }
 

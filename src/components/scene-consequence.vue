@@ -1,28 +1,33 @@
 <template>
   <div class="pl-1 ml-1">
-    <span title="Click to edit" v-if="!editing" @click="editing = true">{{stress.name}}</span>
+    <span title="Click to edit" v-if="!editing" @click="editing = true">{{consequence.name}}</span>
 
     <div class="input-group" v-if="editing">  
-      <input class="form-control-sm" v-model="stress.name"  />
+      <input class="form-control-sm" v-model="consequence.name"  />
       <div class="input-group-append">              
           <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
       </div>
     </div>
-
-    <span v-for="box in stress.boxes" v-bind:key="box.id">
-      <label>{{box.label}}</label><input type="checkbox" :checked="box.used" @change="toggleStress($event, box.id)" class="mr-1" />
-    </span>   
+    
+    <div class="d-flex">
+      <label>{{consequence.label}}</label><input type="text" v-model="consequence.value" class="ml-1 form-control-sm w-100" />
+    </div>
+    <invoke :invokes="consequence.invokes" class="pt-0" />    
   </div>
 </template>
 
 <script>
+import SceneInvoke from './scene-invoke';
 import CommonService from '../assets/js/commonService';
 
 export default {
-  name: 'SceneStress',
+  name: 'SceneConsequence',
   props: {
-    stress: Object,       
+    consequence: Object,
   },  
+  components: {
+    invoke: SceneInvoke,
+  },
   computed: {    
   },
   data () {
@@ -31,11 +36,7 @@ export default {
       commonSvc: new CommonService(),
     }
   },
-  methods: {   
-    toggleStress(event, id) {      
-      let idx = this.stress.boxes.findIndex(x => x.id === id);
-      this.stress.boxes[idx].used = event.target.checked;
-    }
+  methods: {    
   }
 
 }
