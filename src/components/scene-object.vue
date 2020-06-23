@@ -5,25 +5,28 @@
     </div>
 
     <div class="mr-auto w-100">
-      <div class="w-100" :class="getBgForType(objectdata)">
-        <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
-        <div class="input-group" v-if="editing">  
-          <input class="form-control-sm" v-model="objectdata.name" />                    
-          <div class="input-group-append">              
-              <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
+      <div class="w-100 d-flex" :class="getBgForType(objectdata)">              
+        <div class="mr-auto">
+          <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
+          <div class="input-group" v-if="editing">  
+            <input class="form-control-sm" v-model="objectdata.name" />                    
+            <div class="input-group-append">              
+                <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
+            </div>
           </div>
-        </div>
+        </div>        
+        <a v-if="objectdata.object_type" :href="getLink()" target="blank" class="text-white pr-1"><i class="fas fa-link"></i></a>        
       </div>
       
       <div>
-        <div>Aspects</div>
+        <div class="header">Aspects</div>
         <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
           <aspect :aspect="aspect" location="thing"  />
         </div>
       </div>
 
       <div>
-        <div>Stress</div>
+        <div class="header">Stress</div>
         <div v-for="stress in objectdata.stress" v-bind:key="stress.constructor.name">
           <stress :stress="stress" location="thing"  />
         </div>
@@ -87,8 +90,7 @@ export default {
       objCopy.id = this.commonSvc.GenerateUUID();      
       this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.push(objCopy);
     },
-    getBgForType(obj) {
-      
+    getBgForType(obj) {      
       switch(obj.object_type) {
         case "ADVERSARY":
           switch(obj.type.toLowerCase()) {
@@ -104,6 +106,18 @@ export default {
         case "CHARACTER":
           return "bg-success";        
       }
+    },
+    getLink() {
+      let data = this.objectdata;
+      switch(data.object_type)
+      {
+        case "CHARACTER":
+          return `/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.related_id)}/${this.commonSvc.GetId(data.id)}/${data.slug}`;
+        case "ADVERSARY":
+          return `/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.originalId)}/${data.slug}`;
+        default:
+          return "";
+      }
     }
   }
 
@@ -117,5 +131,10 @@ export default {
 
   .separator {
     border-top: solid 1px #ccc; border-width: thin;
+  }
+
+  .header {
+    font-style: italic;
+    border-bottom: solid 1px #ccc;
   }
 </style>

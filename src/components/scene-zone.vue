@@ -289,4 +289,5 @@ export default {
     transform: rotateZ(0deg);
     z-index: 999;    
   }
+  
 </style>

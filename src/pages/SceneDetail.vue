@@ -11,6 +11,15 @@
     cursor:grab; 
   }
    
+   
+  /deep/ a {
+    text-decoration: none;
+  }
+
+  /deep/ .btn-link {
+    color: #888;
+  }
+
   footer {
     display: none;
   }
