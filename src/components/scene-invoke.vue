@@ -1,10 +1,8 @@
 <template>
-  <span class="d-flex">
-    <input type="checkbox" class="mt-2" v-for="invoke in invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="toggleInvoke($event, invoke.id)" />
-    <button type="button" class="btn btn-link p-0 m-0" title="Add invoke" @click="addInvoke()"><i class="fas fas fa-plus-circle fa-xs"></i></button>
-    <span>
-      <button v-if="invokes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>
-    </span>
+  <span class="p-0 m-0">
+    <input type="checkbox" class="" v-for="invoke in invokes" v-bind:key="invoke.id" :checked="invoke.used" @change="toggleInvoke($event, invoke.id)" />
+    <button type="button" class="btn btn-link p-0 m-0" title="Add invoke" @click="addInvoke()"><i class="fas fas fa-plus-circle fa-xs"></i></button>    
+    <button v-if="invokes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove invoke" @click="removeInvoke()"><i class="fas fas fa-minus-circle fa-xs"></i></button>    
   </span>
 </template>
 
@@ -41,4 +39,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .btn {
+    vertical-align: inherit;    
+  }
+  button{
+    line-height: 0 !important;
+  }
 </style>

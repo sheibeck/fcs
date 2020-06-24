@@ -20,9 +20,21 @@
         </div>        
       </div>      
       
-      <div v-if="objectdata.image_url" class="w-100 pr-2 text-right" style="margin-top: -25px;margin-bottom: -25px;">
-        <img :src="objectdata.image_url" style="height: 80px; border: solid 2px black;" class="rounded-circle" alt="portrait" />
+      <!-- editor -->
+      <div v-if="objectdata.image_url && !imageEdit" class="w-100 pr-2 text-right" style="margin-top: -25px;margin-bottom: -25px;">
+        <img :src="objectdata.image_url" style="max-height: 100px; max-width: 100px; border: solid 2px black;" class="rounded-circle" alt="portrait" />
+      </div>      
+
+      <div v-if="imageEdit">
+        <label class="control-label">Portrait Url</label><br/>    
+        <div class="input-group">
+          <input v-model="objectdata.image_url" class="form-control" />
+          <div class="input-group-append" style="height: 38px;">
+            <button type="button" class="input-group-text" @click="imageEdit = false"><i class="fas fa-check-circle text-success"></i></button>
+          </div>
+        </div>
       </div>
+      <!-- drag handle -->
 
       <div>
         <div class="header d-flex">
@@ -85,6 +97,7 @@
 
     <div class="d-flex flex-column bg-light ml-1 border toolbar">
       <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>
+      <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
       <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
@@ -115,6 +128,7 @@ export default {
         stress: true,
         consequences: true,
       },
+      imageEdit: false,
       commonSvc: new CommonService(fcs),      
     }
   },

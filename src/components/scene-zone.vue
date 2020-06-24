@@ -1,12 +1,25 @@
 <template>  
-  <vue-draggable-resizable :id="`zone-${commonSvc.GetId(zone.id)}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" :style="`z-index:${zone.zindex}`" 
+  <vue-draggable-resizable :id="`zone-${commonSvc.GetId(zone.id)}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" 
         drag-handle=".zoneHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'"  :x="zone.x" :y="zone.y"
-        :w="zone.width" :h="zone.height" @dragging="onDrag" @resizing="onResize">
+        :w="zone.width" :h="zone.height" @dragging="onDrag" @resizing="onResize" :style="`z-index:${this.zone.zindex};`">
+    
+    <!-- zone background image and editor -->
+    <img v-if="zone.backgroundImage && !zoneImageEdit" :src="zone.backgroundImage" class="img-fluid zone-image" />
+    
+    <div v-if="zoneImageEdit">      
+      <label class="control-label">Zone Image Url</label><br/>    
+      <div class="input-group">      
+        <input v-model="zone.backgroundImage" class="form-control" />
+        <div class="input-group-append" style="height: 38px;">
+          <button type="button" class="input-group-text" @click="toggleZoneImageEdit()"><i class="fas fa-check-circle text-success"></i></button>
+        </div>
+      </div>
+    </div>
     <!-- drag handle -->
     <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white zoneHandle"></i>
 
     <!-- details -->
-    <div class="mr-auto cancelZoneDrag">
+    <div class="mr-auto cancelZoneDrag w-100">
       <header>
         <!-- name -->        
         <label title="Click to edit" v-if="!editing" @click="editing=true" style="vertical-align: top;">{{zone.name.toUpperCase()}}</label>
@@ -49,11 +62,12 @@
           aria-label="Search Characters"
           :get-result-value="getCharacterResultValue"
           @submit="selectCharacterResult"></autocomplete>
-      </b-popover>    
-      <hr/>
+      </b-popover>
+      <button type="button" class="btn btn-link p-0" @click="toggleZoneImageEdit()" title="Edit zone image"><i class="fas fa-image"></i></button>
+      <hr />
       <button type="button" class="btn btn-link p-0" @click="moveForward()" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
       <button type="button" class="btn btn-link p-0" @click="moveBackward()" title="Move zone backward"><i class="fas fa-chevron-circle-down"></i></button>
-      <button type="button" class="btn btn-link p-0" @click="removeZone()" title="Delete zone"><i class="fas fa-trash-alt"></i></button>
+      <button type="button" class="btn btn-link p-0" @click="removeZone()" title="Delete zone"><i class="fas fa-trash-alt"></i></button>      
     </div>  
   </vue-draggable-resizable>
 </template>
@@ -91,7 +105,12 @@ export default {
   created() {    
     dbSvc = new DbService(this.$root);
     this.init();
-  },  
+  },
+  computed: {
+    hasZoneImage() {
+      return this.zone.backgroundImage;
+    }
+  }, 
   data () {
     return {
       commonSvc: new CommonService(fcs),
@@ -102,14 +121,13 @@ export default {
         animationDuration: '150',
         showOnTop: true
       },
-      adversarySearch: '',
-      adversaries: [],      
-      selectedAdversary: null,      
+      zoneImageEdit: false,
+                  
     }
   },
   methods: {
     init() {         
-    },  
+    },    
     makeGameObject(result, type) {
       if (!result) return;
        
@@ -281,6 +299,9 @@ export default {
       this.zone.width = width
       this.zone.height = height
     },
+    toggleZoneImageEdit() {      
+      this.zoneImageEdit = !this.zoneImageEdit;
+    }
   }
 
 }
@@ -315,6 +336,15 @@ export default {
     transition: transform 0.18s ease-in-out;
     transform: rotateZ(0deg);
     z-index: 999;    
+  }
+
+  .zone-image {
+    content: "";    
+    opacity: 0.5;    
+    width: 98%;
+    height: 98%;
+    position: absolute;
+    z-index: -100;   
   }
   
 </style>

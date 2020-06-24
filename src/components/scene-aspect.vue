@@ -8,11 +8,9 @@
       <div class="input-group-append">
           <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
       </div>
-    </div>
+    </div>    
 
-    <div class="d-flex">
-      <invoke :invokes="aspect.invokes" />
-    </div>
+    <invoke :invokes="aspect.invokes" />
   </div>
 </template>
 
@@ -75,5 +73,8 @@ export default {
 <style lang="scss" scoped>
   .btn {
     vertical-align: inherit;
+  }
+  button{
+    line-height: 0 !important;
   }
 </style>
