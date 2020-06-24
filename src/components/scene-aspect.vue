@@ -1,19 +1,17 @@
 <template>
-  <div class="pl-1 ml-1 badge" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">
-    <span title="Click to edit" v-if="!editing" @click="editing = true">{{aspect.name}}</span>
+  <div class="pl-1 ml-1 badge" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">     
+    <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>      
+    <span title="Click to edit" v-if="!editing" @click="editing = true" style="white-space: pre-wrap" class="text-left">{{aspect.name}}</span>
 
     <div class="input-group" v-if="editing">  
-      <input class="form-control-sm" v-model="aspect.name"  />
-      <div class="input-group-append">              
+      <textarea class="form-control-sm" v-model="aspect.name"></textarea>
+      <div class="input-group-append">
           <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
       </div>
     </div>
 
     <div class="d-flex">
       <invoke :invokes="aspect.invokes" />
-      <span>
-        <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
-      </span>
     </div>
   </div>
 </template>
@@ -75,4 +73,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .btn {
+    vertical-align: inherit;
+  }
 </style>

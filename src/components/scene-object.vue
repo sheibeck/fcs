@@ -5,37 +5,74 @@
     </div>
 
     <div class="mr-auto w-100">
-      <div class="w-100 d-flex" :class="getBgForType(objectdata)">              
-        <div class="mr-auto">
-          <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
-          <div class="input-group" v-if="editing">  
-            <input class="form-control-sm" v-model="objectdata.name" />
-            <div class="input-group-append">              
-                <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
+      <div class="d-flex">
+        <div class="d-flex w-100 mr-auto" :class="getBgForType(objectdata)">
+          <div>
+            <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
+            <div class="input-group" v-if="editing">  
+              <input class="form-control-sm" v-model="objectdata.name" />
+              <div class="input-group-append">              
+                  <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
+              </div>
             </div>
-          </div>
+          </div>                
+          <a v-if="objectdata.object_type" :href="getLink()" target="blank" class="text-white pr-1 mr-auto"><i class="fas fa-link fa-xs"></i></a>                    
         </div>        
-        <a v-if="objectdata.object_type" :href="getLink()" target="blank" class="text-white pr-1"><i class="fas fa-link"></i></a>        
-      </div>
+      </div>      
       
-      <div>
-        <div class="header">Aspects</div>
-        <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
-          <aspect :aspect="aspect" location="thing"  />
-        </div>
+      <div v-if="objectdata.image_url" class="w-100 pr-2 text-right" style="margin-top: -25px;margin-bottom: -25px;">
+        <img :src="objectdata.image_url" style="height: 80px; border: solid 2px black;" class="rounded-circle" alt="portrait" />
       </div>
 
       <div>
-        <div class="header">Stress</div>
-        <div v-for="stress in objectdata.stress" v-bind:key="stress.constructor.name">
-          <stress :stress="stress" location="thing"  />
+        <div class="header d-flex">
+          <span class="mr-auto">Aspects</span>
+          <i v-if="objectdata.show.aspects" @click="objectdata.show.aspects=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.aspects" @click="objectdata.show.aspects=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+        </div>
+        <div v-if="objectdata.show.aspects">
+          <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
+            <aspect :aspect="aspect" location="thing"  />
+          </div>
         </div>
       </div>
 
-      <div>
-        <div class="header">Consequence</div>
-        <div v-for="consequence in objectdata.consequences" v-bind:key="consequence.constructor.name">
-          <consequence :consequence="consequence" location="thing"  />
+      <div v-if="objectdata.object_type != 'CHARACTER'">
+        <div class="header d-flex">
+          <span class="mr-auto">Stress</span>
+          <i v-if="objectdata.show.stress" @click="objectdata.show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.stress" @click="objectdata.show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+        </div>
+        <div v-if="objectdata.show.stress">
+          <div v-for="stress in this.objectdata.stress" v-bind:key="stress.id">
+            <stress :stress="stress" location="thing"  />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="objectdata.conditions && objectdata.object_type != 'CHARACTER'">
+        <div class="header d-flex">
+          <span class="mr-auto">Conditions</span>
+          <i v-if="objectdata.show.conditions" @click="objectdata.show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.conditions" @click="objectdata.show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+        </div>
+        <div v-if="objectdata.show.conditions">
+          <div v-for="condition in this.objectdata.conditions" v-bind:key="condition.id">
+            <stress :stress="condition" location="thing"  />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="objectdata.consequences">
+         <div class="header d-flex">
+          <span class="mr-auto">Consequences</span>
+          <i v-if="objectdata.show.consequences" @click="objectdata.show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.consequences" @click="objectdata.show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+        </div>
+        <div v-if="objectdata.show.consequences">
+          <div v-for="consequence in objectdata.consequences" v-bind:key="consequence.id">
+            <consequence :consequence="consequence" location="thing"  />
+          </div>
         </div>
       </div>
 
@@ -73,6 +110,11 @@ export default {
   data () {
     return {
       editing: false,
+      show: {
+        aspects: true,
+        stress: true,
+        consequences: true,
+      },
       commonSvc: new CommonService(fcs),      
     }
   },
@@ -113,9 +155,9 @@ export default {
               return "bg-danger text-white";
           }
         case "CHARACTER":
-          return "bg-success";        
+          return "bg-success";
       }
-    },
+    },  
     getLink() {
       let data = this.objectdata;
       switch(data.object_type)

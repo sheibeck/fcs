@@ -34,8 +34,8 @@
       <div class="d-flex flex-column flex-sm-row">
         <div class="h4">{{scene.name}}</div>
         <div class="mr-auto ml-2">
-          (<label><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</label>
-          <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />)
+          <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
+          <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
         <button type="button" class="btn-sm btn btn-primary" @click="addZone()">Add Zone</button>
         <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()">Save Scene</button>

@@ -9,7 +9,7 @@
     <div class="mr-auto cancelZoneDrag">
       <header>
         <!-- name -->        
-        <label title="Click to edit" v-if="!editing" @click="editing=true">{{zone.name.toUpperCase()}}</label>
+        <label title="Click to edit" v-if="!editing" @click="editing=true" style="vertical-align: top;">{{zone.name.toUpperCase()}}</label>
         <div class="input-group" v-if="editing">  
           <input class="form-control-sm" v-model="zone.name" />                    
           <div class="input-group-append">              
@@ -17,7 +17,7 @@
           </div>
         </div>
 
-        <span v-if="zone.aspects.length">&mdash; <em>Aspects</em></span>        
+        <span v-if="zone.aspects.length" style="vertical-align: top;">&mdash; <em>Aspects</em></span>        
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
@@ -110,7 +110,23 @@ export default {
   methods: {
     init() {         
     },  
+    makeGameObject(result, type) {
+      if (!result) return;
+       
+      result.aspects = this.convertThingToGameObject(result.aspects, type, "ASPECT");
+      result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE");      
+      result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
+      result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");    
+      
+      this.$set(result, 'show', {
+        aspects: true,
+        stress: true,
+        conditions: true,
+        consequences: true,
+      });
 
+      this.zone.sceneobjects.push(result);
+    },    
     /* adversary search */
     searchAdversaries(query) {      
       return new Promise((resolve) => {
@@ -128,15 +144,7 @@ export default {
       return result.name;
     },    
     selectAdversaryResult(result) {
-      if (!result) return;
-      result.aspects = this.convertThingToGameObject(result.aspects, "ADVERSARY", "ASPECT");
-      result.stress = this.convertThingToGameObject(result.stress, "ADVERSARY", "STRESS");
-      result.consequences = this.convertThingToGameObject(result.consequences, "ADVERSARY", "CONSEQUENCE");
-      
-      result.originalId = result.id; // note the original id so we have a link back to the adversary object in the db
-      result.id = this.commonSvc.GenerateUUID(); // now make sure we hae a unique id in case we add multiples of the same
-            
-      this.zone.sceneobjects.push(result);
+      this.makeGameObject(result, "ADVERSARY");
     },    
     /* end adversary search */
 
@@ -147,7 +155,8 @@ export default {
           return resolve([])
         }
 
-        dbSvc.ListObjects("CHARACTER", this.$store.state.userId, query)          
+        //dbSvc.ListObjects("CHARACTER", this.$store.state.userId, query)
+        dbSvc.ListObjects("CHARACTER", null, query)
           .then((data) => {            
             resolve(data)
           })
@@ -157,15 +166,13 @@ export default {
       return result.name;
     },    
     selectCharacterResult(result) {
-      if (!result) return;
-      result.aspects = this.convertThingToGameObject(result.aspects, "CHARACTER", "ASPECT");
-      result.stress = this.convertThingToGameObject(result.stress, "CHARACTER", "STRESS");
-      result.consequences = this.convertThingToGameObject(result.consequences, "CHARACTER", "CONSEQUENCE");      
-      this.zone.sceneobjects.push(result);
+      this.makeGameObject(result, "CHARACTER");    
     },    
     /* end character search */
 
     convertThingToGameObject(array, thing, type) {
+      if (!array) return;
+
       let gameObject = new Array();
 
       switch(type) {        
@@ -185,16 +192,24 @@ export default {
           break;
         case "STRESS":
           for (let [key, value] of Object.entries(array)) {
-            let stress = {id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };
+            let stress = {id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };                      
             for (let [skey, svalue] of Object.entries(value)) {
               stress.boxes.push({id: this.commonSvc.GenerateUUID(), used: false, label: svalue})
             }          
             gameObject.push(stress);
           }
           break;
+        case "CONDITION":          
+          for (let [key, value] of Object.entries(array)) {            
+            let condition = {id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };            
+            condition.boxes.push({id: this.commonSvc.GenerateUUID(), used: false, label: value})     
+            gameObject.push(condition);
+          }
+          gameObject = gameObject.sort((a, b) => a.name.localeCompare(b.name));
+          break;
         case "CONSEQUENCE":          
-          for (let [key, value] of Object.entries(array)) {
-            let consequence = {id: this.commonSvc.GenerateUUID(), invokes: [], name: key, label: value, value:'', object_type: type };            
+          for (let [key, value] of Object.entries(array)) {            
+            let consequence = {id: this.commonSvc.GenerateUUID(), invokes: [], name: key, label: (thing == "ADVERSARY" ? value : ''), value:(thing == "CHARACTER" ? value : ''), object_type: type };            
             gameObject.push(consequence);
           }
           break;
