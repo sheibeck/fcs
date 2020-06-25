@@ -47,7 +47,10 @@
           <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
-        <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>        
+        <button v-if="!game.connected" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
+        <button v-if="game.connected" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>
+        <button type="button" class="btn-sm btn btn-secondary" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+        <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
         <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
         <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
       </div>
@@ -122,6 +125,10 @@ import SceneAspect from '../components/scene-aspect';
 import { dragscroll } from 'vue-dragscroll';
 import Panzoom from '@panzoom/panzoom'
 
+import Peer from 'peerjs';
+import PeerReceiver from "./../assets/js/peerReceiver";
+import PeerSender from "./../assets/js/peerSender";
+
 let commonSvc = null;
 let dbSvc = null;
 
@@ -162,7 +169,13 @@ export default {
       loading: true,
       scene : {},
       id: this.$route.params.id,
-      canvas: null,      
+      canvas: null, 
+      game: {
+        connected: false,
+        peer: null,
+      },
+      peerReceiver: null,
+      peerSender: null,      
     }
   },
   computed: {
@@ -202,8 +215,25 @@ export default {
       });
             
       panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
-      this.canvas = panzoom;*/
+      this.canvas = panzoom;*/      
     },   
+    startGame() {
+      const peerId = commonSvc.GetId(this.scene.id);
+      this.PeerReceiver = new PeerReceiver(peerId);
+      this.PeerReceiver.initialize();
+    },
+    stopGame() {
+
+    },
+    joinGame() {
+      const peerId = commonSvc.GetId(this.scene.id);
+      this.PeerSender = new PeerSender(peerId);
+      this.PeerSender.initialize();
+
+      setTimeout( () => {
+        this.PeerSender.join();
+      }, 2000);
+    },
     resetCanvas() {
       this.canvas.reset();
     },
