@@ -19,7 +19,7 @@
     <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white zoneHandle"></i>
 
     <!-- details -->
-    <div class="mr-auto cancelZoneDrag w-100">
+    <div class="mr-auto cancelZoneDrag">
       <header>
         <!-- name -->        
         <label title="Click to edit" v-if="!editing" @click="editing=true" style="vertical-align: top;">{{zone.name.toUpperCase()}}</label>
@@ -34,10 +34,10 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <Container id="drag-container" :get-ghost-parent="getGhostParent" :get-child-payload="getChildPayload" 
+      <Container id="drag-container" style="min-height:150px;" :get-ghost-parent="getGhostParent" :get-child-payload="getChildPayload" 
         drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(commonSvc.GetId(zone.id), $event)"
         drag-class="card-ghost" drop-class="card-ghost-drop" :drop-placeholder="dropPlaceholderOptions">            
-        <Draggable v-for="item in zone.sceneobjects" :key="item.id">
+        <Draggable style="min-height:150px;" v-for="item in zone.sceneobjects" :key="item.id">
           <sceneobject :objectdata="item" />
         </Draggable>
       </Container>      
@@ -78,7 +78,6 @@ import SceneAspect from './scene-aspect';
 import draggable from 'vuedraggable';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
-import { VueNestable, VueNestableHandle } from 'vue-nestable';
 import { Container, Draggable } from "vue-smooth-dnd";
 import CommonService from '../assets/js/commonService';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
@@ -96,8 +95,6 @@ export default {
     'vue-draggable-resizable': VueDraggableResizable,
     sceneobject: SceneObject,
     zoneaspect: SceneAspect,
-    VueNestable,
-    VueNestableHandle,
     Container,
     Draggable,
     Autocomplete
@@ -117,7 +114,7 @@ export default {
       editing: false,
       loading: true,     
       dropPlaceholderOptions: {
-        className: '.drop-preview',
+        className: 'drop-preview',
         animationDuration: '150',
         showOnTop: true
       },
@@ -323,8 +320,10 @@ export default {
 
   .drop-preview {
     background-color: rgba(150, 150, 200, 0.1) !important;
-    border: 1px dashed #ccc !important;
+    border: 1px dashed red !important;
     margin: 5px !important;
+    z-index: 88888;
+    min-height: 200px;
   }  
   
   .card-ghost {
@@ -334,17 +333,21 @@ export default {
 
   .card-ghost-drop {
     transition: transform 0.18s ease-in-out;
-    transform: rotateZ(0deg);
-    z-index: 999;    
+    transform: rotateZ(0deg);        
   }
 
   .zone-image {
     content: "";    
     opacity: 0.5;    
+   
+    position: absolute;
+    z-index: -100; 
+
+    object-fit: cover ; /* Do not scale the image */
+    object-position: center; /* Center the image within the element */
     width: 98%;
     height: 98%;
-    position: absolute;
-    z-index: -100;   
+    margin-bottom: 1rem;  
   }
   
 </style>

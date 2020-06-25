@@ -22,7 +22,7 @@
       
       <!-- editor -->
       <div v-if="objectdata.image_url && !imageEdit" class="w-100 pr-2 text-right" style="margin-top: -25px;margin-bottom: -25px;">
-        <img :src="objectdata.image_url" style="max-height: 100px; max-width: 100px; border: solid 2px black;" class="rounded-circle" alt="portrait" />
+        <img :src="objectdata.image_url" style="height: 80px; width: 80px; border: solid 2px black;" class="rounded-circle portrait" alt="portrait" />
       </div>      
 
       <div v-if="imageEdit">
@@ -201,5 +201,13 @@ export default {
   .header {
     font-style: italic;
     border-bottom: solid 1px #ccc;
+  }
+
+  .portrait {
+    object-fit: cover ; /* Do not scale the image */
+    object-position: center; /* Center the image within the element */
+    width: 100%;
+    max-height: 250px;
+    margin-bottom: 1rem;
   }
 </style>

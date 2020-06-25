@@ -3,14 +3,24 @@
     font-weight: 700;
   }
 
+  #canvas-wrapper {
+    position:relative;
+    height: 75vh;    
+    border: solid 2px black; 
+    overflow: scroll;
+    cursor:grab;
+  }
+  
   #scene-canvas {
     position:relative;
-    height: 80vh;    
-    border: solid 2px black;
-    overflow: scroll;   
-    cursor:grab; 
-  }
-   
+    height: 1800px;
+    width: 2400px;    
+
+    background-size: 20px 20px;
+    background-image:
+      linear-gradient(to right, #F0F0F0 1px, transparent 1px),
+      linear-gradient(to bottom, #F0F0F0 1px, transparent 1px);
+  }   
    
   /deep/ a {
     text-decoration: none;
@@ -37,13 +47,16 @@
           <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
-        <button type="button" class="btn-sm btn btn-primary" @click="addZone()">Add Zone</button>
-        <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()">Save Scene</button>
+        <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>        
+        <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
+        <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
       </div>
 
-      <div id="scene-canvas" v-dragscroll:nochilddrag class="bg-light mt-2">
-        <!-- zones -->        
-        <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" />        
+      <div id="canvas-wrapper" v-dragscroll:nochilddrag>
+        <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>      
+          <!-- zones -->        
+          <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
+        </div>
       </div>
 
       <!-- properties -->
@@ -107,6 +120,7 @@ import SceneZone from '../components/scene-zone';
 import draggable from 'vuedraggable';
 import SceneAspect from '../components/scene-aspect';
 import { dragscroll } from 'vue-dragscroll';
+import Panzoom from '@panzoom/panzoom'
 
 let commonSvc = null;
 let dbSvc = null;
@@ -125,10 +139,9 @@ export default {
     dragscroll
   },
   components: {
-    draggable,      
     loading: Loading,
     scenezone: SceneZone,
-    sceneaspect: SceneAspect,
+    sceneaspect: SceneAspect  
   },
   mounted(){    
     commonSvc = new CommonService(this.$root);
@@ -148,7 +161,8 @@ export default {
       description: "",
       loading: true,
       scene : {},
-      id: this.$route.params.id,      
+      id: this.$route.params.id,
+      canvas: null,      
     }
   },
   computed: {
@@ -180,7 +194,19 @@ export default {
             
       //hide the footer for a better game table experience
       document.getElementsByTagName("footer")[0].className += " d-none";
+
+      //panzoom the canvas
+      /*const panElem = document.getElementById('scene-canvas')
+      const panzoom = Panzoom(panElem, {
+        maxScale: 5
+      });
+            
+      panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
+      this.canvas = panzoom;*/
     },   
+    resetCanvas() {
+      this.canvas.reset();
+    },
     getScene : function(ownerId, id) {
       var $component = this;
 
