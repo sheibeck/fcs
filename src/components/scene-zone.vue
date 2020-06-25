@@ -34,9 +34,15 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <Container id="drag-container" style="min-height:150px;" :get-ghost-parent="getGhostParent" :get-child-payload="getChildPayload" 
-        drag-handle-selector=".objectHandle" group-name="zone" @drop="onZoneDrop(commonSvc.GetId(zone.id), $event)"
-        drag-class="card-ghost" drop-class="card-ghost-drop" :drop-placeholder="dropPlaceholderOptions">            
+      <Container id="drag-container" style="min-height:150px;"
+        group-name="zone" 
+        :get-ghost-parent="getGhostParent" 
+        :get-child-payload="getChildPayload" 
+        drag-handle-selector=".objectHandle"  
+        @drop="onZoneDrop(commonSvc.GetId(zone.id), $event)"
+        drag-class="card-ghost" 
+        drop-class="card-ghost-drop" 
+        :drop-placeholder="dropPlaceholderOptions">            
         <Draggable style="min-height:150px;" v-for="item in zone.sceneobjects" :key="item.id">
           <sceneobject :objectdata="item" />
         </Draggable>
