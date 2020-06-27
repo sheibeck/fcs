@@ -21,6 +21,14 @@
       linear-gradient(to right, #F0F0F0 1px, transparent 1px),
       linear-gradient(to bottom, #F0F0F0 1px, transparent 1px);
   }   
+
+  #chat {
+    width: 500px;
+
+    #chat-log {      
+      height: 95%;
+    }
+  }
    
   /deep/ a {
     text-decoration: none;
@@ -55,10 +63,24 @@
         <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
       </div>
 
-      <div id="canvas-wrapper" v-dragscroll:nochilddrag>
-        <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>      
-          <!-- zones -->        
-          <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
+      <div id="game-table" class="d-flex">
+        <div id="canvas-wrapper" v-dragscroll:nochilddrag class="mr-auto">
+          <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>      
+            <!-- zones -->        
+            <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
+          </div>
+        </div>
+        <div>
+          <i v-if="showchat" @click="showchat = false" class="fas fa-angle-double-right"></i>
+          <i v-if="!showchat" @click="showchat = true" class="fas fa-angle-double-left"></i>
+        </div>
+        <div v-if="showchat" id="chat" class="d-flex flex-column">
+          <div id="chat-log" class="border mb-1">
+          </div>
+          <div class="d-flex">
+            <textarea rows="1" id="chat-input" v-model="chatMessage" class="w-75 mr-1"></textarea>
+            <button type="button" @onclick="sendChatMessage()">Submit</button>
+          </div>
         </div>
       </div>
 
@@ -174,6 +196,8 @@ export default {
         connected: false,
         peer: null,
       },
+      showchat: true,
+      chatMessage: "",
       peerReceiver: null,
       peerSender: null,      
     }
@@ -337,6 +361,10 @@ export default {
       let $elem = $(event.currentTarget);
       let slug = commonSvc.Slugify($elem.val());
       this.$set(this.campaign, "slug", slug);
+    },
+    sendChatMessage() {      
+      peerSender.sendChatMessage(this.chatMessage);
+      this.chatMessage = "";
     }
   }
 }

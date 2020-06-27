@@ -55,7 +55,16 @@ export default class PeerServiceReciever {
      */
     ready = () => {
         this.conn.on('data', (data) => {
-            console.log("Data recieved");            
+            console.log("Data recieved");
+            switch(data.type) {
+                default: //chat
+                debugger;
+                    var chatLog = document.getElementById("chat-log");
+                    var chatLogMessage = document.createElement("DIV");  
+                    chatLogMessage.innerHTML = data.message;   
+                    chatLog.appendChild(chatLogMessage);
+                break;
+            }
         });
         this.conn.on('close', () => {
             console.log("Connection reset. Awaiting connection...");

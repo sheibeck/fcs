@@ -18,7 +18,7 @@ export default class PeerServiceReciever {
             // Workaround for peer.reconnect deleting previous id
             if (this.peer.id === null) {
                 console.log('Received null id from peer open');
-                this.peer.id = lastPeerId;
+                this.peer.id = this.lastPeerId;
             } else {
                 this.lastPeerId = this.peer.id;
             }
@@ -36,8 +36,8 @@ export default class PeerServiceReciever {
             console.log('Connection lost. Please reconnect');
 
             // Workaround for peer.reconnect deleting previous id
-            this.peer.id = lastPeerId;
-            this.peer._lastServerId = lastPeerId;
+            this.peer.id = this.lastPeerId;
+            this.peer._lastServerId = this.lastPeerId;
 
             this.peer.reconnect();
         });
@@ -84,8 +84,15 @@ export default class PeerServiceReciever {
             if (command)
                 conn.send(command);
                 */
-            this.conn.send("hello world!");
+               this.sendChatMessage("user connected!");
         });
     };
-
+    
+    sendChatMessage =(message) => {
+        var msg = {
+            type: "chat",
+            message: message,
+        }
+        this.conn.send(msg);
+    }
 }
