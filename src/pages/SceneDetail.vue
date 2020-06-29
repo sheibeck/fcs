@@ -21,13 +21,19 @@
       linear-gradient(to right, #F0F0F0 1px, transparent 1px),
       linear-gradient(to bottom, #F0F0F0 1px, transparent 1px);
   }   
-
+  
   #chat {
     width: 500px;
 
     #chat-log {      
       height: 95%;
     }
+  }
+
+  #game-video {
+    height: 80px;    
+    position: absolute;
+    bottom: 0;
   }
    
   /deep/ a {
@@ -57,6 +63,7 @@
         </div>
         <button v-if="!game.connected" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
         <button v-if="game.connected" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>
+
         <button type="button" class="btn-sm btn btn-secondary" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
         <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
         <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
@@ -79,8 +86,11 @@
           </div>
           <div class="d-flex">
             <textarea rows="1" id="chat-input" v-model="chatMessage" class="w-75 mr-1"></textarea>
-            <button type="button" @onclick="sendChatMessage()">Submit</button>
+            <button type="button" @click="sendChatMessage()">Submit</button>
           </div>
+        </div>
+
+        <div id="game-video">
         </div>
       </div>
 
@@ -205,18 +215,22 @@ export default {
   computed: {
     ...mapGetters([
       'isAuthenticated',
-      'userId'
+      'userId',
+      'currentUser'
     ]),
     isNewScene : function() {
       return this.$route.params.id === "create";
     },
-
     isLoading : function() {
       return this.loading;
     },
     commonSvc() {
       return commonSvc;
     },
+    userName() {
+      var email = fcs.$store.state.userSession.getIdToken().payload["email"];
+      return email.split("@")[0];
+    }
   },
   methods: {
     init() {
@@ -243,21 +257,26 @@ export default {
     },   
     startGame() {
       const peerId = commonSvc.GetId(this.scene.id);
-      this.PeerReceiver = new PeerReceiver(peerId);
-      this.PeerReceiver.initialize();
+      this.peerReceiver = new PeerReceiver(peerId);
+      this.peerReceiver.initialize();      
+      this.game.connected = true;
     },
-    stopGame() {
-
-    },
+    stopGame() {      
+      if (this.peerReceiver.conn) {
+        this.peerReceiver.conn.close();
+      }
+      this.game.connected = false;
+    },    
     joinGame() {
       const peerId = commonSvc.GetId(this.scene.id);
-      this.PeerSender = new PeerSender(peerId);
-      this.PeerSender.initialize();
+      this.peerSender = new PeerSender(peerId);
+      this.peerSender.initialize();
 
       setTimeout( () => {
-        this.PeerSender.join();
-      }, 2000);
-    },
+        this.peerSender.join(this.userName);
+        this.game.connected = true;
+      }, 2000);      
+    },    
     resetCanvas() {
       this.canvas.reset();
     },
@@ -269,7 +288,7 @@ export default {
         return;
       }
 
-      dbSvc.GetObject(id, ownerId).then ( (response) => {   
+      dbSvc.GetObject(id).then ( (response) => {   
         if (!response)
         {
           commonSvc.Notify(`Could not find scene with id <b>${commonSvc.GetId(id)}</b>`, 'error', 2000, () => {
@@ -362,8 +381,20 @@ export default {
       let slug = commonSvc.Slugify($elem.val());
       this.$set(this.campaign, "slug", slug);
     },
-    sendChatMessage() {      
-      peerSender.sendChatMessage(this.chatMessage);
+    sendChatMessage() {
+      //send data to yourself
+      var chatLog = document.getElementById("chat-log");
+      var chatLogMessage = document.createElement("DIV");  
+      chatLogMessage.innerHTML = `<strong>${this.userName}:</strong> ${this.chatMessage}`;
+      chatLog.appendChild(chatLogMessage);
+
+      //send data to peer connections
+      if (this.peerSender) {
+        this.peerSender.sendChatMessage(this.userName, this.chatMessage);
+      } 
+      if (this.peerReceiver) {
+        this.peerReceiver.sendChatMessage(this.userName, this.chatMessage);
+      }
       this.chatMessage = "";
     }
   }

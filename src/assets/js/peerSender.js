@@ -35,8 +35,7 @@ export default class PeerServiceReciever {
         this.peer.on('disconnected', () => {            
             console.log('Connection lost. Please reconnect');
 
-            // Workaround for peer.reconnect deleting previous id
-            this.peer.id = this.lastPeerId;
+            // Workaround for peer.reconnect deleting previous id            
             this.peer._lastServerId = this.lastPeerId;
 
             this.peer.reconnect();
@@ -59,7 +58,7 @@ export default class PeerServiceReciever {
      * Sets up callbacks that handle any events related to the
      * connection and data received on it.
      */
-    join = () => {
+    join = (username) => {
         // Close old connection
         if (this.conn) {
             this.conn.close();
@@ -76,6 +75,15 @@ export default class PeerServiceReciever {
             // Receive messages
             this.conn.on('data', (data) => {
                 console.log('Received', data);
+
+                switch(data.type) {
+                    default: //chat                
+                        var chatLog = document.getElementById("chat-log");
+                        var chatLogMessage = document.createElement("DIV");  
+                        chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+                        chatLog.appendChild(chatLogMessage);
+                    break;
+                }
             });
          
             // Check URL params for comamnds that should be sent immediately
@@ -83,14 +91,15 @@ export default class PeerServiceReciever {
             var command = getUrlParam("command");
             if (command)
                 conn.send(command);
-                */
-               this.sendChatMessage("user connected!");
+            */
+            this.sendChatMessage(username, "connected!");
         });
     };
-    
-    sendChatMessage =(message) => {
+ 
+    sendChatMessage = (username, message) => {
         var msg = {
             type: "chat",
+            username: username,
             message: message,
         }
         this.conn.send(msg);
