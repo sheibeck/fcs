@@ -63,15 +63,15 @@
         </div>
 
         <span v-if="isHost">
-          <button v-if="!game.connected" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
-          <button v-if="game.connected" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>        
+          <button v-if="!game.running" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
+          <button v-if="game.running" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>        
           <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
           <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
           <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
         </span>
 
-        <span v-if="!isHost">      
-          <button type="button" class="btn-sm btn btn-secondary" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+        <span>      
+          <button type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
         </span>
       </div>
 
@@ -208,7 +208,7 @@ export default {
       id: this.$route.params.id,
       canvas: null, 
       game: {
-        connected: false,
+        running: false,
         peer: null,
       },
       showchat: true,
@@ -238,7 +238,7 @@ export default {
     },
     isHost() {      
       return this.scene.owner_id == this.userId;
-    }
+    },
   },
   methods: {
     init() {
@@ -254,6 +254,10 @@ export default {
       //hide the footer for a better game table experience
       document.getElementsByTagName("footer")[0].className += " d-none";
 
+      document.addEventListener('gameserver',  (e) => {        
+        this.game.running = e.detail;
+      }, false);
+      
       //panzoom the canvas
       /*const panElem = document.getElementById('scene-canvas')
       const panzoom = Panzoom(panElem, {
@@ -267,22 +271,19 @@ export default {
       const peerId = commonSvc.GetId(this.scene.id);
       this.peerReceiver = new PeerReceiver(peerId);
       this.peerReceiver.initialize();      
-      this.game.connected = true;
     },
-    stopGame() {      
+    stopGame() {
       if (this.peerReceiver.conn) {
         this.peerReceiver.conn.close();
-      }
-      this.game.connected = false;
+      }      
     },    
-    joinGame() {
+    joinGame() {      
       const peerId = commonSvc.GetId(this.scene.id);
       this.peerSender = new PeerSender(peerId);
       this.peerSender.initialize();
 
       setTimeout( () => {
-        this.peerSender.join(this.userName);
-        this.game.connected = true;
+        this.peerSender.join(this.userName);        
       }, 2000);      
     },    
     resetCanvas() {
@@ -311,7 +312,7 @@ export default {
           $component.name = $component.scene.name + ' (SCENE)';
           $component.description = $component.scene.description || "";    
         }
-debugger;
+
         $component.loading = false;    
       })
     },   
@@ -374,6 +375,9 @@ debugger;
         sceneobjects : [          
         ]
       };
+      if (!this.scene.zones) {
+        this.$set(this.scene, 'zones', new Array());
+      }
       this.scene.zones.push(zone);
       this.$forceUpdate();
     },
@@ -394,21 +398,12 @@ debugger;
       let slug = commonSvc.Slugify($elem.val());
       this.$set(this.campaign, "slug", slug);
     },
-    sendChatMessage() {
-      //send data to yourself
-      var chatLog = document.getElementById("chat-log");
-      var chatLogMessage = document.createElement("DIV");  
-      chatLogMessage.innerHTML = `<strong>${this.userName}:</strong> ${this.chatMessage}`;
-      chatLog.appendChild(chatLogMessage);
-
+    sendChatMessage() {      
       //send data to peer connections
       if (this.peerSender) {
         this.peerSender.sendChatMessage(this.userName, this.chatMessage);
-      } 
-      if (this.peerReceiver) {
-        this.peerReceiver.sendChatMessage(this.userName, this.chatMessage);
-      }
-      this.chatMessage = "";
+        this.chatMessage = "";
+      }      
     }
   }
 }

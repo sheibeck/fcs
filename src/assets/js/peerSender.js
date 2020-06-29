@@ -8,22 +8,14 @@ export default class PeerServiceReciever {
         this.lastPeerId = null;         
     }
 
-    initialize = () => {
+    initialize = () => {        
         // Create own peer object with connection to shared PeerJS server
         this.peer = new Peer(null, {
             debug: 2
         });
 
-        this.peer.on('open', (id) => {
-            // Workaround for peer.reconnect deleting previous id
-            if (this.peer.id === null) {
-                console.log('Received null id from peer open');
-                this.peer.id = this.lastPeerId;
-            } else {
-                this.lastPeerId = this.peer.id;
-            }
-
-            console.log('ID: ' + this.peer.id);
+        this.peer.on('open', (id) => {            
+           console.log('ID: ' + this.peer.id);
         });
         this.peer.on('connection', (c) => {
             // Disallow incoming connections
