@@ -135,7 +135,7 @@ export default {
     },
 
     list : async function (searchText) {      
-      this.scenes = await dbSvc.ListObjects("SCENE", this.$store.state.userId, searchText);
+      this.scenes = await dbSvc.ListObjects("SCENE", this.userId, searchText);
       this.loading = false;         
     },
 

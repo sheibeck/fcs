@@ -61,13 +61,18 @@
           <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
-        <button v-if="!game.connected" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
-        <button v-if="game.connected" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>
 
-        <button type="button" class="btn-sm btn btn-secondary" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
-        <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
-        <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
-        <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
+        <span v-if="isHost">
+          <button v-if="!game.connected" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
+          <button v-if="game.connected" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>        
+          <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
+          <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
+          <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
+        </span>
+
+        <span v-if="!isHost">      
+          <button type="button" class="btn-sm btn btn-secondary" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+        </span>
       </div>
 
       <div id="game-table" class="d-flex">
@@ -191,8 +196,8 @@ export default {
     userId() {
       //wait for our authenticated user id
       this.sceneId = commonSvc.SetId("SCENE", fcs.$route.params.id);
-      this.getScene(this.userId, this.sceneId);
-    }
+      this.getScene(this.userId, this.sceneId);      
+    }    
   },
   data () {
     return {
@@ -230,6 +235,9 @@ export default {
     userName() {
       var email = fcs.$store.state.userSession.getIdToken().payload["email"];
       return email.split("@")[0];
+    },
+    isHost() {      
+      return this.scene.owner_id == this.userId;
     }
   },
   methods: {
@@ -303,7 +311,7 @@ export default {
           $component.name = $component.scene.name + ' (SCENE)';
           $component.description = $component.scene.description || "";    
         }
-
+debugger;
         $component.loading = false;    
       })
     },   
@@ -321,32 +329,37 @@ export default {
       this.loading = false;
     },
     saveScene : function() {
-      var $component = this;
+      if (this.isHost) {
+        var $component = this;
 
-      if (!this.scene.name) {
-        commonSvc.Notify('You must enter a name', 'error');
-        return;
-      }
-
-      // make sure we have a proper user id key
-      $component.$set($component.scene, "owner_id", this.userId);
-
-      //create a new scene Id if we don't have one
-      let isNew = false;
-      if (!$component.scene.id) {
-          isNew = true;
-          $component.$set($component.scene, "id", `SCENE|${commonSvc.GenerateUUID()}`);
-      }
-  
-      dbSvc.SaveObject($component.scene).then( (response) => {
-        if (response) {
-          commonSvc.Notify('Scene saved.', 'success', null, () => {;
-            if (isNew) {
-              location.href = '/scene/' + commonSvc.GetId($component.scene.id) + '/' + $component.scene.slug;
-            }
-          });
+        if (!this.scene.name) {
+          commonSvc.Notify('You must enter a name', 'error');
+          return;
         }
-      });
+
+        // make sure we have a proper user id key
+        $component.$set($component.scene, "owner_id", this.userId);
+
+        //create a new scene Id if we don't have one
+        let isNew = false;
+        if (!$component.scene.id) {
+            isNew = true;
+            $component.$set($component.scene, "id", `SCENE|${commonSvc.GenerateUUID()}`);
+        }
+    
+        dbSvc.SaveObject($component.scene).then( (response) => {
+          if (response) {
+            commonSvc.Notify('Scene saved.', 'success', null, () => {;
+              if (isNew) {
+                location.href = '/scene/' + commonSvc.GetId($component.scene.id) + '/' + $component.scene.slug;
+              }
+            });
+          }
+        });
+      }
+      else {
+        commonSvc.Notify('You do not have permission to do that.', 'error');
+      }
     },      
     addZone() {
       let id = commonSvc.GenerateUUID();
