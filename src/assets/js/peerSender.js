@@ -104,8 +104,9 @@ export default class PeerServiceReciever {
         this.conn.send(msg);
     } 
 
-    drawScene = (data) => {        
-        var event = new CustomEvent('sceneupdate', { detail: { scene: data.scene, connectionId: data.connectionId } });
+    drawScene = (data) => {
+        data.message.lastUpdatedBy = data.connectionId;
+        var event = new CustomEvent('sceneupdate', { detail: { scene: data.message, connectionId: data.connectionId } });
         document.dispatchEvent(event);
     }
 
@@ -114,7 +115,7 @@ export default class PeerServiceReciever {
         var chatLogMessage = document.createElement("DIV");  
         chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
         chatLog.appendChild(chatLogMessage);
-                
+
         chatLog.scrollTop = chatLog.scrollHeight;
     }
 }

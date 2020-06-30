@@ -187,8 +187,14 @@ export default {
       deep: true,
       // We have to move our method to a handler field
       handler() {
-        //this.drawScene()
-      }      
+        if (!this.isLoading) {
+          if (this.scene.isrunning) {
+            this.broadCastSceneChange();
+          } else if (this.isHost) {          
+            this.saveScene(true);
+          }
+        }
+      }
     }
   },
   data () {
@@ -204,6 +210,7 @@ export default {
       saveInProgress: false,
       fullScreen: false,
       editingScene: false,
+      isUpdating: false,
     }
   },
   computed: {
@@ -256,9 +263,10 @@ export default {
         }
       }, false);
       
-      document.addEventListener('sceneupdate',  (e) => {           
-        if (!this.isHost) {
-          this.$set(this, 'scene', e.detail.message);
+      document.addEventListener('sceneupdate',  (e) => {        
+        if (e) {
+          this.isUpdating = true;
+          this.$set(this, 'scene', e.detail.scene);          
         }
       }, false);
 
@@ -301,7 +309,7 @@ export default {
     resetCanvas() {
       this.canvas.reset();
     },
-    getScene : function(ownerId, id) {
+    getScene : function(ownerId, id) {      
       var $component = this;
 
       if (this.id === "create") {
@@ -372,15 +380,18 @@ export default {
             }
           }
         });
-      }     
+      }
     },
-    drawScene() {    
-      if (this.isHost) {        
-        this.saveScene(true);
+    broadCastSceneChange() {
+      //don't broadcast when you are the receiver of an update
+      if (this.isUpdating) {
+        this.isUpdating = false;
+        return;
       }
-      if (this.peerSender && this.peerSender.conn.open) {
+
+      if (!this.isLoading && this.peerSender && this.peerSender.conn.open) {
         this.peerSender.updateScene(this.scene, this.peerSender.conn.connectionId);
-      }
+      }      
     },     
     addZone() {
       let id = commonSvc.GenerateUUID();
@@ -430,8 +441,7 @@ export default {
       if (this.fullScreen) {
         document.getElementsByClassName("navbar")[0].classList.add("d-none");
         document.getElementsByClassName("navbar")[0].classList.add("d-none");                
-        document.getElementById("canvas-wrapper").style.height = "94vh";
-        debugger;
+        document.getElementById("canvas-wrapper").style.height = "94vh";        
         document.getElementById("chat-log").style.height = "90vh";
 
         //for test modes that add an environment header

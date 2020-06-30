@@ -304,6 +304,11 @@ export default {
     },
     toggleZoneImageEdit() {      
       this.zoneImageEdit = !this.zoneImageEdit;
+    },
+    removeZone() {
+      this.$parent.$data.scene.zones = this.$parent.$data.scene.zones.filter(( obj ) => {
+        return obj.id !== this.zone.id;
+      });       
     }
   }
 
