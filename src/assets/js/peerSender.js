@@ -69,11 +69,11 @@ export default class PeerServiceReciever {
                 console.log('Received', data);
 
                 switch(data.type) {
+                    case "scene":
+                        this.drawScene(data);
+                        break;
                     default: //chat                
-                        var chatLog = document.getElementById("chat-log");
-                        var chatLogMessage = document.createElement("DIV");  
-                        chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-                        chatLog.appendChild(chatLogMessage);
+                        this.displayChatMessage(data);
                     break;
                 }
             });
@@ -95,5 +95,25 @@ export default class PeerServiceReciever {
             message: message,
         }
         this.conn.send(msg);
+    }
+
+    updateScene = (scene) => {
+        var msg = {
+            type: "scene",
+            message: scene,
+        }
+        this.conn.send(msg);
+    } 
+
+    drawScene = (scene) => {        
+        var event = new CustomEvent('sceneupdate', { detail: scene });
+        document.dispatchEvent(event);
+    }
+
+    displayChatMessage = (data) => {
+        var chatLog = document.getElementById("chat-log");
+        var chatLogMessage = document.createElement("DIV");  
+        chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+        chatLog.appendChild(chatLogMessage);
     }
 }

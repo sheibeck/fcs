@@ -90,12 +90,9 @@
           <div id="chat-log" class="border mb-1">
           </div>
           <div class="d-flex">
-            <textarea rows="1" id="chat-input" v-model="chatMessage" class="w-75 mr-1"></textarea>
+            <input rows="1" id="chat-input" v-model="chatMessage" class="w-75 mr-1" />
             <button type="button" @click="sendChatMessage()">Submit</button>
           </div>
-        </div>
-
-        <div id="game-video">
         </div>
       </div>
 
@@ -258,6 +255,12 @@ export default {
         this.game.running = e.detail;
       }, false);
       
+      document.addEventListener('sceneupdate',  (e) => {           
+        if (!this.isHost) {
+          this.$set(this, 'scene', e.detail.message);
+        }
+      }, false);
+      
       //panzoom the canvas
       /*const panElem = document.getElementById('scene-canvas')
       const panzoom = Panzoom(panElem, {
@@ -355,6 +358,8 @@ export default {
                 location.href = '/scene/' + commonSvc.GetId($component.scene.id) + '/' + $component.scene.slug;
               }
             });
+
+            this.peerSender.updateScene(this.scene);
           }
         });
       }
@@ -372,7 +377,7 @@ export default {
         y: 0,
         aspects: [         
         ],
-        sceneobjects : [          
+        sceneobjects : [
         ]
       };
       if (!this.scene.zones) {

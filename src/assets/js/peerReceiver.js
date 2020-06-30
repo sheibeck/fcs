@@ -75,27 +75,27 @@ export default class PeerServiceReciever {
 
     dataHandler = (conn, data) => {
         switch(data.type) {
-            default: //chat                
-                /*var chatLog = document.getElementById("chat-log");
-                var chatLogMessage = document.createElement("DIV");  
-                chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-                chatLog.appendChild(chatLogMessage);
-                */
-               
+            case "scene":
+                this.updateScene(data);
+            default: //chat               
                 this.broadcastMessage(data);
             break;
         }
     }
 
-    // So now you have multi-connections. If you want to send a message to all other peer, just using for loop with all the connections
+    updateScene = (message) => {
+        for(var i=0;i<this.connections.length;i++){
+            this.connections[i].send(message);
+        }
+    }
+    
     broadcastMessage = (message) => {
         for(var i=0;i<this.connections.length;i++){
             this.connections[i].send(message);
         }
     }
 
-    // Or if you want to send a message to a specific peer - you need to know his peerid
-    privateMessage = (remotePeerId,message) => {
+    privateMessage = (remotePeerId, message) => {
         for(var i=0;i<this.connections.length;i++) {
             if(this.connections[i].peer==remotePeerId){
                 this.connections[i].send(message);
