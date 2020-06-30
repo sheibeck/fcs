@@ -1,5 +1,6 @@
-export default class PeerServiceReciever {
+import { DiceRoller } from 'rpg-dice-roller';
 
+export default class PeerServiceReciever {
     constructor(gameId) {
         this.peer = null; 
         this.peerId = null;
@@ -90,14 +91,62 @@ export default class PeerServiceReciever {
     };
  
     sendChatMessage = (username, message) => {
+        message = this.parseDiceRolls(message);
+
         var msg = {
             type: "chat",
             username: username,
             message: message,
         }
+
         this.conn.send(msg);
     }
 
+    parseDiceRolls(message) {        
+        const diceRegx = /\/roll (\d*)(D[\df]*)((?:[+*-](?:\d+|\([A-Z]*\)))*)(?:\+(D\d*))?/i;        
+        let roll = message.match(diceRegx);
+        if (roll)
+        {            
+            const roller = new DiceRoller();
+            const rollEquation = `${roll[1]}${roll[2] == "df" ? "dF.2" : roll[2]}${roll[3] ? roll[3]:''}`;
+
+            roller.roll(rollEquation);
+
+            // get the latest dice rolls from the log
+            var latestRoll = roller.log.shift();
+            var displayDice = '';
+            var diceType = roll[2] == "df" ? "fate" : roll[2];
+            
+            //if we're rolling fate dice
+            
+            latestRoll.rolls[0].rolls.forEach(roll => {
+                if (diceType == "fate") {
+                    switch (roll.value) {
+                        case -1:                        
+                            displayDice += '<span class="dice">-</span>';
+                            break;
+                        case 1:
+                            displayDice += '<span class="dice">+</span>';
+                            break;
+                        default:
+                            displayDice += '<span class="dice">0</span>';
+                            break;
+                    }
+                }
+                else {
+                    displayDice += `<span>[${roll.value}]</span>`
+                }
+            });
+
+
+
+            return message += `<p class='dice-roll current-roll'>${displayDice} ${(roll[3] !== '' ? ' (' + roll[3] + ')' : '')} = ${latestRoll.total}</p>`;
+        }
+        else {  
+            return message;
+        }
+    }
+    
     updateScene = (scene, connectionId) => {        
         var msg = {
             type: "scene",
