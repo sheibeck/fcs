@@ -11,15 +11,15 @@ export default class PeerServiceReciever {
 
     initialize = () => {
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(this.peerId, {            
+        this.peer = new Peer(null, {        
             debug: 2
         });
 
-        this.peer.on('open', (id) => {             
+        this.peer.on('open', (id) => {
             console.log('ID: ' + id);
             console.log("Awaiting connection...");
             
-            var event = new CustomEvent('gameserver', { detail: true });
+            var event = new CustomEvent('gameserver', { detail: id });
             document.dispatchEvent(event);
         });
         this.peer.on('connection', (c) => {
@@ -103,8 +103,12 @@ export default class PeerServiceReciever {
         setTimeout( () => {
             for(var i=0;i<this.connections.length;i++){
                 this.connections[i].close();
-            }
-        }, 3000);
+            }            
+            this.peer.destroy();
+
+            var event = new CustomEvent('gameend');
+            document.dispatchEvent(event);
+        }, 1000);        
     }
     
     broadcastMessage = (message) => {

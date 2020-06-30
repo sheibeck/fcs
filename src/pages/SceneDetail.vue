@@ -26,7 +26,8 @@
     width: 500px;
 
     #chat-log {      
-      height: 95%;
+      height: 77vh;
+      overflow: scroll;
     }
   }
 
@@ -79,7 +80,7 @@
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
-        <span>
+        <span v-if="isSceneRunning">
           <button type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
         </span>
 
@@ -101,7 +102,7 @@
           <i v-if="!showchat" @click="showchat = true" class="fas fa-angle-double-left"></i>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column">
-          <div id="chat-log" class="border mb-1">
+          <div id="chat-log" class="border mb-1">            
           </div>
           <div class="d-flex">
             <input rows="1" id="chat-input" v-model="chatMessage" class="w-75 mr-1" />
@@ -245,13 +246,26 @@ export default {
       //hide the footer for a better game table experience
       document.getElementsByTagName("footer")[0].className += " d-none";
 
-      document.addEventListener('gameserver',  (e) => {        
-        this.scene.isrunning = e.detail;
+      document.addEventListener('gameserver', (e) => {        
+        this.scene.isrunning = e.detail.gameRunning;
+        if (this.scene.gamePeerId !== e.detail)
+        {
+          this.scene.gamePeerId = e.detail;
+          this.scene.isrunning = true;
+          this.saveScene(true);
+        }
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {           
         if (!this.isHost) {
           this.$set(this, 'scene', e.detail.message);
+        }
+      }, false);
+
+      document.addEventListener('gameend',  (e) => {           
+        if (this.isHost) {
+          this.scene.isrunning = false;
+          this.saveScene(true);
         }
       }, false);
       
@@ -265,17 +279,18 @@ export default {
       this.canvas = panzoom;*/      
     },   
     startGame() {
-      const peerId = commonSvc.GetId(this.scene.id);
-      this.peerReceiver = new PeerReceiver(peerId);
-      this.peerReceiver.initialize();      
+      let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
+      this.peerReceiver = new PeerReceiver();
+      this.peerReceiver.initialize();
     },
     stopGame() {
-      if (this.peerReceiver.conn) {
-        this.peerReceiver.conn.close();
-      }      
+      if (this.isHost)
+      {
+        this.peerReceiver.endScene();
+      }
     },    
     joinGame() {      
-      const peerId = commonSvc.GetId(this.scene.id);
+      const peerId = this.scene.gamePeerId;
       this.peerSender = new PeerSender(peerId);
       this.peerSender.initialize();
 
@@ -310,6 +325,7 @@ export default {
         //cleanup from shutdown if we left the game running
         if (this.isHost && $component.scene.isrunning) {
           $component.scene.isrunning = false;
+          this.saveScene(true);
         }
 
         $component.loading = false;    
@@ -415,6 +431,8 @@ export default {
         document.getElementsByClassName("navbar")[0].classList.add("d-none");
         document.getElementsByClassName("navbar")[0].classList.add("d-none");                
         document.getElementById("canvas-wrapper").style.height = "94vh";
+        debugger;
+        document.getElementById("chat-log").style.height = "90vh";
 
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.add("d-none");
@@ -422,6 +440,7 @@ export default {
       else {
         document.getElementsByClassName("navbar")[0].classList.remove("d-none"); 
         document.getElementById("canvas-wrapper").style.height = "81vh";
+        document.getElementById("chat-log").style.height = "77vh";
 
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       

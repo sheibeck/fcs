@@ -114,5 +114,7 @@ export default class PeerServiceReciever {
         var chatLogMessage = document.createElement("DIV");  
         chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
         chatLog.appendChild(chatLogMessage);
+                
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
 }
