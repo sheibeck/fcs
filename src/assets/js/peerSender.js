@@ -38,7 +38,7 @@ export default class PeerServiceReciever {
         });
         this.peer.on('error', (err) => {
             console.log(err);
-            alert('' + err);
+            alert('Game may not be running. ' + err);
         });
 
         this.join();
@@ -57,9 +57,7 @@ export default class PeerServiceReciever {
         }
 
         // Create connection to destination peer specified in the input field
-        this.conn = this.peer.connect(this.gameId, {
-            reliable: true
-        });
+        this.conn = this.peer.connect(this.gameId);
        
         this.conn.on('open', () => {            
             console.log("Connected to: " + this.conn.peer);
@@ -74,10 +72,10 @@ export default class PeerServiceReciever {
                         break;
                     default: //chat                
                         this.displayChatMessage(data);
-                    break;
+                        break;
                 }
             });
-         
+
             // Check URL params for comamnds that should be sent immediately
             /*
             var command = getUrlParam("command");
@@ -97,16 +95,17 @@ export default class PeerServiceReciever {
         this.conn.send(msg);
     }
 
-    updateScene = (scene) => {
+    updateScene = (scene, connectionId) => {        
         var msg = {
             type: "scene",
             message: scene,
+            connectionId: connectionId,
         }
         this.conn.send(msg);
     } 
 
-    drawScene = (scene) => {        
-        var event = new CustomEvent('sceneupdate', { detail: scene });
+    drawScene = (data) => {        
+        var event = new CustomEvent('sceneupdate', { detail: { scene: data.scene, connectionId: data.connectionId } });
         document.dispatchEvent(event);
     }
 

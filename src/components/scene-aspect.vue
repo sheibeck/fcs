@@ -3,12 +3,14 @@
     <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>      
     <span title="Click to edit" v-if="!editing" @click="editing = true" style="white-space: pre-wrap" class="text-left">{{aspect.name}}</span>
 
-    <div class="input-group" v-if="editing">  
-      <textarea class="form-control-sm" v-model="aspect.name"></textarea>
-      <div class="input-group-append">
-          <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
-      </div>
-    </div>    
+    <div v-if="editing">
+      <div class="input-group">  
+        <textarea class="form-control-sm" v-model="aspect.name"></textarea>
+        <div class="input-group-append">
+            <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
+        </div>
+      </div>    
+    </div>
 
     <invoke :invokes="aspect.invokes" />
   </div>

@@ -5,7 +5,7 @@
 
   #canvas-wrapper {
     position:relative;
-    height: 75vh;    
+    height: 81vh;
     border: solid 2px black; 
     overflow: scroll;
     cursor:grab;
@@ -56,22 +56,36 @@
 
     <div v-show="!isLoading">
       <div class="d-flex flex-column flex-sm-row">
-        <div class="h4">{{scene.name}}</div>
+        <div title="Click to edit" v-if="!editingScene" @click="editingScene = true" class="h4">{{scene.name}}</div>
+        <div v-if="editingScene">  
+          <div class="input-group">  
+            <input class="form-control-sm" v-model="scene.name" />
+            <div class="input-group-append">
+                <button type="button" class="input-group-text" @click="editingScene = false"><i class="fas fa-check-circle text-success"></i></button>
+            </div>
+          </div>
+        </div>
+
         <div class="mr-auto ml-2">
           <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
 
         <span v-if="isHost">
-          <button v-if="!game.running" type="button" class="btn-sm btn btn-secondary" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
-          <button v-if="game.running" type="button" class="btn-sm btn btn-secondary" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>        
-          <button type="button" class="btn-sm btn btn-secondary" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
-          <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>        
-          <button type="button" class="btn-sm btn btn-success ml-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
+          <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>
+          <button type="button" class="btn-sm btn btn-secondary d-none" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
+          <button type="button" class="btn-sm btn btn-success ml-1 d-none" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
+          <button v-if="!isSceneRunning" type="button" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
+          <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
-        <span>      
+        <span>
           <button type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+        </span>
+
+        <span>
+          <button title="Fullscreen" v-if="!fullScreen" type="button" class="btn-sm btn btn-secondary ml-1" @click="toggleFullScreen()"><i class="fas fa-expand-alt"></i></button>
+          <button title="Exit fullscreen" v-if="fullScreen" type="button" class="btn-sm btn btn-secondary ml-1" @click="toggleFullScreen()"><i class="fas fa-compress-alt"></i></button>
         </span>
       </div>
 
@@ -94,35 +108,7 @@
             <button type="button" @click="sendChatMessage()">Submit</button>
           </div>
         </div>
-      </div>
-
-      <!-- properties -->
-      <div id="accordion">
-        <div class="card-header" id="sceneProperties">
-          <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
-            Scene Properties
-          </button>
-        </div>
-        <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewScene }" aria-labelledby="sceneProperties" data-parent="#accordion">
-          <div class="card-body">
-            <div class="form-group">
-              <label for="name">Name</label>
-              <input class="form-control" type="text" id="name" name="name" placeholder="Scene name" v-model="scene.name" @change="slugify">
-            </div>           
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Scene description..." v-model="scene.description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="imageUrl">Description</label>
-                <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="scene.image_url" />
-            </div>
-
-            <button type="button" class="btn btn-primary" v-on:click="saveScene">Save</button>
-          </div>
-        </div>
-      </div>
-
+      </div>     
     </div>
 
     <!-- add scene object -->
@@ -194,24 +180,29 @@ export default {
       //wait for our authenticated user id
       this.sceneId = commonSvc.SetId("SCENE", fcs.$route.params.id);
       this.getScene(this.userId, this.sceneId);      
-    }    
+    },
+    scene: {
+      // This will let Vue know to look inside the array
+      deep: true,
+      // We have to move our method to a handler field
+      handler() {
+        //this.drawScene()
+      }      
+    }
   },
   data () {
-    return {
-      name: "",
-      description: "",
+    return {     
       loading: true,
       scene : {},
       id: this.$route.params.id,
-      canvas: null, 
-      game: {
-        running: false,
-        peer: null,
-      },
+      canvas: null,     
       showchat: true,
       chatMessage: "",
       peerReceiver: null,
-      peerSender: null,      
+      peerSender: null,  
+      saveInProgress: false,
+      fullScreen: false,
+      editingScene: false,
     }
   },
   computed: {
@@ -236,6 +227,9 @@ export default {
     isHost() {      
       return this.scene.owner_id == this.userId;
     },
+    isSceneRunning() {
+      return this.scene.isrunning;
+    }
   },
   methods: {
     init() {
@@ -252,7 +246,7 @@ export default {
       document.getElementsByTagName("footer")[0].className += " d-none";
 
       document.addEventListener('gameserver',  (e) => {        
-        this.game.running = e.detail;
+        this.scene.isrunning = e.detail;
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {           
@@ -307,13 +301,15 @@ export default {
             document.location = '/scene';
           });
         }
-        else {              
-
-          $component.$set($component, 'scene', response);
-          //draw scene objects
-
+        else {
+          $component.$set($component, 'scene', response);          
           $component.name = $component.scene.name + ' (SCENE)';
           $component.description = $component.scene.description || "";    
+        }
+
+        //cleanup from shutdown if we left the game running
+        if (this.isHost && $component.scene.isrunning) {
+          $component.scene.isrunning = false;
         }
 
         $component.loading = false;    
@@ -332,8 +328,8 @@ export default {
       this.$set(this, 'scene', c);
       this.loading = false;
     },
-    saveScene : function() {
-      if (this.isHost) {
+    saveScene : function(suppressMessage) {
+      if (this.isHost) {        
         var $component = this;
 
         if (!this.scene.name) {
@@ -341,32 +337,35 @@ export default {
           return;
         }
 
-        // make sure we have a proper user id key
-        $component.$set($component.scene, "owner_id", this.userId);
-
         //create a new scene Id if we don't have one
         let isNew = false;
         if (!$component.scene.id) {
             isNew = true;
             $component.$set($component.scene, "id", `SCENE|${commonSvc.GenerateUUID()}`);
+            $component.$set($component.scene, "owner_id", this.userId);
         }
     
         dbSvc.SaveObject($component.scene).then( (response) => {
           if (response) {
-            commonSvc.Notify('Scene saved.', 'success', null, () => {;
-              if (isNew) {
-                location.href = '/scene/' + commonSvc.GetId($component.scene.id) + '/' + $component.scene.slug;
-              }
-            });
-
-            this.peerSender.updateScene(this.scene);
+            if (suppressMessage !== true || isNew) {
+              commonSvc.Notify('Scene saved.', 'success', null, () => {;
+                if (isNew) {
+                  location.href = '/scene/' + commonSvc.GetId($component.scene.id) + '/' + $component.scene.slug;
+                }
+              });
+            }
           }
         });
+      }     
+    },
+    drawScene() {    
+      if (this.isHost) {        
+        this.saveScene(true);
       }
-      else {
-        commonSvc.Notify('You do not have permission to do that.', 'error');
+      if (this.peerSender && this.peerSender.conn.open) {
+        this.peerSender.updateScene(this.scene, this.peerSender.conn.connectionId);
       }
-    },      
+    },     
     addZone() {
       let id = commonSvc.GenerateUUID();
       let zone = {        
@@ -409,6 +408,24 @@ export default {
         this.peerSender.sendChatMessage(this.userName, this.chatMessage);
         this.chatMessage = "";
       }      
+    },
+    toggleFullScreen() {
+      this.fullScreen = !this.fullScreen;
+      if (this.fullScreen) {
+        document.getElementsByClassName("navbar")[0].classList.add("d-none");
+        document.getElementsByClassName("navbar")[0].classList.add("d-none");                
+        document.getElementById("canvas-wrapper").style.height = "94vh";
+
+        //for test modes that add an environment header
+        document.getElementsByClassName("d-print-none")[0].classList.add("d-none");
+      }
+      else {
+        document.getElementsByClassName("navbar")[0].classList.remove("d-none"); 
+        document.getElementById("canvas-wrapper").style.height = "81vh";
+
+        //for test modes that add an environment header
+        document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       
+      }
     }
   }
 }

@@ -55,12 +55,12 @@ export default class PeerServiceReciever {
                 // You can do whatever you want with the data from this connection - this is also the main part
                 this.dataHandler(conn,data);
             });
-            conn.on('error', () =>{
+            conn.on('error', (err) =>{
                 // handle error 
                 //connectionError(conn);
                 console.log(err);            
                 alert('' + err);                
-            });
+            });            
 
             conn.on('close', () =>{
                 // Handle connection closed
@@ -77,21 +77,41 @@ export default class PeerServiceReciever {
         switch(data.type) {
             case "scene":
                 this.updateScene(data);
+                break;
             default: //chat               
                 this.broadcastMessage(data);
-            break;
+                break;
         }
     }
 
-    updateScene = (message) => {
-        for(var i=0;i<this.connections.length;i++){
-            this.connections[i].send(message);
+    updateScene = (message) => {        
+        for(var i=0;i<this.connections.length;i++){            
+            if (message.connectionId != this.connections[i].connectionId) {
+                this.connections[i].send(message);
+            }
         }
+    }
+
+    endScene = () => {
+        var msg = {
+            type: "sceneend",
+            username: "system",
+            message: "The storyteller has ended the scene.",
+        }
+        this.broadcastMessage(msg);
+
+        setTimeout( () => {
+            for(var i=0;i<this.connections.length;i++){
+                this.connections[i].close();
+            }
+        }, 3000);
     }
     
     broadcastMessage = (message) => {
         for(var i=0;i<this.connections.length;i++){
-            this.connections[i].send(message);
+            if (this.connections[i].open) {
+                this.connections[i].send(message);
+            }
         }
     }
 
