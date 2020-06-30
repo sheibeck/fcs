@@ -80,7 +80,7 @@
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
-        <span v-if="isSceneRunning">
+        <span v-if="!isHost && isSceneRunning">
           <button type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
         </span>
 
@@ -105,7 +105,7 @@
           <div id="chat-log" class="border mb-1">            
           </div>
           <div class="d-flex">
-            <input rows="1" id="chat-input" v-model="chatMessage" class="w-75 mr-1" />
+            <input rows="1" id="chat-input" v-model="chatMessage" @keyup.enter="sendChatMessage()" class="w-75 mr-1" />
             <button type="button" @click="sendChatMessage()">Submit</button>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default {
           if (this.scene.isrunning) {
             this.broadCastSceneChange();
           } else if (this.isHost) {          
-            this.saveScene(true);
+            this.saveScene(true); //make sure that host still saves things if the game isn't actively running.
           }
         }
       }
@@ -253,14 +253,12 @@ export default {
       //hide the footer for a better game table experience
       document.getElementsByTagName("footer")[0].className += " d-none";
 
-      document.addEventListener('gameserver', (e) => {        
-        this.scene.isrunning = e.detail.gameRunning;
-        if (this.scene.gamePeerId !== e.detail)
-        {
-          this.scene.gamePeerId = e.detail;
-          this.scene.isrunning = true;
-          this.saveScene(true);
-        }
+      document.addEventListener('gameserver', (e) => {
+        this.setupGameServer(e);
+      }, false);
+
+      document.addEventListener('userconnected', (e) => {        
+        this.peerSender.join(this.userName); 
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {        
@@ -296,15 +294,11 @@ export default {
       {
         this.peerReceiver.endScene();
       }
-    },    
+    },
     joinGame() {      
       const peerId = this.scene.gamePeerId;
       this.peerSender = new PeerSender(peerId);
-      this.peerSender.initialize();
-
-      setTimeout( () => {
-        this.peerSender.join(this.userName);        
-      }, 2000);      
+      this.peerSender.initialize();       
     },    
     resetCanvas() {
       this.canvas.reset();
@@ -455,6 +449,18 @@ export default {
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       
       }
+    },
+    setupGameServer(e) {
+      this.scene.isrunning = e.detail.gameRunning;
+      if (this.scene.gamePeerId !== e.detail)
+      {
+        this.scene.gamePeerId = e.detail;
+        this.scene.isrunning = true;
+        this.saveScene(true);
+      }
+
+      //connect the host as a user
+      this.joinGame();
     }
   }
 }

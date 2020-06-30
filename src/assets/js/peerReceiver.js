@@ -11,7 +11,7 @@ export default class PeerServiceReciever {
 
     initialize = () => {
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(null, {        
+        this.peer = new Peer(null, {
             debug: 2
         });
 
@@ -19,6 +19,8 @@ export default class PeerServiceReciever {
             console.log('ID: ' + id);
             console.log("Awaiting connection...");
             
+            this.displayChatMessage("Game server is running. Waiting for connections...");
+
             var event = new CustomEvent('gameserver', { detail: id });
             document.dispatchEvent(event);
         });
@@ -126,5 +128,14 @@ export default class PeerServiceReciever {
                 break;
             }
         }
+    }
+
+    displayChatMessage = (data) => {
+        var chatLog = document.getElementById("chat-log");
+        var chatLogMessage = document.createElement("DIV");  
+        chatLogMessage.innerHTML = `<strong>System:</strong> ${data}`;
+        chatLog.appendChild(chatLogMessage);
+
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
 }

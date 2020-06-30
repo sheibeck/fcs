@@ -15,7 +15,10 @@ export default class PeerServiceReciever {
         });
 
         this.peer.on('open', (id) => {            
-           console.log('ID: ' + this.peer.id);
+            console.log('ID: ' + this.peer.id);
+
+            var event = new CustomEvent('userconnected', { detail: id });
+            document.dispatchEvent(event);
         });
         this.peer.on('connection', (c) => {
             // Disallow incoming connections
@@ -104,8 +107,7 @@ export default class PeerServiceReciever {
         this.conn.send(msg);
     } 
 
-    drawScene = (data) => {
-        data.message.lastUpdatedBy = data.connectionId;
+    drawScene = (data) => {        
         var event = new CustomEvent('sceneupdate', { detail: { scene: data.message, connectionId: data.connectionId } });
         document.dispatchEvent(event);
     }
