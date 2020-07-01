@@ -57,21 +57,16 @@
 
     <div v-show="!isLoading">
       <div class="d-flex flex-column flex-sm-row">
-        <div title="Click to edit" v-if="!editingScene" @click="editingScene = true" class="h4">{{scene.name}}</div>
-        <div v-if="editingScene">  
-          <div class="input-group">  
-            <input class="form-control-sm" v-model="scene.name" />
-            <div class="input-group-append">
-                <button type="button" class="input-group-text" @click="editingScene = false"><i class="fas fa-check-circle text-success"></i></button>
-            </div>
-          </div>
-        </div>
+        <!-- scene name -->
+        <editableinput :object="scene" item="name" :canedit="isHost" class="h4" />
 
         <div class="mr-auto ml-2">
           <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
 
+        <editableinput v-if="isConnected" :object="getPlayer(this.userId)" :canedit="this.userId == getPlayer(this.userId).id" item="username" label="Username:" />
+       
         <span v-if="isHost">
           <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>
           <button type="button" class="btn-sm btn btn-secondary d-none" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
@@ -80,8 +75,9 @@
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
-        <span v-if="!isHost && isSceneRunning">
-          <button type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+        <span v-if="isSceneRunning">
+          <button v-if="!isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+          <button v-if="isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="exitGame()"><i class="fas fa-sign-language"></i> Join Game</button>
         </span>
 
         <span>
@@ -141,6 +137,7 @@ import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import Loading from '../components/loading';
 import SceneZone from '../components/scene-zone';
+import SceneEditableInput from '../components/scene-editable-input';
 import draggable from 'vuedraggable';
 import SceneAspect from '../components/scene-aspect';
 import { dragscroll } from 'vue-dragscroll';
@@ -169,18 +166,17 @@ export default {
   components: {
     loading: Loading,
     scenezone: SceneZone,
-    sceneaspect: SceneAspect  
+    sceneaspect: SceneAspect,
+    editableinput: SceneEditableInput,
   },
   mounted(){    
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);    
-    this.init();    
   },  
   watch: {
     userId() {
-      //wait for our authenticated user id
-      this.sceneId = commonSvc.SetId("SCENE", fcs.$route.params.id);
-      this.getScene(this.userId, this.sceneId);      
+      //wait for our authenticated user before we setup the scene
+      this.setupScene(this.userId);                
     },
     scene: {
       // This will let Vue know to look inside the array
@@ -190,7 +186,9 @@ export default {
         if (!this.isLoading) {
           if (this.scene.isrunning) {
             this.broadCastSceneChange();
-          } else if (this.isHost) {          
+          }
+
+          if (this.isHost) {
             this.saveScene(true); //make sure that host still saves things if the game isn't actively running.
           }
         }
@@ -211,6 +209,7 @@ export default {
       fullScreen: false,
       editingScene: false,
       isUpdating: false,
+      isConnected: false,
     }
   },
   computed: {
@@ -229,18 +228,36 @@ export default {
       return commonSvc;
     },
     userName() {
-      var email = fcs.$store.state.userSession.getIdToken().payload["email"];
-      return email.split("@")[0];
+      return this.getPlayer(this.userId).username;
     },
     isHost() {      
       return this.scene.owner_id == this.userId;
     },
     isSceneRunning() {
       return this.scene.isrunning;
-    }
+    }    
   },
   methods: {
     init() {
+      //panzoom the canvas
+      /*const panElem = document.getElementById('scene-canvas')
+      const panzoom = Panzoom(panElem, {
+        maxScale: 5
+      });
+            
+      panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
+      this.canvas = panzoom;*/      
+    },      
+    setupScene(userId) {
+      if (this.userId == "public") {
+        commonSvc.Notify("You must be logged in to use this feature.", "error", 2000, () => { document.location.href = `/login?redirect=${document.location.href}` });
+        return;
+      };
+
+      this.sceneId = commonSvc.SetId("SCENE", fcs.$route.params.id);
+      
+      this.getScene(this.userId, this.sceneId);      
+      
       $(document).on('show.bs.modal', '#modalDeleteSessionConfirm', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         var id = button.data('id') // Extract info from data-* attributes
@@ -254,11 +271,24 @@ export default {
       document.getElementsByTagName("footer")[0].className += " d-none";
 
       document.addEventListener('gameserver', (e) => {
-        this.setupGameServer(e);
+        //if the gameserver is running then setup the game
+        if (e.detail !== false) {
+          this.setupGameServer(e);
+        }        
       }, false);
 
-      document.addEventListener('userconnected', (e) => {        
-        this.peerSender.join(this.userName); 
+      document.addEventListener('userconnected', (e) => {
+        this.peerSender.join(this.userName);               
+        this.isConnected = true;
+      }, false);
+
+      document.addEventListener('userjoined', (e) => {
+        this.updatePlayer("lastPeerId", this.peerSender.peer.id);
+      }, false);
+
+      document.addEventListener('userdisconnected', (e) => {
+        this.isConnected = false;
+        this.peerSender.displayChatMessage({ "username": "System", "message": "You have diconnected..." });
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {        
@@ -271,19 +301,16 @@ export default {
       document.addEventListener('gameend',  (e) => {           
         if (this.isHost) {
           this.scene.isrunning = false;
-          this.saveScene(true);
         }
       }, false);
-      
-      //panzoom the canvas
-      /*const panElem = document.getElementById('scene-canvas')
-      const panzoom = Panzoom(panElem, {
-        maxScale: 5
-      });
-            
-      panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
-      this.canvas = panzoom;*/      
-    },   
+
+      document.addEventListener('gameerror',  (e) => {           
+        if (this.isHost) {
+          this.commonSvc.Notify(e.detail.message);
+          this.scene.isrunning = false;    
+        }
+      }, false);      
+    },
     startGame() {
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
       this.peerReceiver = new PeerReceiver();
@@ -299,11 +326,22 @@ export default {
       const peerId = this.scene.gamePeerId;
       this.peerSender = new PeerSender(peerId);
       this.peerSender.initialize();       
-    },    
+    },
+    exitGame() {
+      this.peerSender.conn.close();
+    },
+    updatePlayer(key, value)
+    {
+      var idx = this.scene.players.findIndex(obj => {
+        return obj.id === this.userId
+      })
+      
+      this.scene.players[idx][key] = value;      
+    },
     resetCanvas() {
       this.canvas.reset();
     },
-    getScene : function(ownerId, id) {      
+    async getScene(ownerId, id) {
       var $component = this;
 
       if (this.id === "create") {
@@ -311,28 +349,48 @@ export default {
         return;
       }
 
-      dbSvc.GetObject(id).then ( (response) => {   
-        if (!response)
-        {
-          commonSvc.Notify(`Could not find scene with id <b>${commonSvc.GetId(id)}</b>`, 'error', 2000, () => {
-            document.location = '/scene';
-          });
-        }
-        else {
-          $component.$set($component, 'scene', response);          
-          $component.name = $component.scene.name + ' (SCENE)';
-          $component.description = $component.scene.description || "";    
-        }
+      this.scene = await dbSvc.GetObject(id);
+      
+      if (!this.scene)
+      {
+        commonSvc.Notify(`Could not find scene with id <b>${commonSvc.GetId(id)}</b>`, 'error', 2000, () => {
+          document.location = '/scene';
+        });
+      }      
 
-        //cleanup from shutdown if we left the game running
-        if (this.isHost && $component.scene.isrunning) {
-          $component.scene.isrunning = false;
-          this.saveScene(true);
-        }
+      //cleanup from shutdown if we left the game running
+      if (this.isHost && this.isSceneRunning) {
+        this.scene.isrunning = false;
+        this.saveScene(true);
+      }
 
-        $component.loading = false;    
-      })
+      this.configureUser();
+
+      this.loading = false;
     },   
+    configureUser() {      
+      //add this user to the scenes user list. We'll use this to let users configure things
+      //about themselves like their username.      
+      if (!this.scene.players) {
+        this.scene.players = new Array();
+      }
+
+      let player = this.getPlayer(this.userId);
+      if (!player) {        
+        let player = {
+          "id": this.userId,
+          "username": this.$store.state.userSession.getIdToken().payload.email.split("@")[0],
+        }
+        this.scene.players.push(player);
+        player = this.getPlayer(player.id);
+      }      
+    },
+    getPlayer(id) {
+      if (!this.scene.players) return null;
+      return this.scene.players.find(obj => {
+        return obj.id === id
+      })
+    },
     create : function() {
       let c = {
         "description": "",
@@ -383,8 +441,8 @@ export default {
         return;
       }
 
-      if (!this.isLoading && this.peerSender && this.peerSender.conn.open) {
-        this.peerSender.updateScene(this.scene, this.peerSender.conn.connectionId);
+      if (!this.isLoading && this.peerSender && this.peerSender.peer.open) {
+        this.peerSender.updateScene(this.scene, this.peerSender.peer.id);
       }      
     },     
     addZone() {
@@ -413,7 +471,7 @@ export default {
       }
       this.scene.aspects.push(aspect);
     },
-    highestZone() {      
+    highestZone() {
       var max = Math.max.apply(Math, this.scene.zones.map(function(o) { return o.zindex; }));
       const zonesAtMaxHeight = this.scene.zones.filter(z => z.zindex == max);
       return zonesAtMaxHeight;
@@ -426,8 +484,28 @@ export default {
     sendChatMessage() {      
       //send data to peer connections
       if (this.peerSender) {
-        this.peerSender.sendChatMessage(this.userName, this.chatMessage);
-        this.chatMessage = "";
+        //check for a chat command
+        let regex = /^(\/[w]*) (\w*) (.*)/;
+        let match = this.chatMessage.match(regex);
+        if (match) {
+          let command = match[1];
+          let message = match[3];
+          let player = this.scene.players.find(obj => {
+            return obj.username === match[2];
+          });
+
+          if (!player) {
+            this.commonSvc.Notify("Player not found!");
+            return;
+          }
+          else {          
+            this.peerSender.sendPrivateMessage(this.userName, player.lastPeerId, message);
+          }
+        }
+        else {
+          this.peerSender.sendChatMessage(this.userName, this.chatMessage);
+          this.chatMessage = "";
+        }
       }      
     },
     toggleFullScreen() {
@@ -458,9 +536,6 @@ export default {
         this.scene.isrunning = true;
         this.saveScene(true);
       }
-
-      //connect the host as a user
-      this.joinGame();
     }
   }
 }

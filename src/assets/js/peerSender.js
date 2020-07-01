@@ -9,7 +9,9 @@ export default class PeerServiceReciever {
         this.lastPeerId = null;         
     }
 
-    initialize = () => {        
+    initialize = () => {
+        this.displayChatMessage({ "username": "System", "message": "Attempting to connect to scene..." });
+
         // Create own peer object with connection to shared PeerJS server
         this.peer = new Peer(null, {
             debug: 2
@@ -31,18 +33,23 @@ export default class PeerServiceReciever {
         this.peer.on('disconnected', () => {            
             console.log('Connection lost. Please reconnect');
 
-            // Workaround for peer.reconnect deleting previous id            
-            this.peer._lastServerId = this.lastPeerId;
+            var event = new CustomEvent('userdisconnected');
+            document.dispatchEvent(event);
 
+            // Workaround for peer.reconnect deleting previous id            
+            //this.peer._lastServerId = this.lastPeerId;
+            //this.peer.reconnect();
+            this.disconnectBackoff = 1;
             this.peer.reconnect();
         });
         this.peer.on('close', () => {
             this.conn = null;
             console.log('Connection destroyed. Please refresh');
         });
-        this.peer.on('error', (err) => {
-            console.log(err);
-            alert('Game may not be running. ' + err);
+        const FATAL_ERRORS = ['invalid-id', 'invalid-key', 'network', 'ssl-unavailable', 'server-error', 'socket-error', 'socket-closed', 'unavailable-id', 'webrtc'];
+        this.peer.on('error', (e) => {
+            console.log(e);
+            alert('Game may not be running. ' + e);           
         });
 
         this.join();
@@ -54,7 +61,7 @@ export default class PeerServiceReciever {
      * Sets up callbacks that handle any events related to the
      * connection and data received on it.
      */
-    join = (username) => {
+    join = async (username) => {
         // Close old connection
         if (this.conn) {
             this.conn.close();
@@ -87,6 +94,9 @@ export default class PeerServiceReciever {
                 conn.send(command);
             */
             this.sendChatMessage(username, "connected!");
+
+            var event = new CustomEvent('userjoined');
+            document.dispatchEvent(event);
         });
     };
  
@@ -97,6 +107,17 @@ export default class PeerServiceReciever {
             type: "chat",
             username: username,
             message: message,
+        }
+
+        this.conn.send(msg);
+    }
+
+    sendPrivateMessage = (username, lastPeerId, message) => {        
+        var msg = {
+            type: "private",
+            peerId: lastPeerId,
+            username: username,
+            message: `(private) ${message}`,
         }
 
         this.conn.send(msg);
