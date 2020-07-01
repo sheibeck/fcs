@@ -112,12 +112,13 @@ export default class PeerServiceReciever {
         this.conn.send(msg);
     }
 
-    sendPrivateMessage = (username, lastPeerId, message) => {        
+    sendPrivateMessage = (username, player, message) => {        
         var msg = {
             type: "private",
-            peerId: lastPeerId,
+            player: player,
+            senderId: this.peer.id,
             username: username,
-            message: `(private) ${message}`,
+            message: message,
         }
 
         this.conn.send(msg);
@@ -158,9 +159,6 @@ export default class PeerServiceReciever {
                     displayDice += `<span>[${roll.value}]</span>`
                 }
             });
-
-
-
             return message += `<p class='dice-roll current-roll'>${displayDice} ${(roll[3] !== '' ? ' (' + roll[3] + ')' : '')} = ${latestRoll.total}</p>`;
         }
         else {  
@@ -183,11 +181,21 @@ export default class PeerServiceReciever {
     }
 
     displayChatMessage = (data) => {
+        let pm = "";
+        if (data.player) {
+            if (data.senderId == this.peer.id) {
+                pm = `(pm ${data.player.username})`;
+            } else {
+                pm = `(pm)`;
+            }
+        }
+
         var chatLog = document.getElementById("chat-log");
         var chatLogMessage = document.createElement("DIV");  
-        chatLogMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+        chatLogMessage.innerHTML = `<strong>${data.username}${pm}:</strong> ${data.message}`;
         chatLog.appendChild(chatLogMessage);
 
         chatLog.scrollTop = chatLog.scrollHeight;
+        
     }
 }

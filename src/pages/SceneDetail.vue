@@ -100,12 +100,15 @@
         <div v-if="showchat" id="chat" class="d-flex flex-column">
           <div id="chat-log" class="border mb-1">            
           </div>
+          <div id="player-list">
+              {{getPlayerList}}
+          </div>
           <div class="d-flex">
             <input rows="1" id="chat-input" v-model="chatMessage" @keyup.enter="sendChatMessage()" class="w-75 mr-1" />
             <button type="button" @click="sendChatMessage()">Submit</button>
           </div>
         </div>
-      </div>     
+      </div>
     </div>
 
     <!-- add scene object -->
@@ -235,7 +238,18 @@ export default {
     },
     isSceneRunning() {
       return this.scene.isrunning;
-    }    
+    },    
+    getPlayerList() {      
+      if (!this.scene || !this.scene.players) {
+        return "No players.";
+      }
+
+      let players = "";
+      this.scene.players.forEach(player => {
+        players += `${player.username} (${player.lastPeerId}),`;
+      })
+      return players;
+    }
   },
   methods: {
     init() {
@@ -272,9 +286,23 @@ export default {
 
       document.addEventListener('gameserver', (e) => {
         //if the gameserver is running then setup the game
-        if (e.detail !== false) {
-          this.setupGameServer(e);
-        }        
+        switch(e.detail.type) {
+          case "connected":
+            this.sendSystemMessage("Game server is running. Waiting for players...");
+            this.setupGameServer(e);
+            break;
+          case "scene":
+            //if the host isn't connected as a user, make sure we still update the server
+            // when others make changes
+            if (!this.isConnected) {
+              this.scene = e.detail.message;  
+            }
+            break;          
+          case "disconnected":
+            //server disconnected
+            this.sendSystemMessage("Game server has disconnected!");
+            break;
+        }
       }, false);
 
       document.addEventListener('userconnected', (e) => {
@@ -481,6 +509,9 @@ export default {
       let slug = commonSvc.Slugify($elem.val());
       this.$set(this.campaign, "slug", slug);
     },
+    sendSystemMessage(message) {
+      this.peerReceiver.displayChatMessage(message);     
+    },
     sendChatMessage() {      
       //send data to peer connections
       if (this.peerSender) {
@@ -499,7 +530,7 @@ export default {
             return;
           }
           else {          
-            this.peerSender.sendPrivateMessage(this.userName, player.lastPeerId, message);
+            this.peerSender.sendPrivateMessage(this.userName, player, message);
           }
         }
         else {
@@ -527,13 +558,12 @@ export default {
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       
       }
-    },
+    },   
     setupGameServer(e) {
-      this.scene.isrunning = e.detail.gameRunning;
-      if (this.scene.gamePeerId !== e.detail)
+      this.scene.isrunning = true;
+      if (this.scene.gamePeerId !== e.detail.peerid)
       {
-        this.scene.gamePeerId = e.detail;
-        this.scene.isrunning = true;
+        this.scene.gamePeerId = e.detail.peerid;        
         this.saveScene(true);
       }
     }

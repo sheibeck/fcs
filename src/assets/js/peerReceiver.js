@@ -21,19 +21,17 @@ export default class PeerServiceReciever {
         this.peer.on('open', (id) => {
             console.log('ID: ' + id);
             console.log("Awaiting connection...");
-            
-            this.displayChatMessage("Game server is running. Waiting for players...");
-
-            var event = new CustomEvent('gameserver', { detail: id });
+                        
+            var event = new CustomEvent('gameserver', { detail: { type: "connected", peerid: id } } );
             document.dispatchEvent(event);
         });
         this.peer.on('connection', (c) => {
             this.handleConnection(c);
         });
-        this.peer.on('disconnected', () => {            
+        this.peer.on('disconnected', () => {
             console.log('Connection lost. Please reconnect');
             
-            var event = new CustomEvent('gameserver', { detail: false });
+            var event = new CustomEvent('gameserver', { detail: { type: "disconnected", state: false } });
             document.dispatchEvent(event);
 
             // Workaround for peer.reconnect deleting previous id
@@ -67,7 +65,7 @@ export default class PeerServiceReciever {
                 // handle error 
                 //connectionError(conn);
                 console.log(err);            
-                alert('' + err);                
+                this.displayChatMessage("Player disconnected...");
             });
             conn.on('close', () =>{
                 // Handle connection closed
@@ -84,6 +82,10 @@ export default class PeerServiceReciever {
         switch(data.type) {
             case "scene":
                 this.updateScene(data);
+                // the game server should always be up to date with the current scene
+                // so don't rely on the host client being up and running
+                var event = new CustomEvent('gameserver', { detail: data });
+                document.dispatchEvent(event);
                 break;
             case "private": //
                 this.privateMessage(data);
@@ -126,10 +128,9 @@ export default class PeerServiceReciever {
     }
 
     privateMessage = (message) => {
-        for(var i=0;i<this.connections.length;i++) {
-            if(this.connections[i].peer==message.peerId){
-                this.connections[i].send(message);
-                break;
+        for(var i=0;i<this.connections.length;i++) {            
+            if(this.connections[i].peer==message.player.lastPeerId || this.connections[i].peer==message.senderId){
+                this.connections[i].send(message);               
             }
         }
     }
