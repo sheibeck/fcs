@@ -14,7 +14,7 @@
                     <input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh', $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />
                 </div>
                 <div class="col-6 text-center ">
-                    <div for="fatepoints" class="fate-header">FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span></div>
+                    <div for="fatepoints" class="fate-header">FP <span v-if="vttEnabled" class='dice fo20 font-weight-normal small'>A</span></div>
                     <inputfatepoints />
                 </div>
             </div>
@@ -66,7 +66,7 @@
 
     <div class="row fate-conditions">
         <div class="col-12 form-group">
-            <div for="" class="fate-header">Conditions <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+            <div for="" class="fate-header">Conditions <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
         </div>
 
         <div class="col-sm-12 col-md-6">            
@@ -109,7 +109,7 @@ export default {
   },
   computed: {
  	...mapGetters([      
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   mounted() {
@@ -161,21 +161,21 @@ export default {
     setVal(arr, val) {
        this.$parent.setVal(this.character, arr, val);       
     },
-    sendToRoll20(type, label, obj, item, skillType) {		
+    sendToVTT(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				this.$parent.sendToVTT(type, this.character.name, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
             case "condition":
-				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				this.$parent.sendToVTT(type, this.character.name, label, item);
 				break;
 			default:                
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

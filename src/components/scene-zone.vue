@@ -133,7 +133,7 @@ export default {
     },    
     makeGameObject(result, type) {
       if (!result) return;
-       
+            
       result.aspects = this.convertThingToGameObject(result.aspects, type, "ASPECT");
       result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE");      
       result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
@@ -165,6 +165,9 @@ export default {
       return result.name;
     },    
     selectAdversaryResult(result) {
+      //adversaries can be copied and we want uniqueIds
+      result.originalId = result.id;
+      result.id = this.commonSvc.GenerateUUID();
       this.makeGameObject(result, "ADVERSARY");
     },    
     /* end adversary search */

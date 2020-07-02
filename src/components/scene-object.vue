@@ -16,7 +16,7 @@
               </div>
             </div>
           </div>                
-          <a v-if="objectdata.object_type" :href="getLink()" target="blank" class="text-white pr-1 mr-auto"><i class="fas fa-link fa-xs"></i></a>                    
+          <button v-if="objectdata.object_type" @click="openLink()" target="blank" class="p-0 text-white pr-1 mr-auto btn btn-link"><i class="fas fa-link fa-xs"></i></button>
         </div>        
       </div>      
       
@@ -172,16 +172,18 @@ export default {
           return "bg-success";
       }
     },  
-    getLink() {
+    openLink() {      
       let data = this.objectdata;
       switch(data.object_type)
       {
         case "CHARACTER":
-          return `/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.related_id)}/${this.commonSvc.GetId(data.id)}/${data.slug}`;
+          window.open(`/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.related_id)}/${this.commonSvc.GetId(data.id)}/${data.slug}`);
+          break;
         case "ADVERSARY":
-          return `/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.originalId)}/${data.slug}`;
+          window.open(`/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.originalId)}/${data.slug}`);
+          break;
         default:
-          return "";
+          break;
       }
     }
   }

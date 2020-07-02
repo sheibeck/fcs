@@ -43,7 +43,7 @@
                 <div class="form-group text-center font-weight-bold d-flex">
                     <div class="form-group w-50">
                         <input type="number" class="form-control text-center" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="Refresh" />                        
-                        <span v-if="roll20Enabled" class='dice fo20'>A</span>
+                        <span v-if="vttEnabled" class='dice fo20'>A</span>
                         <span>FP</span>                    
                         <inputfatepoints inputclass="fatepoints" placeholder="-" />
                     </div>
@@ -56,7 +56,7 @@
 
                 <!-- Stress -->
                 <div class="form-group text-center font-weight-bold pt-2">
-                    <div class="col-12">STRESS <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+                    <div class="col-12">STRESS <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
                 </div>
 
                 <!-- physical stress -->
@@ -85,7 +85,7 @@
 
                 <!-- consequences -->
                 <div class="form-group text-center font-weight-bold pt-2">
-                    <div class="col-12">CONSEQUENCES <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+                    <div class="col-12">CONSEQUENCES <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
                 </div>
                 <div v-for="consequence in consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
@@ -129,7 +129,7 @@ export default {
   },
   computed: {
  	...mapGetters([  
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   mounted() {
@@ -215,20 +215,20 @@ export default {
 
 		return result;
     },
-    sendToRoll20(type, label, obj, item, skillType) {		
+    sendToVTT(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				this.$parent.sendToVTT(type, this.character.name, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
-				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				this.$parent.sendToVTT(type, this.character.name, label, item);
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

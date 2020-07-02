@@ -172,9 +172,14 @@ export default {
     sceneaspect: SceneAspect,
     editableinput: SceneEditableInput,
   },
+  created() {    
+    window.addEventListener('message', function(event) {        
+        console.log('got a message');   /* Never happens. Why? */
+    }, false );
+  },
   mounted(){    
     commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);    
+    dbSvc = new DbService(this.$root);       
   },  
   watch: {
     userId() {

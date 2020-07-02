@@ -16,7 +16,7 @@
 					</div>
 					<div class="col-6 text-center ">										
 						<div for="fatepoints" class="fate-header">
-							FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
+							FP <span v-if="vttEnabled" class='dice fo20 font-weight-normal small'>A</span>
 						</div>	
 						<inputfatepoints />
 					</div>
@@ -71,7 +71,7 @@
 			<!-- stress -->
 			<div class="col-sm-6 col-md-4 fate-stress">
 				<div class="form-group">
-					<div for="" class="fate-header">Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+					<div for="" class="fate-header">Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 				<div class="d-flex justify-content-between">
 					<div v-for="stress in stresses" :key="stress.obj">
@@ -82,7 +82,7 @@
 
 			<div class="col-sm-6 col-md-8 fate-consequences">
 				<div class="form-group">
-					<div class="fate-header col-12">Consequences <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+					<div class="fate-header col-12">Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 
 				<div v-for="consequence in consequences" :key="consequence.obj">
@@ -118,7 +118,7 @@ export default {
   },
   computed: {
  	...mapGetters([      
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   mounted() {
@@ -160,21 +160,21 @@ export default {
     setVal(arr, val) {
     	this.$parent.setVal(this.character, arr, val);       
 	},
-	sendToRoll20(type, label, obj, item, skillType) {		
+	sendToVTT(type, label, obj, item, skillType) {		
 		let characterName = this.character.name;
 		switch(type)
 		{
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, characterName, null, item);
+				this.$parent.sendToVTT(type, characterName, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
-				this.$parent.sendToRoll20(type, characterName, label, item);
+				this.$parent.sendToVTT(type, characterName, label, item);
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, characterName, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, characterName, label, this.getVal(item), skillType);
 				}
 				break;
 		}

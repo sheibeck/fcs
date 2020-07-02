@@ -18,11 +18,8 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',      
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    },
+      'vttEnabled'
+    ]),  
     getPlaceHolder() {
       return this.placeholder || "Fate Points";
     }
@@ -33,13 +30,13 @@ export default {
   },
   methods: {    
     setVal(arr, val) {      
-      if (this.roll20Enabled) {        
+      if (this.vttEnabled) {        
         let oldVal = this.$parent.character[arr];
         if (!oldVal || (parseInt(oldVal) < parseInt(val))) {
-          this.$parent.sendToRoll20("fatepoint", null, arr, "1");
+          this.$parent.sendToVTT("fatepoint", null, arr, "1");
         }
         else {
-          this.$parent.sendToRoll20("fatepoint", null, arr, "-1");
+          this.$parent.sendToVTT("fatepoint", null, arr, "-1");
         }
  
         this.$parent.setVal(arr, val);

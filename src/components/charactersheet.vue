@@ -32,7 +32,7 @@ export default {
     if (!commonSvc) { 
       commonSvc = new CommonService(this.$root);
     }
-    fateOf20 = new FateOf20();
+    fateOf20 = new FateOf20();   
   },
   components: {
     "fate-accelerated": SheetFateAccelerated,
@@ -52,6 +52,10 @@ export default {
     character: Object,
   },
   computed: {
+     ...mapGetters([
+      'isAuthenticated',
+      'vttEnabled'
+    ]), 
     currentCharacterSheet() {      
       if (!commonSvc) { 
         commonSvc = new CommonService(this.$root);
@@ -64,30 +68,39 @@ export default {
     }
   },
   methods: {
-    sendToRoll20(type, character, description, data, skillType) {         
-      let msg = null;      
-      switch(type) {
-        case "diceroll":          
-          msg = fateOf20.MsgDiceRoll(character, skillType, description, data);
+    sendToVTT(type, character, description, data, skillType) {         
+      let msg = null;
+      
+      switch (this.vttEnabled) {
+        case "fcsVtt":
+
           break;
-        case "invoke":
-          msg = fateOf20.MsgInvoke(character, description, data);
-          break;
-        case "stuntextra":
-          msg = fateOf20.MsgStuntExtra(character, data);
-          break;
-        case "fatepoint":          
-          msg = fateOf20.MsgFatePoint(character, description, data);
-          break;
-        case "stress":
-        case "condition":
-          msg = fateOf20.MsgStress(character, description, data);
-          break;
-        case "consequence":
-          msg = fateOf20.MsgConsequence(character, description, data);
+
+        case "roll20":
+          switch(type) {
+            case "diceroll":          
+              msg = fateOf20.MsgDiceRoll(character, skillType, description, data);
+              break;
+            case "invoke":
+              msg = fateOf20.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":
+              msg = fateOf20.MsgStuntExtra(character, data);
+              break;
+            case "fatepoint":          
+              msg = fateOf20.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = fateOf20.MsgStress(character, description, data);
+              break;
+            case "consequence":
+              msg = fateOf20.MsgConsequence(character, description, data);
+              break;      
+          }
+          fateOf20.SendMessage(msg);
           break;      
       }
-      fateOf20.SendMessage(msg);
     },
     getVal(obj, graphPath, defaultValue){
       var parts = graphPath.split(".");

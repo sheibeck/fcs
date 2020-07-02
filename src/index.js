@@ -46,7 +46,8 @@ const store = new Vuex.Store({
     customerId: null,
     roll20Enabled: true,
     roll20Installed: false,
-    roll20Running: false,    
+    roll20Running: false,
+    fcsVttEnabled: true,    
     sessions: [],
     filteredSessions: [],
     campaigns: [],
@@ -121,6 +122,17 @@ const store = new Vuex.Store({
       if (document.location.href.indexOf("/charactersheet") > -1) return false;      
       let enabled = getters.isSubscriber && state.roll20Enabled && state.roll20Installed && state.roll20Running;
       return enabled;
+    },
+    fcsVttEnabled: (state, getters) => {
+      if (!window.opener || window.opener.origin !== window.origin) return false;
+      let enabled = getters.isSubscriber && state.fcsVttEnabled;
+      return enabled;
+    },
+    vttEnabled: (state, getters) => {
+      if (!state.isAuthenticated) return false;
+      if (getters.fcsVttEnabled) return "fcsVtt"; //fcs takes priority over roll20
+      if (getters.roll20Enabled) return "roll20";
+      return false;
     },
     isAuthenticated: state => {
       return state.isAuthenticated;

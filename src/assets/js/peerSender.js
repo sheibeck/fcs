@@ -38,15 +38,12 @@ export default class PeerServiceReciever {
 
             // Workaround for peer.reconnect deleting previous id            
             //this.peer._lastServerId = this.lastPeerId;
-            //this.peer.reconnect();
-            this.disconnectBackoff = 1;
-            this.peer.reconnect();
+            //this.peer.reconnect();            
         });
         this.peer.on('close', () => {
             this.conn = null;
             console.log('Connection destroyed. Please refresh');
-        });
-        const FATAL_ERRORS = ['invalid-id', 'invalid-key', 'network', 'ssl-unavailable', 'server-error', 'socket-error', 'socket-closed', 'unavailable-id', 'webrtc'];
+        });        
         this.peer.on('error', (e) => {
             console.log(e);
             alert('Game may not be running. ' + e);           
