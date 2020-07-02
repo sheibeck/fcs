@@ -122,7 +122,7 @@ export default class PeerServiceReciever {
     }
 
     parseDiceRolls(message) {        
-        const diceRegx = /\/roll (\d*)(D[\df]*)((?:[+*-](?:\d+|\([A-Z]*\)))*)(?:\+(D\d*))?/i;        
+        const diceRegx = /\/roll (\d*)(D[\df]*)((?:[+*-](?:\d+|\([A-Z]*\)))*)(?:\+(D\d*))?/i;
         let roll = message.match(diceRegx);
         if (roll)
         {            

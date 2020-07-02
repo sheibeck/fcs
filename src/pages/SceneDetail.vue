@@ -149,9 +149,11 @@ import Panzoom from '@panzoom/panzoom'
 import Peer from 'peerjs';
 import PeerReceiver from "./../assets/js/peerReceiver";
 import PeerSender from "./../assets/js/peerSender";
+import FCSVTTClient from "./../assets/js/fcsVTTClient";
 
 let commonSvc = null;
 let dbSvc = null;
+let vttClient = null;
 
 export default {
   name: 'SceneDetail',
@@ -173,9 +175,7 @@ export default {
     editableinput: SceneEditableInput,
   },
   created() {    
-    window.addEventListener('message', function(event) {        
-        console.log('got a message');   /* Never happens. Why? */
-    }, false );
+    vttClient = new FCSVTTClient();
   },
   mounted(){    
     commonSvc = new CommonService(this.$root);
@@ -342,7 +342,15 @@ export default {
           this.commonSvc.Notify(e.detail.message);
           this.scene.isrunning = false;    
         }
-      }, false);      
+      }, false); 
+      
+      document.addEventListener('charactersheet', (e) => {
+        
+      }, false);
+
+      window.addEventListener("message",  (e) => {
+        this.sendFormattedChat(e);
+      }, false);
     },
     startGame() {
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
@@ -498,7 +506,7 @@ export default {
       this.$forceUpdate();
     },
     addAspect() {
-      let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:commonSvc.GenerateUUID(), used: false}]};
+      let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", invokes: []};
       if (!this.scene.aspects) {        
         this.$set(this.scene, 'aspects', new Array());
       }
@@ -542,7 +550,23 @@ export default {
           this.peerSender.sendChatMessage(this.userName, this.chatMessage);
           this.chatMessage = "";
         }
-      }      
+      }        
+    }, 
+    sendLocalChat(msg) {
+      let chatLog = document.getElementById("chat-log");
+      let chatLogMessage = document.createElement("DIV");                  
+      chatLogMessage.innerHTML = msg;
+      chatLog.appendChild(chatLogMessage);
+      chatLog.scrollTop = chatLog.msg;    
+    },  
+    sendFormattedChat(e) {
+      if (e.data.type !== "charactersheet") return;
+      let msg = e.data.data;
+      if (this.peerSender) {
+        this.peerSender.sendChatMessage(this.userName, msg);
+      } else {
+        this.sendLocalChat(msg);
+      }
     },
     toggleFullScreen() {
       this.fullScreen = !this.fullScreen;

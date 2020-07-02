@@ -101,10 +101,12 @@ import Search from '../components/search'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import FateOf20 from '../assets/js/fateof20'
+import FCSVTT from '../assets/js/fcsVTT'
 
 let commonSvc = null;
 let dbSvc = null;
 let fateOf20 = null;
+let fcsVtt = null;
 
 export default {
   name: 'CharacterList',
@@ -115,6 +117,7 @@ export default {
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
     fateOf20 = new FateOf20();
+    fcsVtt = new FCSVTT();
 
     this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
   },
@@ -277,51 +280,105 @@ export default {
 
       let character = this.adversaries[0].name;
       let msg = null;      
-      switch(type) {
-        case "diceroll":
-          let desc2 = data2;
-          let rollModifier = parseInt(data);  //try to match it straight up
 
-          if (isNaN(rollModifier))
-          {
-            var findModifier = data.match(/(\d)/);
-            if (findModifier) {
-              rollModifier = findModifier[0];
-              desc2 = data2;            
-            }
-            else {
-              findModifier = data2.match(/(\d)/);
-              if(findModifier) {
-                rollModifier = findModifier[0];
+       switch (this.vttEnabled) {
+        case "fcsVtt":
+          switch(type) {
+            case "diceroll":
+              let desc2 = data2;
+              let rollModifier = parseInt(data);  //try to match it straight up
+
+              if (isNaN(rollModifier))
+              {
+                var findModifier = data.match(/(\d)/);
+                if (findModifier) {
+                  rollModifier = findModifier[0];
+                  desc2 = data2;            
+                }
+                else {
+                  findModifier = data2.match(/(\d)/);
+                  if(findModifier) {
+                    rollModifier = findModifier[0];
+                  }
+                  desc2 = data;
+                }
               }
-              desc2 = data;
-            }
-          }
 
-          msg = fateOf20.MsgDiceRoll(character, description, desc2, rollModifier);
+              msg = fcsVtt.MsgDiceRoll(character, description, desc2, rollModifier);
+              break;
+            case "invoke":
+              if (!data) return;
+              msg = fcsVtt.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":          
+              msg = fcsVtt.MsgStuntExtra(character, `${description}: ${data}`);
+              break;
+            case "fatepoint":          
+              msg = fcsVtt.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = fcsVtt.MsgStress(character, description, data);
+              break;        
+            case "consequence":
+              //when dealing with consequences, we'll give them a temporary space for 
+              // the value of the consequence so we can invoke it         
+              this.consequences[data2] = data;
+              msg = fcsVtt.MsgConsequence(character, description, data);
+              break;      
+          }
+          fcsVtt.SendMessage(msg);
           break;
-        case "invoke":
-          if (!data) return;
-          msg = fateOf20.MsgInvoke(character, description, data);
+
+        case "roll20":              
+          switch(type) {
+            case "diceroll":
+              let desc2 = data2;
+              let rollModifier = parseInt(data);  //try to match it straight up
+
+              if (isNaN(rollModifier))
+              {
+                var findModifier = data.match(/(\d)/);
+                if (findModifier) {
+                  rollModifier = findModifier[0];
+                  desc2 = data2;            
+                }
+                else {
+                  findModifier = data2.match(/(\d)/);
+                  if(findModifier) {
+                    rollModifier = findModifier[0];
+                  }
+                  desc2 = data;
+                }
+              }
+
+              msg = fateOf20.MsgDiceRoll(character, description, desc2, rollModifier);
+              break;
+            case "invoke":
+              if (!data) return;
+              msg = fateOf20.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":          
+              msg = fateOf20.MsgStuntExtra(character, `${description}: ${data}`);
+              break;
+            case "fatepoint":          
+              msg = fateOf20.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = fateOf20.MsgStress(character, description, data);
+              break;        
+            case "consequence":
+              //when dealing with consequences, we'll give them a temporary space for 
+              // the value of the consequence so we can invoke it         
+              this.consequences[data2] = data;
+              msg = fateOf20.MsgConsequence(character, description, data);
+              break;      
+          }
+          fateOf20.SendMessage(msg);               
           break;
-        case "stuntextra":          
-          msg = fateOf20.MsgStuntExtra(character, `${description}: ${data}`);
-          break;
-        case "fatepoint":          
-          msg = fateOf20.MsgFatePoint(character, description, data);
-          break;
-        case "stress":
-        case "condition":
-          msg = fateOf20.MsgStress(character, description, data);
-          break;        
-        case "consequence":
-          //when dealing with consequences, we'll give them a temporary space for 
-          // the value of the consequence so we can invoke it         
-          this.consequences[data2] = data;
-          msg = fateOf20.MsgConsequence(character, description, data);
-          break;      
-      }
-      fateOf20.SendMessage(msg);
+
+       }
     },
   }
 }

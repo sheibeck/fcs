@@ -9,6 +9,7 @@
 import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService"
 import FateOf20 from '../assets/js/fateof20'
+import FCSVTT from '../assets/js/fcsVTT'
 
 //sheets
 import SheetFateAccelerated from "./../sheets/fate-accelerated"
@@ -25,6 +26,7 @@ import SheetStarTrek from "./../sheets/star-trek"
 
 let commonSvc = null;
 let fateOf20 = null;
+let fcsVtt = null;
 
 export default {
   name: 'CharacterSheet',
@@ -32,7 +34,8 @@ export default {
     if (!commonSvc) { 
       commonSvc = new CommonService(this.$root);
     }
-    fateOf20 = new FateOf20();   
+    fateOf20 = new FateOf20(); 
+    fcsVtt = new FCSVTT();
   },
   components: {
     "fate-accelerated": SheetFateAccelerated,
@@ -73,7 +76,28 @@ export default {
       
       switch (this.vttEnabled) {
         case "fcsVtt":
-
+          switch(type) {
+            case "diceroll":          
+              msg = fcsVtt.MsgDiceRoll(character, skillType, description, data);
+              break;
+            case "invoke":
+              msg = fcsVtt.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":
+              msg = fcsVtt.MsgStuntExtra(character, data);
+              break;
+            case "fatepoint":          
+              msg = fcsVtt.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = fcsVtt.MsgStress(character, description, data);
+              break;
+            case "consequence":
+              msg = fcsVtt.MsgConsequence(character, description, data);
+              break;      
+          }
+          fcsVtt.SendMessage(msg);
           break;
 
         case "roll20":

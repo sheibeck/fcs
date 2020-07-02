@@ -267,7 +267,7 @@ export default {
     addZoneObject(type) {      
       switch(type) {
         case "aspect":
-          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: []};
+          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", invokes: []};
           this.zone.aspects.push(aspect);
           break;
       }

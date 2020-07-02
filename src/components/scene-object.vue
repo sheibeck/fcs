@@ -142,7 +142,7 @@ export default {
     addThingToObject(type) {       
       switch(type) {
         case "aspect":
-          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", editing: true, invokes: [{id:this.commonSvc.GenerateUUID(), used: false}]};
+          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", invokes: [{id:this.commonSvc.GenerateUUID(), used: false}]};
           if (!this.objectdata.caAndBoost) {             
             this.$set(this.objectdata, 'caAndBoost', new Array());
           }

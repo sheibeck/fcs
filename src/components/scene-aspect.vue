@@ -52,7 +52,7 @@ export default {
       switch(this.location)
       {        
         case "scene":          
-          this.$parent.$data.aspects = this.$parent.$data.aspects.filter(function( obj ) {
+          this.$parent.$data.scene.aspects = this.$parent.$data.scene.aspects.filter(function( obj ) {
             return obj.id !== $component.aspect.id;
           });      
           break;

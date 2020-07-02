@@ -117,10 +117,7 @@ export default {
             commonSvc.Notify('Character saved.', 'success');
           }
         });
-      }
-      else {
-          window.print();
-      }
+      }      
     }
   }
 }
