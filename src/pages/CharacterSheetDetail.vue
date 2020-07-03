@@ -108,10 +108,7 @@ export default {
             });            
           }
         });
-      }
-      else {
-          window.print();
-      }
+      }     
     }
   }
 }

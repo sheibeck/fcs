@@ -39,11 +39,11 @@
           <div v-if="!isEmpty(item.aspects)">
             <h5 class='card-header py-0'>Aspects</h5>
             <p class='card-text px-4 my-0' v-if="item.aspects.high_concept">
-              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'aspect', item.aspects.high_concept)">A</span>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.high_concept)">A</span>
               <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept)"></span>
             </p>
             <p class='card-text px-4 my-0' v-if="item.aspects.trouble">
-              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'aspect', item.aspects.trouble)">A</span>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.trouble)">A</span>
               <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble)"></span>
             </p>
            <p class='card-text px-4 my-0' v-if="item.aspects.other_aspects">
@@ -63,29 +63,29 @@
             <h5 class='card-header py-0'>Stunts &amp; Extras</h5>
 
               <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex">
-              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('stuntextra', stuntIndex, stunt)">A</span>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stuntIndex, stunt)">A</span>
               <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
             </p>
           </div>
 
           <div v-if="!isEmpty(item.stress)">
-            <h5 class='card-header py-0'>Stress <span v-if="hasRoll20" class='dice fo20 font-weight-normal'>D</span></h5>
+            <h5 class='card-header py-0'>Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></h5>
 
             <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress" :key="stressMainIndex">                
                 <strong>{{stressMainIndex}}</strong>
                 <span v-for="(stressValue, stressIndex) in stressMain" :key="stressIndex">
-                  <input type='checkbox' v-bind:value='stressValue' @change="sendToRoll20(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
+                  <input type='checkbox' v-bind:value='stressValue' @change="sendToVTT(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
                 </span>
             </p>
           </div>
 
           <div v-if="!isEmpty(item.consequences)">
-            <h5 class='card-header py-0'>Consequences <span v-if="hasRoll20" class='dice fo20 font-weight-normal'>D</span></h5>
+            <h5 class='card-header py-0'>Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></h5>
 
             <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex">
-              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20('invoke', 'invoke', consequences[conIndex])">A</span>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'invoke', consequences[conIndex])">A</span>
               <strong>{{conIndex}}</strong> <span v-html="fixLabel(con)"></span>
-              <input v-if="hasRoll20" class="ml-2 form-control input-sm" @change="sendToRoll20(`consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
+              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(`consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
             </p>
           </div>
 
@@ -105,20 +105,26 @@ import Search from '../components/search'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import FateOf20 from '../assets/js/fateof20'
+import FCSVTT from '../assets/js/fcsVTT'
+import Models from '../assets/js/models'
 
 let commonSvc = null;
 let dbSvc = null;
 let fateOf20 = null;
+let fcsVtt = null;
+let models = null;
 
 export default {
   name: 'CharacterList',
   components: {
     search: Search,
   },
-  mounted(){
+  created(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
     fateOf20 = new FateOf20();
+    fcsVtt = new FCSVTT();
+    models = new Models();
 
     this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
   },
@@ -135,7 +141,7 @@ export default {
       'isAuthenticated',
       'userId',
       'searchText',
-      'roll20Enabled'
+      'vttEnabled'
     ]),
     adversaryListDefault() {
       if ($cookies.get("fcsAdversaryListDefault"))
@@ -147,10 +153,7 @@ export default {
     },  
     commonSvc() {
       return commonSvc;
-    },
-    hasRoll20() {      
-      return this.roll20Enabled && this.adversaryId;
-    }
+    },  
   },
   watch: {
     userId() {
@@ -204,7 +207,7 @@ export default {
         if (onlyShowMyAdversaries) {
           this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, searchText);
         }
-        else{      
+        else{
           this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, searchText);
         }
 
@@ -217,7 +220,7 @@ export default {
     fixLabel: function (val, type, data) {
       let result = val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
       
-      if (this.hasRoll20 && type) {
+      if (this.vttEnabled && type) {
         let r20result = "";
         let separator = type == "aspect" ? ";" : ",";
         let items = result.split(separator);
@@ -228,11 +231,11 @@ export default {
           
           switch(type) {
             case "skill":              
-              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('diceroll', 'skill', '${item.replace(/\'/,'')}', '${data}')">+</span>`
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToVTT('diceroll', 'skill', '${item.replace(/\'/,'')}', '${data}')">+</span>`
               r20result += item;
               break;
             case "aspect":            
-              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToRoll20('invoke', '${type}', '${item.replace(/\'/,'')}')">A</span>`
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToVTT('invoke', '${type}', '${item.replace(/\'/,'')}')">A</span>`
               r20result += item;            
               break;                         
           }
@@ -279,56 +282,110 @@ export default {
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },
-    sendToRoll20(type, description, data, data2) {  
-      if (!this.hasRoll20) return;
+    sendToVTT(type, description, data, data2) {  
+      if (!this.vttEnabled) return;
 
       let character = this.adversaries[0].name;
       let msg = null;      
-      switch(type) {
-        case "diceroll":
-          let desc2 = data2;
-          let rollModifier = parseInt(data);  //try to match it straight up
 
-          if (isNaN(rollModifier))
-          {
-            var findModifier = data.match(/(\d)/);
-            if (findModifier) {
-              rollModifier = findModifier[0];
-              desc2 = data2;            
-            }
-            else {
-              findModifier = data2.match(/(\d)/);
-              if(findModifier) {
-                rollModifier = findModifier[0];
+       switch (this.vttEnabled) {
+        case "fcsVtt":
+          switch(type) {
+            case "diceroll":
+              let desc2 = data2;
+              let rollModifier = parseInt(data);  //try to match it straight up
+
+              if (isNaN(rollModifier))
+              {
+                var findModifier = data.match(/(\d)/);
+                if (findModifier) {
+                  rollModifier = findModifier[0];
+                  desc2 = data2;            
+                }
+                else {
+                  findModifier = data2.match(/(\d)/);
+                  if(findModifier) {
+                    rollModifier = findModifier[0];
+                  }
+                  desc2 = data;
+                }
               }
-              desc2 = data;
-            }
-          }
 
-          msg = fateOf20.MsgDiceRoll(character, description, desc2, rollModifier);
+              msg = fcsVtt.MsgDiceRoll(character, description, desc2, rollModifier);
+              break;
+            case "invoke":
+              if (!data) return;
+              msg = models.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":          
+              msg = models.MsgStuntExtra(character, `${description}: ${data}`);
+              break;
+            case "fatepoint":          
+              msg = models.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = models.MsgStress(character, description, data);
+              break;        
+            case "consequence":
+              //when dealing with consequences, we'll give them a temporary space for 
+              // the value of the consequence so we can invoke it         
+              this.consequences[data2] = data;
+              msg = models.MsgConsequence(character, description, data);
+              break;      
+          }
+          fcsVtt.SendMessage(msg);
           break;
-        case "invoke":
-          if (!data) return;
-          msg = fateOf20.MsgInvoke(character, description, data);
+
+        case "roll20":              
+          switch(type) {
+            case "diceroll":
+              let desc2 = data2;
+              let rollModifier = parseInt(data);  //try to match it straight up
+
+              if (isNaN(rollModifier))
+              {
+                var findModifier = data.match(/(\d)/);
+                if (findModifier) {
+                  rollModifier = findModifier[0];
+                  desc2 = data2;            
+                }
+                else {
+                  findModifier = data2.match(/(\d)/);
+                  if(findModifier) {
+                    rollModifier = findModifier[0];
+                  }
+                  desc2 = data;
+                }
+              }
+
+              msg = models.MsgDiceRoll(character, description, desc2, rollModifier);
+              break;
+            case "invoke":
+              if (!data) return;
+              msg = models.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":          
+              msg = models.MsgStuntExtra(character, `${description}: ${data}`);
+              break;
+            case "fatepoint":          
+              msg = models.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = models.MsgStress(character, description, data);
+              break;        
+            case "consequence":
+              //when dealing with consequences, we'll give them a temporary space for 
+              // the value of the consequence so we can invoke it         
+              this.consequences[data2] = data;
+              msg = models.MsgConsequence(character, description, data);
+              break;      
+          }
+          fateOf20.SendMessage(msg);               
           break;
-        case "stuntextra":          
-          msg = fateOf20.MsgStuntExtra(character, `${description}: ${data}`);
-          break;
-        case "fatepoint":          
-          msg = fateOf20.MsgFatePoint(character, description, data);
-          break;
-        case "stress":
-        case "condition":
-          msg = fateOf20.MsgStress(character, description, data);
-          break;        
-        case "consequence":
-          //when dealing with consequences, we'll give them a temporary space for 
-          // the value of the consequence so we can invoke it         
-          this.consequences[data2] = data;
-          msg = fateOf20.MsgConsequence(character, description, data);
-          break;      
-      }
-      fateOf20.SendMessage(msg);
+
+       }
     },
   }
 }

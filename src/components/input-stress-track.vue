@@ -28,11 +28,8 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',      
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    }
+      'vttEnabled'
+    ]),   
   },
   data () {
     return {
@@ -41,10 +38,10 @@ export default {
   methods: {    
     setVal(arr, val) {   
           
-      if (this.roll20Enabled) {
+      if (this.vttEnabled) {
         let label = this.$parent.getVal(this.stress.label) || this.stress.label;
         
-        this.$parent.sendToRoll20("stress", label, arr, val);
+        this.$parent.sendToVTT("stress", label, arr, val);
         this.$parent.setVal(arr, val);
         this.$parent.$parent.$parent.save();
       } 

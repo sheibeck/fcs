@@ -32,7 +32,7 @@
 			<div class="fate-header mb-5 mb-sm-0 d-flex">
 				<div class="mr-auto"></div>
 				<div class="d-flex" style="min-height: 50px;">
-					<span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
+					<span v-if="vttEnabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
 					<inputfatepoints inputclass="fatepoints" placeholder="-" />
 				</div>
 			</div>					
@@ -45,7 +45,7 @@
 			<div class="px-3">				
 				<!-- Stress -->
 				<div class="form-group text-center font-weight-bold">
-					<div class="col-12">STRESS  <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+					<div class="col-12">STRESS  <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 
 				<!-- physical stress -->
@@ -74,7 +74,7 @@
 
 				<!-- consequences -->
 				<div class="form-group text-center font-weight-bold">
-					<div class="col-12">CONSEQUENCES <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+					<div class="col-12">CONSEQUENCES <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 				<div v-for="consequence in consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
@@ -119,7 +119,7 @@ export default {
   }, 
   computed: {
  	...mapGetters([  
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   mounted() {
@@ -187,10 +187,10 @@ export default {
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
 
-		if (this.roll20Enabled && arr.indexOf("stress") !== -1)
+		if (this.vttEnabled && arr.indexOf("stress") !== -1)
 		{
 			let label = arr.indexOf("mental") > -1 ? "Mental" : "Physical";
-			this.sendToRoll20("stress", `1 ${label}`, arr, val);		
+			this.sendToVTT("stress", `1 ${label}`, arr, val);		
 			this.$parent.$parent.save();		
 		}		
     },
@@ -207,20 +207,20 @@ export default {
 
         return result;
 	}, 
-	sendToRoll20(type, label, obj, item, skillType) {		
+	sendToVTT(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				this.$parent.sendToVTT(type, this.character.name, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
-				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				this.$parent.sendToVTT(type, this.character.name, label, item);
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

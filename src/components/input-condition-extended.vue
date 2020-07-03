@@ -33,11 +33,8 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',      
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    },
+      'vttEnabled'
+    ]),  
     isVertical() {
       return this.vertical == "true" || false;
     },
@@ -54,8 +51,8 @@ export default {
       return this.$parent.getVal(graphPath, defaultValue);
     },
     setVal(label, arr, val) {             
-      if (this.roll20Enabled) {        
-        this.$parent.sendToRoll20("condition", label, arr, val);
+      if (this.vttEnabled) {        
+        this.$parent.sendToVTT("condition", label, arr, val);
         this.$parent.setVal(arr, val);
         this.$parent.$parent.$parent.save();
       } 

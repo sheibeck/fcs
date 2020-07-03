@@ -4,8 +4,8 @@ export default class FateOf20 {
     //for manual installation of extension
     devExtensionId = "";    
     extensionId = "fmejbimehejoebbhmgimpjpjdfeplpia";
-    commonSvc = new CommonService();      
-
+    commonSvc = new CommonService();
+    
     port = null;
 
     constructor() {        
@@ -59,61 +59,6 @@ export default class FateOf20 {
         fcs.$store.state.roll20Installed = true;
     }
 
-    /* message types */
-    MsgDiceRoll = (character, skillType, skill, modifier) => {
-        return {
-            type: "diceroll",
-            character: character,
-            skillType: skillType,
-            skill: skill,
-            modifier: modifier           
-        }
-    }
-
-    MsgInvoke = (character, description, aspect) => {
-        return {
-            type: "invoke",
-            character: character,
-            description: description,
-            aspect: aspect,
-        }
-    }
-
-    MsgStuntExtra = (character, stuntextra) => {
-        return {
-            type: "stuntextra",
-            character: character,            
-            stuntextra: stuntextra,
-        }
-    }
-
-    MsgFatePoint = (character, description, modifier) => {
-        return {
-            type: "fatepoint",
-            character: character,
-            description: description,
-            modifier: modifier,                          
-        }
-    }
-
-    MsgStress = (character, description, stress) => {
-        return {
-            type: "stress",
-            character: character,
-            description: description,
-            stress: stress,
-        }
-    }
-
-    MsgConsequence = (character, description, consequence) => {
-        return {
-            type: "consequence",
-            character: character,
-            description: description,
-            consequence: consequence,
-        }
-    }
-
     SendMessage = (msg) => {
         try {     
             this.port.postMessage(msg);
@@ -124,7 +69,7 @@ export default class FateOf20 {
     }
 
     HandleListener = (msg) => {        
-        if (msg.result.roll20Connect) {
+        if (msg.result.roll20Connect) {            
             fcs.$store.state.roll20Running = msg.result.roll20Connect;
         }
         console.log(msg.result);

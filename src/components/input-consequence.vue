@@ -1,6 +1,6 @@
 <template>
 	<div class="form-group d-flex">
-    <span v-if="hasRoll20" class="dice fo20 pt-1 pr-1" v-on:click="sendToRoll20()">C</span>
+    <span v-if="vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
     <label class="pr-3">{{consequence.value}}</label>
     <input type="text" class="form-control" :id="consequence.obj" :name="consequence.obj" 
       @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="consequence.label"
@@ -19,25 +19,22 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',      
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    }
+      'vttEnabled'
+    ]),   
   },
   data () {
     return {
     }
   },
   methods: { 
-    sendToRoll20() {      
+    sendToVTT() {      
       if (!this.consequence || !this.consequence.label) return;
       let label = `consequence ${this.consequence.label}`;
-      this.$parent.sendToRoll20('invoke', label, "consequences", this.consequence.obj);
+      this.$parent.sendToVTT('invoke', label, "consequences", this.consequence.obj);
     },
     setVal(arr, val) {       
-      if (this.roll20Enabled) {
-        this.$parent.sendToRoll20("consequence", this.consequence.label, arr, val);
+      if (this.vttEnabled) {
+        this.$parent.sendToVTT("consequence", this.consequence.label, arr, val);
         this.$parent.setVal(arr, val);
         this.$parent.$parent.$parent.save();
       } 

@@ -34,7 +34,7 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // For simple requests:
 // For simple requests:
 browser.runtime.onConnectExternal.addListener(function(port) {
-    port.onMessage.addListener(function(msg) {         
+    port.onMessage.addListener(function(msg) {        
         if (msg.message == "roll20Running?") {
             port.postMessage({result: { roll20Connect: roll20IsRunning}});
         }

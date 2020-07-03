@@ -17,6 +17,7 @@
                  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
                     <a class="nav-link" v-bind:class="{active : isActive('character')}" href="/character"><i class="fas fa-user"></i> My Characters</a>
                     <a class="nav-link" v-bind:class="{active : isActive('campaign')}" href="/campaign"><i class="fas fa-globe-americas"></i> My Campaigns</a>
+                    <a class="nav-link" v-bind:class="{active : isActive('scene')}" href="/scene"><i class="fas fa-book-open"></i> My Scenes</a>
                  </div>
               </li>
               <li class="nav-item" v-bind:class="{active : isActive('charactersheet')}" ref="el">
@@ -170,7 +171,12 @@ export default {
       
       String.prototype.toTitleCase = function () {
         return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-      };       
+      };
+
+      Array.prototype.move = function(from,to){
+        this.splice(to,0,this.splice(from,1)[0]);
+        return this;
+      };
 
       commonSvc.SetupForEnvironment();
 
@@ -180,7 +186,7 @@ export default {
         if (event.keyCode === 13) {
             $("#search-button").click();
         }
-      });
+      });          
 
       AWS.config.region = 'us-east-1';      
       

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-2">    
+  <div class="container mt-2">      
     <form>
       <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" />
 
@@ -87,7 +87,7 @@ export default {
       characterData: null,        
     }
   },
-  methods : {   
+  methods : {    
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
@@ -117,10 +117,7 @@ export default {
             commonSvc.Notify('Character saved.', 'success');
           }
         });
-      }
-      else {
-          window.print();
-      }
+      }      
     }
   }
 }

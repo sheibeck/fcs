@@ -196,4 +196,13 @@ export default class CommonService {
                       <a class="close" onclick="eval(${dismiss})" style="cursor:pointer;" data-dismiss="alert">×</a><span>${msg}</span></div>`;
     $('#alert_placeholder').append(alertMsg);
   }
+
+  GetShortText = function(text) {
+    if (text)
+    {
+      let maxLength = 100;
+      return text.length < maxLength ? text : text.substring(0,maxLength) + "...";
+    }
+    return text;
+  }
 }

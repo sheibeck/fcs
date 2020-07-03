@@ -74,8 +74,12 @@ export default class UserService {
         this.fcs.$store.commit("credentials", credentials);
         this.fcs.$store.commit("CognitoUser", CognitoUser);            
         this.SetupAuthorizedUser(result, CognitoUser);
-
-        document.location = 'character';
+        
+        if (this.fcs.$route.query.redirect) {
+          document.location = this.fcs.$route.query.redirect;
+        } else {
+          document.location = 'character';
+        }
       },
 
       onFailure: (err) => {
