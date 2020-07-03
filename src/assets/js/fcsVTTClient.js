@@ -6,7 +6,7 @@ export default class FCSVTTClient {
         this.diceRoller = new DiceRoller();
     }
 
-    handleListener = (msg) => {        
+    handleListener = (msg) => {
         if (msg.data.type !== "fcsVTT") return;
         msg = msg.data.data;                   
         
@@ -74,7 +74,7 @@ export default class FCSVTTClient {
         this.chatMessage(chatMessage);
     }
 
-    chatMessage = (message) => {  
+    chatMessage = (message) => {         
         let description = message.description||"";      
 
         if (message.roll) {

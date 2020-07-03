@@ -98,7 +98,7 @@
           <i v-if="!showchat" @click="showchat = true" class="fas fa-angle-double-left"></i>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column">
-          <div id="chat-log" class="border mb-1">            
+          <div id="chat-log" class="border mb-1">
           </div>
           <div id="player-list">
               {{getPlayerList}}
@@ -150,10 +150,12 @@ import Peer from 'peerjs';
 import PeerReceiver from "./../assets/js/peerReceiver";
 import PeerSender from "./../assets/js/peerSender";
 import FCSVTTClient from "./../assets/js/fcsVTTClient";
+import FCSVTT from '../assets/js/fcsVTT'
 
 let commonSvc = null;
 let dbSvc = null;
 let vttClient = null;
+let fcsVtt = null;
 
 export default {
   name: 'SceneDetail',
@@ -174,8 +176,9 @@ export default {
     sceneaspect: SceneAspect,
     editableinput: SceneEditableInput,
   },
-  created() {    
+  created() {
     vttClient = new FCSVTTClient();
+    fcsVtt = new FCSVTT();
   },
   mounted(){    
     commonSvc = new CommonService(this.$root);
@@ -595,7 +598,53 @@ export default {
         this.scene.gamePeerId = e.detail.peerid;        
         this.saveScene(true);
       }
-    }
+    },
+    sendToVTT(type, description, data, data2, character) {
+      let msg=null;      
+      switch(type) {
+        case "diceroll":               
+          let rollModifier = parseInt(data);  //try to match it straight up
+          let desc2 = description;
+          if (isNaN(rollModifier))
+          {
+            var findModifier = data.match(/(\d)/);
+            if (findModifier) {
+              rollModifier = findModifier[0];              
+            }
+            else {
+              findModifier = description.match(/(\d)/);
+              if(findModifier) {
+                rollModifier = findModifier[0];
+              }
+              desc2 = data;
+            }
+          }
+
+          msg = fcsVtt.MsgDiceRoll(character, description, desc2, rollModifier);
+          break;
+        case "invoke":
+          if (!data) return;
+          msg = fcsVtt.MsgInvoke(character, description, data);
+          break;
+        case "stuntextra":          
+          msg = fcsVtt.MsgStuntExtra(character, `${description}: ${data}`);
+          break;
+        case "fatepoint":          
+          msg = fcsVtt.MsgFatePoint(character, description, data);
+          break;
+        case "stress":
+        case "condition":
+          msg = fcsVtt.MsgStress(character, description, data);
+          break;        
+        case "consequence":
+          //when dealing with consequences, we'll give them a temporary space for 
+          // the value of the consequence so we can invoke it         
+          this.consequences[data2] = data;
+          msg = fcsVtt.MsgConsequence(character, description, data);
+          break;      
+      }
+      window.postMessage({type: "fcsVTT", data: msg});      
+    },
   }
 }
 </script>

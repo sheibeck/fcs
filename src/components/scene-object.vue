@@ -39,12 +39,26 @@
       <div>
         <div class="header d-flex">
           <span class="mr-auto">Aspects</span>
-          <i v-if="objectdata.show.aspects" @click="objectdata.show.aspects=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!objectdata.show.aspects" @click="objectdata.show.aspects=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="show.aspects" @click="show.aspects=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!show.aspects" @click="show.aspects=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="objectdata.show.aspects">
+        <div v-if="show.aspects">
           <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
             <aspect :aspect="aspect" location="thing"  />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="header d-flex">
+          <span class="mr-auto">Skills</span>          
+          <i title="Add skill" @click="addThingToObject('skill')" class="fas fas fa-plus-circle fa-sm pt-1"></i>
+          <i v-if="show.skills" @click="show.skills=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!show.skills" @click="show.skills=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+        </div>
+        <div v-if="show.skills">
+          <div v-for="skill in objectdata.skills" v-bind:key="skill.id">
+            <skill :skill="skill" location="thing"  />
           </div>
         </div>
       </div>
@@ -52,10 +66,10 @@
       <div v-if="objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
           <span class="mr-auto">Stress</span>
-          <i v-if="objectdata.show.stress" @click="objectdata.show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!objectdata.show.stress" @click="objectdata.show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="show.stress" @click="show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!show.stress" @click="show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="objectdata.show.stress">
+        <div v-if="show.stress">
           <div v-for="stress in this.objectdata.stress" v-bind:key="stress.id">
             <stress :stress="stress" location="thing"  />
           </div>
@@ -65,10 +79,10 @@
       <div v-if="objectdata.conditions && objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
           <span class="mr-auto">Conditions</span>
-          <i v-if="objectdata.show.conditions" @click="objectdata.show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!objectdata.show.conditions" @click="objectdata.show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="show.conditions" @click="show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!show.conditions" @click="show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="objectdata.show.conditions">
+        <div v-if="show.conditions">
           <div v-for="condition in this.objectdata.conditions" v-bind:key="condition.id">
             <stress :stress="condition" location="thing"  />
           </div>
@@ -78,10 +92,10 @@
       <div v-if="objectdata.consequences">
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
-          <i v-if="objectdata.show.consequences" @click="objectdata.show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!objectdata.show.consequences" @click="objectdata.show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="show.consequences" @click="show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!show.consequences" @click="show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="objectdata.show.consequences">
+        <div v-if="show.consequences">
           <div v-for="consequence in objectdata.consequences" v-bind:key="consequence.id">
             <consequence :consequence="consequence" location="thing"  />
           </div>
@@ -108,6 +122,7 @@
 import SceneAspect from './scene-aspect';
 import SceneStress from './scene-stress';
 import SceneConsequence from './scene-consequence';
+import SceneSkill from './scene-skill';
 import CommonService from '../assets/js/commonService';
 
 export default {
@@ -119,12 +134,14 @@ export default {
     aspect: SceneAspect,
     stress: SceneStress,
     consequence: SceneConsequence,
-  },    
+    skill: SceneSkill,
+  },      
   data () {
     return {
       editing: false,
       show: {
         aspects: true,
+        skills: true,
         stress: true,
         consequences: true,
       },
@@ -148,6 +165,10 @@ export default {
           }
           this.objectdata.caAndBoost.push(aspect);
           break;
+        case "skill":
+          let skill = {id: this.commonSvc.GenerateUUID(), name: "SkillName", value: "+0", object_type: type };            
+          this.objectdata.skills.push(skill);
+          break;
       }
     },  
     copyObject() {
@@ -170,6 +191,8 @@ export default {
           }
         case "CHARACTER":
           return "bg-success";
+        default:
+          return "bg-secondary";
       }
     },  
     openLink() {      

@@ -137,7 +137,8 @@ export default {
       result.aspects = this.convertThingToGameObject(result.aspects, type, "ASPECT");
       result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE");      
       result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
-      result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");    
+      result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");
+      result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");
       
       this.$set(result, 'show', {
         aspects: true,
@@ -235,6 +236,12 @@ export default {
           for (let [key, value] of Object.entries(array)) {            
             let consequence = {id: this.commonSvc.GenerateUUID(), invokes: [], name: key, label: (thing == "ADVERSARY" ? value : ''), value:(thing == "CHARACTER" ? value : ''), object_type: type };            
             gameObject.push(consequence);
+          }
+          break;
+        case "SKILL":          
+          for (let [key, value] of Object.entries(array)) {            
+            let skill = {id: this.commonSvc.GenerateUUID(), name: parseInt(value) ? key : value, value: parseInt(key) ? value : key, object_type: type };            
+            gameObject.push(skill);
           }
           break;
       };
