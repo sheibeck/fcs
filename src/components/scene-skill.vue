@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <button class="btn btn-link p-0 m-0 small" type="button"><i title="Remove skill" @click="removeSkill()" class="fas fas fa-trash-alt fa-xs"></i></button>
+    <button class="btn btn-link p-0 m-0 small" type="button"><i title="Remove skill" @click="removeSkill()" class="fas fa-trash-alt fa-xs"></i></button>
   </div>
 </template>
 

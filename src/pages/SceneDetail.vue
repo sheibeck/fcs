@@ -26,7 +26,7 @@
     width: 500px;
 
     #chat-log {      
-      height: 77vh;
+      height: 68vh;
       overflow: scroll;
     }
   }
@@ -65,7 +65,7 @@
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
 
-        <editableinput v-if="isConnected" :object="getPlayer(this.userId)" :canedit="this.userId == getPlayer(this.userId).id" item="username" label="Username:" />
+        <editableinput :object="getPlayer(this.userId)" item="username" label="Username:" />
        
         <span v-if="isHost">
           <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>
@@ -100,12 +100,14 @@
         <div v-if="showchat" id="chat" class="d-flex flex-column">
           <div id="chat-log" class="border mb-1">
           </div>
-          <div id="player-list">
-              {{getPlayerList}}
-          </div>
-          <div class="d-flex">
-            <input rows="1" id="chat-input" v-model="chatMessage" @keyup.enter="sendChatMessage()" class="w-75 mr-1" />
-            <button type="button" @click="sendChatMessage()">Submit</button>
+          <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1"></textarea>
+          <div class="d-flex mt-1">
+            <select type="button" v-model="selectedPlayer" class="form-control mr-1">
+              <option value="everyone">Everyone</option>
+              <option v-for="player in this.scene.players" :key="player.id" :value="player.id">{{player.username}}</option>              
+            </select>
+            <button type="button" class="btn btn-secondary btn-sm mr-1" @click="sendChatMessage()">Send</button>
+            <button title="Roll 4df" type="button" class="btn btn-info btn-sm" @click="rollFateDice()"><span class="dice">+</span></button>
           </div>
         </div>
       </div>
@@ -151,6 +153,9 @@ import PeerReceiver from "./../assets/js/peerReceiver";
 import PeerSender from "./../assets/js/peerSender";
 import FCSVTTClient from "./../assets/js/fcsVTTClient";
 import FCSVTT from '../assets/js/fcsVTT'
+import Models from '../assets/js/models';
+
+let models = new Models();
 
 let commonSvc = null;
 let dbSvc = null;
@@ -221,6 +226,7 @@ export default {
       editingScene: false,
       isUpdating: false,
       isConnected: false,
+      selectedPlayer: "everyone"
     }
   },
   computed: {
@@ -246,18 +252,7 @@ export default {
     },
     isSceneRunning() {
       return this.scene.isrunning;
-    },    
-    getPlayerList() {      
-      if (!this.scene || !this.scene.players) {
-        return "No players.";
-      }
-
-      let players = "";
-      this.scene.players.forEach(player => {
-        players += `${player.username} (${player.lastPeerId}),`;
-      })
-      return players;
-    }
+    }    
   },
   methods: {
     init() {
@@ -509,7 +504,7 @@ export default {
       this.$forceUpdate();
     },
     addAspect() {
-      let aspect = {id:commonSvc.GenerateUUID(), name: "Aspect Name", invokes: []};
+      let aspect = models.SceneAspect("", "", "scene");
       if (!this.scene.aspects) {        
         this.$set(this.scene, 'aspects', new Array());
       }
@@ -528,32 +523,24 @@ export default {
     sendSystemMessage(message) {
       this.peerReceiver.displayChatMessage(message);     
     },
-    sendChatMessage() {      
-      //send data to peer connections
+    sendChatMessage() {
+      if (!this.chatMessage) return;      
+      
       if (this.peerSender) {
-        //check for a chat command
-        let regex = /^(\/[w]*) (\w*) (.*)/;
-        let match = this.chatMessage.match(regex);
-        if (match) {
-          let command = match[1];
-          let message = match[3];
+        if (this.selectedPlayer !== "everyone") {
           let player = this.scene.players.find(obj => {
-            return obj.username === match[2];
-          });
-
-          if (!player) {
-            this.commonSvc.Notify("Player not found!");
-            return;
-          }
-          else {          
-            this.peerSender.sendPrivateMessage(this.userName, player, message);
-          }
+            return obj.id === this.selectedPlayer
+          });          
+          this.peerSender.sendPrivateMessage(this.userName, player, this.chatMessage);          
         }
         else {
-          this.peerSender.sendChatMessage(this.userName, this.chatMessage);
-          this.chatMessage = "";
+          this.peerSender.sendChatMessage(this.userName, this.chatMessage);          
         }
-      }        
+        this.chatMessage = "";
+      }
+      else {
+        this.commonSvc.Notify("You are not connected.");
+      }
     }, 
     sendLocalChat(msg) {
       let chatLog = document.getElementById("chat-log");
@@ -577,7 +564,7 @@ export default {
         document.getElementsByClassName("navbar")[0].classList.add("d-none");
         document.getElementsByClassName("navbar")[0].classList.add("d-none");                
         document.getElementById("canvas-wrapper").style.height = "94vh";        
-        document.getElementById("chat-log").style.height = "90vh";
+        document.getElementById("chat-log").style.height = "81vh";
 
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.add("d-none");
@@ -585,7 +572,7 @@ export default {
       else {
         document.getElementsByClassName("navbar")[0].classList.remove("d-none"); 
         document.getElementById("canvas-wrapper").style.height = "81vh";
-        document.getElementById("chat-log").style.height = "77vh";
+        document.getElementById("chat-log").style.height = "68vh";
 
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       
@@ -620,31 +607,41 @@ export default {
             }
           }
 
-          msg = fcsVtt.MsgDiceRoll(character, description, desc2, rollModifier);
+          msg = models.MsgDiceRoll(character, description, desc2, rollModifier);
           break;
         case "invoke":
           if (!data) return;
-          msg = fcsVtt.MsgInvoke(character, description, data);
+          msg = models.MsgInvoke(character, description, data);
           break;
         case "stuntextra":          
-          msg = fcsVtt.MsgStuntExtra(character, `${description}: ${data}`);
+          msg = models.MsgStuntExtra(character, `${description}: ${data}`);
           break;
         case "fatepoint":          
-          msg = fcsVtt.MsgFatePoint(character, description, data);
+          msg = models.MsgFatePoint(character, description, data);
           break;
         case "stress":
         case "condition":
-          msg = fcsVtt.MsgStress(character, description, data);
+          msg = models.MsgStress(character, description, data);
           break;        
         case "consequence":
           //when dealing with consequences, we'll give them a temporary space for 
           // the value of the consequence so we can invoke it         
           this.consequences[data2] = data;
-          msg = fcsVtt.MsgConsequence(character, description, data);
+          msg = models.MsgConsequence(character, description, data);
           break;      
       }
       window.postMessage({type: "fcsVTT", data: msg});      
     },
-  }
+    rollFateDice() {      
+      let msg =  {
+          character: this.userName,
+          action: `Rolled: <em>4df</em>`,
+          roll: { 
+              modifier: `0`,                       
+          }
+      };    
+      vttClient.chatMessage(msg);
+    }
+  },
 }
 </script>

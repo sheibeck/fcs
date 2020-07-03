@@ -2,7 +2,7 @@
   <div>    
     <div title="Click to edit" v-if="!editing" @click="canEdit()">
       <label v-if="label">{{label}}</label>
-      {{object[item]}}
+      {{getThing}}
     </div>
     <div v-if="editing">
       <div class="input-group">  
@@ -28,6 +28,11 @@ export default {
   data () {
     return { 
       editing: false     
+    }
+  },
+  computed: {
+    getThing() {
+      return this.object ? this.object[this.item] : "";
     }
   },
   methods: {    

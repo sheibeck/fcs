@@ -12,7 +12,7 @@ export default class FCSVTTClient {
         
         let chatMessage = "";
         let subMessage = "";
-        switch(msg.type) {         
+        switch(msg.type) {
             case "diceroll":                                 
                 chatMessage = {
                     character: msg.character,

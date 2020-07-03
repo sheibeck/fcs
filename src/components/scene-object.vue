@@ -39,8 +39,8 @@
       <div>
         <div class="header d-flex">
           <span class="mr-auto">Aspects</span>
-          <i v-if="show.aspects" @click="show.aspects=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!show.aspects" @click="show.aspects=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="show.aspects" @click="show.aspects=false" title="Hide" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!show.aspects" @click="show.aspects=true" title="Show" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
         <div v-if="show.aspects">
           <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
@@ -49,10 +49,10 @@
         </div>
       </div>
 
-      <div>
+      <div v-if="objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
           <span class="mr-auto">Skills</span>          
-          <i title="Add skill" @click="addThingToObject('skill')" class="fas fas fa-plus-circle fa-sm pt-1"></i>
+          <i title="Add skill" @click="addThingToObject('skill')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="show.skills" @click="show.skills=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!show.skills" @click="show.skills=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
@@ -66,6 +66,7 @@
       <div v-if="objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
           <span class="mr-auto">Stress</span>
+          <i title="Add stress" @click="addThingToObject('stress')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="show.stress" @click="show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!show.stress" @click="show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
@@ -79,6 +80,7 @@
       <div v-if="objectdata.conditions && objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
           <span class="mr-auto">Conditions</span>
+          <i title="Add condition" @click="addThingToObject('condition')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="show.conditions" @click="show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!show.conditions" @click="show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
@@ -89,9 +91,10 @@
         </div>
       </div>
 
-      <div v-if="objectdata.consequences">
+      <div v-if="objectdata.consequences && objectdata.object_type != 'CHARACTER'">
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
+          <i title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="show.consequences" @click="show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!show.consequences" @click="show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
@@ -110,7 +113,7 @@
     </div>
 
     <div class="d-flex flex-column bg-light ml-1 border toolbar">
-      <button type="button" class="btn btn-link p-0" title="Add Aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Attach an aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
       <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
@@ -124,6 +127,9 @@ import SceneStress from './scene-stress';
 import SceneConsequence from './scene-consequence';
 import SceneSkill from './scene-skill';
 import CommonService from '../assets/js/commonService';
+import Models from '../assets/js/models';
+
+let models = new Models();
 
 export default {
   name: 'SceneObject',
@@ -156,17 +162,30 @@ export default {
         return obj.id !== id;
       });
     },
-    addThingToObject(type) {       
+    addThingToObject(type) {  
+      let objectType = "sceneobject";     
       switch(type) {
         case "aspect":
-          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", invokes: [{id:this.commonSvc.GenerateUUID(), used: false}]};
+          let aspect = models.SceneAspect("","",objectType,true);          
           if (!this.objectdata.caAndBoost) {             
             this.$set(this.objectdata, 'caAndBoost', new Array());
           }
           this.objectdata.caAndBoost.push(aspect);
           break;
-        case "skill":
-          let skill = {id: this.commonSvc.GenerateUUID(), name: "SkillName", value: "+0", object_type: type };            
+        case "consequence":
+          let consequence = models.SceneConsequence("", "", "", objectType)           
+          this.objectdata.consequences.push(consequence);
+          break;
+        case "condition":
+          let condition = models.SceneCondition("", "", objectType)
+          this.objectdata.conditions.push(condition);
+          break;
+        case "stress":        
+          let stress = models.SceneStress("", objectType)           
+          this.objectdata.stress.push(stress);
+          break
+        case "skill":          
+          let skill = models.SceneSkill("", "", objectType)           
           this.objectdata.skills.push(skill);
           break;
       }
@@ -217,6 +236,10 @@ export default {
 <style lang="scss" scoped>
   .objectHandle {
     cursor:grab;
+  }
+
+  .fas {
+    cursor: pointer;
   }
 
   .separator {

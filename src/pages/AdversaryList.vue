@@ -102,22 +102,25 @@ import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import FateOf20 from '../assets/js/fateof20'
 import FCSVTT from '../assets/js/fcsVTT'
+import Models from '../assets/js/models'
 
 let commonSvc = null;
 let dbSvc = null;
 let fateOf20 = null;
 let fcsVtt = null;
+let models = null;
 
 export default {
   name: 'CharacterList',
   components: {
     search: Search,
   },
-  mounted(){
+  created(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
     fateOf20 = new FateOf20();
     fcsVtt = new FCSVTT();
+    models = new Models();
 
     this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
   },
@@ -308,23 +311,23 @@ export default {
               break;
             case "invoke":
               if (!data) return;
-              msg = fcsVtt.MsgInvoke(character, description, data);
+              msg = models.MsgInvoke(character, description, data);
               break;
             case "stuntextra":          
-              msg = fcsVtt.MsgStuntExtra(character, `${description}: ${data}`);
+              msg = models.MsgStuntExtra(character, `${description}: ${data}`);
               break;
             case "fatepoint":          
-              msg = fcsVtt.MsgFatePoint(character, description, data);
+              msg = models.MsgFatePoint(character, description, data);
               break;
             case "stress":
             case "condition":
-              msg = fcsVtt.MsgStress(character, description, data);
+              msg = models.MsgStress(character, description, data);
               break;        
             case "consequence":
               //when dealing with consequences, we'll give them a temporary space for 
               // the value of the consequence so we can invoke it         
               this.consequences[data2] = data;
-              msg = fcsVtt.MsgConsequence(character, description, data);
+              msg = models.MsgConsequence(character, description, data);
               break;      
           }
           fcsVtt.SendMessage(msg);
@@ -352,27 +355,27 @@ export default {
                 }
               }
 
-              msg = fateOf20.MsgDiceRoll(character, description, desc2, rollModifier);
+              msg = models.MsgDiceRoll(character, description, desc2, rollModifier);
               break;
             case "invoke":
               if (!data) return;
-              msg = fateOf20.MsgInvoke(character, description, data);
+              msg = models.MsgInvoke(character, description, data);
               break;
             case "stuntextra":          
-              msg = fateOf20.MsgStuntExtra(character, `${description}: ${data}`);
+              msg = models.MsgStuntExtra(character, `${description}: ${data}`);
               break;
             case "fatepoint":          
-              msg = fateOf20.MsgFatePoint(character, description, data);
+              msg = models.MsgFatePoint(character, description, data);
               break;
             case "stress":
             case "condition":
-              msg = fateOf20.MsgStress(character, description, data);
+              msg = models.MsgStress(character, description, data);
               break;        
             case "consequence":
               //when dealing with consequences, we'll give them a temporary space for 
               // the value of the consequence so we can invoke it         
               this.consequences[data2] = data;
-              msg = fateOf20.MsgConsequence(character, description, data);
+              msg = models.MsgConsequence(character, description, data);
               break;      
           }
           fateOf20.SendMessage(msg);               

@@ -24,7 +24,7 @@
         <!-- name -->        
         <label title="Click to edit" v-if="!editing" @click="editing=true" style="vertical-align: top;">{{zone.name.toUpperCase()}}</label>
         <div class="input-group" v-if="editing">  
-          <input class="form-control-sm" v-model="zone.name" />                    
+          <input class="form-control-sm" v-model="zone.name" />
           <div class="input-group-append">              
               <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
           </div>
@@ -52,18 +52,18 @@
     <div class="d-flex flex-column bg-light pl-1">
       <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>    
       <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
-      <b-popover :target="`add-adversary-${this.zone.id}`" triggers="click blur">
+      <b-popover ref="popoverAdversary" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Adversary</template>
-        <autocomplete  :search="searchAdversaries"
+        <autocomplete :search="searchAdversaries"
           placeholder="Search Adversaries"
           aria-label="Search Adversaries"
           :get-result-value="getAdversaryResultValue"
           @submit="selectAdversaryResult"></autocomplete>
       </b-popover>
       <b-button :id="`add-character-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></b-button>  
-      <b-popover :target="`add-character-${this.zone.id}`" triggers="click blur">
+      <b-popover ref="popoverCharacter" :target="`add-character-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Character</template>
-        <autocomplete  :search="searchCharacters"
+        <autocomplete :search="searchCharacters"
           placeholder="Search Characters"
           aria-label="Search Characters"
           :get-result-value="getCharacterResultValue"
@@ -88,8 +88,10 @@ import { Container, Draggable } from "vue-smooth-dnd";
 import CommonService from '../assets/js/commonService';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import DbService from '../assets/js/dbService';
+import Models from '../assets/js/models';
 
 let dbSvc = null;
+let models = new Models();
 
 export default {
   name: 'SceneObject',
@@ -164,12 +166,13 @@ export default {
     },
     getAdversaryResultValue(result) {
       return result.name;
-    },    
+    },
     selectAdversaryResult(result) {
-      //adversaries can be copied and we want uniqueIds
+      //adversaries can be copied and we want uniqueIds      
       result.originalId = result.id;
       result.id = this.commonSvc.GenerateUUID();
       this.makeGameObject(result, "ADVERSARY");
+      this.$refs.popoverAdversary.$emit('close');
     },    
     /* end adversary search */
 
@@ -191,7 +194,9 @@ export default {
       return result.name;
     },    
     selectCharacterResult(result) {
-      this.makeGameObject(result, "CHARACTER");    
+      //TODO: Make sure you can't add the same character if it already exists.
+      this.makeGameObject(result, "CHARACTER");      
+      this.$refs.popoverCharacter.$emit('close');   
     },    
     /* end character search */
 
@@ -206,41 +211,42 @@ export default {
             if (thing == "ADVERSARY") {
               var subAspects = value.split(";");
               subAspects.forEach( item => {
-                let aspect = {id: this.commonSvc.GenerateUUID(), invokes: [], name: item, label: key, object_type: thing };
+                let aspect = models.SceneAspect(item, key, thing);
                 gameObject.push(aspect);
               });                        
             } else {              
-              let aspect = {id: this.commonSvc.GenerateUUID(), invokes: [], name: value, label: key, object_type: thing };
+              let aspect = models.SceneAspect(value, key, thing);
               gameObject.push(aspect);
             }
           }
           break;
-        case "STRESS":
+        case "STRESS":          
           for (let [key, value] of Object.entries(array)) {
-            let stress = {id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };                      
+            let stress = models.SceneStress(key, type)
             for (let [skey, svalue] of Object.entries(value)) {
-              stress.boxes.push({id: this.commonSvc.GenerateUUID(), used: false, label: svalue})
+              let stressbox = models.SceneStressBox(svalue)
+              stress.boxes.push(stressbox)
             }          
             gameObject.push(stress);
           }
           break;
         case "CONDITION":          
           for (let [key, value] of Object.entries(array)) {            
-            let condition = {id: this.commonSvc.GenerateUUID(), boxes: [], name: key, object_type: type };            
-            condition.boxes.push({id: this.commonSvc.GenerateUUID(), used: false, label: value})     
+            let condition = SceneCondition(key, type);
+            condition.boxes.push(models.SceneStressBox(value))     
             gameObject.push(condition);
           }
           gameObject = gameObject.sort((a, b) => a.name.localeCompare(b.name));
           break;
         case "CONSEQUENCE":          
-          for (let [key, value] of Object.entries(array)) {            
-            let consequence = {id: this.commonSvc.GenerateUUID(), invokes: [], name: key, label: (thing == "ADVERSARY" ? value : ''), value:(thing == "CHARACTER" ? value : ''), object_type: type };            
+          for (let [key, value] of Object.entries(array)) {
+            let consequence = models.SceneConsequence(key, (thing == "ADVERSARY" ? value : ''), (thing == "CHARACTER" ? value : ''), type);
             gameObject.push(consequence);
           }
           break;
         case "SKILL":          
           for (let [key, value] of Object.entries(array)) {            
-            let skill = {id: this.commonSvc.GenerateUUID(), name: parseInt(value) ? key : value, value: parseInt(key) ? value : key, object_type: type };            
+            let skill = models.SceneSkill(parseInt(value) ? key : value, parseInt(key) ? value : key, type);
             gameObject.push(skill);
           }
           break;
@@ -274,7 +280,7 @@ export default {
     addZoneObject(type) {      
       switch(type) {
         case "aspect":
-          let aspect = {id:this.commonSvc.GenerateUUID(), name: "Aspect Name", invokes: []};
+          let aspect = models.SceneAspect("", "", "zone");
           this.zone.aspects.push(aspect);
           break;
       }

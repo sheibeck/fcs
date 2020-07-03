@@ -6,10 +6,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import CommonService from "./../assets/js/commonService"
-import FateOf20 from '../assets/js/fateof20'
-import FCSVTT from '../assets/js/fcsVTT'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
+import FateOf20 from '../assets/js/fateof20';
+import FCSVTT from '../assets/js/fcsVTT';
+import Models from '../assets/js/models';
+
 
 //sheets
 import SheetFateAccelerated from "./../sheets/fate-accelerated"
@@ -27,15 +29,15 @@ import SheetStarTrek from "./../sheets/star-trek"
 let commonSvc = null;
 let fateOf20 = null;
 let fcsVtt = null;
+let models = null;
 
 export default {
   name: 'CharacterSheet',
-  mounted() {       
-    if (!commonSvc) { 
-      commonSvc = new CommonService(this.$root);
-    }
+  created() {    
+    commonSvc = new CommonService(this.$root);    
     fateOf20 = new FateOf20(); 
     fcsVtt = new FCSVTT();
+    models = new Models();
   },
   components: {
     "fate-accelerated": SheetFateAccelerated,
@@ -78,23 +80,23 @@ export default {
         case "fcsVtt":
           switch(type) {
             case "diceroll":          
-              msg = fcsVtt.MsgDiceRoll(character, skillType, description, data);
+              msg = models.MsgDiceRoll(character, skillType, description, data);
               break;
             case "invoke":
-              msg = fcsVtt.MsgInvoke(character, description, data);
+              msg = models.MsgInvoke(character, description, data);
               break;
             case "stuntextra":
-              msg = fcsVtt.MsgStuntExtra(character, data);
+              msg = models.MsgStuntExtra(character, data);
               break;
             case "fatepoint":          
-              msg = fcsVtt.MsgFatePoint(character, description, data);
+              msg = models.MsgFatePoint(character, description, data);
               break;
             case "stress":
             case "condition":
-              msg = fcsVtt.MsgStress(character, description, data);
+              msg = models.MsgStress(character, description, data);
               break;
             case "consequence":
-              msg = fcsVtt.MsgConsequence(character, description, data);
+              msg = models.MsgConsequence(character, description, data);
               break;      
           }
           fcsVtt.SendMessage(msg);
@@ -103,23 +105,23 @@ export default {
         case "roll20":
           switch(type) {
             case "diceroll":          
-              msg = fateOf20.MsgDiceRoll(character, skillType, description, data);
+              msg = models.MsgDiceRoll(character, skillType, description, data);
               break;
             case "invoke":
-              msg = fateOf20.MsgInvoke(character, description, data);
+              msg = models.MsgInvoke(character, description, data);
               break;
             case "stuntextra":
-              msg = fateOf20.MsgStuntExtra(character, data);
+              msg = models.MsgStuntExtra(character, data);
               break;
             case "fatepoint":          
-              msg = fateOf20.MsgFatePoint(character, description, data);
+              msg = models.MsgFatePoint(character, description, data);
               break;
             case "stress":
             case "condition":
-              msg = fateOf20.MsgStress(character, description, data);
+              msg = models.MsgStress(character, description, data);
               break;
             case "consequence":
-              msg = fateOf20.MsgConsequence(character, description, data);
+              msg = models.MsgConsequence(character, description, data);
               break;      
           }
           fateOf20.SendMessage(msg);
