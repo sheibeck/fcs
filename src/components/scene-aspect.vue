@@ -1,6 +1,6 @@
 <template>
   <div class="pl-1 ml-1 badge" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">     
-    <button v-if="!aspect.object_type" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>      
+    <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>      
     <span title="Click to edit" v-if="!editing" @click="editing = true" style="white-space: pre-wrap" class="text-left">{{aspect.name}}</span>
 
     <div v-if="editing">

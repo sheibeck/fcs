@@ -280,7 +280,7 @@ export default {
     addZoneObject(type) {      
       switch(type) {
         case "aspect":
-          let aspect = models.SceneAspect("", "", "zone");
+          let aspect = models.SceneAspect("", "", "");
           this.zone.aspects.push(aspect);
           break;
       }
