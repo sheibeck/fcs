@@ -16,7 +16,7 @@
               </div>
             </div>
           </div>                
-          <button v-if="objectdata.object_type" @click="openLink()" target="blank" class="p-0 text-white pr-1 mr-auto btn btn-link"><i class="fas fa-link fa-xs"></i></button>
+          <button v-if="isFCSObject" @click="openLink()" target="blank" class="p-0 text-white pr-1 mr-auto btn btn-link"><i class="fas fa-link fa-xs"></i></button>
         </div>        
       </div>      
       
@@ -39,6 +39,7 @@
       <div>
         <div class="header d-flex">
           <span class="mr-auto">Aspects</span>
+          <i title="Add aspect" @click="addThingToObject('aspect')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="show.aspects" @click="show.aspects=false" title="Hide" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!show.aspects" @click="show.aspects=true" title="Show" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
@@ -113,7 +114,7 @@
     </div>
 
     <div class="d-flex flex-column bg-light ml-1 border toolbar">
-      <button type="button" class="btn btn-link p-0" title="Attach an aspect" @click="addThingToObject('aspect')"><i class="fas fa-sticky-note"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Create advantage/boost" @click="addThingToObject('caAndBoost')"><i class="fas fa-sticky-note"></i></button>
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
       <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
@@ -155,6 +156,11 @@ export default {
       commonSvc: new CommonService(fcs),      
     }
   },
+  computed: {
+    isFCSObject() {
+      return this.objectdata.object_type == "CHARACTER" || this.objectdata.object_type == "ADVERSARY";
+    }
+  },
   methods: {
     removeObject(id) {
       let $component = this;       
@@ -165,12 +171,16 @@ export default {
     addThingToObject(type) {  
       let objectType = "sceneobject";     
       switch(type) {
-        case "aspect":
-          let aspect = models.SceneAspect("","",objectType,true);          
+        case "caAndBoost":          
+          let caAndBoost = models.SceneAspect("CA or Boost","","",true);          
           if (!this.objectdata.caAndBoost) {             
             this.$set(this.objectdata, 'caAndBoost', new Array());
           }
-          this.objectdata.caAndBoost.push(aspect);
+          this.objectdata.caAndBoost.push(caAndBoost);
+          break;
+        case "aspect":          
+          let aspect = models.SceneAspect("", "", this.objectdata.type);          
+          this.objectdata.aspects.push(aspect);
           break;
         case "consequence":
           let consequence = models.SceneConsequence("", "", "", objectType)           
@@ -190,10 +200,11 @@ export default {
           break;
       }
     },  
-    copyObject() {
+    copyObject() {      
       let objCopy = Object.assign({}, this.objectdata);
-      objCopy.id = this.commonSvc.GenerateUUID();      
-      this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.push(objCopy);
+      objCopy.id = this.commonSvc.GenerateUUID();
+
+      this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.push( JSON.parse( JSON.stringify( objCopy ) ) );      
     },
     getBgForType(obj) {      
       switch(obj.object_type) {

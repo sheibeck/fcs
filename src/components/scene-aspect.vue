@@ -42,13 +42,14 @@ export default {
       switch(aspect.object_type) {
         case "CHARACTER":
         case "ADVERSARY":
+        case "NPC":
           return "badge-light";
         default:
           return "badge-warning";
       }
     },  
     removeAspect() {      
-      let $component = this;
+      let $component = this;      
       switch(this.location)
       {        
         case "scene":          
@@ -61,10 +62,27 @@ export default {
             return obj.id !== $component.aspect.id;
           });      
           break;
-        default:
-          this.$parent.$props.objectdata.caAndBoost = this.$parent.$props.objectdata.caAndBoost.filter(function( obj ) {
-            return obj.id !== $component.aspect.id;
+        default:          
+          //this means it's on the object and there are 2 places it might be
+          //account for adding/removing from characters aspects instead of a ca/boost
+          let isCaBoost = this.$parent.$props.objectdata.caAndBoost && this.$parent.$props.objectdata.caAndBoost.find(function( obj ) {
+            return obj.id === $component.aspect.id;
           });
+          if (isCaBoost) {
+            this.$parent.$props.objectdata.caAndBoost = this.$parent.$props.objectdata.caAndBoost.filter(function( obj ) {
+              return obj.id !== $component.aspect.id;
+            });
+          }
+
+          //account for adding/removing from characters aspects instead of a ca/boost
+          let isCharacterAspect = this.$parent.$props.objectdata.aspects && this.$parent.$props.objectdata.aspects.find(function( obj ) {
+            return obj.id === $component.aspect.id;
+          });
+          if (isCharacterAspect) {
+            this.$parent.$props.objectdata.aspects = this.$parent.$props.objectdata.aspects.filter(function( obj ) {
+              return obj.id !== $component.aspect.id;
+            });
+          }
       }
     }
   }

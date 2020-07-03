@@ -58,10 +58,10 @@ export default class Models {
         }
     }
 
-    SceneAspect = (name, label, type, hasInvoke) => {        
+    SceneAspect = (name, label, type, hasInvoke) => {         
         var aspect = {id: this.commonSvc.GenerateUUID(), invokes: [], name: name || "Aspect Name", label: label || "", object_type: type };
         if (hasInvoke) {
-            aspect.push(this.SceneInvoke());
+            aspect.invokes.push(this.SceneInvoke());
         }
         return aspect;
     }
@@ -88,5 +88,21 @@ export default class Models {
 
     SceneInvoke = () => {
         return {id:this.commonSvc.GenerateUUID(), used: false}
+    }
+
+    SceneNPC = () => {
+        return  {
+            "stress": [],
+            "object_type": "NPC",            
+            "aspects": [],           
+            "type": "NPC",
+            "stunts": {},
+            "skills": [],            
+            "name": "NPC",
+            "genre": "Any",
+            "consequences": [],
+            "id": this.commonSvc.GenerateUUID(),
+            "originalId": ""            
+        }
     }
 }

@@ -51,15 +51,6 @@
 
     <div class="d-flex flex-column bg-light pl-1">
       <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>    
-      <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
-      <b-popover ref="popoverAdversary" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
-        <template v-slot:title>Add Adversary</template>
-        <autocomplete :search="searchAdversaries"
-          placeholder="Search Adversaries"
-          aria-label="Search Adversaries"
-          :get-result-value="getAdversaryResultValue"
-          @submit="selectAdversaryResult"></autocomplete>
-      </b-popover>
       <b-button :id="`add-character-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></b-button>  
       <b-popover ref="popoverCharacter" :target="`add-character-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Character</template>
@@ -69,6 +60,16 @@
           :get-result-value="getCharacterResultValue"
           @submit="selectCharacterResult"></autocomplete>
       </b-popover>
+      <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
+      <b-popover ref="popoverAdversary" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
+        <template v-slot:title>Add Adversary</template>
+        <autocomplete :search="searchAdversaries"
+          placeholder="Search Adversaries"
+          aria-label="Search Adversaries"
+          :get-result-value="getAdversaryResultValue"
+          @submit="selectAdversaryResult"></autocomplete>
+      </b-popover>
+      <b-button :id="`add-npc-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add NPC" @click="addNPC()"><i class="fas fa-users"></i></b-button>
       <button type="button" class="btn btn-link p-0" @click="toggleZoneImageEdit()" title="Edit zone image"><i class="fas fa-image"></i></button>
       <hr />
       <button type="button" class="btn btn-link p-0" @click="moveForward()" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
@@ -142,15 +143,20 @@ export default {
       result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");
       result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");
       
+      /*
       this.$set(result, 'show', {
         aspects: true,
         stress: true,
         conditions: true,
         consequences: true,
-      });
+      });*/
 
       this.zone.sceneobjects.push(result);
-    },    
+    },
+    addNPC() {      
+      let npc = models.SceneNPC();
+      this.zone.sceneobjects.push(npc);
+    },
     /* adversary search */
     searchAdversaries(query) {      
       return new Promise((resolve) => {
