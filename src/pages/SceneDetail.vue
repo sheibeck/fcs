@@ -346,7 +346,7 @@ export default {
         
       }, false);
 
-      window.addEventListener("message",  (e) => {
+      window.addEventListener("message",  (e) => {        
         this.sendFormattedChat(e);
       }, false);
     },

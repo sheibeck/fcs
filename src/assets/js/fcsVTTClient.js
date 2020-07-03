@@ -6,7 +6,7 @@ export default class FCSVTTClient {
         this.diceRoller = new DiceRoller();
     }
 
-    handleListener = (msg) => {
+    handleListener = (msg) => {        
         if (msg.data.type !== "fcsVTT") return;
         msg = msg.data.data;                   
         
@@ -77,8 +77,8 @@ export default class FCSVTTClient {
     chatMessage = (message) => {         
         let description = message.description||"";      
 
-        if (message.roll) {
-            this.diceRoller.roll(`4dF.2+${message.roll.modifier}`);
+        if (message.roll) {            
+            this.diceRoller.roll(`4dF.2+${parseInt(message.roll.modifier)}`);
             // get the latest dice rolls from the log
             var latestRoll = this.diceRoller.log.shift();
             var displayDice = '';
