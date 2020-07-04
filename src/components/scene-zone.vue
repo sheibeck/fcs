@@ -238,7 +238,7 @@ export default {
           break;
         case "CONDITION":          
           for (let [key, value] of Object.entries(array)) {            
-            let condition = SceneCondition(key, type);
+            let condition = models.SceneCondition(key, type);
             condition.boxes.push(models.SceneStressBox(value))     
             gameObject.push(condition);
           }
