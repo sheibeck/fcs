@@ -1,7 +1,10 @@
-export default class PeerServiceReciever {
+import CommonService from "./commonService";
+
+export default class PeerReceiver {
+    debugger;
     remotePeerIds= new Array();// You need this to link with specific DOM element
     connections= new Array(); // This is where you manage multi-connections
-    disconnectBackoff = 1;
+    commonSvc = new CommonService();
 
     constructor(peerId) {
         this.peer = null; 
@@ -14,8 +17,11 @@ export default class PeerServiceReciever {
         this.displayChatMessage("Initializing game server...");
 
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(null, {
-            debug: 2
+        this.peer = new Peer(this.commonSvc.GenerateUUID(), {
+            debug: 3,
+            secure: true,
+            host: "fcs-peer-server.herokuapp.com",
+            port: 443           
         });
 
         this.peer.on('open', (id) => {

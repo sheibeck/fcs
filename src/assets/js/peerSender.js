@@ -1,6 +1,9 @@
 import { DiceRoller } from 'rpg-dice-roller';
+import CommonService from "./commonService";
 
-export default class PeerServiceReciever {
+export default class PeerSender {
+    commonSvc = new CommonService();
+
     constructor(gameId) {
         this.peer = null; 
         this.peerId = null;
@@ -13,8 +16,11 @@ export default class PeerServiceReciever {
         this.displayChatMessage({ "username": "System", "message": "Attempting to connect to scene..." });
 
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(null, {
-            debug: 2
+        this.peer = new Peer(this.commonSvc.GenerateUUID(), {
+            debug: 3,
+            secure: true,
+            host: "fcs-peer-server.herokuapp.com",
+            port: 443
         });
 
         this.peer.on('open', (id) => {            

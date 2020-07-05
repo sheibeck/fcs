@@ -57,4 +57,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .input-group-append {
+    height: 30px;
+  }
 </style>

@@ -58,7 +58,21 @@
           placeholder="Search Characters"
           aria-label="Search Characters"
           :get-result-value="getCharacterResultValue"
-          @submit="selectCharacterResult"></autocomplete>
+          @submit="selectCharacterResult">
+           <template #result="{ result, props }">
+          <li v-bind="props">
+            <div class="p-0 m-0 h6">
+              {{result.name}}
+            </div>
+            <div class="small p-0 m-0">
+              <div v-if="result.aspects">                           
+                <div v-if="result.aspects.highconcept"><label class="p-0 m-0">HC:</label> {{result.aspects.highconcept||""}}</div>
+                <div v-if="result.aspects.trouble"><label class="p-0 m-0">T:</label> {{result.aspects.trouble||""}}</div>
+              </div>
+              <div><label class="p-0 m-0">Sheet:</label> {{result.related_id.replace("CHARACTERSHEET|", "")}}</div>
+            </div>
+          </li>
+        </template></autocomplete>
       </b-popover>
       <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
       <b-popover ref="popoverAdversary" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
@@ -67,7 +81,21 @@
           placeholder="Search Adversaries"
           aria-label="Search Adversaries"
           :get-result-value="getAdversaryResultValue"
-          @submit="selectAdversaryResult"></autocomplete>
+          @submit="selectAdversaryResult">
+          <template #result="{ result, props }">
+          <li v-bind="props">
+            <div class="p-0 m-0 h6">
+              {{result.name}}
+            </div>
+            <div class="small p-0 m-0">
+              <div v-if="result.aspects">  
+                <div v-if="result.aspects.high_concept"><label class="p-0 m-0">HC:</label> {{result.aspects.high_concept||""}}</div>
+                <div v-if="result.aspects.trouble"><label class="p-0 m-0">T:</label> {{result.aspects.trouble||""}}</div>
+              </div>
+              <div><label class="p-0 m-0">Type:</label> {{result.type||"Unknown"}}</div>
+            </div>
+          </li>
+        </template></autocomplete>
       </b-popover>
       <b-button :id="`add-npc-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add NPC" @click="addNPC()"><i class="fas fa-users"></i></b-button>
       <button type="button" class="btn btn-link p-0" @click="toggleZoneImageEdit()" title="Edit zone image"><i class="fas fa-image"></i></button>
@@ -170,8 +198,8 @@ export default {
           })
       })
     },
-    getAdversaryResultValue(result) {
-      return result.name;
+    getAdversaryResultValue(result) {      
+      return result;
     },
     selectAdversaryResult(result) {
       //adversaries can be copied and we want uniqueIds      
@@ -197,7 +225,7 @@ export default {
       })
     },
     getCharacterResultValue(result) {
-      return result.name;
+      return result;
     },    
     selectCharacterResult(result) {
       //TODO: Make sure you can't add the same character if it already exists.
