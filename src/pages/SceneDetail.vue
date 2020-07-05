@@ -155,6 +155,8 @@ import FCSVTTClient from "./../assets/js/fcsVTTClient";
 import FCSVTT from '../assets/js/fcsVTT'
 import Models from '../assets/js/models';
 
+import { debounce } from 'vue-debounce'
+
 let models = new Models();
 
 let commonSvc = null;
@@ -198,7 +200,7 @@ export default {
       // This will let Vue know to look inside the array
       deep: true,
       // We have to move our method to a handler field
-      handler() {
+      handler: debounce(function() {
         if (!this.isLoading) {
           if (this.scene.isrunning) {
             this.broadCastSceneChange();
@@ -208,8 +210,8 @@ export default {
             this.saveScene(true); //make sure that host still saves things if the game isn't actively running.
           }
         }
-      }
-    }
+      }, 300)
+    },
   },
   data () {
     return {     
