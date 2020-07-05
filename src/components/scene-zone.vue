@@ -34,10 +34,12 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <Container id="drag-container" style="min-height:150px;"
+      <Container :id="`drag-container-${commonSvc.GetId(zone.id)}`" style="min-height:150px;"
         group-name="zone" 
         :get-ghost-parent="getGhostParent" 
-        :get-child-payload="getChildPayload" 
+        :get-child-payload="getChildPayload"
+        @drag-enter="onDragEnter" 
+        @drag-end="onDragEnd"               
         drag-handle-selector=".objectHandle"  
         @drop="onZoneDrop(commonSvc.GetId(zone.id), $event)"
         drag-class="card-ghost" 
@@ -155,8 +157,7 @@ export default {
         animationDuration: '150',
         showOnTop: true
       },
-      zoneImageEdit: false,
-                  
+      zoneImageEdit: false,                  
     }
   },
   methods: {
@@ -310,7 +311,19 @@ export default {
           zone.sceneobjects.splice(dropResult.removedIndex, 1);
         }
       }
-    },  
+    },
+    onDragEnter() {      
+      var containers = document.getElementsByClassName("smooth-dnd-container");
+      [].forEach.call(containers, function (elem) {
+        elem.classList.add("drop-preview");
+      });
+    }, 
+    onDragEnd() {      
+      var containers = document.getElementsByClassName("smooth-dnd-container");
+      [].forEach.call(containers, function (elem) {
+        elem.classList.remove("drop-preview");
+      });
+    }, 
     addZoneObject(type) {      
       switch(type) {
         case "aspect":
@@ -381,9 +394,8 @@ export default {
 
   .drop-preview {
     background-color: rgba(150, 150, 200, 0.1) !important;
-    border: 1px dashed red !important;
-    margin: 5px !important;
-    z-index: 88888;
+    border: 2px dashed black !important;
+    margin: 5px !important;    
     min-height: 200px;
   }  
   
