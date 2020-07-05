@@ -16,8 +16,10 @@ export default class PeerReceiver {
     initialize = () => {
         this.displayChatMessage("Initializing game server...");
 
+        let peerId = (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
+
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(this.commonSvc.GenerateUUID(), {
+        this.peer = new Peer(peerId, {
             debug: 3,
             secure: true,
             host: "fcs-peer-server.herokuapp.com",
