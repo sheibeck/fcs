@@ -65,8 +65,8 @@
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
 
-        <editableinput :object="getPlayer(this.userId)" item="username" label="Username:" />
-       
+        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i> Settings</button>
+               
         <span v-if="isHost">
           <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>
           <button type="button" class="btn-sm btn btn-secondary d-none" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
@@ -114,25 +114,28 @@
     </div>
 
     <!-- add scene object -->
-    <div class="modal" id="modalSceneObject" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal" id="modalSettings" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="modalLabel">Add Scene Object</h5>
+            <h5 class="modal-title" id="modalLabel">Scene Settings</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            
+            <editableinput :object="getPlayer(userId)" item="username" label="Username:" />
+            <label>Scene Description:</label>
+            <textarea rows=3 class="form-control" v-model="scene.description"></textarea>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>            
           </div>
         </div>
       </div>
     </div>
+
+    
   </div>
 </template>
 

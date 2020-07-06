@@ -423,4 +423,8 @@ export default {
     margin-bottom: 1rem;  
   }
   
+  .smooth-dnd-draggable-wrapper {
+    width: fit-content !important;
+  }
+  
 </style>
