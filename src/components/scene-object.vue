@@ -7,25 +7,13 @@
 
     <div class="mr-auto w-100">
       <div class="d-flex">
-        <div class="d-flex w-100 mr-auto" :class="getBgForType(objectdata)">
-          <div>
-            <strong title="Click to edit" class="px-1" v-if="!editing" @click="editing=true">{{objectdata.name}}</strong>
-            <div class="input-group" v-if="editing">  
-              <input class="form-control-sm" v-model="objectdata.name" />
-              <div class="input-group-append">              
-                  <button type="button" class="input-group-text" @click="editing=false"><i class="fas fa-check-circle text-success"></i></button>
-              </div>
-            </div>
-          </div>                
-          <button v-if="isFCSObject" @click="openLink()" target="blank" class="p-0 text-white pr-1 mr-auto btn btn-link"><i class="fas fa-link fa-xs"></i></button>
-        </div>        
+        <div class="d-flex w-100 mr-auto" :class="getBgForType(objectdata)">          
+          <button v-if="isFCSObject" :title="`Play this ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 text-white btn btn-link sheet-link"><i class="fas fa-link fa-xs"></i></button>          
+          <editableinput :object="objectdata" item="name" class="font-weight-bold" />
+          <img v-if="objectdata.image_url && !imageEdit" :src="objectdata.image_url" class="rounded-circle portrait" alt="portrait" />          
+        </div>
       </div>      
       
-      <!-- editor -->
-      <div v-if="objectdata.image_url && !imageEdit" class="w-100 pr-2 text-right" style="margin-top: -25px;margin-bottom: -25px;">
-        <img :src="objectdata.image_url" style="height: 80px; width: 80px; border: solid 2px black;" class="rounded-circle portrait" alt="portrait" />
-      </div>      
-
       <div v-if="imageEdit">
         <label class="control-label">Portrait Url</label><br/>    
         <div class="input-group">
@@ -40,10 +28,10 @@
         <div class="header d-flex">
           <span class="mr-auto">Aspects</span>
           <i title="Add aspect" @click="addThingToObject('aspect')" class="fas fa-plus-circle fa-sm pt-1"></i>
-          <i v-if="show.aspects" @click="show.aspects=false" title="Hide" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!show.aspects" @click="show.aspects=true" title="Show" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="objectdata.show.aspects" @click="objectdata.show.aspects=false" title="Hide" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.aspects" @click="objectdata.show.aspects=true" title="Show" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="show.aspects">
+        <div v-if="objectdata.show.aspects">
           <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
             <aspect :aspect="aspect" location="thing"  />
           </div>
@@ -52,12 +40,12 @@
 
       <div v-if="objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
-          <span class="mr-auto">Skills</span>          
+          <span class="mr-auto">Skills</span>
           <i title="Add skill" @click="addThingToObject('skill')" class="fas fa-plus-circle fa-sm pt-1"></i>
-          <i v-if="show.skills" @click="show.skills=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!show.skills" @click="show.skills=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="objectdata.show.skills" @click="objectdata.show.skills=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.skills" @click="objectdata.show.skills=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="show.skills">
+        <div v-if="objectdata.show.skills">
           <div v-for="skill in objectdata.skills" v-bind:key="skill.id">
             <skill :skill="skill" location="thing"  />
           </div>
@@ -68,10 +56,10 @@
         <div class="header d-flex">
           <span class="mr-auto">Stress</span>
           <i title="Add stress" @click="addThingToObject('stress')" class="fas fa-plus-circle fa-sm pt-1"></i>
-          <i v-if="show.stress" @click="show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!show.stress" @click="show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="objectdata.show.stress" @click="objectdata.show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.stress" @click="objectdata.show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="show.stress">
+        <div v-if="objectdata.show.stress">
           <div v-for="stress in this.objectdata.stress" v-bind:key="stress.id">
             <stress :stress="stress" location="thing"  />
           </div>
@@ -82,10 +70,10 @@
         <div class="header d-flex">
           <span class="mr-auto">Conditions</span>
           <i title="Add condition" @click="addThingToObject('condition')" class="fas fa-plus-circle fa-sm pt-1"></i>
-          <i v-if="show.conditions" @click="show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!show.conditions" @click="show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="objectdata.show.conditions" @click="objectdata.show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.conditions" @click="objectdata.show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="show.conditions">
+        <div v-if="objectdata.show.conditions">
           <div v-for="condition in this.objectdata.conditions" v-bind:key="condition.id">
             <stress :stress="condition" location="thing"  />
           </div>
@@ -96,10 +84,10 @@
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
           <i title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>
-          <i v-if="show.consequences" @click="show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
-          <i v-if="!show.consequences" @click="show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+          <i v-if="objectdata.show.consequences" @click="objectdata.show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.consequences" @click="objectdata.show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
-        <div v-if="show.consequences">
+        <div v-if="objectdata.show.consequences">
           <div v-for="consequence in objectdata.consequences" v-bind:key="consequence.id">
             <consequence :consequence="consequence" location="thing"  />
           </div>
@@ -139,6 +127,7 @@ import SceneSkill from './scene-skill';
 import CommonService from '../assets/js/commonService';
 import Models from '../assets/js/models';
 import interact from 'interactjs';
+import SceneEditableInput from './scene-editable-input';
 
 let models = new Models();
 
@@ -152,24 +141,27 @@ export default {
     stress: SceneStress,
     consequence: SceneConsequence,
     skill: SceneSkill,
+    editableinput: SceneEditableInput,
   },
   created() {
-    if (!this.objectdata.acted) this.$set(this.objectdata, "acted", false);
+    if (!typeof this.objectdata.acted === "boolean") this.$set(this.objectdata, "acted", false);
     if (!this.objectdata.x) this.$set(this.objectdata, "x", 40);
-    if (!this.objectdata.y) this.$set(this.objectdata, "y", 40);
+    if (!this.objectdata.y) this.$set(this.objectdata, "y", 40);   
+
+    if (!this.objectdata.show) this.$set(this.objectdata, "show", {});
+    if (!typeof this.objectdata.show.aspects === "boolean") this.$set(this.objectdata.show, "aspects", true);
+    if (!typeof this.objectdata.show.skills === "boolean") this.$set(this.objectdata.show, "skills", true)
+    if (!typeof this.objectdata.show.consequences === "boolean") this.$set(this.objectdata.show, "consequences", true)
+    if (!typeof this.objectdata.show.stress === "boolean") this.$set(this.objectdata.show, "stress", true)
+    if (!typeof this.objectdata.show.conditions === "boolean") this.$set(this.objectdata.show, "conditions", true)
+
   },
   mounted() {    
     this.init();
   },
   data () {
     return {
-      editing: false,
-      show: {
-        aspects: true,
-        skills: true,
-        stress: true,
-        consequences: true,
-      },
+      editing: false,     
       imageEdit: false,
       commonSvc: new CommonService(fcs),
       selectedZone: null,
@@ -179,12 +171,15 @@ export default {
     isFCSObject() {
       return this.objectdata.object_type == "CHARACTER" || this.objectdata.object_type == "ADVERSARY";
     },
+    FCSObjectType() {
+      return this.objectdata.object_type;
+    },
     zoneList() {       
       var list = this.$parent.$parent.$parent.$data.scene.zones.filter((item) => { return item.id !== this.$parent.$parent.$props.zone.id });
       return list;
-    }
+    },    
   },
-  methods: {
+  methods: {   
     init() {
       let dragElemName = `scene-object-${this.commonSvc.GetId(this.objectdata.id)}`;
       let dragElem = document.getElementById(dragElemName);
@@ -321,6 +316,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>  
+  .scene-object {
+    min-height:150px;
+    width: 325px;
+  }
+
   .fas {
     cursor: pointer;
   }
@@ -340,5 +340,10 @@ export default {
     width: 100%;
     max-height: 250px;
     margin-bottom: 1rem;
+    height: 80px;width: 80px;border: 2px solid black;position: absolute;left: 220px;top: -45px;
+  }
+
+  .sheet-link {
+    line-height: .8;    
   }
 </style>

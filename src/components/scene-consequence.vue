@@ -13,7 +13,7 @@
     <div class="d-flex mr-auto">
       <label v-if="consequence.label != true && consequence.label != false">{{consequence.label.toTitleCase()}}</label>
       <input type="text" v-model="consequence.value" class="ml-1 form-control-sm" />
-      <button class="btn btn-link p-0 m-0 small" type="button"><i title="Remove skill" @click="removeConsequence()" class="fas fa-trash-alt fa-xs"></i></button>
+      <button class="btn btn-link p-0 m-0 small" type="button"><i title="Remove consequence" @click="removeConsequence()" class="fas fa-trash-alt fa-xs"></i></button>
     </div>        
   </div>
 </template>

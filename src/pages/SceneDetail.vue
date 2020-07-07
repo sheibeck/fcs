@@ -42,7 +42,7 @@
   }
 
   /deep/ .btn-link {
-    color: #888;
+    color: #888;    
   }
 
   footer {
@@ -69,7 +69,7 @@
                
         <span v-if="isHost">
           <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>
-          <button type="button" class="btn-sm btn btn-secondary d-none" @click="resetCanvas()"><i class="fas fa-undo"></i> Reset Canvas</button>
+          <button type="button" class="btn-sm btn btn-secondary ml-1" @click="startNewTurn()"><i class="fas fa-undo"></i> New Turn</button>
           <button type="button" class="btn-sm btn btn-success ml-1 d-none" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
           <button v-if="!isSceneRunning" type="button" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
@@ -124,7 +124,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <editableinput :object="getPlayer(userId)" item="username" label="Username:" />
+            <editableinput v-if="getPlayer(userId)" :object="getPlayer(userId)" item="username" label="Username:" />
             <label>Scene Description:</label>
             <textarea rows=3 class="form-control" v-model="scene.description"></textarea>
           </div>
@@ -389,8 +389,13 @@ export default {
       
       this.scene.players[idx][key] = value;      
     },
-    resetCanvas() {
-      this.canvas.reset();
+    startNewTurn() {      
+      for (let zoneIdx in this.scene.zones) {
+        for (let objIdx in this.scene.zones[zoneIdx].sceneobjects) {
+          this.scene.zones[zoneIdx].sceneobjects[objIdx].hasOwnProperty('acted')
+            this.scene.zones[zoneIdx].sceneobjects[objIdx].acted = false;  
+        }
+      };
     },
     async getScene(ownerId, id) {
       var $component = this;
@@ -434,11 +439,13 @@ export default {
         player = this.getPlayer(player.id);
       }      
     },
-    getPlayer(id) {
+    getPlayer(id) {      
       if (!this.scene.players) return null;
-      return this.scene.players.find(obj => {
+      var players = this.scene.players.find(obj => {
         return obj.id === id
       })
+
+      return players;
     },
     create : function() {
       let c = {

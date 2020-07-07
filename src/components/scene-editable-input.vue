@@ -1,12 +1,12 @@
 <template>
   <div>    
-    <div title="Click to edit" v-if="!editing" @click="canEdit()" class="editable">
+    <div title="Click to edit" v-if="!editing" @click="toggleEdit()" class="editable">
       <label v-if="label">{{label}}</label>
       {{getThing}}
     </div>
-    <div v-if="editing">
+    <div v-show="editing">
       <div class="input-group">  
-        <input class="form-control-sm" v-model="object[item]" @keyup.enter="editing = false" />
+        <input class="form-control-sm" ref="editor" v-model="object[item]" @keyup.enter="toggleEdit()" />
         <div class="input-group-append">
             <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
         </div>
@@ -29,18 +29,23 @@ export default {
     return { 
       editing: false     
     }
-  },
-  computed: {
+  },  
+  computed: {    
     getThing() {
       return this.object ? this.object[this.item] : "";
     }
   },
-  methods: {    
-    canEdit() {
-      if (this.canEdit) {
-        this.editing = true;
+  methods: {
+    toggleEdit() {         
+      if (this.canEdit ?? true) {
+        this.editing = !this.editing;
+        if (this.editing) {
+          setTimeout(() => {
+            this.$refs.editor.focus();
+          },250);
+        }
       }
-    }
+    },
   }
 
 }

@@ -12,8 +12,9 @@
     <span v-for="box in stress.boxes" v-bind:key="box.id">
       <label v-if="typeof box.label == 'string'">{{box.label.toTitleCase()}}</label><input type="checkbox" :checked="box.used" @change="toggleStress($event, box.id)" class="mr-1" />
     </span>
-    <button type="button" class="btn btn-link p-0 m-0" title="Add stress box" @click="addStressBox()"><i class="fas fa-plus-square fa-xs"></i></i></button>    
-    <button v-if="stress.boxes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove stress box" @click="removeStressBox()"><i class="fas fa-minus-square fa-xs"></i></button>    
+    <button type="button" class="btn btn-link p-0 m-0" title="Add stress box" @click="addStressBox()"><i class="fas fa-plus-square fa-xs"></i></button>    
+    <button v-if="stress.boxes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove stress box" @click="removeStressBox()"><i class="fas fa-minus-square fa-xs"></i></button>
+    <button class="btn btn-link p-0 m-0 small" type="button"><i title="Remove stress track" @click="removeStressTrack()" class="fas fa-trash-alt fa-xs"></i></button>
   </div>
 </template>
 
@@ -46,11 +47,19 @@ export default {
     },
     removeStressBox() {      
       this.stress.boxes.pop();
-    },   
+    },
+    removeStressTrack() {
+       this.$parent.objectdata.stress = this.$parent.objectdata.stress.filter( (obj) => {
+        return obj.id !== this.stress.id;
+      }); 
+    }
   }
 
 }
 </script>
 
 <style lang="scss" scoped>
+  .btn-link {
+    line-height: .8;
+  }
 </style>

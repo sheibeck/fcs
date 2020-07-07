@@ -36,7 +36,7 @@
 
       <div :id="`drag-container-${commonSvc.GetId(zone.id)}`" class="border" style="min-height:150px;height:94%;width:100%;">
         
-        <sceneobject :objectdata="item" style="min-height:150px;max-width:300px;" v-for="item in zone.sceneobjects" :key="item.id" />
+        <sceneobject :objectdata="item" v-for="item in zone.sceneobjects" :key="item.id" />
       
       </div>      
     </div>
@@ -155,15 +155,7 @@ export default {
       result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE");      
       result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
       result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");
-      result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");
-      
-      /*
-      this.$set(result, 'show', {
-        aspects: true,
-        stress: true,
-        conditions: true,
-        consequences: true,
-      });*/
+      result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");         
 
       this.zone.sceneobjects.push(result);
     },    
