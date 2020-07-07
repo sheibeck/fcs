@@ -26,7 +26,7 @@
     width: 500px;
 
     #chat-log {      
-      height: 68vh;
+      height: 66vh;
       overflow: scroll;
     }
   }
@@ -216,6 +216,11 @@ export default {
       }, 300)
     },
   },
+  updated() {
+    if (this.loading) {
+      this.init();
+    }
+  },
   data () {
     return {     
       loading: true,
@@ -262,13 +267,15 @@ export default {
   methods: {
     init() {
       //panzoom the canvas
-      /*const panElem = document.getElementById('scene-canvas')
+      const panElem = document.getElementById('scene-canvas')
       const panzoom = Panzoom(panElem, {
-        maxScale: 5
+        maxScale: 5,
+        overflow: scroll,
       });
             
-      panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
-      this.canvas = panzoom;*/      
+      panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);     
+      this.canvas = panzoom;
+      this.loading = false;
     },      
     setupScene(userId) {
       if (this.userId == "public") {
@@ -408,9 +415,7 @@ export default {
         this.saveScene(true);
       }
 
-      this.configureUser();
-
-      this.loading = false;
+      this.configureUser();      
     },   
     configureUser() {      
       //add this user to the scenes user list. We'll use this to let users configure things
@@ -569,15 +574,15 @@ export default {
         document.getElementsByClassName("navbar")[0].classList.add("d-none");
         document.getElementsByClassName("navbar")[0].classList.add("d-none");                
         document.getElementById("canvas-wrapper").style.height = "94vh";        
-        document.getElementById("chat-log").style.height = "81vh";
+        document.getElementById("chat-log").style.height = "78vh";
 
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.add("d-none");
       }
       else {
         document.getElementsByClassName("navbar")[0].classList.remove("d-none"); 
-        document.getElementById("canvas-wrapper").style.height = "81vh";
-        document.getElementById("chat-log").style.height = "68vh";
+        document.getElementById("canvas-wrapper").style.height = "82vh";
+        document.getElementById("chat-log").style.height = "66vh";
 
         //for test modes that add an environment header
         document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       

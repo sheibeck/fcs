@@ -43,7 +43,7 @@ export default {
   methods: { 
     sendToVTT() {      
       let characterName = this.$parent.objectdata.name;
-      this.$parent.$parent.$parent.$parent.$parent.$parent.sendToVTT('diceroll',this.skill.name, this.skill.value, 'skill', characterName);
+      this.$parent.$parent.$parent.$parent.sendToVTT('diceroll',this.skill.name, this.skill.value, 'skill', characterName);
     },
     removeSkill() {
       this.$parent.objectdata.skills = this.$parent.objectdata.skills.filter( (obj) => {

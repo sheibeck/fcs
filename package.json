@@ -29,6 +29,7 @@
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.15.0",
     "draggable-vue-directive": "^2.1.0",
+    "interactjs": "^1.9.20",
     "jquery": "^3.5.1",
     "jquery-serializeobject": "^1.0.0",
     "m": "^1.5.6",

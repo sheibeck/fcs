@@ -1,6 +1,6 @@
 <template>  
   <vue-draggable-resizable :id="`zone-${commonSvc.GetId(zone.id)}`" class="p-1 m-1 d-flex border bg-white zone draggable-item" 
-        drag-handle=".zoneHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'"  :x="zone.x" :y="zone.y"
+        drag-handle=".zoneHandle" :parent="true" :drag-cancel="'.cancelZoneDrag'" :x="zone.x" :y="zone.y"
         :w="zone.width" :h="zone.height" @dragging="onDrag" @resizing="onResize" :style="`z-index:${this.zone.zindex};`">
     
     <!-- zone background image and editor -->
@@ -19,7 +19,7 @@
     <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white zoneHandle"></i>
 
     <!-- details -->
-    <div class="mr-auto cancelZoneDrag">
+    <div class="mr-auto cancelZoneDrag w-100">
       <header>
         <!-- name -->        
         <label title="Click to edit" v-if="!editing" @click="editing=true" style="vertical-align: top;">{{zone.name.toUpperCase()}}</label>
@@ -34,21 +34,11 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <Container :id="`drag-container-${commonSvc.GetId(zone.id)}`" style="min-height:150px;"
-        group-name="zone" 
-        :get-ghost-parent="getGhostParent" 
-        :get-child-payload="getChildPayload"
-        @drag-enter="onDragEnter" 
-        @drag-end="onDragEnd"               
-        drag-handle-selector=".objectHandle"  
-        @drop="onZoneDrop(commonSvc.GetId(zone.id), $event)"
-        drag-class="card-ghost" 
-        drop-class="card-ghost-drop" 
-        :drop-placeholder="dropPlaceholderOptions">            
-        <Draggable style="min-height:150px;" v-for="item in zone.sceneobjects" :key="item.id">
-          <sceneobject :objectdata="item" />
-        </Draggable>
-      </Container>      
+      <div :id="`drag-container-${commonSvc.GetId(zone.id)}`" class="border" style="min-height:150px;height:94%;width:100%;">
+        
+        <sceneobject :objectdata="item" style="min-height:150px;max-width:300px;" v-for="item in zone.sceneobjects" :key="item.id" />
+      
+      </div>      
     </div>
 
     <div class="d-flex flex-column bg-light pl-1">
@@ -98,11 +88,11 @@
             </div>
           </li>
         </template></autocomplete>
-      </b-popover>
+      </b-popover>     
       <b-button :id="`add-npc-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add NPC" @click="addNPC()"><i class="fas fa-users"></i></b-button>
       <button type="button" class="btn btn-link p-0" @click="toggleZoneImageEdit()" title="Edit zone image"><i class="fas fa-image"></i></button>
-      <hr />
-      <button type="button" class="btn btn-link p-0" @click="moveForward()" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
+      
+      <button type="button" class="btn btn-link p-0 mt-auto" @click="moveForward()" title="Move zone forward"><i class="fas fa-chevron-circle-up"></i></button>
       <button type="button" class="btn btn-link p-0" @click="moveBackward()" title="Move zone backward"><i class="fas fa-chevron-circle-down"></i></button>
       <button type="button" class="btn btn-link p-0" @click="removeZone()" title="Delete zone"><i class="fas fa-trash-alt"></i></button>      
     </div>  
@@ -112,10 +102,8 @@
 <script>
 import SceneObject from './scene-object';
 import SceneAspect from './scene-aspect';
-import draggable from 'vuedraggable';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
-import { Container, Draggable } from "vue-smooth-dnd";
 import CommonService from '../assets/js/commonService';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import DbService from '../assets/js/dbService';
@@ -129,13 +117,10 @@ export default {
   props: {
     zone: Object,
   },  
-  components: {   
-    draggable, 
+  components: {      
     'vue-draggable-resizable': VueDraggableResizable,
     sceneobject: SceneObject,
-    zoneaspect: SceneAspect,
-    Container,
-    Draggable,
+    zoneaspect: SceneAspect,    
     Autocomplete
   },  
   created() {    
@@ -145,7 +130,7 @@ export default {
   computed: {
     hasZoneImage() {
       return this.zone.backgroundImage;
-    }
+    },  
   }, 
   data () {
     return {
@@ -157,7 +142,7 @@ export default {
         animationDuration: '150',
         showOnTop: true
       },
-      zoneImageEdit: false,                  
+      zoneImageEdit: false,      
     }
   },
   methods: {
@@ -181,7 +166,7 @@ export default {
       });*/
 
       this.zone.sceneobjects.push(result);
-    },
+    },    
     addNPC() {      
       let npc = models.SceneNPC();
       this.zone.sceneobjects.push(npc);
@@ -291,39 +276,7 @@ export default {
     },
     getChildPayload (index) {      
       return this.zone.sceneobjects[index];      
-    },
-    onZoneDrop (collection, dropResult) { 
-      //get array      
-      var zone = this.$parent.$data.scene.zones.find(obj => {
-        return this.commonSvc.GetId(obj.id) === collection;
-      });
-      
-      //if we re-ordered in the same container
-      if (dropResult.addedIndex != null && dropResult.removedIndex != null) {        
-        zone.sceneobjects.move(dropResult.removedIndex, dropResult.addedIndex);
-      }
-      else {
-        if (dropResult.addedIndex != null) {
-          zone.sceneobjects.splice(dropResult.addedIndex, 0, dropResult.payload)
-        }
-        
-        if (dropResult.removedIndex != null) {
-          zone.sceneobjects.splice(dropResult.removedIndex, 1);
-        }
-      }
-    },
-    onDragEnter() {      
-      var containers = document.getElementsByClassName("smooth-dnd-container");
-      [].forEach.call(containers, function (elem) {
-        elem.classList.add("drop-preview");
-      });
-    }, 
-    onDragEnd() {      
-      var containers = document.getElementsByClassName("smooth-dnd-container");
-      [].forEach.call(containers, function (elem) {
-        elem.classList.remove("drop-preview");
-      });
-    }, 
+    },   
     addZoneObject(type) {      
       switch(type) {
         case "aspect":

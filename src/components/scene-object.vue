@@ -1,6 +1,7 @@
 <template>
-  <div class="m-1 p-1 bg-light border d-flex" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`">
-    <div class="bg-secondary text-white mr-1 p-1 objectHandle">
+  <div class="m-1 p-1 bg-light border d-flex scene-object" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`"    
+    :style="{ position: 'absolute', top: `${objectdata.y}px`, left: `${objectdata.x}px` }">    
+    <div class="bg-secondary text-white mr-1 p-1 drag-handle">
       <i class="fas fa-bars"></i>
     </div>
 
@@ -34,8 +35,7 @@
           </div>
         </div>
       </div>
-      <!-- drag handle -->
-
+      
       <div>
         <div class="header d-flex">
           <span class="mr-auto">Aspects</span>
@@ -114,10 +114,19 @@
     </div>
 
     <div class="d-flex flex-column bg-light ml-1 border toolbar">
-      <button type="button" class="btn btn-link p-0" title="Create advantage/boost" @click="addThingToObject('caAndBoost')"><i class="fas fa-sticky-note"></i></button>
-      <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
+      <button v-if="!objectdata.acted" type="button" class="btn btn-link p-0" title="Has not acted yet" @click="toggleTurn()"><i class="far fa-hourglass"></i></button>
+      <button v-if="objectdata.acted" type="button" class="btn btn-link p-0" title="Has taken an action" @click="toggleTurn()"><i class="fas fa-hourglass"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Create advantage/boost" @click="addThingToObject('caAndBoost')"><i class="fas fa-sticky-note"></i></button>      
+      <b-button :id="`move-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Move to Zone"><i class="fas fa-expand-arrows-alt"></i></b-button>
       <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
-      <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
+      <b-popover ref="popoverZonePicker" :target="`move-object-${this.objectdata.id}`" triggers="click blur">
+        <template v-slot:title>Move to Zone</template>
+        <select v-model="selectedZone" @change="moveObjectToZone">
+          <option v-for="zone in zoneList" :key="zone.id" :value="zone.id">{{zone.name}}</option>
+        </select>
+      </b-popover>
+      <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
+      <button type="button" class="btn btn-link p-0 mt-auto" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 </template>
@@ -129,6 +138,7 @@ import SceneConsequence from './scene-consequence';
 import SceneSkill from './scene-skill';
 import CommonService from '../assets/js/commonService';
 import Models from '../assets/js/models';
+import interact from 'interactjs';
 
 let models = new Models();
 
@@ -142,7 +152,15 @@ export default {
     stress: SceneStress,
     consequence: SceneConsequence,
     skill: SceneSkill,
-  },      
+  },
+  created() {
+    if (!this.objectdata.acted) this.$set(this.objectdata, "acted", false);
+    if (!this.objectdata.x) this.$set(this.objectdata, "x", 40);
+    if (!this.objectdata.y) this.$set(this.objectdata, "y", 40);
+  },
+  mounted() {    
+    this.init();
+  },
   data () {
     return {
       editing: false,
@@ -153,21 +171,73 @@ export default {
         consequences: true,
       },
       imageEdit: false,
-      commonSvc: new CommonService(fcs),      
+      commonSvc: new CommonService(fcs),
+      selectedZone: null,
     }
   },
   computed: {
     isFCSObject() {
       return this.objectdata.object_type == "CHARACTER" || this.objectdata.object_type == "ADVERSARY";
+    },
+    zoneList() {       
+      var list = this.$parent.$parent.$parent.$data.scene.zones.filter((item) => { return item.id !== this.$parent.$parent.$props.zone.id });
+      return list;
     }
   },
   methods: {
+    init() {
+      let dragElemName = `scene-object-${this.commonSvc.GetId(this.objectdata.id)}`;
+      let dragElem = document.getElementById(dragElemName);
+      let dragElemId = `#${dragElemName}`;
+     
+      //make it draggable     
+      interact(dragElemId)        
+        .draggable({
+          allowFrom: '.drag-handle',          
+          inertia: false,
+          modifiers: [
+              interact.modifiers.restrictRect({
+                  restriction: 'parent'                  
+              })
+          ],
+          // enable autoScroll
+          autoScroll: true,
+          listeners: { 
+            move: (event) => {
+              let target = event.target                
+              let x = (this.objectdata.x || 0) + event.dx;
+              let y = (this.objectdata.y || 0) + event.dy;
+                          
+              // keep the dragged position in the data-x/data-y attributes
+              this.objectdata.x = x;
+              this.objectdata.y = y;
+            }
+          }                     
+        }); 
+    },
     removeObject(id) {
       let $component = this;       
-      this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects = this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.filter(function( obj ) {
+      this.$parent.$parent.$props.zone.sceneobjects = this.$parent.$parent.$props.zone.sceneobjects.filter(function( obj ) {
         return obj.id !== id;
       });
     },
+    moveObjectToZone() {
+      //get array
+      var sceneObjectIdx = this.$parent.$parent.$props.zone.sceneobjects.findIndex(obj => {
+        return obj.id === this.objectdata.id;
+      });
+
+      var newZoneIdx = this.$parent.$parent.$parent.$data.scene.zones.findIndex(obj => {
+        return obj.id === this.selectedZone;
+      });
+      
+      //add the draggable to the new zone
+      this.$parent.$parent.$parent.$data.scene.zones[newZoneIdx].sceneobjects.push(this.objectdata);
+      //remove the draggable from the originating zone      
+      this.$parent.$parent.$props.zone.sceneobjects.splice(sceneObjectIdx, 1);
+
+      this.selectedZone = null;
+    },   
     addThingToObject(type) {  
       let objectType = "sceneobject";     
       switch(type) {
@@ -204,7 +274,10 @@ export default {
       let objCopy = Object.assign({}, this.objectdata);
       objCopy.id = this.commonSvc.GenerateUUID();
 
-      this.$parent.$parent.$parent.$parent.$props.zone.sceneobjects.push( JSON.parse( JSON.stringify( objCopy ) ) );      
+      let newObj = JSON.parse( JSON.stringify( objCopy ) );
+      newObj.x = null;
+      newObj.y = null;
+      this.$parent.$parent.$props.zone.sceneobjects.push(newObj);
     },
     getBgForType(obj) {      
       switch(obj.object_type) {
@@ -238,17 +311,16 @@ export default {
         default:
           break;
       }
+    },
+    toggleTurn() {      
+      this.objectdata.acted = !this.objectdata.acted ?? true;
     }
   }
 
 }
 </script>
 
-<style lang="scss" scoped>
-  .objectHandle {
-    cursor:grab;
-  }
-
+<style lang="scss" scoped>  
   .fas {
     cursor: pointer;
   }
