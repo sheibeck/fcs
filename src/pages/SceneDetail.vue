@@ -77,7 +77,7 @@
 
         <span v-if="isSceneRunning">
           <button v-if="!isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
-          <button v-if="isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="exitGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+          <button v-if="isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="exitGame()"><i class="fas fa-sign-language"></i> Exit Game</button>
         </span>
 
         <span>
@@ -380,6 +380,8 @@ export default {
     },
     exitGame() {
       this.peerSender.conn.close();
+      this.peerSender.peer = null;
+      this.isConnected = false;
     },
     updatePlayer(key, value)
     {

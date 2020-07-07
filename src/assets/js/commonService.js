@@ -87,6 +87,20 @@ export default class CommonService {
     return shortid.generate();
   }
 
+  GeneratePeerId = function() {
+    /*let peerId = this.GenerateUUID();        
+    let regex = new RegExp("[0-9]");
+    let invalidPeerId = regex.test(peerId);
+    while(invalidPeerId) {
+        peerId = this.commonSvc.GenerateUUID();
+        invalidPeerId = regex.test(peerId);
+    }
+    debugger;
+    return peerId;
+    */
+    return (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
+  }
+
   SortObject = (obj) => {
     return Object.keys(obj).sort().reduce(function (result, key) {
         result[key] = obj[key];

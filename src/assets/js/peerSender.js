@@ -15,7 +15,7 @@ export default class PeerSender {
     initialize = () => {
         this.displayChatMessage({ "username": "System", "message": "Attempting to connect to scene..." });
         
-        let peerId = (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
+        let peerId = this.commonSvc.GeneratePeerId();
 
         // Create own peer object with connection to shared PeerJS server
         this.peer = new Peer(peerId, {
@@ -25,8 +25,10 @@ export default class PeerSender {
             port: 443
         });
 
+        console.log('ID: ' + this.peer.id);
+
         this.peer.on('open', (id) => {            
-            console.log('ID: ' + this.peer.id);
+            console.log('Player peer opened with ID: ' + this.peer.id);
 
             var event = new CustomEvent('userconnected', { detail: id });
             document.dispatchEvent(event);

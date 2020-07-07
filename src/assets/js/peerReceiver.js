@@ -1,7 +1,6 @@
 import CommonService from "./commonService";
 
-export default class PeerReceiver {
-    debugger;
+export default class PeerReceiver {    
     remotePeerIds= new Array();// You need this to link with specific DOM element
     connections= new Array(); // This is where you manage multi-connections
     commonSvc = new CommonService();
@@ -16,8 +15,8 @@ export default class PeerReceiver {
     initialize = () => {
         this.displayChatMessage("Initializing game server...");
 
-        let peerId = (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
-
+        let peerId = this.commonSvc.GeneratePeerId();        
+        
         // Create own peer object with connection to shared PeerJS server
         this.peer = new Peer(peerId, {
             debug: 3,
@@ -26,8 +25,10 @@ export default class PeerReceiver {
             port: 443           
         });
 
+        console.log('ID: ' + this.peer.id);
+
         this.peer.on('open', (id) => {
-            console.log('ID: ' + id);
+            console.log('Game server opened with ID: ' + this.peer.id);
             console.log("Awaiting connection...");
                         
             var event = new CustomEvent('gameserver', { detail: { type: "connected", peerid: id } } );
@@ -76,7 +77,10 @@ export default class PeerReceiver {
                 // Handle connection closed
                 //connectionClose(conn);
                 this.conn = null;
-                console.log("Connection destroyed. Please refresh.");  
+                console.log("Connection destroyed. Please refresh."); 
+                
+                var event = new CustomEvent('userdisconnected');
+                document.dispatchEvent(event);
             });
          
             this.connections.push(conn);
