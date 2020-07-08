@@ -87,17 +87,7 @@ export default class CommonService {
     return shortid.generate();
   }
 
-  GeneratePeerId = function() {
-    /*let peerId = this.GenerateUUID();        
-    let regex = new RegExp("[0-9]");
-    let invalidPeerId = regex.test(peerId);
-    while(invalidPeerId) {
-        peerId = this.commonSvc.GenerateUUID();
-        invalidPeerId = regex.test(peerId);
-    }
-    debugger;
-    return peerId;
-    */
+  GeneratePeerId = function() {  
     return (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
   }
 
@@ -163,7 +153,7 @@ export default class CommonService {
         {
           environmentLabel = "LOCAL";
         }        
-        $('body').prepend(`<h1 class="d-print-none">${environmentLabel}</h1>`);
+        $('ul.navbar-nav').append(`<span class="d-print-none ml-5 mt-1 text-center text-white h4">** ${environmentLabel} **</span>`);
       }
 
       if (window.location.host !== 'localhost:8080' && window.location.host.indexOf("gitpod.io") == -1)

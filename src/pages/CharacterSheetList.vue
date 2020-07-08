@@ -6,7 +6,7 @@
         <search class="mt-0 mt-md-1 mb-1"></search>
       </div>
       <div class='card-columns'>
-        <div v-for='sheet in sheets' class='card'>
+        <div v-for='sheet in sheets' :key="sheet.id" class='card'>
           <a v-bind:href="`charactersheet/${sheet.slug}`" v-bind:data-id='sheet.id' role="button">
             <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           </a>

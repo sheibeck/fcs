@@ -3,30 +3,40 @@
     font-weight: 700;
   }
 
-  #canvas-wrapper {
-    position:relative;
-    height: 81vh;
-    border: solid 2px black; 
-    overflow: scroll;
-    cursor:grab;
-  }
-  
-  #scene-canvas {
-    position:relative;
-    height: 1800px;
-    width: 2400px;    
+  #game-table {
+    height: 85vh;
 
-    background-size: 20px 20px;
-    background-image:
-      linear-gradient(to right, #F0F0F0 1px, transparent 1px),
-      linear-gradient(to bottom, #F0F0F0 1px, transparent 1px);
-  }   
-  
+    #canvas-wrapper {
+      position:relative;    
+      border: solid 2px black; 
+      overflow: scroll;
+      cursor:grab;
+    }
+
+    #scene-canvas {
+      position:relative;
+      height: 1800px;
+      width: 2400px;    
+
+      background-size: 20px 20px;
+      background-image:
+        linear-gradient(to right, #F0F0F0 1px, transparent 1px),
+        linear-gradient(to bottom, #F0F0F0 1px, transparent 1px);
+    }   
+  }
+
+  #scene-toolbar {
+    background-color: #ccc;
+    button, a {
+      padding: 3px !important;
+    }
+  }
+
   #chat {
     width: 500px;
 
     #chat-log {      
-      height: 66vh;
+      height: 100%;
       overflow: scroll;
     }
   }
@@ -44,10 +54,6 @@
   /deep/ .btn-link {
     color: #888;    
   }
-
-  footer {
-    display: none;
-  }
 </style>
 
 <template>
@@ -56,21 +62,14 @@
     <loading :loading="isLoading" />
 
     <div v-show="!isLoading">
-      <div class="d-flex flex-column flex-sm-row">
-        <!-- scene name -->
-        <editableinput :object="scene" item="name" :canedit="isHost" class="h4" />
-
-        <div class="mr-auto ml-2">
-          <em style="vertical-align: top;"><button type="button" class="btn btn-link p-0" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button> Aspects:</em>
+      <div class="d-flex">  
+         <div class="mr-auto">
+          <em style="vertical-align: top;">Scene Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
         </div>
-
-        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i> Settings</button>
-               
+      
         <span v-if="isHost">
-          <button type="button" class="btn-sm btn btn-primary ml-1" @click="addZone()"><i class="fas fa-shapes"></i> Add Zone</button>
-          <button type="button" class="btn-sm btn btn-secondary ml-1" @click="startNewTurn()"><i class="fas fa-undo"></i> New Turn</button>
-          <button type="button" class="btn-sm btn btn-success ml-1 d-none" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
+          <button type="button" class="btn-sm btn btn-success ml-1 d-none p-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
           <button v-if="!isSceneRunning" type="button" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
@@ -86,18 +85,23 @@
         </span>
       </div>
 
-      <div id="game-table" class="d-flex">
+      <div id="game-table" class="d-flex">       
         <div id="canvas-wrapper" v-dragscroll:nochilddrag class="mr-auto">
           <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>      
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
         </div>
-        <div>
-          <i v-if="showchat" @click="showchat = false" class="fas fa-angle-double-right"></i>
-          <i v-if="!showchat" @click="showchat = true" class="fas fa-angle-double-left"></i>
+        <div id="scene-toolbar" class="d-flex flex-column">          
+          <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
+          <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
+          <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
+          <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
+          <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>                    
+          <button v-if="isHost" type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
+          <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
         </div>
-        <div v-if="showchat" id="chat" class="d-flex flex-column">
+        <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
           <div id="chat-log" class="border mb-1">
           </div>
           <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1"></textarea>
@@ -124,6 +128,7 @@
             </button>
           </div>
           <div class="modal-body">
+            <editableinput :object="scene" item="name" :canedit="isHost" class="" label="Scene Name:" />
             <editableinput v-if="getPlayer(userId)" :object="getPlayer(userId)" item="username" label="Username:" />
             <label>Scene Description:</label>
             <textarea rows=3 class="form-control" v-model="scene.description"></textarea>
@@ -209,7 +214,7 @@ export default {
             this.broadCastSceneChange();
           }
 
-          if (this.isHost) {
+          if (this.isHost) {            
             this.saveScene(true); //make sure that host still saves things if the game isn't actively running.
           }
         }
@@ -391,7 +396,8 @@ export default {
       
       this.scene.players[idx][key] = value;      
     },
-    startNewTurn() {      
+    startNewTurn() {
+      commonSvc.Notify("Starting a new turn...", "info");
       for (let zoneIdx in this.scene.zones) {
         for (let objIdx in this.scene.zones[zoneIdx].sceneobjects) {
           this.scene.zones[zoneIdx].sceneobjects[objIdx].hasOwnProperty('acted')
@@ -580,21 +586,12 @@ export default {
     toggleFullScreen() {
       this.fullScreen = !this.fullScreen;
       if (this.fullScreen) {
-        document.getElementsByClassName("navbar")[0].classList.add("d-none");
-        document.getElementsByClassName("navbar")[0].classList.add("d-none");                
-        document.getElementById("canvas-wrapper").style.height = "94vh";        
-        document.getElementById("chat-log").style.height = "78vh";
-
-        //for test modes that add an environment header
-        document.getElementsByClassName("d-print-none")[0].classList.add("d-none");
+        document.getElementsByClassName("navbar")[0].classList.add("d-none");        
+        document.getElementById("game-table").style.height = "94vh";      
       }
       else {
-        document.getElementsByClassName("navbar")[0].classList.remove("d-none"); 
-        document.getElementById("canvas-wrapper").style.height = "82vh";
-        document.getElementById("chat-log").style.height = "66vh";
-
-        //for test modes that add an environment header
-        document.getElementsByClassName("d-print-none")[0].classList.remove("d-none");       
+        document.getElementsByClassName("navbar")[0].classList.remove("d-none");         
+        document.getElementById("game-table").style.height = "85vh";        
       }
     },   
     setupGameServer(e) {
@@ -656,11 +653,15 @@ export default {
           character: this.userName,
           action: `Rolled: <em>4df</em>`,
           roll: { 
-              modifier: `0`,                       
+              modifier: `0`,
           }
       };    
       vttClient.chatMessage(msg);
-    }
+    },
+    shareUrl : function(event) {
+      event.preventDefault();
+      commonSvc.CopyTextToClipboard(event.currentTarget.href);
+    },
   },
 }
 </script>

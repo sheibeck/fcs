@@ -24,7 +24,8 @@
             </div>
             <hr />
              <div class="d-flex">
-                <a :href="`/scene/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>                
+                <a :href="`/scene/${commonSvc.GetId(item.id)}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>  
+                <a :href="`/scene/${commonSvc.GetId(item.id)}`" class='btn btn-secondary text-white ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
                 <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
               </div>
           </div>
