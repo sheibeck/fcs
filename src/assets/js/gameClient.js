@@ -1,8 +1,12 @@
 import { DiceRoller } from 'rpg-dice-roller';
 import CommonService from "./commonService";
 
-export default class PeerSender {
+export default class GameClient {
+    getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     commonSvc = new CommonService();
+    players = new Array();    
+    connections = new Array();    
+    mediaStreams = new Array();
 
     constructor(gameId) {
         this.peer = null; 
@@ -27,28 +31,17 @@ export default class PeerSender {
 
         console.log('ID: ' + this.peer.id);
 
-        this.peer.on('open', (id) => {            
-            console.log('Player peer opened with ID: ' + this.peer.id);
-
-            var event = new CustomEvent('userconnected', { detail: id });
-            document.dispatchEvent(event);
+        this.peer.on('open', (id) => {             
+            this.handlePeerOpened(id);           
         });
         this.peer.on('connection', (c) => {
-            // Disallow incoming connections
-            c.on('open', () => {
-                c.send("Sender does not accept incoming connections");
-                setTimeout(function() { c.close(); }, 500);
-            });
+           
         });
         this.peer.on('disconnected', () => {            
-            console.log('Connection lost. Please reconnect');
+           console.log('Connection lost. Please reconnect');
 
-            var event = new CustomEvent('userdisconnected');
-            document.dispatchEvent(event);
-
-            // Workaround for peer.reconnect deleting previous id            
-            //this.peer._lastServerId = this.lastPeerId;
-            //this.peer.reconnect();            
+           let event = new CustomEvent('userdisconnected');
+           document.dispatchEvent(event);        
         });
         this.peer.on('close', () => {
             this.conn = null;
@@ -76,36 +69,107 @@ export default class PeerSender {
 
         // Create connection to destination peer specified in the input field
         this.conn = this.peer.connect(this.gameId);
+        this.connections.push(this.conn);
        
-        this.conn.on('open', () => {            
+        this.conn.on('open', () => {        
             console.log("Connected to: " + this.conn.peer);
-
-            // Receive messages
-            this.conn.on('data', (data) => {
-                console.log('Received', data);
-
-                switch(data.type) {
-                    case "scene":
-                        this.drawScene(data);
-                        break;
-                    default: //chat                
-                        this.displayChatMessage(data);
-                        break;
-                }
-            });
-
-            // Check URL params for comamnds that should be sent immediately
-            /*
-            var command = getUrlParam("command");
-            if (command)
-                conn.send(command);
-            */
-            this.sendChatMessage(username, "connected!");
-
-            var event = new CustomEvent('userjoined');
-            document.dispatchEvent(event);
+            this.handleSelfJoinedGame(username);
         });
     };
+
+    handleSelfJoinedGame(username) {        
+        // Receive messages
+        this.conn.on('data', (data) => {
+            console.log('Received', data);
+
+            switch(data.type) {
+                case "scene":
+                    this.drawScene(data);
+                    break;
+                case "players":
+                    this.handlePlayersUpdate(data);
+                    break;
+                default: //chat                
+                    this.displayChatMessage(data);
+                    break;
+            }
+        });
+
+        this.sendChatMessage(username, "connected!");
+
+        let event = new CustomEvent('userjoined');
+        document.dispatchEvent(event);
+
+        this.startLocalMedia();
+    } 
+
+    startLocalMedia() {
+        //connect my own media
+        this.getUserMedia({ audio: true, video: true }, 
+            (stream) => {                    
+                this.onReceiveStream(stream, 'my-camera');
+            },
+            (err) => {
+                alert("Cannot get access to your camera and video !");
+                console.error(err);
+            });
+    }
+
+    onReceiveStream(stream, element_id) {
+        // Retrieve the video element according to the desired
+        let video = document.getElementById(element_id);
+        // Set the given stream as the video source 
+        video.srcObject = stream;
+
+        video.onloadedmetadata = function(e) {
+            video.play();
+          };
+    
+        // Store a global reference of the stream
+        this.mediaStreams.push(stream);
+    }
+
+    handlePeerOpened(id) {        
+        console.log('Player peer opened with ID: ' + this.peer.id);
+        var event = new CustomEvent('userconnected', { detail: id });
+        document.dispatchEvent(event);
+
+        this.peer.on('call', (call) => {
+            this.getUserMedia({video: true, audio: true}, function(stream) {
+                call.answer(stream); // Answer the call with an A/V stream.
+                call.on('stream', (remoteStream) => {
+                    this.onReceiveStream(stream, 'peer-camera');
+                });
+            }, (err) => {
+                console.log('Failed to get local stream' ,err);
+            });
+        });
+    }
+
+    handlePlayersUpdate(data) {
+        if (!this.peer) return;
+
+        this.players = data.message;
+
+        this.players.forEach( (player) => {            
+            //if not connect to a player and the player isn't me then start a media connection
+            if (!(player in this.peer.connections) && player !== this.peer.id) {
+                this.handleMediaConnection(player);
+            }
+        });
+
+    };
+
+    handleMediaConnection = (player) => {        
+        this.getUserMedia({video: true, audio: true}, (stream) => {
+            let call = this.peer.call(player, stream);            
+            call.on('stream', (remoteStream) => {
+                this.onReceiveStream(remoteStream, player);
+            });
+        }, (err) => {
+            console.log('Failed to get local stream' ,err);
+        });
+    }
  
     sendChatMessage = (username, message) => {
         message = this.parseDiceRolls(message);

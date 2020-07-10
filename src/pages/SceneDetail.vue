@@ -41,10 +41,15 @@
     }
   }
 
-  #game-video {
-    height: 80px;    
+  #video-container {
     position: absolute;
     bottom: 0;
+
+    video {
+      height: 100px;  
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);    
+    }
   }
    
   /deep/ a {
@@ -117,6 +122,10 @@
       </div>
     </div>
 
+    <div id="video-container">
+      <video id="my-camera" />
+    </div>
+
     <!-- add scene object -->
     <div class="modal" id="modalSettings" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -157,8 +166,8 @@ import { dragscroll } from 'vue-dragscroll';
 import Panzoom from '@panzoom/panzoom'
 
 import Peer from 'peerjs';
-import PeerReceiver from "./../assets/js/peerReceiver";
-import PeerSender from "./../assets/js/peerSender";
+import GameServer from "./../assets/js/gameServer";
+import GameClient from "./../assets/js/gameClient";
 import FCSVTTClient from "./../assets/js/fcsVTTClient";
 import FCSVTT from '../assets/js/fcsVTT'
 import Models from '../assets/js/models';
@@ -234,13 +243,12 @@ export default {
       canvas: null,     
       showchat: true,
       chatMessage: "",
-      peerReceiver: null,
-      peerSender: null,  
+      gameServer: null,
+      gameClient: null,  
       saveInProgress: false,
       fullScreen: false,
       editingScene: false,
-      isUpdating: false,
-      isConnected: false,
+      isUpdating: false,      
       selectedPlayer: "everyone"
     }
   },
@@ -267,7 +275,10 @@ export default {
     },
     isSceneRunning() {
       return this.scene.isrunning;
-    }    
+    },
+    isConnected() {      
+      return this.gameClient && this.gameClient.peer && this.gameClient.peer.open;
+    }
   },
   methods: {
     init() {
@@ -326,17 +337,15 @@ export default {
       }, false);
 
       document.addEventListener('userconnected', (e) => {
-        this.peerSender.join(this.userName);               
-        this.isConnected = true;
+        this.gameClient.join(this.userName);        
       }, false);
 
       document.addEventListener('userjoined', (e) => {
-        this.updatePlayer("lastPeerId", this.peerSender.peer.id);
+        this.updatePlayer("lastPeerId", this.gameClient.peer.id);
       }, false);
 
-      document.addEventListener('userdisconnected', (e) => {
-        this.isConnected = false;
-        this.peerSender.displayChatMessage({ "username": "System", "message": "You have diconnected..." });
+      document.addEventListener('userdisconnected', (e) => {        
+        this.gameClient.displayChatMessage({ "username": "System", "message": "A player has disconnected..." });
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {        
@@ -369,24 +378,32 @@ export default {
     },
     startGame() {
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
-      this.peerReceiver = new PeerReceiver();
-      this.peerReceiver.initialize();
+      this.gameServer = new GameServer();
+      this.gameServer.initialize();
     },
     stopGame() {
       if (this.isHost)
       {
-        this.peerReceiver.endScene();
+        this.gameServer.endScene();
       }
     },
     joinGame() {      
-      const peerId = this.scene.gamePeerId;
-      this.peerSender = new PeerSender(peerId);
-      this.peerSender.initialize();       
+      const gameServerId = this.scene.gamePeerId;
+      this.gameClient = new GameClient(gameServerId);
+      this.gameClient.initialize();
     },
-    exitGame() {
-      this.peerSender.conn.close();
-      this.peerSender.peer = null;
-      this.isConnected = false;
+    exitGame() {      
+      for (let conn = 0; conn < this.gameClient.mediaStreams.length; conn++) {
+        let mediaStream = this.gameClient.mediaStreams[conn];
+        mediaStream.getAudioTracks()[0].stop();
+        mediaStream.getVideoTracks()[0].stop();
+      }
+
+      for (let conn = 0; conn < this.gameClient.connections.length; conn++) {
+        this.gameClient.connections[conn].close();
+      }
+
+      this.gameClient.peer = null;
     },
     updatePlayer(key, value)
     {
@@ -505,8 +522,8 @@ export default {
         return;
       }
 
-      if (!this.isLoading && this.peerSender && this.peerSender.peer.open) {
-        this.peerSender.updateScene(this.scene, this.peerSender.peer.id);
+      if (!this.isLoading && this.gameClient && this.gameClient.peer.open) {
+        this.gameClient.updateScene(this.scene, this.gameClient.peer.id);
       }      
     },     
     addZone() {
@@ -546,20 +563,20 @@ export default {
       this.$set(this.campaign, "slug", slug);
     },
     sendSystemMessage(message) {
-      this.peerReceiver.displayChatMessage(message);     
+      this.gameServer.displayChatMessage(message);     
     },
     sendChatMessage() {
       if (!this.chatMessage) return;      
       
-      if (this.peerSender) {
+      if (this.gameClient) {
         if (this.selectedPlayer !== "everyone") {
           let player = this.scene.players.find(obj => {
             return obj.id === this.selectedPlayer
           });          
-          this.peerSender.sendPrivateMessage(this.userName, player, this.chatMessage);          
+          this.gameClient.sendPrivateMessage(this.userName, player, this.chatMessage);          
         }
         else {
-          this.peerSender.sendChatMessage(this.userName, this.chatMessage);          
+          this.gameClient.sendChatMessage(this.userName, this.chatMessage);          
         }
         this.chatMessage = "";
       }
@@ -577,8 +594,8 @@ export default {
     sendFormattedChat(e) {
       if (e.data.type !== "charactersheet") return;
       let msg = e.data.data;
-      if (this.peerSender) {
-        this.peerSender.sendChatMessage(this.userName, msg);
+      if (this.gameClient) {
+        this.gameClient.sendChatMessage(this.userName, msg);
       } else {
         this.sendLocalChat(msg);
       }

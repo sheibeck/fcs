@@ -1,6 +1,6 @@
 import CommonService from "./commonService";
 
-export default class PeerReceiver {    
+export default class GameServer {    
     remotePeerIds= new Array();// You need this to link with specific DOM element
     connections= new Array(); // This is where you manage multi-connections
     commonSvc = new CommonService();
@@ -29,7 +29,7 @@ export default class PeerReceiver {
 
         this.peer.on('open', (id) => {
             console.log('Game server opened with ID: ' + this.peer.id);
-            console.log("Awaiting connection...");
+            console.log("Awaiting player connections...");
                         
             var event = new CustomEvent('gameserver', { detail: { type: "connected", peerid: id } } );
             document.dispatchEvent(event);
@@ -39,13 +39,9 @@ export default class PeerReceiver {
         });
         this.peer.on('disconnected', () => {
             console.log('Connection lost. Please reconnect');
-            
+                        
             var event = new CustomEvent('gameserver', { detail: { type: "disconnected", state: false } });
             document.dispatchEvent(event);
-
-            // Workaround for peer.reconnect deleting previous id
-            //this.peer._lastServerId = this.peerId;
-            //this.peer.reconnect();
         });
         this.peer.on('close', () => {
             this.conn = null;
@@ -63,29 +59,47 @@ export default class PeerReceiver {
 
         conn.on('open', () => {            
             console.log("Connected with peer: "+ conn.connectionId);
+          
             conn.on('data', (data) => {
                 // You can do whatever you want with the data from this connection - this is also the main part
                 this.dataHandler(conn,data);
             });
-            conn.on('error', (err) =>{
-                // handle error 
-                //connectionError(conn);
+            conn.on('error', (err) =>{                
                 console.log(err);            
-                this.displayChatMessage("Player disconnected...");
+                this.displayChatMessage("A player failed to connect...");
             });
-            conn.on('close', () =>{
-                // Handle connection closed
-                //connectionClose(conn);
-                this.conn = null;
-                console.log("Connection destroyed. Please refresh."); 
-                
-                var event = new CustomEvent('userdisconnected');
-                document.dispatchEvent(event);
+            conn.on('close', () =>{   
+                this.handlePlayerDisconnect(conn);
             });
          
             this.connections.push(conn);
+            //send the player data            
+            this.sendPlayerData();
         });        
     };
+
+    handlePlayerDisconnect(conn) {
+        console.log(`Peer ${conn.peer} disconnected.`);
+        this.remotePeerIds = this.remotePeerIds.filter( id => id !== conn.peer );
+        this.connections = this.connections.filter( c => c.connectionId !== conn.connectionId );                                
+        var event = new CustomEvent('userdisconnected');
+        document.dispatchEvent(event);
+
+        //update the players with peer connections
+        this.sendPlayerData();
+    }
+
+    handleMediaCall = (clientPeer) => {
+        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        getUserMedia({video: true, audio: true}, (stream) => {
+            var clientCall = this.peer.call(clientPeer.peerId, stream);
+            clientCall.on('stream', function(remoteStream) {
+                // Show stream in some video/canvas element.
+            });
+        }, function(err) {
+            console.log('Failed to get local stream' ,err);
+        });
+    }
 
     dataHandler = (conn, data) => {
         switch(data.type) {
@@ -99,6 +113,8 @@ export default class PeerReceiver {
             case "private": //
                 this.privateMessage(data);
                 break;
+            case "players":
+                this.sendPlayerData();
             default: //chat               
                 this.broadcastMessage(data);
                 break;
@@ -124,6 +140,15 @@ export default class PeerReceiver {
         }, 1000);        
     }
     
+    sendPlayerData() {
+        var msg = {
+            type: "players",
+            username: "system",
+            message: this.remotePeerIds
+        }
+        this.broadcastMessage(msg);
+    }
+
     broadcastMessage = (message) => {
         for(var i=0;i<this.connections.length;i++){
             if (this.connections[i].open) {
