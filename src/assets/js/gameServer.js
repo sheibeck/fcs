@@ -87,19 +87,7 @@ export default class GameServer {
 
         //update the players with peer connections
         this.sendPlayerData();
-    }
-
-    handleMediaCall = (clientPeer) => {
-        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-        getUserMedia({video: true, audio: true}, (stream) => {
-            var clientCall = this.peer.call(clientPeer.peerId, stream);
-            clientCall.on('stream', function(remoteStream) {
-                // Show stream in some video/canvas element.
-            });
-        }, function(err) {
-            console.log('Failed to get local stream' ,err);
-        });
-    }
+    }  
 
     dataHandler = (conn, data) => {
         switch(data.type) {

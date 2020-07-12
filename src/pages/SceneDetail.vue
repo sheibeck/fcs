@@ -41,11 +41,12 @@
     }
   }
 
-  #video-container {
+  /deep/ #video-container {
     position: absolute;
     bottom: 0;
 
     video {
+      margin-left: 5px;      
       height: 100px;  
       -webkit-transform: scaleX(-1);
       transform: scaleX(-1);    
@@ -122,7 +123,7 @@
       </div>
     </div>
 
-    <div id="video-container">
+    <div id="video-container">      
       <video id="my-camera" />
     </div>
 
@@ -332,6 +333,7 @@ export default {
           case "disconnected":
             //server disconnected
             this.sendSystemMessage("Game server has disconnected!");
+            this.exitGame();
             break;
         }
       }, false);
@@ -344,8 +346,10 @@ export default {
         this.updatePlayer("lastPeerId", this.gameClient.peer.id);
       }, false);
 
-      document.addEventListener('userdisconnected', (e) => {        
-        this.gameClient.displayChatMessage({ "username": "System", "message": "A player has disconnected..." });
+      document.addEventListener('userdisconnected', (e) => {
+        if (this.gameClient) {
+          this.gameClient.displayChatMessage({ "username": "System", "message": "A player has disconnected..." });        
+        }
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {        
@@ -389,21 +393,48 @@ export default {
     },
     joinGame() {      
       const gameServerId = this.scene.gamePeerId;
-      this.gameClient = new GameClient(gameServerId);
+      this.gameClient = new GameClient(gameServerId, this.isHost);
       this.gameClient.initialize();
     },
     exitGame() {      
-      for (let conn = 0; conn < this.gameClient.mediaStreams.length; conn++) {
-        let mediaStream = this.gameClient.mediaStreams[conn];
-        mediaStream.getAudioTracks()[0].stop();
-        mediaStream.getVideoTracks()[0].stop();
+      if (!this.gameClient) return;
+
+      for (let conn = 0; conn < this.gameClient.mediaConnections.length; conn++) {
+          let mediaStream = this.gameClient.mediaConnections[conn];
+          
+          //remove the video element
+          let vidElem = document.getElementById(mediaStream.peer);
+          if (vidElem)
+              vidElem.parentNode.removeChild(vidElem);
+            
+          mediaStream.close();
       }
 
       for (let conn = 0; conn < this.gameClient.connections.length; conn++) {
-        this.gameClient.connections[conn].close();
+          let chatConnection = this.gameClient.connections[conn];
+          chatConnection.close();
       }
+      
+      this.gameClient.cleanupConnections();
 
+      //stop my stream
+      try {
+        this.gameClient.myStream.getAudioTracks()[0].stop();        
+      }catch(e) {
+        console.log(e.message);
+      }
+      try {
+        this.gameClient.myStream.getVideoTracks()[0].stop();
+      }catch(e) {
+        console.log(e.message);
+      }
+      let myCamera = document.getElementById("my-camera");
+      myCamera.srcObject = null;
+     
+      //close all streams      
+      if (this.gameClient.peer) this.gameClient.peer.destroy();
       this.gameClient.peer = null;
+      this.gameClient.myStream = null;
     },
     updatePlayer(key, value)
     {
@@ -522,7 +553,7 @@ export default {
         return;
       }
 
-      if (!this.isLoading && this.gameClient && this.gameClient.peer.open) {
+      if (!this.isLoading && this.gameClient && this.gameClient.peer && this.gameClient.peer.open) {
         this.gameClient.updateScene(this.scene, this.gameClient.peer.id);
       }      
     },     

@@ -6,14 +6,16 @@ export default class GameClient {
     commonSvc = new CommonService();
     players = new Array();    
     connections = new Array();    
-    mediaStreams = new Array();
+    mediaConnections = new Array();
+    myStream = null;
 
-    constructor(gameId) {
+    constructor(gameId, isHost) {
         this.peer = null; 
         this.peerId = null;
         this.conn = null;
         this.gameId = gameId;  
         this.lastPeerId = null;
+        this.isHost = isHost;
     }
 
     initialize = () => {
@@ -34,16 +36,43 @@ export default class GameClient {
         this.peer.on('open', (id) => {             
             this.handlePeerOpened(id);           
         });
+
         this.peer.on('connection', (c) => {
            
+        });           
+
+        this.peer.on('call', (call) => {         
+            call.answer(this.myStream); // Answer the call with an A/V stream.
+
+             // Store a global reference of the stream 
+            this.mediaConnections.push(call);        
+
+            call.on('stream', (remoteStream) => {
+                this.onReceiveStream(remoteStream, call.peer);
+            });
+            
+            call.peerConnection.oniceconnectionstatechange = (ev) => {
+                if (call.peerConnection.iceConnectionState == "disconnected") {                    
+                    this.cleanupConnections();
+                }
+            }  
+
+            call.on('close', (remoteStream) => {
+                //this.cleanupConnections();
+            });
+
+            call.on('error', (err) => {
+                console.log(err.message);                
+            })
         });
+
         this.peer.on('disconnected', () => {            
            console.log('Connection lost. Please reconnect');
 
            let event = new CustomEvent('userdisconnected');
            document.dispatchEvent(event);        
         });
-        this.peer.on('close', () => {
+        this.peer.on('close', () => {            
             this.conn = null;
             console.log('Connection destroyed. Please refresh');
         });        
@@ -71,13 +100,13 @@ export default class GameClient {
         this.conn = this.peer.connect(this.gameId);
         this.connections.push(this.conn);
        
-        this.conn.on('open', () => {        
+        this.conn.on('open', async () => {        
             console.log("Connected to: " + this.conn.peer);
-            this.handleSelfJoinedGame(username);
+            await this.handleSelfJoinedGame(username);
         });
     };
 
-    handleSelfJoinedGame(username) {        
+    async handleSelfJoinedGame(username) {        
         // Receive messages
         this.conn.on('data', (data) => {
             console.log('Received', data);
@@ -99,76 +128,137 @@ export default class GameClient {
 
         let event = new CustomEvent('userjoined');
         document.dispatchEvent(event);
-
-        this.startLocalMedia();
+        
+        await this.startLocalMedia();
     } 
 
-    startLocalMedia() {
-        //connect my own media
-        this.getUserMedia({ audio: true, video: true }, 
-            (stream) => {                    
-                this.onReceiveStream(stream, 'my-camera');
+    async startLocalMedia() {        
+        const usbcamera = "4c3d1367c73f62297322c127b73008d56d60b714025d46ce3944f296498d7b7b"
+        const usbmic = "27c67373401df8a0adaeb3cb3cbacb8629eac9569f4172d4002bd03d8aca29a2"
+        const integratedcamera = "7fd5e26b38ce25a9afcda31d01fc21d9757e29c7f05b87159e56edcd2e971221";
+        const integratedmic = "3cb36dccda7b356477126cd13e4e3178e0279bc1a5dab3bac19854282980ee86"
+
+        let videoSettings = true;
+        let audioSettings = true;
+
+        if (`${process.env.NODE_ENV}` !== "production")
+        {          
+          if (window.location.host == "localhost:8080")
+          {
+            videoSettings = {
+                deviceId: { exact: this.isHost ?  integratedcamera : usbcamera }
+            } 
+            audioSettings = false;
+          }                  
+        }
+
+        await this.getUserMedia({ 
+                audio: audioSettings,
+                video: videoSettings,
+            }, 
+            (stream) => {                                 
+                this.myStream = stream;
+
+                this.onReceiveStream(stream, 'my-camera');                            
+                //now that you are connected call any other players
+                this.players.forEach( (player) => {            
+                    //if not connect to a player and the player isn't me then start a media connection
+                    if (!(player in this.peer.connections) && player !== this.peer.id) {
+                        this.handleRemoteMediaConnection(player);
+                    }
+                });
             },
             (err) => {
-                alert("Cannot get access to your camera and video !");
+                this.commonSvc.Notify(err.message);
                 console.error(err);
-            });
+            }); 
+      
     }
 
-    onReceiveStream(stream, element_id) {
-        // Retrieve the video element according to the desired
-        let video = document.getElementById(element_id);
-        // Set the given stream as the video source 
-        video.srcObject = stream;
+    gotDevices(mediaDevices) {
+        select.innerHTML = '';
+        select.appendChild(document.createElement('option'));
+        let count = 1;
+        mediaDevices.forEach(mediaDevice => {
+          if (mediaDevice.kind === 'videoinput') {
+            const option = document.createElement('option');
+            option.value = mediaDevice.deviceId;
+            const label = mediaDevice.label || `Camera ${count++}`;
+            const textNode = document.createTextNode(label);
+            option.appendChild(textNode);
+            select.appendChild(option);
+          }
+        });
+    }
 
-        video.onloadedmetadata = function(e) {
-            video.play();
-          };
     
-        // Store a global reference of the stream
-        this.mediaStreams.push(stream);
+    onReceiveStream(stream, id) {        
+        let videoElem = this.createVideoElement(id);
+        
+        // Set the given stream as the video source 
+        videoElem.srcObject = stream;
+        
+        videoElem.onloadedmetadata = function(e) {
+            videoElem.play();
+        };
+    }
+
+    cleanupConnections() {        
+        for (let conn = 0; conn < this.mediaConnections.length; conn++) {
+            let mediaStream = this.mediaConnections[conn];            
+            if (!mediaStream.open || mediaStream.peerConnection.iceConnectionState === "disconnected") {
+                let vidElem = document.getElementById(mediaStream.peer);
+                if (vidElem)
+                    vidElem.parentNode.removeChild(vidElem);
+                mediaStream.close();
+            }
+            this.mediaConnections = this.mediaConnections.filter( conn => conn.open == true );
+        }
+
+        //cleanup chat connections
+        this.connections = this.connections.filter( conn => conn.open == true );        
+    }
+
+    createVideoElement(id) {
+        let videoContainer = document.getElementById("video-container");
+        let videoElem = document.getElementById(id);
+        if (videoElem == null) {            
+            var newElem = document.createElement('video');
+            newElem.id = id;          
+            videoContainer.appendChild(newElem);
+            videoElem = document.getElementById(id);
+        }
+        return videoElem;
+    }
+
+    removeVideoElement(id) {
+        let videoElem = videoContainer.getElementById(id);
+        videoElem.parentNode.removeChild(videoElem);
     }
 
     handlePeerOpened(id) {        
         console.log('Player peer opened with ID: ' + this.peer.id);
         var event = new CustomEvent('userconnected', { detail: id });
-        document.dispatchEvent(event);
-
-        this.peer.on('call', (call) => {
-            this.getUserMedia({video: true, audio: true}, function(stream) {
-                call.answer(stream); // Answer the call with an A/V stream.
-                call.on('stream', (remoteStream) => {
-                    this.onReceiveStream(stream, 'peer-camera');
-                });
-            }, (err) => {
-                console.log('Failed to get local stream' ,err);
-            });
-        });
+        document.dispatchEvent(event);        
     }
 
     handlePlayersUpdate(data) {
         if (!this.peer) return;
-
-        this.players = data.message;
-
-        this.players.forEach( (player) => {            
-            //if not connect to a player and the player isn't me then start a media connection
-            if (!(player in this.peer.connections) && player !== this.peer.id) {
-                this.handleMediaConnection(player);
-            }
-        });
-
+        this.players = data.message;      
     };
 
-    handleMediaConnection = (player) => {        
-        this.getUserMedia({video: true, audio: true}, (stream) => {
-            let call = this.peer.call(player, stream);            
-            call.on('stream', (remoteStream) => {
-                this.onReceiveStream(remoteStream, player);
-            });
-        }, (err) => {
-            console.log('Failed to get local stream' ,err);
+    handleRemoteMediaConnection = (player) => {        
+        let call = this.peer.call(player, this.myStream);        
+        this.mediaConnections.push(call);
+        call.on('stream', (remoteStream) => {
+            this.onReceiveStream(remoteStream, call.peer);
         });
+
+        call.peerConnection.oniceconnectionstatechange = (ev) => {           
+            if (call.peerConnection.iceConnectionState == "disconnected") {                
+                this.cleanupConnections();
+            }
+        }  
     }
  
     sendChatMessage = (username, message) => {
