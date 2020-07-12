@@ -9,13 +9,14 @@ export default class GameClient {
     mediaConnections = new Array();
     myStream = null;
 
-    constructor(gameId, isHost) {
-        this.peer = null; 
-        this.peerId = null;
+    constructor(gameId, playerId, userName, isHost) {
+        this.peer = null;         
         this.conn = null;
-        this.gameId = gameId;  
+        this.gameId = gameId;
         this.lastPeerId = null;
         this.isHost = isHost;
+        this.playerId = playerId;
+        this.userName = userName;
     }
 
     initialize = () => {
@@ -79,9 +80,7 @@ export default class GameClient {
         this.peer.on('error', (e) => {
             console.log(e);
             alert('Game may not be running. ' + e);           
-        });
-
-        this.join();
+        });        
     };
 
     /**
@@ -97,7 +96,7 @@ export default class GameClient {
         }
 
         // Create connection to destination peer specified in the input field
-        this.conn = this.peer.connect(this.gameId);
+        this.conn = this.peer.connect(this.gameId, { metadata: { playerId: this.playerId, peerId: this.peer.id, userName: username } });
         this.connections.push(this.conn);
        
         this.conn.on('open', async () => {        
@@ -106,7 +105,7 @@ export default class GameClient {
         });
     };
 
-    async handleSelfJoinedGame(username) {        
+    async handleSelfJoinedGame(username) {
         // Receive messages
         this.conn.on('data', (data) => {
             console.log('Received', data);
@@ -141,7 +140,8 @@ export default class GameClient {
         let videoSettings = true;
         let audioSettings = true;
 
-        if (`${process.env.NODE_ENV}` !== "production")
+        const debugging = true;
+        if (`${process.env.NODE_ENV}` === "development" && debugging)
         {          
           if (window.location.host == "localhost:8080")
           {
@@ -157,13 +157,13 @@ export default class GameClient {
                 video: videoSettings,
             }, 
             (stream) => {                                 
-                this.myStream = stream;
+                this.myStream = stream;                
+                this.onReceiveStream(stream, 'my-camera');
 
-                this.onReceiveStream(stream, 'my-camera');                            
-                //now that you are connected call any other players
+                //now that you are connected call any other players                
                 this.players.forEach( (player) => {            
-                    //if not connect to a player and the player isn't me then start a media connection
-                    if (!(player in this.peer.connections) && player !== this.peer.id) {
+                    //if not connect to a player and the player isn't me then start a media connection                    
+                    if (!(player.peer in this.peer.connections) && player !== this.peer.id) {
                         this.handleRemoteMediaConnection(player);
                     }
                 });
@@ -192,7 +192,7 @@ export default class GameClient {
     }
 
     
-    onReceiveStream(stream, id) {        
+    onReceiveStream(stream, id) {
         let videoElem = this.createVideoElement(id);
         
         // Set the given stream as the video source 
@@ -224,10 +224,13 @@ export default class GameClient {
         let videoElem = document.getElementById(id);
         if (videoElem == null) {            
             var newElem = document.createElement('video');
-            newElem.id = id;          
+            newElem.id = id;
             videoContainer.appendChild(newElem);
-            videoElem = document.getElementById(id);
+            videoElem = document.getElementById(id);            
         }
+        if (videoElem.id == "my-camera") {                                
+            videoElem.muted = true;
+        }        
         return videoElem;
     }
 
@@ -247,8 +250,11 @@ export default class GameClient {
         this.players = data.message;      
     };
 
-    handleRemoteMediaConnection = (player) => {        
-        let call = this.peer.call(player, this.myStream);        
+    handleRemoteMediaConnection = (player) => {
+        //connet to other players, but don't connect to yourself )
+        if (player.peerId === this.peer.id) return;
+        
+        let call = this.peer.call(player.peerId, this.myStream, { metadata: { playerId: this.playerId, peerId: this.peer.id, userName: this.userName } });
         this.mediaConnections.push(call);
         call.on('stream', (remoteStream) => {
             this.onReceiveStream(remoteStream, call.peer);
@@ -273,7 +279,7 @@ export default class GameClient {
         this.conn.send(msg);
     }
 
-    sendPrivateMessage = (username, player, message) => {        
+    sendPrivateMessage = (username, player, message) => {
         var msg = {
             type: "private",
             player: player,
@@ -327,17 +333,16 @@ export default class GameClient {
         }
     }
     
-    updateScene = (scene, connectionId) => {        
+    updateScene = (scene) => {        
         var msg = {
             type: "scene",
-            message: scene,
-            connectionId: connectionId,
+            message: scene     
         }
         this.conn.send(msg);
     } 
 
     drawScene = (data) => {        
-        var event = new CustomEvent('sceneupdate', { detail: { scene: data.message, connectionId: data.connectionId } });
+        var event = new CustomEvent('sceneupdate', { detail: { scene: data.message } });
         document.dispatchEvent(event);
     }
 

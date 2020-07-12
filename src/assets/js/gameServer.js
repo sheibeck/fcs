@@ -1,7 +1,7 @@
 import CommonService from "./commonService";
 
 export default class GameServer {    
-    remotePeerIds= new Array();// You need this to link with specific DOM element
+    remotePeers= new Array();// You need this to link with specific DOM element
     connections= new Array(); // This is where you manage multi-connections
     commonSvc = new CommonService();
 
@@ -54,8 +54,8 @@ export default class GameServer {
     };
 
     // Handle connection - this is most important part
-    handleConnection = (conn) =>{
-        this.remotePeerIds.push(conn.peer); // Add remote peer to list
+    handleConnection = (conn) =>{                
+        this.remotePeers.push(conn.metadata); // keep a list of connected
 
         conn.on('open', () => {            
             console.log("Connected with peer: "+ conn.connectionId);
@@ -79,10 +79,10 @@ export default class GameServer {
     };
 
     handlePlayerDisconnect(conn) {
-        console.log(`Peer ${conn.peer} disconnected.`);
-        this.remotePeerIds = this.remotePeerIds.filter( id => id !== conn.peer );
-        this.connections = this.connections.filter( c => c.connectionId !== conn.connectionId );                                
-        var event = new CustomEvent('userdisconnected');
+        console.log(`Peer ${conn.peer} disconnected.`);        
+        this.remotePeers = this.remotePeers.filter( rc => rc.peerId !== conn.peer );
+        this.connections = this.connections.filter( rc => rc.connectionId !== conn.connectionId );                                
+        var event = new CustomEvent('userdisconnected', { detail: { type: "disconnected", player: conn.metadata } });
         document.dispatchEvent(event);
 
         //update the players with peer connections
@@ -132,7 +132,7 @@ export default class GameServer {
         var msg = {
             type: "players",
             username: "system",
-            message: this.remotePeerIds
+            message: JSON.parse( JSON.stringify( this.remotePeers ) ),
         }
         this.broadcastMessage(msg);
     }

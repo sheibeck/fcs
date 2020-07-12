@@ -97,7 +97,7 @@
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
-        </div>
+        </div>  
         <div id="scene-toolbar" class="d-flex flex-column">          
           <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
           <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
@@ -105,7 +105,7 @@
           <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
           <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>                    
           <button v-if="isHost" type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
-          <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
+          <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Game Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
           <div id="chat-log" class="border mb-1">
@@ -338,7 +338,7 @@ export default {
         }
       }, false);
 
-      document.addEventListener('userconnected', (e) => {
+      document.addEventListener('userconnected', (e) => {        
         this.gameClient.join(this.userName);        
       }, false);
 
@@ -347,8 +347,9 @@ export default {
       }, false);
 
       document.addEventListener('userdisconnected', (e) => {
+        debugger;
         if (this.gameClient) {
-          this.gameClient.displayChatMessage({ "username": "System", "message": "A player has disconnected..." });        
+          this.gameClient.displayChatMessage({ "username": "System", "message": `${e.detail.player.username} has disconnected...` });
         }
       }, false);
       
@@ -393,8 +394,8 @@ export default {
     },
     joinGame() {      
       const gameServerId = this.scene.gamePeerId;
-      this.gameClient = new GameClient(gameServerId, this.isHost);
-      this.gameClient.initialize();
+      this.gameClient = new GameClient(gameServerId, this.userId, this.userName, this.isHost);
+      this.gameClient.initialize();      
     },
     exitGame() {      
       if (!this.gameClient) return;
@@ -554,7 +555,7 @@ export default {
       }
 
       if (!this.isLoading && this.gameClient && this.gameClient.peer && this.gameClient.peer.open) {
-        this.gameClient.updateScene(this.scene, this.gameClient.peer.id);
+        this.gameClient.updateScene(this.scene);
       }      
     },     
     addZone() {
