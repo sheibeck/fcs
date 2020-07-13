@@ -1,8 +1,7 @@
 import { DiceRoller } from 'rpg-dice-roller';
 import CommonService from "./commonService";
 
-export default class GameClient {
-    getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+export default class GameClient {    
     commonSvc = new CommonService();
     players = new Array();    
     connections = new Array();    
@@ -152,7 +151,8 @@ export default class GameClient {
           }                  
         }
 
-        await this.getUserMedia({ 
+        let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        await getUserMedia({ 
                 audio: audioSettings,
                 video: videoSettings,   
             }, 
