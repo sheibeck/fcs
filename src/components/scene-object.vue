@@ -143,18 +143,16 @@ export default {
     skill: SceneSkill,
     editableinput: SceneEditableInput,
   },
-  created() {
-    if (!typeof this.objectdata.acted === "boolean") this.$set(this.objectdata, "acted", false);
+  created() {    
     if (!this.objectdata.x) this.$set(this.objectdata, "x", 40);
     if (!this.objectdata.y) this.$set(this.objectdata, "y", 40);   
 
     if (!this.objectdata.show) this.$set(this.objectdata, "show", {});
-    if (!typeof this.objectdata.show.aspects === "boolean") this.$set(this.objectdata.show, "aspects", true);
-    if (!typeof this.objectdata.show.skills === "boolean") this.$set(this.objectdata.show, "skills", true)
-    if (!typeof this.objectdata.show.consequences === "boolean") this.$set(this.objectdata.show, "consequences", true)
-    if (!typeof this.objectdata.show.stress === "boolean") this.$set(this.objectdata.show, "stress", true)
-    if (!typeof this.objectdata.show.conditions === "boolean") this.$set(this.objectdata.show, "conditions", true)
-
+    if (typeof this.objectdata.show.aspects === "undefined") this.$set(this.objectdata.show, "aspects", true);
+    if (typeof this.objectdata.show.skills === "undefined") this.$set(this.objectdata.show, "skills", true)
+    if (typeof this.objectdata.show.consequences === "undefined") this.$set(this.objectdata.show, "consequences", true)
+    if (typeof this.objectdata.show.stress === "undefined") this.$set(this.objectdata.show, "stress", true)
+    if (typeof this.objectdata.show.conditions === "undefined") this.$set(this.objectdata.show, "conditions", true)
   },
   mounted() {    
     this.init();
@@ -308,7 +306,12 @@ export default {
       }
     },
     toggleTurn() {      
-      this.objectdata.acted = !this.objectdata.acted ?? true;
+      if (typeof this.objectdata.acted === "undefined") {
+        this.$set(this.objectdata, "acted", true);
+      }
+      else {
+        this.objectdata.acted = !this.objectdata.acted
+      }
     }
   }
 

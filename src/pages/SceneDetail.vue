@@ -68,9 +68,14 @@
 
     <div v-show="!isLoading">
       <div class="d-flex">  
-         <div class="mr-auto">
+        <div class="mr-auto">
           <em style="vertical-align: top;">Scene Aspects:</em>
           <sceneaspect :aspect="aspect" location="scene" v-for="aspect in scene.aspects" v-bind:key="aspect.id" />
+        </div>
+
+        <div v-if="isHost" class="mr-2" title="Storyteller Fate Points">
+          <i class="fas fa-coins"></i>
+          <input class="text-center" style="width: 50px;" id="fate-points" type="number" :value="scene.fatepoints" @change="spendFate($event)" />
         </div>
       
         <span v-if="isHost">
@@ -105,6 +110,7 @@
           <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>                    
           <button v-if="isHost" type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
           <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Game Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
+          <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-broom"></i></button>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
           <div id="chat-log" class="border mb-1">
@@ -236,7 +242,7 @@ export default {
     }
   },
   data () {
-    return {     
+    return {   
       loading: true,
       scene : {},
       id: this.$route.params.id,
@@ -728,8 +734,14 @@ export default {
       event.preventDefault();
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
     },
-    mediaControl(){
-
+    clearChatLog() {
+      document.getElementById("chat-log").innerHTML = "";
+    },
+    spendFate(event){      
+      let newValue = event.target.value;
+      let msg = parseInt(newValue) > (parseInt(this.scene.fatepoints || 0)) ? "Gained" : "Spent";      
+      this.sendToVTT("fatepoint", `${msg} a fate point`, msg == "Gained" ? 1 : 0, null, "The Storyteller");
+      this.scene.fatepoints = newValue;
     }
   },
 }
