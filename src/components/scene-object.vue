@@ -54,6 +54,20 @@
 
       <div v-if="objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
+          <span class="mr-auto">Stunts/Extras</span>
+          <i title="Add stunt/extra" @click="addThingToObject('stuntextra')" class="fas fa-plus-circle fa-sm pt-1"></i>
+          <i v-if="objectdata.show.stuntextras" @click="objectdata.show.stuntextras=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
+          <i v-if="!objectdata.show.stuntextras" @click="objectdata.show.stuntextras=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
+        </div>
+        <div v-if="objectdata.show.stuntextras">
+          <div v-for="stuntextra in objectdata.stuntextras" v-bind:key="stuntextra.id">
+            <stuntextra :stuntextra="stuntextra" location="thing"  />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="objectdata.object_type != 'CHARACTER'">
+        <div class="header d-flex">
           <span class="mr-auto">Stress</span>
           <i title="Add stress" @click="addThingToObject('stress')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="objectdata.show.stress" @click="objectdata.show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
@@ -122,6 +136,7 @@
 <script>
 import SceneAspect from './scene-aspect';
 import SceneStress from './scene-stress';
+import SceneStuntExtra from './scene-stuntextra';
 import SceneConsequence from './scene-consequence';
 import SceneSkill from './scene-skill';
 import CommonService from '../assets/js/commonService';
@@ -141,6 +156,7 @@ export default {
     stress: SceneStress,
     consequence: SceneConsequence,
     skill: SceneSkill,
+    stuntextra: SceneStuntExtra,
     editableinput: SceneEditableInput,
   },
   created() {    
@@ -149,10 +165,11 @@ export default {
 
     if (!this.objectdata.show) this.$set(this.objectdata, "show", {});
     if (typeof this.objectdata.show.aspects === "undefined") this.$set(this.objectdata.show, "aspects", true);
-    if (typeof this.objectdata.show.skills === "undefined") this.$set(this.objectdata.show, "skills", true)
-    if (typeof this.objectdata.show.consequences === "undefined") this.$set(this.objectdata.show, "consequences", true)
-    if (typeof this.objectdata.show.stress === "undefined") this.$set(this.objectdata.show, "stress", true)
-    if (typeof this.objectdata.show.conditions === "undefined") this.$set(this.objectdata.show, "conditions", true)
+    if (typeof this.objectdata.show.skills === "undefined") this.$set(this.objectdata.show, "skills", true);
+    if (typeof this.objectdata.show.consequences === "undefined") this.$set(this.objectdata.show, "consequences", true);
+    if (typeof this.objectdata.show.stress === "undefined") this.$set(this.objectdata.show, "stress", true);
+    if (typeof this.objectdata.show.conditions === "undefined") this.$set(this.objectdata.show, "conditions", true);
+    if (typeof this.objectdata.show.stuntextras === "undefined") this.$set(this.objectdata.show, "stuntextras", true);
   },
   mounted() {    
     this.init();
@@ -241,25 +258,47 @@ export default {
           }
           this.objectdata.caAndBoost.push(caAndBoost);
           break;
-        case "aspect":          
-          let aspect = models.SceneAspect("", "", this.objectdata.type);          
+        case "aspect":  
+          if (!this.objectdata.aspects) { 
+            this.$set(this.objectdata, 'aspects', new Array());
+          }          
+          let aspect = models.SceneAspect("", "", this.objectdata.object_type);          
           this.objectdata.aspects.push(aspect);
           break;
         case "consequence":
+          if (!this.objectdata.consequences) { 
+            this.$set(this.objectdata, 'consequences', new Array());
+          }
           let consequence = models.SceneConsequence("", "", "", objectType)           
           this.objectdata.consequences.push(consequence);
           break;
         case "condition":
+          if (!this.objectdata.conditions) { 
+            this.$set(this.objectdata, 'conditions', new Array());
+          }
           let condition = models.SceneCondition("", "", objectType)
           this.objectdata.conditions.push(condition);
           break;
-        case "stress":        
+        case "stress":
+          if (!this.objectdata.stress) { 
+            this.$set(this.objectdata, 'stress', new Array());
+          }
           let stress = models.SceneStress("", objectType)           
           this.objectdata.stress.push(stress);
           break
-        case "skill":          
+        case "skill":
+          if (!this.objectdata.skills) { 
+            this.$set(this.objectdata, 'skills', new Array());
+          }
           let skill = models.SceneSkill("", "", objectType)           
           this.objectdata.skills.push(skill);
+          break;
+        case "stuntextra": 
+          if (!this.objectdata.stuntextras) { 
+            this.$set(this.objectdata, 'stuntextras', new Array());
+          }
+          let stuntextra = models.SceneStuntExtra("", "", objectType)           
+          this.objectdata.stuntextras.push(stuntextra);
           break;
       }
     },  

@@ -1,11 +1,8 @@
 <template>
   <div class="pl-1 ml-1 small d-flex">
     <span class="dice fo20" v-on:click="sendToVTT()">+</span>    
-   
-    <editableinput :object="skill" item="name" class="w-75  font-weight-bold" />
-
-    <editableinput :object="skill" item="value" class="w-25" />
-
+    <editableinput :object="skill" item="name" class="font-weight-bold mr-1" />
+    <editableinput :object="skill" item="value" class="mr-auto" />
     <button class="btn btn-link p-0 m-0 small button-remove" type="button"><i title="Remove skill" @click="removeSkill()" class="fas fa-trash-alt fa-xs"></i></button>
   </div>
 </template>
