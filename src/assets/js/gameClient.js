@@ -140,7 +140,7 @@ export default class GameClient {
         let videoSettings = true;
         let audioSettings = true;
 
-        const debugging = true;
+        const debugging = false;
         if (`${process.env.NODE_ENV}` === "development" && debugging)
         {          
           if (window.location.host == "localhost:8080")
@@ -211,8 +211,13 @@ export default class GameClient {
         // Set the given stream as the video source 
         videoElem.srcObject = stream;
         
-        videoElem.onloadedmetadata = function(e) {
+        videoElem.onloadedmetadata = (e) => {
             videoElem.play();
+            //don't playback your own audio            
+            if (videoElem.parentElement.id == this.commonSvc.GetPlayerIdForDom(this.playerId))
+            {
+                videoElem.muted = true;
+            }
         };        
     }
 
@@ -246,10 +251,16 @@ export default class GameClient {
         if (videoElem == null) {            
             var vidTemplate = `
                 <div id="${id}" class="mr-1">
-                    <div class="bg-light text-center">
-                        ${userName}
+                    <div class="bg-light text-center d-flex">
+                        <div class="mr-auto">${userName}</div>
+                        <div class="media-controls small pt-1 text-right">
+                            <i class="fas fa-microphone" data-id="${id}" data-action="mute" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none'); document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                            <i class="fas fa-microphone-slash d-none" data-id="${id}" data-action="unmute" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                            <i class="far fa-pause-circle" data-id="${id}" data-action="pause" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                            <i class="fas fa-play-circle d-none" data-id="${id}" data-action="play" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                        </div>
                     </div>
-                    <video />
+                    <video></video>
                 </div>`;
                 videoContainer.insertAdjacentHTML('beforeend', vidTemplate);
         }

@@ -122,7 +122,8 @@
       </div>
     </div>
 
-    <div id="video-container" class="" :class="{'d-none': !isConnected, 'd-flex': isConnected}">      
+    <div id="video-container" class="" :class="{'d-none': !isConnected, 'd-flex': isConnected}">     
+     
     </div>
 
     <!-- add scene object -->
@@ -248,7 +249,8 @@ export default {
       fullScreen: false,
       editingScene: false,
       isUpdating: false,      
-      selectedPlayer: "everyone"
+      selectedPlayer: "everyone",
+      connectedPlayers: null,
     }
   },
   computed: {
@@ -338,6 +340,26 @@ export default {
             break;
         }
       }, false);
+
+      document.addEventListener('mediacontrol', (e) => {        
+        let playerId = e.detail.playerId;
+        let action = e.detail.type;
+
+        switch(action) { 
+          case "mute":       
+            this.gameClient.myStream.getAudioTracks()[0].enabled = false;
+            break;
+          case "unmute":
+            this.gameClient.myStream.getAudioTracks()[0].enabled = true;
+            break;
+          case "pause":            
+            this.gameClient.myStream.getVideoTracks()[0].enabled = false;
+            break;
+          case "play":
+            this.gameClient.myStream.getVideoTracks()[0].enabled = true;
+            break;
+        }          
+      });
 
       document.addEventListener('userconnected', (e) => {        
         this.gameClient.join(this.userName);        
@@ -706,6 +728,9 @@ export default {
       event.preventDefault();
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
     },
+    mediaControl(){
+
+    }
   },
 }
 </script>
