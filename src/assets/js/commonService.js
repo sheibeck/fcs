@@ -209,4 +209,8 @@ export default class CommonService {
     }
     return text;
   }
+
+  GetPlayerIdForDom = function(playerId) {
+    return playerId.replace(":","-");
+  }
 }

@@ -41,10 +41,15 @@
     }
   }
 
-  #game-video {
-    height: 80px;    
+  /deep/ #video-container {
     position: absolute;
     bottom: 0;
+    
+    video {      
+      height: 100px;  
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);    
+    }
   }
    
   /deep/ a {
@@ -91,7 +96,7 @@
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
-        </div>
+        </div>  
         <div id="scene-toolbar" class="d-flex flex-column">          
           <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
           <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
@@ -99,7 +104,7 @@
           <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
           <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>                    
           <button v-if="isHost" type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
-          <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
+          <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Game Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
           <div id="chat-log" class="border mb-1">
@@ -115,6 +120,10 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div id="video-container" class="" :class="{'d-none': !isConnected, 'd-flex': isConnected}">     
+     
     </div>
 
     <!-- add scene object -->
@@ -157,8 +166,8 @@ import { dragscroll } from 'vue-dragscroll';
 import Panzoom from '@panzoom/panzoom'
 
 import Peer from 'peerjs';
-import PeerReceiver from "./../assets/js/peerReceiver";
-import PeerSender from "./../assets/js/peerSender";
+import GameServer from "./../assets/js/gameServer";
+import GameClient from "./../assets/js/gameClient";
 import FCSVTTClient from "./../assets/js/fcsVTTClient";
 import FCSVTT from '../assets/js/fcsVTT'
 import Models from '../assets/js/models';
@@ -234,14 +243,14 @@ export default {
       canvas: null,     
       showchat: true,
       chatMessage: "",
-      peerReceiver: null,
-      peerSender: null,  
+      gameServer: null,
+      gameClient: null,  
       saveInProgress: false,
       fullScreen: false,
       editingScene: false,
-      isUpdating: false,
-      isConnected: false,
-      selectedPlayer: "everyone"
+      isUpdating: false,      
+      selectedPlayer: "everyone",
+      connectedPlayers: null,
     }
   },
   computed: {
@@ -260,14 +269,20 @@ export default {
       return commonSvc;
     },
     userName() {
-      return this.getPlayer(this.userId).username;
+      if (this.getPlayer(this.userId)) {
+        return this.getPlayer(this.userId).username;
+      }
+      else return "";
     },
     isHost() {      
       return this.scene.owner_id == this.userId;
     },
     isSceneRunning() {
       return this.scene.isrunning;
-    }    
+    },
+    isConnected() {      
+      return this.gameClient && this.gameClient.peer && this.gameClient.peer.open;
+    }
   },
   methods: {
     init() {
@@ -320,23 +335,44 @@ export default {
             break;          
           case "disconnected":
             //server disconnected
-            this.sendSystemMessage("Game server has disconnected!");
+            this.sendSystemMessage("Game server disconnected!");
+            this.exitGame();
             break;
         }
       }, false);
 
-      document.addEventListener('userconnected', (e) => {
-        this.peerSender.join(this.userName);               
-        this.isConnected = true;
+      document.addEventListener('mediacontrol', (e) => {        
+        let playerId = e.detail.playerId;
+        let action = e.detail.type;
+
+        switch(action) { 
+          case "mute":       
+            this.gameClient.myStream.getAudioTracks()[0].enabled = false;
+            break;
+          case "unmute":
+            this.gameClient.myStream.getAudioTracks()[0].enabled = true;
+            break;
+          case "pause":            
+            this.gameClient.myStream.getVideoTracks()[0].enabled = false;
+            break;
+          case "play":
+            this.gameClient.myStream.getVideoTracks()[0].enabled = true;
+            break;
+        }          
+      });
+
+      document.addEventListener('userconnected', (e) => {        
+        this.gameClient.join(this.userName);        
       }, false);
 
       document.addEventListener('userjoined', (e) => {
-        this.updatePlayer("lastPeerId", this.peerSender.peer.id);
+        this.updatePlayer("lastPeerId", this.gameClient.peer.id);
       }, false);
 
-      document.addEventListener('userdisconnected', (e) => {
-        this.isConnected = false;
-        this.peerSender.displayChatMessage({ "username": "System", "message": "You have diconnected..." });
+      document.addEventListener('userdisconnected', (e) => {        
+        if (this.gameClient) {
+          this.gameClient.displayChatMessage({ "username": "System", "message": `${e.detail.player.userName} disconnected...` });
+        }
       }, false);
       
       document.addEventListener('sceneupdate',  (e) => {        
@@ -369,24 +405,54 @@ export default {
     },
     startGame() {
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
-      this.peerReceiver = new PeerReceiver();
-      this.peerReceiver.initialize();
+      this.gameServer = new GameServer();
+      this.gameServer.initialize();
     },
     stopGame() {
       if (this.isHost)
       {
-        this.peerReceiver.endScene();
+        this.gameServer.endScene();
       }
     },
     joinGame() {      
-      const peerId = this.scene.gamePeerId;
-      this.peerSender = new PeerSender(peerId);
-      this.peerSender.initialize();       
+      const gameServerId = this.scene.gamePeerId;
+      this.gameClient = new GameClient(gameServerId, this.userId, this.userName, this.isHost);
+      this.gameClient.initialize();      
     },
-    exitGame() {
-      this.peerSender.conn.close();
-      this.peerSender.peer = null;
-      this.isConnected = false;
+    exitGame() {      
+      if (!this.gameClient) return;
+
+      for (let conn = 0; conn < this.gameClient.mediaConnections.length; conn++) {
+          let mediaStream = this.gameClient.mediaConnections[conn];                      
+          mediaStream.close();
+      }
+
+      for (let conn = 0; conn < this.gameClient.connections.length; conn++) {
+          let chatConnection = this.gameClient.connections[conn];
+          chatConnection.close();
+      }
+      
+      this.gameClient.cleanupConnections();
+
+      //remove all the player media containers
+      document.getElementById("video-container").innerHTML = "";
+
+      //stop my stream
+      try {
+        this.gameClient.myStream.getAudioTracks()[0].stop();        
+      }catch(e) {
+        console.log(e.message);
+      }
+      try {
+        this.gameClient.myStream.getVideoTracks()[0].stop();
+      }catch(e) {
+        console.log(e.message);
+      }
+         
+      //close all streams      
+      if (this.gameClient.peer) this.gameClient.peer.destroy();
+      this.gameClient.peer = null;
+      this.gameClient.myStream = null;
     },
     updatePlayer(key, value)
     {
@@ -505,8 +571,8 @@ export default {
         return;
       }
 
-      if (!this.isLoading && this.peerSender && this.peerSender.peer.open) {
-        this.peerSender.updateScene(this.scene, this.peerSender.peer.id);
+      if (!this.isLoading && this.gameClient && this.gameClient.peer && this.gameClient.peer.open) {
+        this.gameClient.updateScene(this.scene);
       }      
     },     
     addZone() {
@@ -546,20 +612,20 @@ export default {
       this.$set(this.campaign, "slug", slug);
     },
     sendSystemMessage(message) {
-      this.peerReceiver.displayChatMessage(message);     
+      this.gameServer.displayChatMessage(message);     
     },
     sendChatMessage() {
       if (!this.chatMessage) return;      
       
-      if (this.peerSender) {
+      if (this.gameClient) {
         if (this.selectedPlayer !== "everyone") {
           let player = this.scene.players.find(obj => {
             return obj.id === this.selectedPlayer
           });          
-          this.peerSender.sendPrivateMessage(this.userName, player, this.chatMessage);          
+          this.gameClient.sendPrivateMessage(this.userName, player, this.chatMessage);          
         }
         else {
-          this.peerSender.sendChatMessage(this.userName, this.chatMessage);          
+          this.gameClient.sendChatMessage(this.userName, this.chatMessage);          
         }
         this.chatMessage = "";
       }
@@ -577,8 +643,8 @@ export default {
     sendFormattedChat(e) {
       if (e.data.type !== "charactersheet") return;
       let msg = e.data.data;
-      if (this.peerSender) {
-        this.peerSender.sendChatMessage(this.userName, msg);
+      if (this.gameClient) {
+        this.gameClient.sendChatMessage(this.userName, msg);
       } else {
         this.sendLocalChat(msg);
       }
@@ -662,6 +728,9 @@ export default {
       event.preventDefault();
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
     },
+    mediaControl(){
+
+    }
   },
 }
 </script>
