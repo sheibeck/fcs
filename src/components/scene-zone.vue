@@ -146,7 +146,7 @@ export default {
     }
   },
   methods: {
-    init() {         
+    init() {
     },    
     makeGameObject(result, type) {
       if (!result) return;
@@ -156,6 +156,19 @@ export default {
       result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
       result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");
       result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");         
+            
+      let stuntArray = this.convertThingToGameObject(result.stunts, type, "STUNTEXTRA");
+      result.stunts = null;
+      let extrasArray = this.convertThingToGameObject(result.extras, type, "STUNTEXTRA");
+      result.extras = null;
+
+      result.stuntextras = new Array();      
+      if (stuntArray) {
+        result.stuntextras = result.stuntextras.concat(stuntArray);
+      }
+      if (extrasArray) {
+        result.stuntextras = result.stuntextras.concat(extrasArray);
+      }
 
       this.zone.sceneobjects.push(result);
     },    
@@ -217,6 +230,9 @@ export default {
 
       let gameObject = new Array();
 
+      //only show aspects for characters. We want to drive playes to use the sheets
+      if (thing == "CHARACTER" && type !== "ASPECT") return;
+
       switch(type) {        
         case "ASPECT":
           for (let [key, value] of Object.entries(array)) {
@@ -256,11 +272,36 @@ export default {
             gameObject.push(consequence);
           }
           break;
-        case "SKILL":          
+        case "SKILL":
           for (let [key, value] of Object.entries(array)) {            
             let skill = models.SceneSkill(parseInt(value) ? key : value, parseInt(key) ? value : key, type);
             gameObject.push(skill);
           }
+          break;
+        case "STUNTEXTRA":          
+          //character stunts/extras are string, so attempt to parse them
+          if (thing == "CHARACTER") {        
+            let items = array.split('\n');
+            items.forEach(item => {
+              let stuntextra = null;
+              var tempItem = item.split(":");
+              if (tempItem.length > 1) {
+                stuntextra = models.SceneStuntExtra(tempItem[0], tempItem[1], type);
+              }
+              else {
+                stuntextra = models.SceneStuntExtra(tempItem, "Stunt/extra effect" , type);
+              }
+              gameObject.push(stuntextra);
+            })
+          }
+          else {
+            //adversaries are already an array
+            for (let [key, value] of Object.entries(array)) {            
+              let stuntextra = models.SceneStuntExtra(key, value, type);
+              gameObject.push(stuntextra);
+            }
+          }
+
           break;
       };
 

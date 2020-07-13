@@ -5,11 +5,15 @@
       {{getThing}}
     </div>
     <div v-show="editing">
-      <div class="input-group">  
+      <div class="input-group" v-if="!type">  
         <input class="form-control-sm" ref="editor" v-model="object[item]" @keyup.enter="toggleEdit()" />
         <div class="input-group-append">
             <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
         </div>
+      </div>
+      <div class="input-group d-flex flex-column" v-if="type=='textarea'">
+        <textarea class="w-100" rows="3" ref="editor" v-model="object[item]" />
+        <button type="button" class="" @click="editing = false"><i class="fas fa-check-circle text-success"></i> Save</button>        
       </div>
     </div>
   </div>
@@ -23,7 +27,8 @@ export default {
     object: Object,
     item: String,
     label: String,
-    canedit: Boolean
+    canedit: Boolean,
+    type: String,
   },
   data () {
     return { 

@@ -90,6 +90,10 @@ export default class Models {
         return {id:this.commonSvc.GenerateUUID(), used: false}
     }
 
+    SceneStuntExtra = (name, value, type) => {
+        return {id: this.commonSvc.GenerateUUID(), name: name || "Stunt/Extra", value: value || "Stunt/extra effect", object_type: type };
+    }
+
     SceneNPC = () => {
         return  {
             "stress": [],

@@ -139,7 +139,7 @@ export default class GameClient {
         let videoSettings = true;
         let audioSettings = true;
 
-        const debugging = false;
+        const debugging = true;
         if (`${process.env.NODE_ENV}` === "development" && debugging)
         {          
           if (window.location.host == "localhost:8080")

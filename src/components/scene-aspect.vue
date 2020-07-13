@@ -38,7 +38,7 @@ export default {
     }
   },
   methods: {  
-    getColor(aspect) {  
+    getColor(aspect) { 
       switch(aspect.object_type) {
         case "CHARACTER":
         case "ADVERSARY":
