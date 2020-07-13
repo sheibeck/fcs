@@ -7,6 +7,7 @@ export default class GameClient {
     connections = new Array();    
     mediaConnections = new Array();
     myStream = null;
+    maxReconnectRetries = 3;
 
     constructor(gameId, playerId, userName, isHost) {
         this.peer = null;         
@@ -67,10 +68,9 @@ export default class GameClient {
         });
 
         this.peer.on('disconnected', () => {            
-           console.log('Connection lost. Please reconnect');
-
-           let event = new CustomEvent('userdisconnected', { detail: { type: "disconnected", player: { userName: "You"} } });
-           document.dispatchEvent(event);        
+            console.log('Player connection lost.');        
+            let event = new CustomEvent('userdisconnected', { detail: { type: "disconnected", player: { userName: "You"} } });
+            document.dispatchEvent(event);
         });
         this.peer.on('close', () => {            
             this.conn = null;
@@ -151,7 +151,7 @@ export default class GameClient {
           }                  
         }
 
-        let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;        
         await getUserMedia({ 
                 audio: audioSettings,
                 video: videoSettings,   
@@ -248,7 +248,8 @@ export default class GameClient {
         let userName = player.userName;
         
         let videoContainer = document.getElementById("video-container");
-        if (videoElem == null) {            
+        let playerContainer = document.getElementById(id)
+        if (playerContainer == null) {
             var vidTemplate = `
                 <div id="${id}" class="mr-1">
                     <div class="bg-light text-center d-flex">
@@ -264,7 +265,7 @@ export default class GameClient {
                 </div>`;
                 videoContainer.insertAdjacentHTML('beforeend', vidTemplate);
         }
-        let videoElem = document.getElementById(id).getElementsByTagName("video")[0];
+        let videoElem = document.getElementById(id).getElementsByTagName("video")[0];        
         return videoElem;
     }
 

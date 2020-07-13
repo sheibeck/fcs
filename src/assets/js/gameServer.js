@@ -4,6 +4,7 @@ export default class GameServer {
     remotePeers= new Array();// You need this to link with specific DOM element
     connections= new Array(); // This is where you manage multi-connections
     commonSvc = new CommonService();
+    maxReconnectRetries = 3;
 
     constructor(peerId) {
         this.peer = null; 
@@ -38,10 +39,9 @@ export default class GameServer {
             this.handleConnection(c);
         });
         this.peer.on('disconnected', () => {
-            console.log('Connection lost. Please reconnect');
-                        
+            console.log('Server disconnected.');
             var event = new CustomEvent('gameserver', { detail: { type: "disconnected", state: false } });
-            document.dispatchEvent(event);
+            document.dispatchEvent(event);            
         });
         this.peer.on('close', () => {
             this.conn = null;
