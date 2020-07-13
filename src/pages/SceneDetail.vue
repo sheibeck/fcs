@@ -44,9 +44,8 @@
   /deep/ #video-container {
     position: absolute;
     bottom: 0;
-
-    video {
-      margin-left: 5px;      
+    
+    video {      
       height: 100px;  
       -webkit-transform: scaleX(-1);
       transform: scaleX(-1);    
@@ -123,8 +122,7 @@
       </div>
     </div>
 
-    <div id="video-container">      
-      <video id="my-camera" />
+    <div id="video-container" class="" :class="{'d-none': !isConnected, 'd-flex': isConnected}">      
     </div>
 
     <!-- add scene object -->
@@ -269,7 +267,10 @@ export default {
       return commonSvc;
     },
     userName() {
-      return this.getPlayer(this.userId).username;
+      if (this.getPlayer(this.userId)) {
+        return this.getPlayer(this.userId).username;
+      }
+      else return "";
     },
     isHost() {      
       return this.scene.owner_id == this.userId;
@@ -332,7 +333,7 @@ export default {
             break;          
           case "disconnected":
             //server disconnected
-            this.sendSystemMessage("Game server has disconnected!");
+            this.sendSystemMessage("Game server disconnected!");
             this.exitGame();
             break;
         }
@@ -346,10 +347,9 @@ export default {
         this.updatePlayer("lastPeerId", this.gameClient.peer.id);
       }, false);
 
-      document.addEventListener('userdisconnected', (e) => {
-        debugger;
+      document.addEventListener('userdisconnected', (e) => {        
         if (this.gameClient) {
-          this.gameClient.displayChatMessage({ "username": "System", "message": `${e.detail.player.username} has disconnected...` });
+          this.gameClient.displayChatMessage({ "username": "System", "message": `${e.detail.player.userName} disconnected...` });
         }
       }, false);
       
@@ -401,13 +401,7 @@ export default {
       if (!this.gameClient) return;
 
       for (let conn = 0; conn < this.gameClient.mediaConnections.length; conn++) {
-          let mediaStream = this.gameClient.mediaConnections[conn];
-          
-          //remove the video element
-          let vidElem = document.getElementById(mediaStream.peer);
-          if (vidElem)
-              vidElem.parentNode.removeChild(vidElem);
-            
+          let mediaStream = this.gameClient.mediaConnections[conn];                      
           mediaStream.close();
       }
 
@@ -417,6 +411,9 @@ export default {
       }
       
       this.gameClient.cleanupConnections();
+
+      //remove all the player media containers
+      document.getElementById("video-container").innerHTML = "";
 
       //stop my stream
       try {
@@ -429,9 +426,7 @@ export default {
       }catch(e) {
         console.log(e.message);
       }
-      let myCamera = document.getElementById("my-camera");
-      myCamera.srcObject = null;
-     
+         
       //close all streams      
       if (this.gameClient.peer) this.gameClient.peer.destroy();
       this.gameClient.peer = null;

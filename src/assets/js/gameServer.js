@@ -81,7 +81,8 @@ export default class GameServer {
     handlePlayerDisconnect(conn) {
         console.log(`Peer ${conn.peer} disconnected.`);        
         this.remotePeers = this.remotePeers.filter( rc => rc.peerId !== conn.peer );
-        this.connections = this.connections.filter( rc => rc.connectionId !== conn.connectionId );                                
+        this.connections = this.connections.filter( rc => rc.connectionId !== conn.connectionId );   
+                                 
         var event = new CustomEvent('userdisconnected', { detail: { type: "disconnected", player: conn.metadata } });
         document.dispatchEvent(event);
 
