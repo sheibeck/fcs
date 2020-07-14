@@ -1,24 +1,19 @@
 <template>
-  <div class="pl-1 ml-1 badge" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">     
-    <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>      
-    <span title="Click to edit" v-if="!editing" @click="editing = true" style="white-space: pre-wrap" class="text-left">{{aspect.name}}</span>
-
-    <div v-if="editing">
-      <div class="input-group">  
-        <textarea class="form-control-sm" v-model="aspect.name"></textarea>
-        <div class="input-group-append">
-            <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
-        </div>
-      </div>    
+  <div class="pl-1 ml-1" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">
+    <div class="d-flex">
+      <span class="dice fo20" v-on:click="sendToVTT()">C</span>     
+      <editableinput :object="aspect" item="name" class="font-weight-bold pr-1 mr-auto" />
+          
+      <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
     </div>
-
-    <invoke :invokes="aspect.invokes" />
+    <invoke :invokes="aspect.invokes" class="mx-2 mr-auto" />
   </div>
 </template>
 
 <script>
 import SceneInvoke from './scene-invoke';
 import CommonService from '../assets/js/commonService';
+import SceneEditableInput from './scene-editable-input';
 
 export default {
   name: 'SceneAspect',
@@ -28,6 +23,7 @@ export default {
   },
   components: {
     invoke: SceneInvoke,
+    editableinput: SceneEditableInput, 
   },
   computed: {    
   },
@@ -43,10 +39,14 @@ export default {
         case "CHARACTER":
         case "ADVERSARY":
         case "NPC":
-          return "badge-light";
+          return "small";
         default:
-          return "badge-warning";
+          return "badge badge-warning";
       }
+    },
+    sendToVTT() {
+      let characterName = this.$parent.objectdata.name;
+      this.$parent.$parent.$parent.$parent.sendToVTT('aspect',this.aspect.name, this.aspect.value, 'aspect', characterName);
     },  
     removeAspect() {      
       let $component = this;      
