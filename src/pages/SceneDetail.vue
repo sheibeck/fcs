@@ -723,7 +723,7 @@ export default {
       }
     },
     sendToVTT(type, description, data, data2, character) {
-      let msg=null;      
+      let msg=null;            
       switch(type) {
         case "diceroll":               
           let rollModifier = parseInt(data);  //try to match it straight up
