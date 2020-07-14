@@ -8,15 +8,21 @@ export default class GameClient {
     mediaConnections = new Array();
     myStream = null;
     maxReconnectRetries = 3;
+    mediaSettings = { 
+        useVideo: true, 
+        useAudio: true, 
+        videoDevice: null, 
+        audioDevice: null,        
+    };
+    userName = null;
 
-    constructor(gameId, playerId, userName, isHost) {
+    constructor(gameId, playerId, isHost) {
         this.peer = null;         
         this.conn = null;
         this.gameId = gameId;
         this.lastPeerId = null;
         this.isHost = isHost;
-        this.playerId = playerId;
-        this.userName = userName;
+        this.playerId = playerId;        
     }
 
     initialize = () => {
@@ -88,7 +94,10 @@ export default class GameClient {
      * Sets up callbacks that handle any events related to the
      * connection and data received on it.
      */
-    join = async (username) => {
+    join = async (username, mediaSettings) => {
+        this.mediaSettings = mediaSettings;
+        this.userName = username;
+
         // Close old connection
         if (this.conn) {
             this.conn.close();
@@ -130,38 +139,37 @@ export default class GameClient {
         await this.startLocalMedia();
     } 
 
-    async startLocalMedia() {        
+    async startLocalMedia() {
         const usbcamera = "4c3d1367c73f62297322c127b73008d56d60b714025d46ce3944f296498d7b7b"
         const usbmic = "27c67373401df8a0adaeb3cb3cbacb8629eac9569f4172d4002bd03d8aca29a2"
         const integratedcamera = "7fd5e26b38ce25a9afcda31d01fc21d9757e29c7f05b87159e56edcd2e971221";
         const integratedmic = "3cb36dccda7b356477126cd13e4e3178e0279bc1a5dab3bac19854282980ee86"
 
-        let videoSettings = true;
-        let audioSettings = true;
+        let videoSettings = this.mediaSettings.useVideo;
+        let audioSettings = this.mediaSettings.useAudio;
 
-        const debugging = false;
-        if (`${process.env.NODE_ENV}` === "development" && debugging)
-        {          
-          if (window.location.host == "localhost:8080")
-          {
-            videoSettings = {
-                deviceId: { exact: this.isHost ?  integratedcamera : usbcamera }
-            } 
-            audioSettings = false;
-          }                  
-        }
+        //if we aren't showing audio or video then render the players
+        if (!videoSettings && !audioSettings) {
+            return;
+        }        
+
+        //find audio/video constraints. If we don't find any exact IDs then we set to true 
+        // and it will use the system defaults
+        const audioSource = this.mediaSettings.microphoneDevice == "default" ? null : this.mediaSettings.microphoneDevice;
+        const videoSource = this.mediaSettings.videoDevice == "default" ? null : this.mediaSettings.videoDevice;
+        const constraints = {
+            audio: (!audioSource || !audioSettings) ? audioSettings : {deviceId: audioSource ? {exact: audioSource} : undefined},
+            video: (!videoSource || !videoSettings) ? videoSettings : {deviceId: videoSource ? {exact: videoSource} : undefined}
+        };
 
         let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;        
-        await getUserMedia({ 
-                audio: audioSettings,
-                video: videoSettings,   
-            }, 
+        await getUserMedia(constraints, 
             (stream) => {
                 this.myStream = stream;                
                 this.onReceiveStream(stream, this.playerId);
 
                 //now that you are connected call any other players                
-                this.players.forEach( (player) => {                                
+                this.players.forEach( (player) => {                      
                     //if not connect to a player and the player isn't me then start a media connection                    
                     if (player.peerId !== this.peer.id && !(player.peerId in this.mediaConnections)) {
                         this.handleRemoteMediaConnection(player);
@@ -206,7 +214,7 @@ export default class GameClient {
             }
         }
        
-        let videoElem = this.createVideoElement(player);           
+        let videoElem = this.createMediaElements(player);           
        
         // Set the given stream as the video source 
         videoElem.srcObject = stream;
@@ -243,29 +251,12 @@ export default class GameClient {
         this.connections = this.connections.filter( conn => conn.open == true );        
     }
     
-    createVideoElement(player) {        
-        let id = this.commonSvc.GetPlayerIdForDom(player.playerId);
-        let userName = player.userName;
+    createMediaElements(player) {        
+        let id = this.commonSvc.GetPlayerIdForDom(player.playerId);    
+        var vidTemplate = `<video></video>`            
+        document.getElementById(id).insertAdjacentHTML('beforeend', vidTemplate);
         
-        let videoContainer = document.getElementById("video-container");
-        let playerContainer = document.getElementById(id)
-        if (playerContainer == null) {
-            var vidTemplate = `
-                <div id="${id}" class="mr-1">
-                    <div class="bg-light text-center d-flex">
-                        <div class="mr-auto">${userName}</div>
-                        <div class="media-controls small pt-1 text-right">
-                            <i class="fas fa-microphone" data-id="${id}" data-action="mute" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none'); document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                            <i class="fas fa-microphone-slash d-none" data-id="${id}" data-action="unmute" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                            <i class="far fa-pause-circle" data-id="${id}" data-action="pause" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                            <i class="fas fa-play-circle d-none" data-id="${id}" data-action="play" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                        </div>
-                    </div>
-                    <video></video>
-                </div>`;
-                videoContainer.insertAdjacentHTML('beforeend', vidTemplate);
-        }
-        let videoElem = document.getElementById(id).getElementsByTagName("video")[0];        
+        let videoElem = document.getElementById(id).getElementsByTagName("video")[0];
         return videoElem;
     }
 
@@ -282,7 +273,32 @@ export default class GameClient {
 
     handlePlayersUpdate(data) {
         if (!this.peer) return;
-        this.players = data.message;      
+        this.players = data.message;
+        
+        //render player names so we know who is logged in        
+        this.players.forEach( (player) => {                      
+                        
+            let id = this.commonSvc.GetPlayerIdForDom(player.playerId);
+            let userName = player.userName;
+            
+            let playerContainer = document.getElementById("player-container");
+            let playerElem = document.getElementById(id)
+            if (playerElem == null) {
+                var playerTemplate = `
+                    <div id="${id}" class="mr-1">
+                        <div class="userheader bg-light text-center d-flex">
+                            <div class="mr-auto">${userName}</div>
+                            <div class="media-controls small pt-1 text-right">
+                                <i class="fas fa-microphone ${this.mediaSettings.useAudio == "false" ? "d-none" : "" }" data-id="${id}" data-action="mute" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none'); document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i class="fas fa-microphone-slash d-none" data-id="${id}" data-action="unmute" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i class="far fa-pause-circle ${this.mediaSettings.useVideo == "false" ? "d-none" : "" }" data-id="${id}" data-action="pause" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i class="fas fa-play-circle d-none" data-id="${id}" data-action="play" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                            </div>
+                        </div>                       
+                    </div>`;
+                playerContainer.insertAdjacentHTML('beforeend', playerTemplate);
+            }     
+        });
     };
 
     handleRemoteMediaConnection = (player) => {
