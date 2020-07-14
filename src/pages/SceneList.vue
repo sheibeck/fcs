@@ -94,7 +94,7 @@ export default {
     },
     slugify: function() {
       return this.scenes.map(function(item) {
-          return '/scene/' + commonSvc.GetId(item.id) + '/' + commonSvc.Slugify(item.name);
+          return '/scene/' + commonSvc.GetId(item.id);
       });
     },
     ...mapGetters([

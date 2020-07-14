@@ -609,7 +609,7 @@ export default {
             if (suppressMessage !== true || isNew) {
               commonSvc.Notify('Scene saved.', 'success', null, () => {;
                 if (isNew) {
-                  location.href = '/scene/' + commonSvc.GetId($component.scene.id) + '/' + $component.scene.slug;
+                  location.href = '/scene/' + commonSvc.GetId($component.scene.id);
                 }
               });
             }
@@ -714,7 +714,8 @@ export default {
       }
     },   
     setupGameServer(e) {
-      this.scene.isrunning = true;
+      this.$set(this.scene, "isrunning", true);
+      //this.scene.isrunning = true;
       if (this.scene.gamePeerId !== e.detail.peerid)
       {
         this.scene.gamePeerId = e.detail.peerid;        
@@ -790,8 +791,7 @@ export default {
       this.sendToVTT("fatepoint", `${msg} a fate point`, msg == "Gained" ? 1 : 0, null, "The Storyteller");
       this.scene.fatepoints = newValue;
     },
-    updateOnlineSettings(event) {
-      debugger;
+    updateOnlineSettings(event) {      
       //users can't save the scene, so store some settings
       localStorage.setItem('fcs_useAudio', this.mediaSettings.useAudio);
       localStorage.setItem('fcs_useVideo', this.mediaSettings.useVideo);
