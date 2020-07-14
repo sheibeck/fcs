@@ -3,10 +3,11 @@
     <div class="d-flex">
       <span class="dice fo20" v-on:click="sendToVTT()">C</span>     
       <editableinput :object="aspect" item="name" class="font-weight-bold pr-1 mr-auto" />
-          
+      
+      <invoke :invokes="aspect.invokes" class="mx-2" />
+      
       <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
-    </div>
-    <invoke :invokes="aspect.invokes" class="mx-2 mr-auto" />
+    </div>    
   </div>
 </template>
 
@@ -46,7 +47,7 @@ export default {
     },
     sendToVTT() {
       let characterName = this.$parent.objectdata.name;
-      this.$parent.$parent.$parent.$parent.sendToVTT('aspect',this.aspect.name, this.aspect.value, 'aspect', characterName);
+      this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, this.aspect.name, null , characterName);
     },  
     removeAspect() {      
       let $component = this;      
