@@ -41,7 +41,7 @@
     }
   }
 
-  /deep/ #video-container {
+  /deep/ #player-container {
     position: absolute;
     bottom: 0;
     
@@ -108,7 +108,7 @@
           <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
           <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
           <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>                    
-          <button v-if="isHost" type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
+          <button type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
           <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Game Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
           <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-broom"></i></button>
         </div>
@@ -117,9 +117,9 @@
           </div>
           <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1"></textarea>
           <div class="d-flex mt-1">
-            <select type="button" v-model="selectedPlayer" class="form-control mr-1">
+            <select v-model="selectedPlayer" class="form-control mr-1">
               <option value="everyone">Everyone</option>
-              <option v-for="player in this.scene.players" :key="player.id" :value="player.id">{{player.username}}</option>              
+              <option v-for="player in this.scene.players" :key="player.id" :value="player.id">{{player.username}}</option>
             </select>
             <button type="button" class="btn btn-secondary btn-sm mr-1" @click="sendChatMessage()">Send</button>
             <button title="Roll 4df" type="button" class="btn btn-info btn-sm" @click="rollFateDice()"><span class="dice">+</span></button>
@@ -128,7 +128,7 @@
       </div>
     </div>
 
-    <div id="video-container" class="" :class="{'d-none': !isConnected, 'd-flex': isConnected}">     
+    <div id="player-container" class="" :class="{'d-none': !isConnected, 'd-flex': isConnected}">     
      
     </div>
 
@@ -143,10 +143,35 @@
             </button>
           </div>
           <div class="modal-body">
-            <editableinput :object="scene" item="name" :canedit="isHost" class="" label="Scene Name:" />
-            <editableinput v-if="getPlayer(userId)" :object="getPlayer(userId)" item="username" label="Username:" />
-            <label>Scene Description:</label>
-            <textarea rows=3 class="form-control" v-model="scene.description"></textarea>
+            <div id="Host-Settings" v-if="isHost">
+              <editableinput v-if="isHost" :object="scene" item="name" :canedit="isHost" class="" label="Scene Name:" />            
+              <label>Scene Description:</label>
+              <textarea rows=3 class="form-control" v-model="scene.description"></textarea>
+              <hr />
+            </div>
+            <editableinput v-if="getPlayer(userId)" :object="getPlayer(userId)" item="username" label="Username:" showEditIcon=true />
+            <div>
+              <input type="checkbox" id="usevideo" v-model="mediaSettings.useVideo" 
+                  @change="updateOnlineSettings($event)" /> Use video when playing online
+            </div>
+            <div>
+              <input type="checkbox" id="useaudio" v-model="mediaSettings.useAudio" 
+                  @change="updateOnlineSettings($event)" /> Use audio when playing online
+            </div>
+            <div>
+              <label>Video Device</label>
+              <select :value="getSelectedVideoDevice" @change="selectMediaDevice($event, 'video')" class="form-control">
+                <option value="default">System Default</option>
+                <option v-for="device in this.videoDevices" :key="device.id" :value="device.deviceId">{{device.label}}</option>
+              </select>
+            </div>            
+            <div>
+              <label>Microphone</label>
+              <select :value="getSelectedMicrophoneDevice" @change="selectMediaDevice($event, 'microphone')" class="form-control">
+                <option value="default">System Default</option>              
+                <option v-for="device in this.microphoneDevices" :key="device.id" :value="device.deviceId">{{device.label}}</option>
+              </select>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>            
@@ -222,15 +247,17 @@ export default {
     scene: {
       // This will let Vue know to look inside the array
       deep: true,
-      // We have to move our method to a handler field
+      
+      //give some delay to account for users typing and such before we broadcast scene changes
       handler: debounce(function() {
         if (!this.isLoading) {
           if (this.scene.isrunning) {
             this.broadCastSceneChange();
           }
 
+          //only the hose can save changes, so when it receives a broacast, save the scene
           if (this.isHost) {            
-            this.saveScene(true); //make sure that host still saves things if the game isn't actively running.
+            this.saveScene(true); 
           }
         }
       }, 300)
@@ -257,6 +284,14 @@ export default {
       isUpdating: false,      
       selectedPlayer: "everyone",
       connectedPlayers: null,
+      mediaSettings: {
+        useVideo: localStorage.getItem('fcs_useVideo') ? (localStorage.getItem('fcs_useVideo') == "true" ? true : false) : true,
+        useAudio: localStorage.getItem('fcs_useAudio') ? (localStorage.getItem('fcs_useAudio') == "true" ? true : false) : true,
+        videoDevice: localStorage.getItem('fcs_videoDevice') ?? null,        
+        microphoneDevice: localStorage.getItem('fcs_microphoneDevice') ?? null,
+      },
+      videoDevices: new Array(),      
+      microphoneDevices: new Array(),
     }
   },
   computed: {
@@ -288,6 +323,12 @@ export default {
     },
     isConnected() {      
       return this.gameClient && this.gameClient.peer && this.gameClient.peer.open;
+    },
+    getSelectedVideoDevice() {      
+      return this.mediaSettings.videoDevice ?? "default";
+    },    
+    getSelectedMicrophoneDevice() {
+      return this.mediaSettings.microphoneDevice ?? "default";
     }
   },
   methods: {
@@ -302,6 +343,22 @@ export default {
       panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);     
       this.canvas = panzoom;
       this.loading = false;
+
+      navigator.mediaDevices.enumerateDevices()
+      .then( (devices) => {        
+        devices.forEach( (device) => {
+          if (device.kind == "audioinput") {
+            this.microphoneDevices.push(device);
+          }
+
+          if (device.kind == "videoinput") {
+            this.videoDevices.push(device);
+          }
+        });
+      })
+      .catch(function(err) {
+        console.log(err.name + ": " + err.message);
+      });
     },      
     setupScene(userId) {
       if (this.userId == "public") {
@@ -311,20 +368,14 @@ export default {
 
       this.sceneId = commonSvc.SetId("SCENE", fcs.$route.params.id);
       
-      this.getScene(this.userId, this.sceneId);      
-      
-      $(document).on('show.bs.modal', '#modalDeleteSessionConfirm', function (event) {
-        var button = $(event.relatedTarget) // Button that triggered the modal
-        var id = button.data('id') // Extract info from data-* attributes
-        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-        var modal = $(this);
-        $(modal.find('.js-delete')).data('id', id);
-      });
+      this.getScene(this.userId, this.sceneId);     
             
       //hide the footer for a better game table experience
       document.getElementsByTagName("footer")[0].className += " d-none";
 
+      this.attachListeners();
+    },
+    attachListeners() {
       document.addEventListener('gameserver', (e) => {
         //if the gameserver is running then setup the game
         switch(e.detail.type) {
@@ -368,7 +419,7 @@ export default {
       });
 
       document.addEventListener('userconnected', (e) => {        
-        this.gameClient.join(this.userName);        
+        this.gameClient.join(this.userName, this.mediaSettings);
       }, false);
 
       document.addEventListener('userjoined', (e) => {
@@ -400,11 +451,7 @@ export default {
           this.scene.isrunning = false;    
         }
       }, false); 
-      
-      document.addEventListener('charactersheet', (e) => {
-        
-      }, false);
-
+     
       window.addEventListener("message",  (e) => {        
         this.sendFormattedChat(e);
       }, false);
@@ -441,7 +488,7 @@ export default {
       this.gameClient.cleanupConnections();
 
       //remove all the player media containers
-      document.getElementById("video-container").innerHTML = "";
+      document.getElementById("player-container").innerHTML = "";
 
       //stop my stream
       try {
@@ -742,7 +789,28 @@ export default {
       let msg = parseInt(newValue) > (parseInt(this.scene.fatepoints || 0)) ? "Gained" : "Spent";      
       this.sendToVTT("fatepoint", `${msg} a fate point`, msg == "Gained" ? 1 : 0, null, "The Storyteller");
       this.scene.fatepoints = newValue;
-    }
+    },
+    updateOnlineSettings(event) {
+      debugger;
+      //users can't save the scene, so store some settings
+      localStorage.setItem('fcs_useAudio', this.mediaSettings.useAudio);
+      localStorage.setItem('fcs_useVideo', this.mediaSettings.useVideo);
+    },
+    selectMediaDevice(event, type) {
+      let selectedValue = event.target.value;
+            
+      switch(type) {
+        case "video":
+          localStorage.setItem('fcs_videoDevice', selectedValue);  
+          this.mediaSettings.videoDevice = selectedValue;
+          break;       
+        case "microphone":         
+          localStorage.setItem('fcs_microphoneDevice', selectedValue);  
+          this.mediaSettings.microphoneDevice = selectedValue;          
+          break;
+      }
+      
+    }   
   },
 }
 </script>
