@@ -620,7 +620,11 @@ export default {
             $component.$set($component.scene, "id", `SCENE|${commonSvc.GenerateUUID()}`);
             $component.$set($component.scene, "owner_id", this.userId);
         }
-    
+
+        //make a searchable list of players        
+        this.scene.playerList = this.scene.players.map(p => p.playerId);
+        this.scene.playerList = this.scene.playerList.filter(p => p !== this.userId);
+            
         dbSvc.SaveObject($component.scene).then( (response) => {
           if (response) {
             if (suppressMessage !== true || isNew) {
