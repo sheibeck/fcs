@@ -231,7 +231,7 @@ export default {
       let gameObject = new Array();
 
       //only show aspects for characters. We want to drive playes to use the sheets
-      if (thing == "CHARACTER" && type !== "ASPECT") return;
+      if (thing == "CHARACTER" && (type !== "ASPECT" && type !== "CONSEQUENCE" && type !== "CONDITION") ) return;
 
       switch(type) {        
         case "ASPECT":

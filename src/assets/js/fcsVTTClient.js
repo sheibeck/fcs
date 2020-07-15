@@ -23,10 +23,10 @@ export default class FCSVTTClient {
                 };                
                 console.log(chatMessage);
                 break;
-            case "invoke":                
+            case "invoke":                           
                 chatMessage = {
                     character: msg.character, 
-                    action: "Invoked an aspect", 
+                    action: "Invoked",
                     description: msg.aspect
                 };     
                 break;

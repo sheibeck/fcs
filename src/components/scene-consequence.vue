@@ -1,5 +1,6 @@
 <template>
-  <div class="pl-1 ml-1">
+  <div class="pl-1 ml-1 small">
+    <span class="dice fo20" v-on:click="sendToVTT()">C</span>
     <span title="Click to edit" v-if="!editing" @click="editing = true">{{consequence.name.toTitleCase()}}</span>
     <invoke :invokes="consequence.invokes" class="pt-0" />
 
@@ -39,6 +40,11 @@ export default {
     }
   },
   methods: {
+    sendToVTT() {      
+      let invokerName = this.$parent.$parent.$parent.$parent.getPlayer(this.$parent.$parent.$parent.$parent.userId).userName;
+      let characterName = this.$parent.$props.objectdata.name;
+      this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.consequence.name, `(${characterName}) ${this.consequence.value}`, characterName, invokerName); 
+    },  
     removeConsequence() {
       this.$parent.objectdata.consequences = this.$parent.objectdata.consequences.filter( (obj) => {
         return obj.id !== this.consequence.id;
