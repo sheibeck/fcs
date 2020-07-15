@@ -72,7 +72,7 @@
         <input type="text" class="form-control" id="name" v-model="scene.name" placeholder="Scene Name">
       </div>
       <div class="form-group">
-        <label for="description">Example textarea</label>
+        <label for="description">Description</label>
         <textarea class="form-control" id="description" v-model="scene.description" rows="3"></textarea>
       </div>
       <button type="button" @click="saveScene()" class="btn btn-success">Create Scene</button>
@@ -621,7 +621,8 @@ export default {
             $component.$set($component.scene, "owner_id", this.userId);
         }
 
-        //make a searchable list of players        
+        //make a searchable list of players
+        if (!this.scene.players) this.scene.players = new Array();        
         this.scene.playerList = this.scene.players.map(p => p.playerId);
         this.scene.playerList = this.scene.playerList.filter(p => p !== this.userId);
             
