@@ -144,8 +144,8 @@ export default class DbService {
         //add some search parameters
         if (filter) {
             this.GetSearchFilters(filter, params);
-        }        
-             
+        }
+
         const queryAll = async (params) => {            
             let lastEvaluatedKey = 'dummy'; // string must not be empty
             const itemsAll = [];
@@ -291,6 +291,8 @@ export default class DbService {
         FilterExpression += ' OR contains (related_id, :anu)';
         FilterExpression += ' OR contains (related_id, :ant)';
 
+        FilterExpression += ' OR contains (playerList, :playerId)';        
+
         FilterExpression += ' OR slug = :anl )';
 
         
@@ -300,6 +302,7 @@ export default class DbService {
                 ':anl': searchText.toLowerCase(),
                 ':anu': searchText.toUpperCase(),
                 ':ant': searchText.toTitleCase(),
+                ':playerId': searchText,
             },
             ExpressionAttributeNames: {
                 "#object_name": "name",
