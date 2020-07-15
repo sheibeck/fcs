@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <div v-if="objectdata.conditions && objectdata.object_type != 'CHARACTER'">
+      <div v-if="objectdata.conditions">
         <div class="header d-flex">
           <span class="mr-auto">Conditions</span>
           <i title="Add condition" @click="addThingToObject('condition')" class="fas fa-plus-circle fa-sm pt-1"></i>
@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <div v-if="objectdata.consequences && objectdata.object_type != 'CHARACTER'">
+      <div v-if="objectdata.consequences">
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
           <i title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>

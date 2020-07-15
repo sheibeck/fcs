@@ -723,6 +723,9 @@ export default {
       } else {
         this.sendLocalChat(msg);
       }
+
+      var chatLog = document.getElementById("chat-log");
+      chatLog.scrollTop = chatLog.scrollHeight;
     },
     toggleFullScreen() {
       this.fullScreen = !this.fullScreen;
@@ -769,7 +772,7 @@ export default {
           break;
         case "invoke":
           if (!data) return;
-          msg = models.MsgInvoke(character, description, data);
+          msg = models.MsgInvoke(character, data2, data);
           break;
         case "stuntextra":          
           msg = models.MsgStuntExtra(character, `${description}: ${data}`);

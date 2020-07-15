@@ -1,7 +1,7 @@
 <template>
   <div class="pl-1 ml-1" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">
     <div class="d-flex">
-      <span class="dice fo20" v-on:click="sendToVTT()">C</span>     
+      <span class="dice fo20" v-on:click="sendToVTT()">C</span>
       <editableinput :object="aspect" item="name" class="font-weight-bold pr-1 mr-auto" />
       
       <invoke :invokes="aspect.invokes" class="mx-2" />
@@ -45,9 +45,24 @@ export default {
           return "badge badge-warning";
       }
     },
-    sendToVTT() {
-      let characterName = this.$parent.objectdata.name;
-      this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, this.aspect.name, null , characterName);
+    sendToVTT() {      
+      let invokerName;
+ 
+      switch(this.location)
+      {        
+        case "scene":    
+          invokerName = this.$parent.getPlayer(this.$parent.userId).userName;      
+          this.$parent.sendToVTT('invoke', this.aspect.name, `(Scene) ${this.aspect.name}`, "Scene" , invokerName);          
+          break;
+        case "zone":          
+          invokerName = this.$parent.$parent.$parent.getPlayer(this.$parent.$parent.$parent.userId).userName;
+          this.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, `(Zone) ${this.aspect.name}`, "Zone" , invokerName);          
+          break;
+        default:
+           invokerName = this.$parent.$parent.$parent.$parent.getPlayer(this.$parent.$parent.$parent.$parent.userId).userName;
+           let characterName = this.$parent.$props.objectdata.name;
+           this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, `(${characterName}) ${this.aspect.name}`, characterName, invokerName);
+      }
     },  
     removeAspect() {      
       let $component = this;      
