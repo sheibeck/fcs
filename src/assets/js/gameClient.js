@@ -26,7 +26,7 @@ export default class GameClient {
     }
 
     initialize = () => {
-        this.displayChatMessage({ "username": "System", "message": "Attempting to connect to scene..." });
+        this.displayChatMessage({ "userName": "System", "message": "Attempting to connect to scene..." });
         
         let peerId = this.commonSvc.GeneratePeerId();
 
@@ -94,9 +94,9 @@ export default class GameClient {
      * Sets up callbacks that handle any events related to the
      * connection and data received on it.
      */
-    join = async (username, mediaSettings) => {
+    join = async (userName, mediaSettings) => {
         this.mediaSettings = mediaSettings;
-        this.userName = username;
+        this.userName = userName;
 
         // Close old connection
         if (this.conn) {
@@ -109,11 +109,11 @@ export default class GameClient {
        
         this.conn.on('open', async () => {        
             console.log("Connected to: " + this.conn.peer);
-            await this.handleSelfJoinedGame(username);
+            await this.handleSelfJoinedGame(userName);
         });
     };
 
-    async handleSelfJoinedGame(username) {
+    async handleSelfJoinedGame(userName) {
         // Receive messages
         this.conn.on('data', (data) => {
             console.log('Received', data);
@@ -131,7 +131,7 @@ export default class GameClient {
             }
         });
 
-        this.sendChatMessage("System", `${username} connected!`);
+        this.sendChatMessage("System", `${userName} connected!`);
 
         let event = new CustomEvent('userjoined');
         document.dispatchEvent(event);
@@ -198,7 +198,6 @@ export default class GameClient {
           }
         });
     }
-
     
     onReceiveStream(stream, metadata) {   
         let player = null;     
@@ -298,7 +297,7 @@ export default class GameClient {
                     </div>`;
                 playerContainer.insertAdjacentHTML('beforeend', playerTemplate);
             }     
-        });
+        });        
     };
 
     handleRemoteMediaConnection = (player) => {
@@ -323,24 +322,24 @@ export default class GameClient {
         }  
     }
  
-    sendChatMessage = (username, message) => {
+    sendChatMessage = (userName, message) => {        
         message = this.parseDiceRolls(message);
-
+        
         var msg = {
             type: "chat",
-            username: username,
+            userName: userName,
             message: message,
         }
 
         this.conn.send(msg);
     }
 
-    sendPrivateMessage = (username, player, message) => {
+    sendPrivateMessage = (userName, player, message) => {        
         var msg = {
             type: "private",
             player: player,
             senderId: this.peer.id,
-            username: username,
+            userName: userName,
             message: message,
         }
 
@@ -406,7 +405,7 @@ export default class GameClient {
         let pm = "";
         if (data.player) {
             if (data.senderId == this.peer.id) {
-                pm = `(pm ${data.player.username})`;
+                pm = `(pm ${data.player.userName})`;
             } else {
                 pm = `(pm)`;
             }
@@ -414,7 +413,7 @@ export default class GameClient {
 
         var chatLog = document.getElementById("chat-log");
         var chatLogMessage = document.createElement("DIV");  
-        chatLogMessage.innerHTML = `<strong>${data.username}${pm}:</strong> ${data.message}`;
+        chatLogMessage.innerHTML = `<strong>${data.userName}${pm}:</strong> ${data.message}`;
         chatLog.appendChild(chatLogMessage);
 
         chatLog.scrollTop = chatLog.scrollHeight;

@@ -30,8 +30,8 @@
               </div>
           </div>
           <div class='card-footer text-muted'>
-            <div v-if="item.description" class='small'>
-              {{ getShortText(item.description) }}
+            <div v-if="item.players" class='small'>
+              Players: {{ item.players.length }}
             </div> 
             <div>            
               <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>

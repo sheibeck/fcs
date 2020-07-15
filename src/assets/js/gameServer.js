@@ -73,6 +73,7 @@ export default class GameServer {
             });
          
             this.connections.push(conn);
+            
             //send the player data            
             this.sendPlayerData();
         });        
@@ -113,7 +114,7 @@ export default class GameServer {
     endScene = () => {
         var msg = {
             type: "sceneend",
-            username: "system",
+            userName: "system",
             message: "The storyteller has ended the scene.",
         }
         this.broadcastMessage(msg);
@@ -132,7 +133,7 @@ export default class GameServer {
     sendPlayerData() {
         var msg = {
             type: "players",
-            username: "system",
+            userName: "system",
             message: JSON.parse( JSON.stringify( this.remotePeers ) ),
         }
         this.broadcastMessage(msg);
@@ -152,7 +153,7 @@ export default class GameServer {
 
     privateMessage = (message) => {
         for(var i=0;i<this.connections.length;i++) {            
-            if(this.connections[i].peer==message.player.lastPeerId || this.connections[i].peer==message.senderId){
+            if(this.connections[i].peer==message.player.peerId || this.connections[i].peer==message.senderId){
                 this.connections[i].send(message);               
             }
         }

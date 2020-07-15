@@ -66,7 +66,19 @@
    
     <loading :loading="isLoading" />
 
-    <div v-show="!isLoading">
+    <div v-if="!isLoading && isNewScene">
+       <div class="form-group">
+        <label for="name">Scene Name</label>
+        <input type="text" class="form-control" id="name" v-model="scene.name" placeholder="Scene Name">
+      </div>
+      <div class="form-group">
+        <label for="description">Example textarea</label>
+        <textarea class="form-control" id="description" v-model="scene.description" rows="3"></textarea>
+      </div>
+      <button type="button" @click="saveScene()" class="btn btn-success">Create Scene</button>
+    </div>
+
+    <div v-show="!isLoading && !isNewScene">
       <div class="d-flex">  
         <div class="mr-auto">
           <em style="vertical-align: top;">Scene Aspects:</em>
@@ -119,7 +131,7 @@
           <div class="d-flex mt-1">
             <select v-model="selectedPlayer" class="form-control mr-1">
               <option value="everyone">Everyone</option>
-              <option v-for="player in this.scene.players" :key="player.id" :value="player.id">{{player.username}}</option>
+              <option v-for="player in this.scene.players" :key="player.playerId" :value="player.playerId">{{player.userName}}</option>
             </select>
             <button type="button" class="btn btn-secondary btn-sm mr-1" @click="sendChatMessage()">Send</button>
             <button title="Roll 4df" type="button" class="btn btn-info btn-sm" @click="rollFateDice()"><span class="dice">+</span></button>
@@ -149,7 +161,7 @@
               <textarea rows=3 class="form-control" v-model="scene.description"></textarea>
               <hr />
             </div>
-            <editableinput v-if="getPlayer(userId)" :object="getPlayer(userId)" item="username" label="Username:" showEditIcon=true />
+            <editableinput v-if="getPlayer(userId)" :object="getPlayer(userId)" item="userName" label="Username:" showEditIcon=true />
             <div>
               <input type="checkbox" id="usevideo" v-model="mediaSettings.useVideo" 
                   @change="updateOnlineSettings($event)" /> Use video when playing online
@@ -250,13 +262,13 @@ export default {
       
       //give some delay to account for users typing and such before we broadcast scene changes
       handler: debounce(function() {
-        if (!this.isLoading) {
+        if (!this.isLoading && !this.isNewScene) {
           if (this.scene.isrunning) {
             this.broadCastSceneChange();
           }
 
           //only the hose can save changes, so when it receives a broacast, save the scene
-          if (this.isHost) {            
+          if (this.isHost) {
             this.saveScene(true); 
           }
         }
@@ -309,11 +321,11 @@ export default {
     commonSvc() {
       return commonSvc;
     },
-    userName() {
+    getUserName() {      
       if (this.getPlayer(this.userId)) {
-        return this.getPlayer(this.userId).username;
+        return this.getPlayer(this.userId).userName;
       }
-      else return "";
+      else return this.$store.state.userSession.getIdToken().payload.email.split("@")[0];
     },
     isHost() {      
       return this.scene.owner_id == this.userId;
@@ -419,16 +431,16 @@ export default {
       });
 
       document.addEventListener('userconnected', (e) => {        
-        this.gameClient.join(this.userName, this.mediaSettings);
+        this.gameClient.join(this.getUserName, this.mediaSettings);
       }, false);
 
       document.addEventListener('userjoined', (e) => {
-        this.updatePlayer("lastPeerId", this.gameClient.peer.id);
+        this.updatePlayer("peerId", this.gameClient.peer.id);
       }, false);
 
       document.addEventListener('userdisconnected', (e) => {        
         if (this.gameClient) {
-          this.gameClient.displayChatMessage({ "username": "System", "message": `${e.detail.player.userName} disconnected...` });
+          this.gameClient.displayChatMessage({ "userName": "System", "message": `${e.detail.player.userName} disconnected...` });
         }
       }, false);
       
@@ -452,8 +464,12 @@ export default {
         }
       }, false); 
      
-      window.addEventListener("message",  (e) => {        
+      window.addEventListener("message",  (e) => {
         this.sendFormattedChat(e);
+      }, false);
+
+      document.addEventListener("playerupdate", (e) => {        
+        this.scene.players = e.detail;
       }, false);
     },
     startGame() {
@@ -469,7 +485,7 @@ export default {
     },
     joinGame() {      
       const gameServerId = this.scene.gamePeerId;
-      this.gameClient = new GameClient(gameServerId, this.userId, this.userName, this.isHost);
+      this.gameClient = new GameClient(gameServerId, this.userId, this.getUserName, this.isHost);
       this.gameClient.initialize();      
     },
     exitGame() {      
@@ -510,7 +526,7 @@ export default {
     updatePlayer(key, value)
     {
       var idx = this.scene.players.findIndex(obj => {
-        return obj.id === this.userId
+        return obj.playerId === this.userId
       })
       
       this.scene.players[idx][key] = value;      
@@ -551,7 +567,7 @@ export default {
     },   
     configureUser() {      
       //add this user to the scenes user list. We'll use this to let users configure things
-      //about themselves like their username.      
+      //about themselves like their userName.            
       if (!this.scene.players) {
         this.scene.players = new Array();
       }
@@ -559,20 +575,21 @@ export default {
       let player = this.getPlayer(this.userId);
       if (!player) {        
         let player = {
-          "id": this.userId,
-          "username": this.$store.state.userSession.getIdToken().payload.email.split("@")[0],
+          "playerId": this.userId,
+          "userName": this.$store.state.userSession.getIdToken().payload.email.split("@")[0],
+          "peerId": null,
         }
         this.scene.players.push(player);
-        player = this.getPlayer(player.id);
+        player = this.getPlayer(player.playerId);
       }      
     },
-    getPlayer(id) {      
+    getPlayer(id) {       
       if (!this.scene.players) return null;
-      var players = this.scene.players.find(obj => {
-        return obj.id === id
+      var player = this.scene.players.find(obj => {
+        return obj.playerId === id
       })
 
-      return players;
+      return player;
     },
     create : function() {
       let c = {
@@ -582,7 +599,7 @@ export default {
         "owner_id": this.userId,        
         "scale": "",
         "slug": "new-scene",
-        "name": "New Scene",        
+        "name": "New Scene",
       };
       this.$set(this, 'scene', c);
       this.loading = false;
@@ -673,12 +690,12 @@ export default {
       if (this.gameClient) {
         if (this.selectedPlayer !== "everyone") {
           let player = this.scene.players.find(obj => {
-            return obj.id === this.selectedPlayer
+            return obj.playerId === this.selectedPlayer
           });          
-          this.gameClient.sendPrivateMessage(this.userName, player, this.chatMessage);          
+          this.gameClient.sendPrivateMessage(this.getUserName, player, this.chatMessage);          
         }
         else {
-          this.gameClient.sendChatMessage(this.userName, this.chatMessage);          
+          this.gameClient.sendChatMessage(this.getUserName, this.chatMessage);          
         }
         this.chatMessage = "";
       }
@@ -697,7 +714,7 @@ export default {
       if (e.data.type !== "charactersheet") return;
       let msg = e.data.data;
       if (this.gameClient) {
-        this.gameClient.sendChatMessage(this.userName, msg);
+        this.gameClient.sendChatMessage(this.getUserName, msg);
       } else {
         this.sendLocalChat(msg);
       }
@@ -764,13 +781,13 @@ export default {
           // the value of the consequence so we can invoke it         
           this.consequences[data2] = data;
           msg = models.MsgConsequence(character, description, data);
-          break;      
+          break;
       }
       window.postMessage({type: "fcsVTT", data: msg});      
     },
     rollFateDice() {      
       let msg =  {
-          character: this.userName,
+          character: this.getUserName,
           action: `Rolled: <em>4df</em>`,
           roll: { 
               modifier: `0`,
