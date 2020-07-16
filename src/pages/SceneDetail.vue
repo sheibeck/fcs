@@ -225,7 +225,8 @@ import FCSVTTClient from "./../assets/js/fcsVTTClient";
 import FCSVTT from '../assets/js/fcsVTT'
 import Models from '../assets/js/models';
 
-import { debounce } from 'vue-debounce'
+import { isEqual } from 'lodash-es';
+import { debounce } from 'vue-debounce';
 
 let models = new Models();
 
@@ -266,17 +267,20 @@ export default {
       //wait for our authenticated user before we setup the scene
       this.setupScene(this.userId);                
     },
+    chatLog() {
+      setTimeout( () => {
+        this.ScrollChatToBottm();
+      }, 300);
+    },
     scene: {
       // This will let Vue know to look inside the array
       deep: true,
       
       //give some delay to account for users typing and such before we broadcast scene changes
       handler: debounce( async function(scene) {
-      //handler: async function() {        
-        var sceneHasChanged = JSON.stringify( this.scene )
-                               !== this.previousSceneData;
-        
-        if (sceneHasChanged && !this.isLoading && !this.isNewScene) {
+        if (this.isLoading || this.isNewScene) return;
+
+        if (this.hasSceneChanged()) {
           if (this.scene) {
             this.broadCastSceneChange();
           }
@@ -303,7 +307,7 @@ export default {
       scene : {},
       //keep the old values so we know when to save. Trying to prevent
       //infinite loops when saving/broadcasting scene changes
-      previousSceneData : "",
+      previousSceneData : {},
       id: this.$route.params.id,
       canvas: null,     
       showchat: true,
@@ -333,10 +337,10 @@ export default {
       'userId',
       'currentUser'
     ]),
-    isNewScene : function() {
+    isNewScene() {
       return this.$route.params.id === "create";
-    },
-    isLoading : function() {
+    },   
+    isLoading() {
       return this.loading;
     },
     commonSvc() {
@@ -365,6 +369,26 @@ export default {
     }
   },
   methods: {
+    hasSceneChanged() {
+      //ditch the vue js junk from these objects so we can compare them vanilla
+      let vscene = commonSvc.DeepCopy(this.scene);
+      let voldscene = this.previousSceneData;
+      let isChanged = this.getObjectDiff(vscene, voldscene);
+      return isChanged.length > 0;
+    },
+    getObjectDiff(obj1, obj2) {
+        const diff = Object.keys(obj1).reduce((result, key) => {
+            if (!obj2.hasOwnProperty(key)) {
+                result.push(key);
+            } else if (isEqual(obj1[key], obj2[key])) {
+                const resultKeyIndex = result.indexOf(key);
+                result.splice(resultKeyIndex, 1);
+            }
+            return result;
+        }, Object.keys(obj2));
+
+        return diff;
+    },
     init() {
       //panzoom the canvas
       const panElem = document.getElementById('scene-canvas')
@@ -574,7 +598,7 @@ export default {
       }
 
       this.scene = await dbSvc.GetObject(id);
-      this.previousSceneData = JSON.stringify(this.scene);
+      this.previousSceneData = commonSvc.DeepCopy(this.scene);
       
       if (!this.scene)
       {
@@ -654,7 +678,7 @@ export default {
         this.scene.playerList = this.scene.playerList.filter(p => p !== this.userId);
             
         let response = await dbSvc.SaveObject($component.scene);
-        this.previousSceneData = JSON.stringify(this.scene);
+        this.previousSceneData = this.previousSceneData = commonSvc.DeepCopy(this.scene);
         
         if (response) {
           if (suppressMessage !== true || isNew) {
@@ -740,9 +764,7 @@ export default {
     updateChatLog(userName, msg) {      
       this.chatLog += `\n
 **${userName}**:
-${msg}`;
-      var chatLogContainer = document.getElementById("chat-log");
-      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
+${msg}`;      
     },  
     sendFormattedChat(e) {
       if (e.data.type !== "charactersheet") return;
@@ -752,8 +774,6 @@ ${msg}`;
       } else {
         this.updateChatLog(this.getUserName, msg);
       }      
-      var chatLogContainer = document.getElementById("chat-log");
-      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
     },
     toggleFullScreen() {
       this.fullScreen = !this.fullScreen;
@@ -863,6 +883,10 @@ ${msg}`;
           break;
       }
       
+    },
+    ScrollChatToBottm() {          
+      var chatLogContainer = this.$el.querySelector("#chat-log");
+      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;    
     }   
   },
 }

@@ -213,4 +213,8 @@ export default class CommonService {
   GetPlayerIdForDom = function(playerId) {
     return playerId.replace(":","-");
   }
+
+  DeepCopy(objToCopy) {
+    return JSON.parse( JSON.stringify( objToCopy ) );
+  }
 }
