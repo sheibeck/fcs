@@ -159,12 +159,10 @@ export default class GameServer {
         }
     }
 
-    displayChatMessage = (data) => {
-        var chatLog = document.getElementById("chat-log");
-        var chatLogMessage = document.createElement("DIV");  
-        chatLogMessage.innerHTML = `<strong>System:</strong> ${data}`;
-        chatLog.appendChild(chatLogMessage);
-
-        chatLog.scrollTop = chatLog.scrollHeight;
+    displayChatMessage = (data) => {        
+        let message = `<strong>System:</strong> ${data}`;
+        
+        var event = new CustomEvent('displaychatmessage', { detail: { userName: "System", message: data } });
+        document.dispatchEvent(event);        
     }
 }

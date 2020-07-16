@@ -43,7 +43,7 @@ export default {
     sendToVTT() {      
       let invokerName = this.$parent.$parent.$parent.$parent.getPlayer(this.$parent.$parent.$parent.$parent.userId).userName;
       let characterName = this.$parent.$props.objectdata.name;
-      this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.consequence.name, `(${characterName}) ${this.consequence.value}`, characterName, invokerName); 
+      this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.consequence.name, `${this.consequence.value}`, characterName, characterName); 
     },  
     removeConsequence() {
       this.$parent.objectdata.consequences = this.$parent.objectdata.consequences.filter( (obj) => {

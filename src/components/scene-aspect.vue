@@ -50,18 +50,18 @@ export default {
  
       switch(this.location)
       {        
-        case "scene":    
+        case "scene":
           invokerName = this.$parent.getPlayer(this.$parent.userId).userName;      
-          this.$parent.sendToVTT('invoke', this.aspect.name, `(Scene) ${this.aspect.name}`, "Scene" , invokerName);          
+          this.$parent.sendToVTT('invoke', this.aspect.name, `${this.aspect.name}`, "Scene" , "Scene");          
           break;
         case "zone":          
           invokerName = this.$parent.$parent.$parent.getPlayer(this.$parent.$parent.$parent.userId).userName;
-          this.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, `(Zone) ${this.aspect.name}`, "Zone" , invokerName);          
+          this.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, `${this.aspect.name}`, "Zone" , "Zone");          
           break;
         default:
            invokerName = this.$parent.$parent.$parent.$parent.getPlayer(this.$parent.$parent.$parent.$parent.userId).userName;
            let characterName = this.$parent.$props.objectdata.name;
-           this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, `(${characterName}) ${this.aspect.name}`, characterName, invokerName);
+           this.$parent.$parent.$parent.$parent.sendToVTT('invoke', this.aspect.name, `${this.aspect.name}`, characterName, characterName);
       }
     },  
     removeAspect() {      
