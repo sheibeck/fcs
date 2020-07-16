@@ -350,7 +350,7 @@ export default class GameClient {
         const diceRegx = /\/roll (\d*)(D[\df]*)((?:[+*-](?:\d+|\([A-Z]*\)))*)(?:\+(D\d*))?/i;
         let roll = message.match(diceRegx);
         if (roll)
-        {            
+        {
             const roller = new DiceRoller();
             const rollEquation = `${roll[1]}${roll[2] == "df" ? "dF.2" : roll[2]}${roll[3] ? roll[3]:''}`;
 
@@ -367,21 +367,25 @@ export default class GameClient {
                 if (diceType == "fate") {
                     switch (roll.value) {
                         case -1:                        
-                            displayDice += '<span class="dice">-</span>';
+                            //displayDice += '<span class="dice">-</span>';
+                            displayDice += '[-]';
                             break;
                         case 1:
-                            displayDice += '<span class="dice">+</span>';
+                            //displayDice += '<span class="dice">+</span>';
+                            displayDice += '[+]';
                             break;
                         default:
-                            displayDice += '<span class="dice">0</span>';
+                            //displayDice += '<span class="dice">0</span>';
+                            displayDice += '[0]';
                             break;
                     }
                 }
                 else {
-                    displayDice += `<span>[${roll.value}]</span>`
+                    displayDice += `[${roll.value}]`
                 }
             });
-            return message += `<p class='dice-roll current-roll'>${displayDice} ${(roll[3] !== '' ? ' (' + roll[3] + ')' : '')} = ${latestRoll.total}</p>`;
+            //return message += `<p class='dice-roll current-roll'>${displayDice} ${(roll[3] !== '' ? ' (' + roll[3] + ')' : '')} = ${latestRoll.total}</p>`;
+            return message += `> **${displayDice} ${(roll[3] !== '' ? ' (' + roll[3] + ')' : '')} = ${latestRoll.total}**`;
         }
         else {  
             return message;
@@ -411,12 +415,7 @@ export default class GameClient {
             }
         }
 
-        var chatLog = document.getElementById("chat-log");
-        var chatLogMessage = document.createElement("DIV");  
-        chatLogMessage.innerHTML = `<strong>${data.userName}${pm}:</strong> ${data.message}`;
-        chatLog.appendChild(chatLogMessage);
-
-        chatLog.scrollTop = chatLog.scrollHeight;
-        
+        var event = new CustomEvent('displaychatmessage', { detail: { userName: data.userName, message: data.message } });
+        document.dispatchEvent(event);
     }
 }

@@ -16,7 +16,7 @@ export default class FCSVTTClient {
             case "diceroll":                                 
                 chatMessage = {
                     character: msg.character,
-                    action: `Rolled: <em>${msg.skill}</em>`,
+                    action: `rolled: _${msg.skill}_`,
                     roll: { 
                         modifier: `${msg.modifier||0}`,                       
                     }
@@ -25,8 +25,9 @@ export default class FCSVTTClient {
                 break;
             case "invoke":                           
                 chatMessage = {
-                    character: msg.character, 
-                    action: "Invoked",
+                    //flipped these on purpose to make the chat output feel better
+                    action: msg.character, 
+                    character: "Invoked",
                     description: msg.aspect
                 };     
                 break;
@@ -38,11 +39,11 @@ export default class FCSVTTClient {
                 };  
                 break;
             case "stuntextra":
-                let stuntextra = msg.stuntextra.match(/(.*?):(.*)/);
+                let stuntextra = msg.stuntextra.match(/(.*?):(.*)/);                
                 chatMessage = {
                     character: msg.character, 
-                    action: `Stunt/Gear: <em>${stuntextra[1]}</em>`, 
-                    description: stuntextra[2]
+                    action: `Stunt/Gear: _${stuntextra[1].trim()}_`, 
+                    description: stuntextra[2].trim()
                 };                  
                 break;
             case "stress":               
@@ -75,7 +76,7 @@ export default class FCSVTTClient {
     }
 
     chatMessage = (message) => {         
-        let description = message.description||"";      
+        let description = message.description||"";
 
         if (message.roll) {            
             this.diceRoller.roll(`4dF.2+${parseInt(message.roll.modifier)}`);
@@ -86,28 +87,33 @@ export default class FCSVTTClient {
             $.each(latestRoll.rolls[0].rolls, function (key, value) {
                 switch (value.value) {
                     case -1:
-                        displayDice += '<span class="dice">-</span>';
+                        //displayDice += '<span class="dice">-</span>';
+                        displayDice += '[-]';
                         break;
                     case 1:
-                        displayDice += '<span class="dice">+</span>';
+                        //displayDice += '<span class="dice">+</span>';
+                        displayDice += '[+]';
                         break;
                     default:
-                        displayDice += '<span class="dice">0</span>';
+                        //displayDice += '<span class="dice">0</span>';
+                        displayDice += '[ ]';
                         break;
                 }
             });
 
             displayDice += ` ${message.roll.modifier.indexOf('-') == -1 ? "+" : ""} ${message.roll.modifier} = ${latestRoll.total}`;
-            description = displayDice;
+            description += `**${displayDice}**`;
         }
 
-        let chatCard = `<div class="card border-dark my-1 mx-1 py-0">
+        /*let chatCard = `<div class="card border-dark my-1 mx-1 py-0">
             <div class="card-header py-0 font-weight-bold">${message.character}</div>
             <div class="card-body text-dark py-0">                
                 <p class="card-text py-0 mb-1">${message.action}</p>
                 <p class="card-text py-0 font-weight-bold">${description}</p>
             </div>
-        </div>`;
+        </div>`*/;        
+        let chatCard = `> ${message.character} ${message.action}
+> **${description}**`;
 
         window.parent.postMessage({type: "charactersheet", data: chatCard});        
     }

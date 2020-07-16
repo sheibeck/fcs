@@ -32,12 +32,22 @@
     }
   }
 
-  #chat {
+  /deep/ #chat {
     width: 500px;
 
-    #chat-log {      
+    #chat-log {
       height: 100%;
-      overflow: scroll;
+      overflow-y: scroll;             
+
+      p {
+        margin-bottom: 0;        
+      }
+
+      blockquote {        
+        background-color: lightgoldenrodyellow;
+        padding: 5px !important;
+        margin-bottom: 5px;
+      }     
     }
   }
 
@@ -125,8 +135,7 @@
           <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-broom"></i></button>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
-          <div id="chat-log" class="border mb-1">
-          </div>
+          <VueShowdown id="chat-log" class="border mb-1 px-1" :options="{ emoji: false }" :markdown="chatLog" />          
           <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1"></textarea>
           <div class="d-flex mt-1">
             <select v-model="selectedPlayer" class="form-control mr-1">
@@ -206,7 +215,8 @@ import SceneEditableInput from '../components/scene-editable-input';
 import draggable from 'vuedraggable';
 import SceneAspect from '../components/scene-aspect';
 import { dragscroll } from 'vue-dragscroll';
-import Panzoom from '@panzoom/panzoom'
+import Panzoom from '@panzoom/panzoom';
+import VueShowdown, { showdown } from 'vue-showdown';
 
 import Peer from 'peerjs';
 import GameServer from "./../assets/js/gameServer";
@@ -261,18 +271,24 @@ export default {
       deep: true,
       
       //give some delay to account for users typing and such before we broadcast scene changes
-      handler: debounce(function() {
-        if (!this.isLoading && !this.isNewScene) {
-          if (this.scene.isrunning) {
+      handler: debounce( async function(scene) {
+      //handler: async function() {        
+        var sceneHasChanged = JSON.stringify( this.scene )
+                               !== this.previousSceneData;
+        
+        if (sceneHasChanged && !this.isLoading && !this.isNewScene) {
+          if (this.scene) {
             this.broadCastSceneChange();
           }
 
           //only the hose can save changes, so when it receives a broacast, save the scene
           if (this.isHost) {
-            this.saveScene(true); 
+            await this.saveScene(true);
+            this.broadCastSceneChange();
           }
         }
       }, 300)
+      //}
     },
   },
   updated() {
@@ -283,7 +299,11 @@ export default {
   data () {
     return {   
       loading: true,
+      savingScene: false,
       scene : {},
+      //keep the old values so we know when to save. Trying to prevent
+      //infinite loops when saving/broadcasting scene changes
+      previousSceneData : "",
       id: this.$route.params.id,
       canvas: null,     
       showchat: true,
@@ -303,7 +323,8 @@ export default {
         microphoneDevice: localStorage.getItem('fcs_microphoneDevice') ?? null,
       },
       videoDevices: new Array(),      
-      microphoneDevices: new Array(),
+      microphoneDevices: new Array(),      
+      chatLog: "",
     }
   },
   computed: {
@@ -398,8 +419,8 @@ export default {
           case "scene":
             //if the host isn't connected as a user, make sure we still update the server
             // when others make changes
-            if (!this.isConnected) {
-              this.scene = e.detail.message;  
+            if (!this.isConnected) {              
+              this.scene = e.detail.message;
             }
             break;          
           case "disconnected":
@@ -471,6 +492,10 @@ export default {
       document.addEventListener("playerupdate", (e) => {        
         this.scene.players = e.detail;
       }, false);
+
+      document.addEventListener("displaychatmessage", (e) => {
+        this.updateChatLog(e.detail.userName, e.detail.message);
+      });
     },
     startGame() {
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
@@ -549,6 +574,7 @@ export default {
       }
 
       this.scene = await dbSvc.GetObject(id);
+      this.previousSceneData = JSON.stringify(this.scene);
       
       if (!this.scene)
       {
@@ -560,7 +586,7 @@ export default {
       //cleanup from shutdown if we left the game running
       if (this.isHost && this.isSceneRunning) {
         this.scene.isrunning = false;
-        this.saveScene(true);
+        //this.saveScene(true);
       }
 
       this.configureUser();      
@@ -604,12 +630,13 @@ export default {
       this.$set(this, 'scene', c);
       this.loading = false;
     },
-    saveScene : function(suppressMessage) {
+    saveScene : async function(suppressMessage) {      
       if (this.isHost) {        
         var $component = this;
 
         if (!this.scene.name) {
           commonSvc.Notify('You must enter a name', 'error');
+          this.savingScene = false;
           return;
         }
 
@@ -626,17 +653,18 @@ export default {
         this.scene.playerList = this.scene.players.map(p => p.playerId);
         this.scene.playerList = this.scene.playerList.filter(p => p !== this.userId);
             
-        dbSvc.SaveObject($component.scene).then( (response) => {
-          if (response) {
-            if (suppressMessage !== true || isNew) {
-              commonSvc.Notify('Scene saved.', 'success', null, () => {;
-                if (isNew) {
-                  location.href = '/scene/' + commonSvc.GetId($component.scene.id);
-                }
-              });
-            }
-          }
-        });
+        let response = await dbSvc.SaveObject($component.scene);
+        this.previousSceneData = JSON.stringify(this.scene);
+        
+        if (response) {
+          if (suppressMessage !== true || isNew) {
+            commonSvc.Notify('Scene saved.', 'success', null, () => {;
+              if (isNew) {
+                location.href = '/scene/' + commonSvc.GetId($component.scene.id);
+              }
+            });
+          }      
+        }
       }
     },
     broadCastSceneChange() {
@@ -701,19 +729,20 @@ export default {
         }
         else {
           this.gameClient.sendChatMessage(this.getUserName, this.chatMessage);          
-        }
-        this.chatMessage = "";
+        }        
       }
       else {
-        this.commonSvc.Notify("You are not connected.");
+        this.updateChatLog(this.getUserName, this.chatMessage);
       }
+      
+      this.chatMessage = "";
     }, 
-    sendLocalChat(msg) {
-      let chatLog = document.getElementById("chat-log");
-      let chatLogMessage = document.createElement("DIV");                  
-      chatLogMessage.innerHTML = msg;
-      chatLog.appendChild(chatLogMessage);
-      chatLog.scrollTop = chatLog.msg;    
+    updateChatLog(userName, msg) {      
+      this.chatLog += `\n
+**${userName}**:
+${msg}`;
+      var chatLogContainer = document.getElementById("chat-log");
+      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
     },  
     sendFormattedChat(e) {
       if (e.data.type !== "charactersheet") return;
@@ -721,11 +750,10 @@ export default {
       if (this.gameClient) {
         this.gameClient.sendChatMessage(this.getUserName, msg);
       } else {
-        this.sendLocalChat(msg);
-      }
-
-      var chatLog = document.getElementById("chat-log");
-      chatLog.scrollTop = chatLog.scrollHeight;
+        this.updateChatLog(this.getUserName, msg);
+      }      
+      var chatLogContainer = document.getElementById("chat-log");
+      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
     },
     toggleFullScreen() {
       this.fullScreen = !this.fullScreen;
@@ -744,7 +772,7 @@ export default {
       if (this.scene.gamePeerId !== e.detail.peerid)
       {
         this.scene.gamePeerId = e.detail.peerid;        
-        this.saveScene(true);
+        //this.saveScene(true);
       }
     },
     sendToVTT(type, description, data, data2, character) {
@@ -796,7 +824,7 @@ export default {
     rollFateDice() {      
       let msg =  {
           character: this.getUserName,
-          action: `Rolled: <em>4df</em>`,
+          action: `Rolled: _4df_`,
           roll: { 
               modifier: `0`,
           }
@@ -808,7 +836,7 @@ export default {
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
     },
     clearChatLog() {
-      document.getElementById("chat-log").innerHTML = "";
+      this.chatLog = "";
     },
     spendFate(event){      
       let newValue = event.target.value;
