@@ -22,6 +22,10 @@
             <label class='' for='image_url'>Portrait Url:</label>
             <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />
           </div>
+          <div class='form-group'>
+            <label class='' for='image_url'>Description:</label>
+            <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
+          </div>
         </div>
       
         <div class='row' v-if="!isAuthenticated">           

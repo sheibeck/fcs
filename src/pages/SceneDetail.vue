@@ -15,8 +15,8 @@
 
     #scene-canvas {
       position:relative;
-      height: 1800px;
-      width: 2400px;    
+      height: 3600px;
+      width: 4800px;    
 
       background-size: 20px 20px;
       background-image:

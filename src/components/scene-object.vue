@@ -8,11 +8,11 @@
     <div class="mr-auto w-100">
       <div class="d-flex">
         <div class="d-flex w-100 mr-auto" :class="getBgForType(objectdata)">          
-          <button v-if="isFCSObject" :title="`Play this ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 text-white btn btn-link sheet-link"><i class="fas fa-link fa-xs"></i></button>          
+          <button v-if="isFCSObject" :title="`Play this ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 mx-1 text-white btn btn-link sheet-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
           <editableinput :object="objectdata" item="name" class="font-weight-bold" />
           <img v-if="objectdata.image_url && !imageEdit" :src="objectdata.image_url" class="rounded-circle portrait" alt="portrait" />          
         </div>
-      </div>      
+      </div>
       
       <div v-if="imageEdit">
         <label class="control-label">Portrait Url</label><br/>    
@@ -21,6 +21,9 @@
           <div class="input-group-append" style="height: 38px;">
             <button type="button" class="input-group-text" @click="imageEdit = false"><i class="fas fa-check-circle text-success"></i></button>
           </div>
+        </div>
+        <div>
+          <a target="_blank" :href="`https://www.google.com/search?safe=strict&tbm=isch&q=${this.objectdata.name}`" title="Search for image">Search for image</a>
         </div>
       </div>
       
@@ -80,7 +83,7 @@
         </div>
       </div>
 
-      <div v-if="objectdata.conditions">
+      <div v-if="objectdata.conditions && objectdata.object_type != 'CHARACTER'">
         <div class="header d-flex">
           <span class="mr-auto">Conditions</span>
           <i title="Add condition" @click="addThingToObject('condition')" class="fas fa-plus-circle fa-sm pt-1"></i>
@@ -94,7 +97,7 @@
         </div>
       </div>
 
-      <div v-if="objectdata.consequences">
+      <div v-if="objectdata.consequences && objectdata.object_type != 'CHARACTER'">
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
           <i title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>
