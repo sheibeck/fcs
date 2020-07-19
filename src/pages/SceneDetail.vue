@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
   label {
-    font-weight: 700;
+    font-weight: 800;
   }
 
   #game-table {
@@ -33,7 +33,7 @@
   }
 
   /deep/ #chat {
-    width: 500px;
+    width: 700px;
 
     #chat-log {
       height: 100%;
@@ -123,7 +123,7 @@
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
-        </div>  
+        </div>        
         <div id="scene-toolbar" class="d-flex flex-column">          
           <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
           <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
