@@ -71,8 +71,7 @@ export default class FateOf20 {
     }
 
     HandleListener = (msg) => {        
-        if (msg.result.roll20Connect) { 
-            debugger;           
+        if (msg.result.roll20Connect) {             
             fcs.$store.state.roll20Running = msg.result.roll20Connect;
         }
         console.log(msg.result);

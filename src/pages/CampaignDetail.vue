@@ -91,7 +91,7 @@
                 <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description"></textarea>
             </div>
             <div class="form-group">
-                <label for="imageUrl">Description</label>
+                <label for="imageUrl">Campaign Image Url</label>
                 <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="campaign.image_url" />
             </div>
 
@@ -549,7 +549,7 @@ export default {
       let session = {
         id: commonSvc.SetId("LOG", commonSvc.GenerateUUID()),
         object_type: "LOG",
-        date: this.getFormattedDate(new Date()),
+        date: commonSvc.GetFormattedDate(new Date()),
         description: "Details...",
         related_id: this.campaign.id,
         owner_id: this.userId,
@@ -561,22 +561,7 @@ export default {
     },
     getNiceDate : function(date) {
         return commonSvc.GetNiceDate(date);
-    },
-    getFormattedDate : function(date) {
-      var year = date.getFullYear();
-
-      var month = (1 + date.getMonth()).toString();
-      month = month.length > 1 ? month : '0' + month;
-
-      var day = date.getDate().toString();
-      day = day.length > 1 ? day : '0' + day;
-
-      var time = date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: false, minute: 'numeric' });
-
-      let dateString =  year + '-' + month + '-' + day + 'T' + time;
-
-      return dateString;
-    },
+    },    
     deleteSession : function (event) {
       let $component = this;
       let sessionId = $(event.currentTarget).data('id');

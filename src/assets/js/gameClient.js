@@ -337,8 +337,7 @@ export default class GameClient {
     sendPrivateMessage = (userName, player, message) => {        
         var msg = {
             type: "private",
-            player: player,
-            senderId: this.peer.id,
+            player: player,            
             userName: userName,
             message: message,
         }
@@ -405,17 +404,18 @@ export default class GameClient {
         document.dispatchEvent(event);
     }
 
-    displayChatMessage = (data) => {
+    displayChatMessage = (data) => {        
         let pm = "";
+        
         if (data.player) {
-            if (data.senderId == this.peer.id) {
+            if (data.player.playerId == this.playerId) {
                 pm = `(pm ${data.player.userName})`;
             } else {
                 pm = `(pm)`;
             }
         }
 
-        var event = new CustomEvent('displaychatmessage', { detail: { userName: data.userName, message: data.message } });
+        var event = new CustomEvent('displaychatmessage', { detail: { userName: `${data.userName}${pm}`, message: data.message } });
         document.dispatchEvent(event);
     }
 }
