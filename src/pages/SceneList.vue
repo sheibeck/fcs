@@ -9,63 +9,68 @@
       </nav>
 
       <div v-if="isActiveTab('yours')">
-        <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-md-flex">
-          <a href='/scene/create' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Scene <i class="fas fa-book-open"></i></a>
-          <search class=""></search>
-        </div>
-        <div v-if="!hasScenes">
-          <h2>You have not created any scenes.</h2>
-        </div>
-        <div v-if="hasScenes" class='card-columns'>
-          <div v-for="item in scenes" v-bind:key="item.id" class='card'>
-            <div class='card-body'>
-              <h5 class='card-title'>{{item.name}}</h5>
-              <div class='row'>
-                <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
-                  <img v-bind:src="item.image_url" class='img-fluid' />
-                </p>
-                <p class='card-text col'>
-                  {{ getShortText(item.description) }}
-                </p>           
-              </div>
-              <hr />
-              <div class="d-flex">
-                  <a :href="`/scene/${commonSvc.GetId(item.id)}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>  
-                  <a :href="`/scene/${commonSvc.GetId(item.id)}`" class='btn btn-secondary text-white ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
-                  <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
+        <div v-if="isSubscriber">        
+          <div v-if="isAuthenticated" class="d-print-none mb-2 hide-on-detail d-md-flex">
+            <a href='/scene/create' class='btn btn-success mr-auto mb-1 mb-md-0'>Create a Scene <i class="fas fa-book-open"></i></a>
+            <search class=""></search>
+          </div>
+          <div v-if="!hasScenes">         
+            <h2>You have not created any scenes.</h2>         
+          </div>
+          <div v-if="hasScenes" class='card-columns'>
+            <div v-for="item in scenes" v-bind:key="item.id" class='card'>
+              <div class='card-body'>
+                <h5 class='card-title'>{{item.name}}</h5>
+                <div class='row'>
+                  <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
+                    <img v-bind:src="item.image_url" class='img-fluid' />
+                  </p>
+                  <p class='card-text col'>
+                    {{ getShortText(item.description) }}
+                  </p>           
                 </div>
-            </div>
-            <div class='card-footer text-muted'>
-              <div v-if="item.players" class='small'>
-                Players: {{ item.players.length }}
-              </div> 
-              <div>            
-                <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>
+                <hr />
+                <div class="d-flex">
+                    <a :href="`/scene/${commonSvc.GetId(item.id)}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>  
+                    <a :href="`/scene/${commonSvc.GetId(item.id)}`" class='btn btn-secondary text-white ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
+                    <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
+                  </div>
+              </div>
+              <div class='card-footer text-muted'>
+                <div v-if="item.players" class='small'>
+                  Players: {{ item.players.length }}
+                </div> 
+                <div>            
+                  <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <input id='copyUrl' class='hidden' />
+          <input id='copyUrl' class='hidden' />
 
-        <!-- delete confirmation modal-->
-        <div class="modal fade" id="modalDeleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteLabel">Confirm Scene Delete</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this scene?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger js-delete" v-on:click="deleteScene">Delete</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
+          <!-- delete confirmation modal-->
+          <div class="modal fade" id="modalDeleteConfirm" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="deleteLabel">Confirm Scene Delete</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Are you sure you want to delete this scene?</p>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-danger js-delete" v-on:click="deleteScene">Delete</button>
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div v-if="!isSubscriber">
+          <ctasubscribe />
         </div>
       </div>
 
@@ -112,6 +117,7 @@
 import { mapGetters } from 'vuex';
 import Search from '../components/search';
 import Loading from '../components/loading';
+import CTASubscribe from '../components/cta-subscribe';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 
@@ -127,6 +133,7 @@ export default {
   components: {
     search: Search,
     loading: Loading,
+    ctasubscribe: CTASubscribe
   },
   mounted(){   
     this.init();
@@ -146,7 +153,8 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-      'searchText'
+      'searchText',
+      'isSubscriber'
     ]),   
     commonSvc() {
       return commonSvc;

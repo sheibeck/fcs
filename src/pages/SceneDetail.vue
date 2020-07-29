@@ -378,6 +378,7 @@ export default {
       else return this.$store.state.userSession.getIdToken().payload.email.split("@")[0];
     },
     isHost() {      
+      //TODO: look for IsSubscribed here, as the host must be a subscriber
       return this.scene.owner_id == this.userId;
     },
     isSceneRunning() {
