@@ -102,7 +102,7 @@
       
         <span v-if="isHost">
           <button type="button" class="btn-sm btn btn-success ml-1 d-none p-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
-          <button v-if="!isSceneRunning" type="button" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
+          <button v-if="!isSceneRunning" type="button" :disabled="waitingForGameStart" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
@@ -149,6 +149,8 @@
           </div>
           <div class="d-flex flex-column">
             <button type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>
+            <a :href="`/scene/${id}`" class='btn btn-link' @click="shareUrl"><i class='fa fa-share'></i></a>
+            <a href="https://github.com/sheibeck/fcs/wiki/Scene-Builder" target="_blank" class="btn btn-link" title="Help"><i class="fas fa-question"></i></a>
             <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
             <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>            
           </div>
@@ -350,6 +352,8 @@ export default {
       videoDevices: new Array(),      
       microphoneDevices: new Array(),      
       chatLog: "",
+      waitingForGameStart: false,
+      isrunning: false,
     }
   },
   computed: {
@@ -543,14 +547,16 @@ export default {
       });
     },
     startGame() {
+      this.waitingForGameStart = true;
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
       this.gameServer = new GameServer();
-      this.gameServer.initialize();
+      this.gameServer.initialize();      
     },
     stopGame() {
       if (this.isHost)
       {
         this.gameServer.endScene();
+        this.waitingForGameStart = false;
       }
     },
     joinGame() {      
@@ -810,12 +816,12 @@ ${msg}`;
       }
     },   
     setupGameServer(e) {
-      this.$set(this.scene, "isrunning", true);
-      //this.scene.isrunning = true;
+      this.scene.isrunning = true;
+      this.waitingForGameStart = false;
+      
       if (this.scene.gamePeerId !== e.detail.peerid)
       {
-        this.scene.gamePeerId = e.detail.peerid;        
-        //this.saveScene(true);
+        this.scene.gamePeerId = e.detail.peerid;                
       }
     },
     sendToVTT(type, description, data, data2, character) {
