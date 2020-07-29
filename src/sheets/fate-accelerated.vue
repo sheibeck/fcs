@@ -23,10 +23,16 @@
 		</div>
 
 		<div class="col-sm-6 col-md-8 order-md-1">
-			<div class="form-group">
-				<div for="name" class="fate-header">ID</div>
-				<input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />
-			</div>
+			<div class="d-flex">
+                <div class="form-group w-75 mr-1">
+                    <div for="name" class="fate-header">ID</div>
+                    <input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />                
+                </div>
+                <div class="form-group w-25">
+                    <div for="name" class="fate-header">Pronoun</div>
+                    <input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
+                </div>
+            </div>
 
 			<div class="form-group">
 				<textarea class="form-control" id="description" name="description" rows="3" @change="setVal('description',  $event.target.value)" :value="getVal('description')" placeholder="Description"></textarea>
@@ -54,7 +60,7 @@
 
 			<div v-for="approach in approaches" :key="approach.obj">
 				<inputapproach :item="approach" />
-			</div>			
+			</div>
 		</div>
 	</div>
 

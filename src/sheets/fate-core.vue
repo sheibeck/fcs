@@ -22,10 +22,16 @@
             </div>
         </div>
 
-        <div class="col-sm-6 col-md-8 order-md-1">
-            <div class="form-group">
-                <div for="name" class="fate-header">ID</div>
-                <input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />
+        <div class="col-sm-6 col-md-8 order-md-1 ">
+            <div class="d-flex">
+                <div class="form-group w-75 mr-1">
+                    <div for="name" class="fate-header">ID</div>
+                    <input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />                
+                </div>
+                <div class="form-group w-25">
+                    <div for="name" class="fate-header">Pronoun</div>
+                    <input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
+                </div>
             </div>
 
             <div class="form-group">

@@ -217,4 +217,20 @@ export default class CommonService {
   DeepCopy(objToCopy) {
     return JSON.parse( JSON.stringify( objToCopy ) );
   }
+
+  GetFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    var time = date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: false, minute: 'numeric' });
+
+    let dateString =  year + '-' + month + '-' + day + 'T' + time;
+
+    return dateString;
+  }
 }

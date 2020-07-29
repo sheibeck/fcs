@@ -109,12 +109,6 @@ const store = new Vuex.Store({
   },
   getters: {
     isSubscriber : state => {
-      /*
-      * we can pause payments to give people access, no need for super-user group at this point
-      var groups = state.userSession.getIdToken().payload['cognito:groups'];
-      if (groups && groups.includes("super-user")) {
-        return true;
-      }*/     
       return state.hasActiveSubscription;
     },
     roll20Enabled: (state, getters) => {

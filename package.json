@@ -105,6 +105,7 @@
     "webpack-merge": "^4.2.2",
     "weekstart": "^1.0.1",
     "whatwg-fetch": "^3.0.0",
-    "write-file-webpack-plugin": "^4.5.1"
+    "write-file-webpack-plugin": "^4.5.1",
+    "source-map-loader": "^1.0.0"
   }
 }

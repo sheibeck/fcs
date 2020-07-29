@@ -1,6 +1,6 @@
 {
   "name": "Fate of 20",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "manifest_version": 2,
   "description": "This extension allows you to use FateCharacterSheet.com along with Roll20 for Fate-based roll20 Campaigns",
   "permissions": [
@@ -11,6 +11,7 @@
     "matches": [
       "*://*.fatecharactersheet.com/*",
       "*://*.fatecharactersheet.s3-website-us-east-1.amazonaws.com/*",
+      "*://do5epdx30z6ui.cloudfront.net/*",
       "*://localhost/*"
     ]
   },

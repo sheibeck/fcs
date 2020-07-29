@@ -1,9 +1,15 @@
 <template>
 <div class="sheet">
 	<div class="row">		
-		<div class="col-sm-6">
-			<div class="form-group">
+		<div class="col-sm-6 d-flex">
+			<div class="form-group w-75 d-flex mr-3">
+				<label class="mt-2 mr-2">Name</label>
 				<input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />
+			</div>
+
+			<div class="form-group d-flex">
+				<label class="mt-2 mr-2">Pronoun</label>
+				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('name')" placeholder="Pronoun" />
 			</div>
 		</div>
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">

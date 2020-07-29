@@ -12,7 +12,10 @@
         <input v-model="zone.backgroundImage" class="form-control" />
         <div class="input-group-append" style="height: 38px;">
           <button type="button" class="input-group-text" @click="toggleZoneImageEdit()"><i class="fas fa-check-circle text-success"></i></button>
-        </div>
+        </div>       
+      </div>
+      <div>
+        <a target="_blank" :href="`https://www.google.com/search?safe=strict&tbm=isch&q=${this.zone.name}`" title="Search for image">Search for image</a>
       </div>
     </div>
     <!-- drag handle -->
@@ -43,7 +46,7 @@
 
     <div class="d-flex flex-column bg-light pl-1">
       <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>    
-      <b-button :id="`add-character-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Character" @click="addZoneObject('character')"><i class="fas fa-user-circle"></i></b-button>  
+      <b-button :id="`add-character-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Character"><i class="fas fa-user-circle"></i></b-button>  
       <b-popover ref="popoverCharacter" :target="`add-character-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Character</template>
         <autocomplete :search="searchCharacters"
@@ -231,7 +234,7 @@ export default {
       let gameObject = new Array();
 
       //only show aspects for characters. We want to drive playes to use the sheets
-      if (thing == "CHARACTER" && (type !== "ASPECT" && type !== "CONSEQUENCE" && type !== "CONDITION") ) return;
+      if (thing == "CHARACTER" && (type !== "ASPECT") ) return;
 
       switch(type) {        
         case "ASPECT":

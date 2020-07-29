@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
   label {
-    font-weight: 700;
+    font-weight: 800;
   }
 
   #game-table {
@@ -15,8 +15,8 @@
 
     #scene-canvas {
       position:relative;
-      height: 1800px;
-      width: 2400px;    
+      height: 3600px;
+      width: 4800px;    
 
       background-size: 20px 20px;
       background-image:
@@ -33,7 +33,7 @@
   }
 
   /deep/ #chat {
-    width: 500px;
+    width: 700px;
 
     #chat-log {
       height: 100%;
@@ -102,7 +102,7 @@
       
         <span v-if="isHost">
           <button type="button" class="btn-sm btn btn-success ml-1 d-none p-1" @click="saveScene()"><i class="fas fa-save"></i> Save Scene</button>
-          <button v-if="!isSceneRunning" type="button" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
+          <button v-if="!isSceneRunning" type="button" :disabled="waitingForGameStart" class="btn-sm btn btn-info" @click="startGame()"><i class="fas fa-play"></i> Start Game</button>
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
@@ -123,16 +123,37 @@
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
-        </div>  
-        <div id="scene-toolbar" class="d-flex flex-column">          
-          <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
-          <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
-          <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
-          <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
-          <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>                    
-          <button type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>          
-          <a v-if="!loading" :href="`/scene/${commonSvc.GetId(scene.id)}`" title="Share Game Url" class='btn btn-link' @click="shareUrl"><i class='fa fa-share-square'></i></a>
-          <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-broom"></i></button>
+        </div>        
+        <div id="scene-toolbar" class="d-flex flex-column">         
+          <div v-if="isHost" class="d-flex flex-column">
+            <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
+            <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
+            <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>                      
+            <b-button id="save-chatlog" type="button" variant="link" class="btn btn-link" title="Save chat to campaign"><i class="fas fa-book-open"></i></b-button>  
+            <b-popover ref="popoverCampaign" triggers="click blur" target="save-chatlog">
+              <template v-slot:title>Save chat log to campaign</template>
+              <autocomplete title="Search Campaign" :search="searchCampaigns"
+                placeholder="Select Campaign"
+                aria-label="Select Campaign"
+                :get-result-value="getCampaignResultValue"
+                @submit="selectCampaignResult">
+                <template #result="{ result, props }">
+                <li v-bind="props">
+                  <div class="p-0 m-0 h6">
+                    {{result.name}}
+                  </div>             
+                </li>
+              </template></autocomplete>
+            </b-popover>
+            <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-broom"></i></button>
+          </div>
+          <div class="d-flex flex-column">
+            <button type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>
+            <a :href="`/scene/${id}`" class='btn btn-link' @click="shareUrl"><i class='fa fa-share'></i></a>
+            <a href="https://github.com/sheibeck/fcs/wiki/Scene-Builder" target="_blank" class="btn btn-link" title="Help"><i class="fas fa-question"></i></a>
+            <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
+            <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>            
+          </div>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
           <VueShowdown id="chat-log" class="border mb-1 px-1" :options="{ emoji: false }" :markdown="chatLog" />          
@@ -217,6 +238,7 @@ import SceneAspect from '../components/scene-aspect';
 import { dragscroll } from 'vue-dragscroll';
 import Panzoom from '@panzoom/panzoom';
 import VueShowdown, { showdown } from 'vue-showdown';
+import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import Peer from 'peerjs';
 import GameServer from "./../assets/js/gameServer";
@@ -253,6 +275,7 @@ export default {
     scenezone: SceneZone,
     sceneaspect: SceneAspect,
     editableinput: SceneEditableInput,
+    Autocomplete,
   },
   created() {
     vttClient = new FCSVTTClient();
@@ -269,7 +292,7 @@ export default {
     },
     chatLog() {
       setTimeout( () => {
-        this.ScrollChatToBottm();
+        this.ScrollChatToBottom();
       }, 300);
     },
     scene: {
@@ -329,6 +352,8 @@ export default {
       videoDevices: new Array(),      
       microphoneDevices: new Array(),      
       chatLog: "",
+      waitingForGameStart: false,
+      isrunning: false,
     }
   },
   computed: {
@@ -522,14 +547,16 @@ export default {
       });
     },
     startGame() {
+      this.waitingForGameStart = true;
       let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
       this.gameServer = new GameServer();
-      this.gameServer.initialize();
+      this.gameServer.initialize();      
     },
     stopGame() {
       if (this.isHost)
       {
         this.gameServer.endScene();
+        this.waitingForGameStart = false;
       }
     },
     joinGame() {      
@@ -744,19 +771,21 @@ export default {
     sendChatMessage() {
       if (!this.chatMessage) return;      
       
-      if (this.gameClient) {
+      let userName = this.getUserName;
+      if (this.gameClient) {        
         if (this.selectedPlayer !== "everyone") {
           let player = this.scene.players.find(obj => {
             return obj.playerId === this.selectedPlayer
-          });          
-          this.gameClient.sendPrivateMessage(this.getUserName, player, this.chatMessage);          
+          });
+          this.gameClient.sendPrivateMessage(userName, player, this.chatMessage); 
+          this.updateChatLog(`${userName} (pm ${player.userName})`, this.chatMessage);                   
         }
         else {
-          this.gameClient.sendChatMessage(this.getUserName, this.chatMessage);          
+          this.gameClient.sendChatMessage(userName, this.chatMessage);          
         }        
       }
       else {
-        this.updateChatLog(this.getUserName, this.chatMessage);
+        this.updateChatLog(userName, this.chatMessage);
       }
       
       this.chatMessage = "";
@@ -787,12 +816,12 @@ ${msg}`;
       }
     },   
     setupGameServer(e) {
-      this.$set(this.scene, "isrunning", true);
-      //this.scene.isrunning = true;
+      this.scene.isrunning = true;
+      this.waitingForGameStart = false;
+      
       if (this.scene.gamePeerId !== e.detail.peerid)
       {
-        this.scene.gamePeerId = e.detail.peerid;        
-        //this.saveScene(true);
+        this.scene.gamePeerId = e.detail.peerid;                
       }
     },
     sendToVTT(type, description, data, data2, character) {
@@ -858,6 +887,9 @@ ${msg}`;
     clearChatLog() {
       this.chatLog = "";
     },
+    copyChatToCampaignLog() {
+
+    },
     spendFate(event){      
       let newValue = event.target.value;
       let msg = parseInt(newValue) > (parseInt(this.scene.fatepoints || 0)) ? "Gained" : "Spent";      
@@ -884,10 +916,49 @@ ${msg}`;
       }
       
     },
-    ScrollChatToBottm() {          
+    ScrollChatToBottom() {          
       var chatLogContainer = this.$el.querySelector("#chat-log");
       chatLogContainer.scrollTop = chatLogContainer.scrollHeight;    
-    }   
+    },
+     /* campaign search */
+    searchCampaigns(query) {      
+      return new Promise((resolve) => {
+        if (query.length < 3) {
+          return resolve([])
+        }
+        
+        dbSvc.ListObjects("CAMPAIGN", this.userId, query)
+          .then((data) => {            
+            resolve(data)
+          })
+      })
+    },
+    getCampaignResultValue(result) {
+      return result;
+    },    
+    selectCampaignResult(result) {      
+      this.copyChatToCampaign(result);      
+      this.$refs.popoverCampaign.$emit('close');   
+    },   
+    copyChatToCampaign(campaign) {      
+      let session = {
+        id: commonSvc.SetId("LOG", commonSvc.GenerateUUID()),
+        object_type: "LOG",
+        date: commonSvc.GetFormattedDate(new Date()),
+        description: this.chatLog,
+        related_id: campaign.id,
+        owner_id: this.userId,
+      };
+      
+      dbSvc.SaveObject(session).then( (response) => {  
+        if (response) {      
+          commonSvc.Notify(`Chat saved to campaign ${campaign.name}.`, 'success');
+        }
+      });
+
+      this.clearChatLog();
+    }
+    /* end character search */
   },
 }
 </script>
