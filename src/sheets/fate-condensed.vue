@@ -91,7 +91,7 @@
 			<div class="fate-header col-12">Skills</div>
 
 			<div class="px-3 skills">
-				<div class="small text-muted font-italic">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
+				<div class="small text-muted font-italic d-print-none">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
 				<div v-for="skill in skills" :key="skill.obj" class="py-1">
 					<inputskill :item="skill" />
 				</div>

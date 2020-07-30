@@ -42,7 +42,7 @@
 
     <div class="row">
         <!-- aspects -->
-        <div class="col-sm-12 col-md-4 fate-aspects">
+        <div class="col-sm-12 col-md-6 fate-aspects">
             <div class="form-group">
                 <div for="" class="fate-header">Aspects</div>
             </div>            
@@ -51,7 +51,7 @@
 			</div>    
         </div>
 
-        <div class="col-sm-12 col-md-8 fate-skills">                       
+        <div class="col-sm-12 col-md-6 fate-skills">                       
             <inputskillpyramid :skills="skills" header="Skills" :skillList="skillList" />            
         </div>
     </div>

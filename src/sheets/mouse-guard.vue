@@ -265,10 +265,8 @@ components: {
 	/deep/ .fate-conditions label {
         font-family: 'IM Fell English', sans-serif;
         text-transform: uppercase;
-		font-size: 30px;
-		font-weight: 700;
-		margin-left: -5px;
-		margin-right: -5px;
+		font-size: 24px;
+		font-weight: 700;		
 	}
 
 	.portrait {

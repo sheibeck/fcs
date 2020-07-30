@@ -203,10 +203,8 @@ export default {
       display: none;
     }
 
-    .sheet {
-			margin: 20px;
-			margin-top: 40px;
-			max-width: 1024px;
+    .sheet {			
+			margin-top: 30px;			
 		}
   }
 
