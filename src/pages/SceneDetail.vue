@@ -565,7 +565,9 @@ export default {
       this.gameClient = new GameClient(gameServerId, this.userId, this.getUserName, this.isHost);
       this.gameClient.initialize();      
     },
-    exitGame() {      
+    exitGame() {
+      this.waitingForGameStart = false;
+      
       if (!this.gameClient) return;
 
       for (let conn = 0; conn < this.gameClient.mediaConnections.length; conn++) {
@@ -598,7 +600,7 @@ export default {
       //close all streams      
       if (this.gameClient.peer) this.gameClient.peer.destroy();
       this.gameClient.peer = null;
-      this.gameClient.myStream = null;
+      this.gameClient.myStream = null;      
     },
     updatePlayer(key, value)
     {

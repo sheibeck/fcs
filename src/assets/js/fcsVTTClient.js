@@ -112,8 +112,9 @@ export default class FCSVTTClient {
                 <p class="card-text py-0 font-weight-bold">${description}</p>
             </div>
         </div>`*/;        
-        let chatCard = `> ${message.character} ${message.action}
-> **${description}**`;
+        let chatCard = `> ${message.character} ${message.action}`
+        if (description)
+            chatCard += `\n> **${description}**`;
 
         window.parent.postMessage({type: "charactersheet", data: chatCard});        
     }
