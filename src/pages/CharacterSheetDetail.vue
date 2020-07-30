@@ -20,7 +20,7 @@
         <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
           <div class='form-group'>
             <label class='' for='image_url'>Portrait Url:</label>
-            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
+            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />
           </div>
           <div class='form-group'>
             <label class='' for='image_url'>Description:</label>

@@ -7,7 +7,7 @@
 
     <div class="mr-auto w-100">
       <div class="d-flex">
-        <div class="d-flex w-100 mr-auto" :class="getBgForType(objectdata)">          
+        <div class="d-flex w-100 mr-auto" :class="getBgColor(objectdata)">
           <button v-if="isFCSObject" :title="`Play this ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 mx-1 text-white btn btn-link sheet-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
           <editableinput :object="objectdata" item="name" class="font-weight-bold" />
           <img v-if="objectdata.image_url && !imageEdit" :src="objectdata.image_url" class="rounded-circle portrait" alt="portrait" />          
@@ -122,14 +122,19 @@
       <button v-if="!objectdata.acted" type="button" class="btn btn-link p-0" title="Has not acted yet" @click="toggleTurn()"><i class="far fa-hourglass"></i></button>
       <button v-if="objectdata.acted" type="button" class="btn btn-link p-0" title="Has taken an action" @click="toggleTurn()"><i class="fas fa-hourglass"></i></button>
       <button type="button" class="btn btn-link p-0" title="Create advantage/boost" @click="addThingToObject('caAndBoost')"><i class="fas fa-sticky-note"></i></button>      
-      <b-button :id="`move-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Move to Zone"><i class="fas fa-expand-arrows-alt"></i></b-button>
-      <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
+      <b-button :id="`move-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Move to Zone"><i class="fas fa-expand-arrows-alt"></i></b-button>      
       <b-popover ref="popoverZonePicker" :target="`move-object-${this.objectdata.id}`" triggers="click blur">
         <template v-slot:title>Move to Zone</template>
         <select v-model="selectedZone" @change="moveObjectToZone">
           <option v-for="zone in zoneList" :key="zone.id" :value="zone.id">{{zone.name}}</option>
         </select>
       </b-popover>
+      <b-button :id="`color-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Change Color"><i class="fas fa-palette"></i></b-button>
+      <b-popover ref="popoverColorPicker" :target="`color-object-${this.objectdata.id}`" triggers="click blur">
+        <template v-slot:title>Change Color</template>
+        <div v-for="color in colorList" :key="color" :value="color"><div class="p-2" style="cursor:pointer;" :class="color" @click="updateObjectColor(color)">&nbsp;</div></div>      
+      </b-popover> 
+      <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button type="button" class="btn btn-link p-0 mt-auto" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
@@ -183,6 +188,9 @@ export default {
       imageEdit: false,
       commonSvc: new CommonService(fcs),
       selectedZone: null,
+      colorList: [
+        "bg-primary", "bg-secondary", "bg-danger", "bg-success", "bg-dark text-white", "bg-warning"
+      ]
     }
   },
   computed: {
@@ -251,6 +259,10 @@ export default {
 
       this.selectedZone = null;
     },   
+    updateObjectColor(color) {
+      this.objectdata.bgcolor = color;
+      this.$refs.popoverColorPicker.$emit('close');
+    },
     addThingToObject(type) {  
       let objectType = "sceneobject";     
       switch(type) {
@@ -314,24 +326,37 @@ export default {
       newObj.y = null;
       this.$parent.$parent.$props.zone.sceneobjects.push(newObj);
     },
-    getBgForType(obj) {      
-      switch(obj.object_type) {
-        case "ADVERSARY":
-          switch(obj.type.toLowerCase()) {
-            case "obstacle":
-              return "bg-dark text-white";
-            case "constraint":
-              return "bg-primary";
-            case "other":
-              return "bg-info";
-            default:
-              return "bg-danger text-white";
-          }
-        case "CHARACTER":
-          return "bg-success";
-        default:
-          return "bg-secondary";
+    getBgColor(obj) {
+      if (!obj.bgcolor) {      
+        let bgColor = "";       
+        switch(obj.object_type) {
+          case "ADVERSARY":
+            switch(obj.type.toLowerCase()) {
+              case "obstacle":
+                bgColor = "bg-dark text-white";
+                break;
+              case "constraint":
+                bgColor = "bg-primary";
+                break;
+              case "other":
+                bgColor = "bg-info";
+                break;
+              default:
+                bgColor= "bg-danger text-white";
+                break;
+            }
+          case "CHARACTER":
+            bgColor = "bg-success";
+            break;
+
+          default:
+            bgColor = "bg-secondary";
+            break;
+        }      
+        this.$set(obj, 'bgcolor', bgColor);
       }
+
+      return obj.bgcolor;
     },  
     openLink() {      
       let data = this.objectdata;

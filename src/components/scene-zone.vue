@@ -5,25 +5,27 @@
     
     <!-- zone background image and editor -->
     <img v-if="zone.backgroundImage && !zoneImageEdit" :src="zone.backgroundImage" class="img-fluid zone-image" />
-    
-    <div v-if="zoneImageEdit">      
-      <label class="control-label">Zone Image Url</label><br/>    
-      <div class="input-group">      
-        <input v-model="zone.backgroundImage" class="form-control" />
-        <div class="input-group-append" style="height: 38px;">
-          <button type="button" class="input-group-text" @click="toggleZoneImageEdit()"><i class="fas fa-check-circle text-success"></i></button>
-        </div>       
-      </div>
-      <div>
-        <a target="_blank" :href="`https://www.google.com/search?safe=strict&tbm=isch&q=${this.zone.name}`" title="Search for image">Search for image</a>
-      </div>
-    </div>
+   
     <!-- drag handle -->
     <i class="fas fa-expand-arrows-alt p-1 mr-1 bg-dark text-white zoneHandle"></i>
-
+          
     <!-- details -->
     <div class="mr-auto cancelZoneDrag w-100">
-      <header>
+      <!-- zone image editor -->
+      <div v-if="zoneImageEdit" class="m-2 p-2 border bg-light">
+        <label class="control-label">Zone Image Url</label><br/>    
+        <div class="input-group">      
+          <input v-model="zone.backgroundImage" class="form-control" />
+          <div class="input-group-append" style="height: 38px;">
+            <button type="button" class="input-group-text" @click="toggleZoneImageEdit()"><i class="fas fa-check-circle text-success"></i></button>
+          </div>       
+        </div>
+        <div>
+          <a target="_blank" :href="`https://www.google.com/search?safe=strict&tbm=isch&q=${this.zone.name}`" title="Search for image">Search for image</a>
+        </div>        
+      </div>     
+
+      <header v-if="!zoneImageEdit">
         <!-- name -->        
         <label title="Click to edit" v-if="!editing" @click="editing=true" style="vertical-align: top;">{{zone.name.toUpperCase()}}</label>
         <div class="input-group" v-if="editing">  
@@ -37,11 +39,12 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <div :id="`drag-container-${commonSvc.GetId(zone.id)}`" class="border" style="min-height:150px;height:94%;width:100%;">
+      <div v-if="!zoneImageEdit" :id="`drag-container-${commonSvc.GetId(zone.id)}`" class="border" style="min-height:150px;height:94%;width:100%;">
         
         <sceneobject :objectdata="item" v-for="item in zone.sceneobjects" :key="item.id" />
       
-      </div>      
+      </div>  
+      
     </div>
 
     <div class="d-flex flex-column bg-light pl-1">

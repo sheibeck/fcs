@@ -889,10 +889,7 @@ ${msg}`;
     },
     clearChatLog() {
       this.chatLog = "";
-    },
-    copyChatToCampaignLog() {
-
-    },
+    },    
     spendFate(event){      
       let newValue = event.target.value;
       let msg = parseInt(newValue) > (parseInt(this.scene.fatepoints || 0)) ? "Gained" : "Spent";      
@@ -939,11 +936,11 @@ ${msg}`;
     getCampaignResultValue(result) {
       return result;
     },    
-    selectCampaignResult(result) {      
+    selectCampaignResult(result) {
       this.copyChatToCampaign(result);      
       this.$refs.popoverCampaign.$emit('close');   
     },   
-    copyChatToCampaign(campaign) {      
+    copyChatToCampaign(campaign) {
       let session = {
         id: commonSvc.SetId("LOG", commonSvc.GenerateUUID()),
         object_type: "LOG",
@@ -959,7 +956,10 @@ ${msg}`;
         }
       });
 
-      this.clearChatLog();
+      var doClearChat = confirm("Do you wan to clear the chat log?");
+      if (doClearChat) {
+        this.clearChatLog();
+      }      
     }
     /* end character search */
   },
