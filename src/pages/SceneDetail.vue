@@ -124,9 +124,9 @@
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
         </div>        
-        <div id="scene-toolbar" class="d-flex flex-column">         
+        <div id="scene-toolbar" class="d-flex flex-column align-items-end">
           <div v-if="isHost" class="d-flex flex-column">
-            <button type="button" title="New Turn" class="btn btn-link" @click="startNewTurn()"><i class="fas fa-undo"></i></button>
+            <button type="button" title="New Round" class="btn btn-link" @click="startNewRound()"><i class="fas fa-undo"></i></button>
             <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
             <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>                      
             <b-button id="save-chatlog" type="button" variant="link" class="btn btn-link" title="Save chat to campaign"><i class="fas fa-book-open"></i></b-button>  
@@ -144,15 +144,18 @@
                   </div>             
                 </li>
               </template></autocomplete>
-            </b-popover>
-            <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-broom"></i></button>
+            </b-popover>            
           </div>
-          <div class="d-flex flex-column">
+          <div class="d-flex flex-column mr-auto">
             <button type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>
-            <a :href="`/scene/${id}`" class='btn btn-link' @click="shareUrl"><i class='fa fa-share'></i></a>
+            <a :href="`/scene/${id}`" title="Copy scene link" class='btn btn-link' @click="shareUrl"><i class='fa fa-share'></i></a>
             <a href="https://github.com/sheibeck/fcs/wiki/Scene-Builder" target="_blank" class="btn btn-link" title="Help"><i class="fas fa-question"></i></a>
             <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
             <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>            
+          </div>
+          <div v-if="isHost" class="d-flex flex-column mt-auto">
+            <button type="button" class="btn btn-link" title="Clear chat log" @click="clearChatLog()"><i class="fas fa-comment-slash"></i></button>
+            <button type="button" class="btn btn-link" title="Clear scene" @click="clearScene()"><i class="fas fa-broom"></i></button>
           </div>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
@@ -241,6 +244,8 @@ import VueShowdown, { showdown } from 'vue-showdown';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import Peer from 'peerjs';
+import bootbox from 'bootbox';
+
 import GameServer from "./../assets/js/gameServer";
 import GameClient from "./../assets/js/gameClient";
 import FCSVTTClient from "./../assets/js/fcsVTTClient";
@@ -610,8 +615,8 @@ export default {
       
       this.scene.players[idx][key] = value;      
     },
-    startNewTurn() {
-      commonSvc.Notify("Starting a new turn...", "info");
+    startNewRound() {
+      commonSvc.Notify("Starting a new round...", "info");
       for (let zoneIdx in this.scene.zones) {
         for (let objIdx in this.scene.zones[zoneIdx].sceneobjects) {
           this.scene.zones[zoneIdx].sceneobjects[objIdx].hasOwnProperty('acted')
@@ -888,8 +893,48 @@ ${msg}`;
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
     },
     clearChatLog() {
-      this.chatLog = "";
-    },    
+      bootbox.confirm({
+        title: "Clear Chat?",
+        message: "Are you sure you want to clear the chat log? This cannot be undone.",
+        buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-danger'
+            },
+            cancel: {
+              label: 'No',
+              className: 'btn-secondary'
+            }
+        },
+        callback: (result) => {
+          if (result) {
+            this.chatLog = "";
+          }
+        }
+      });      
+    },
+    clearScene() {
+      bootbox.confirm({
+        title: "Clear Scene?",
+        message: "Are you sure you want to clear the scene? This cannot be undone.",
+        buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-danger'
+            },
+            cancel: {
+              label: 'No',
+              className: 'btn-secondary'
+            }
+        },
+        callback: (result) => {
+          if (result) {
+            this.scene.zones = [];
+            this.scene.aspects = [];
+          }
+        }
+      });
+    },
     spendFate(event){      
       let newValue = event.target.value;
       let msg = parseInt(newValue) > (parseInt(this.scene.fatepoints || 0)) ? "Gained" : "Spent";      

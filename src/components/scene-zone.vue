@@ -155,8 +155,8 @@ export default {
     init() {
     },    
     makeGameObject(result, type) {
-      if (!result) return;
-            
+      if (!result || ( type == "CHARACTER" && this.characterExists(result.id) )) return;
+                  
       result.aspects = this.convertThingToGameObject(result.aspects, type, "ASPECT");
       result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE");      
       result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
@@ -177,7 +177,21 @@ export default {
       }
 
       this.zone.sceneobjects.push(result);
-    },    
+    },   
+    characterExists(id) {      
+      let isCharacterInScene = this.$parent.$data.scene.zones.find(( zone ) => {
+        return zone.sceneobjects.find((obj) => {
+          return obj.id == id;
+        }) 
+      });
+      
+      if (isCharacterInScene) {
+        this.commonSvc.Notify(`Character is already in the scene.`, 'warning');
+        return true;
+      }
+      
+      return false;      
+    },
     addNPC() {      
       let npc = models.SceneNPC();
       this.zone.sceneobjects.push(npc);
