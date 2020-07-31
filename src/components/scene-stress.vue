@@ -12,9 +12,9 @@
     <span v-for="box in stress.boxes" v-bind:key="box.id">
       <label v-if="typeof box.label == 'string'">{{box.label.toTitleCase()}}</label><input type="checkbox" :checked="box.used" @change="toggleStress($event, box.id)" class="mr-1" />
     </span>
-    <button type="button" class="btn btn-link p-0 m-0" title="Add stress box" @click="addStressBox()"><i class="fas fa-plus-square fa-xs"></i></button>    
-    <button v-if="stress.boxes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove stress box" @click="removeStressBox()"><i class="fas fa-minus-square fa-xs"></i></button>
-    <button class="btn btn-link p-0 m-0 small" type="button"><i title="Remove stress track" @click="removeStressTrack()" class="fas fa-trash-alt fa-xs"></i></button>
+    <button v-if="!isCondition" type="button" class="btn btn-link p-0 m-0" title="Add stress box" @click="addStressBox()"><i class="fas fa-plus-square fa-xs"></i></button>    
+    <button v-if="!isCondition && stress.boxes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove stress box" @click="removeStressBox()"><i class="fas fa-minus-square fa-xs"></i></button>
+    <button v-if="!isCondition" class="btn btn-link p-0 m-0 small" type="button"><i title="Remove stress track" @click="removeStressTrack()" class="fas fa-trash-alt fa-xs"></i></button>
   </div>
 </template>
 
@@ -27,9 +27,13 @@ let models = new Models();
 export default {
   name: 'SceneStress',
   props: {
-    stress: Object,       
+    stress: Object,
+    type: String       
   },  
-  computed: {    
+  computed: {
+    isCondition() {
+      return this.type && this.type.toLowerCase() == "condition";
+    }    
   },
   data () {
     return { 

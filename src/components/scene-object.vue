@@ -1,15 +1,16 @@
 <template>
   <div class="m-1 p-1 bg-light border d-flex scene-object" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`"    
     :style="{ position: 'absolute', top: `${objectdata.y}px`, left: `${objectdata.x}px` }">    
-    <div class="bg-secondary text-white mr-1 p-1 drag-handle">
+    <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column align-items-end">
       <i class="fas fa-bars"></i>
+      <button v-if="isFCSObject" :title="`Play ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 m-0 mt-auto text-white btn btn-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
+      <button v-if="isCharacter" :title="`Sync ${FCSObjectType}`" @click="syncCharacter()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-sync-alt fa-xs"></i></button>      
     </div>
 
     <div class="mr-auto w-100">
       <div class="d-flex">
-        <div class="d-flex w-100 mr-auto" :class="getBgColor(objectdata)">
-          <button v-if="isFCSObject" :title="`Play this ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 mx-1 text-white btn btn-link sheet-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
-          <editableinput :object="objectdata" item="name" class="font-weight-bold" />
+        <div class="d-flex w-100 mr-auto" :class="getBgColor(objectdata)">          
+          <editableinput :object="objectdata" item="name" class="font-weight-bold pl-1" />
           <img v-if="objectdata.image_url && !imageEdit" :src="objectdata.image_url" class="rounded-circle portrait" alt="portrait" />          
         </div>
       </div>
@@ -30,18 +31,18 @@
       <div>
         <div class="header d-flex">
           <span class="mr-auto">Aspects</span>
-          <i title="Add aspect" @click="addThingToObject('aspect')" class="fas fa-plus-circle fa-sm pt-1"></i>
+          <i v-if="!isCharacter" title="Add aspect" @click="addThingToObject('aspect')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="objectdata.show.aspects" @click="objectdata.show.aspects=false" title="Hide" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!objectdata.show.aspects" @click="objectdata.show.aspects=true" title="Show" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
         <div v-if="objectdata.show.aspects">
           <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
-            <aspect :aspect="aspect" location="thing"  />
+            <aspect :aspect="aspect" location="thing" :type="objectdata.object_type" />
           </div>
         </div>
       </div>
 
-      <div v-if="objectdata.object_type != 'CHARACTER'">
+      <div v-if="!isCharacter">
         <div class="header d-flex">
           <span class="mr-auto">Skills</span>
           <i title="Add skill" @click="addThingToObject('skill')" class="fas fa-plus-circle fa-sm pt-1"></i>
@@ -55,7 +56,7 @@
         </div>
       </div>
 
-      <div v-if="objectdata.object_type != 'CHARACTER'">
+      <div v-if="!isCharacter">
         <div class="header d-flex">
           <span class="mr-auto">Stunts/Extras</span>
           <i title="Add stunt/extra" @click="addThingToObject('stuntextra')" class="fas fa-plus-circle fa-sm pt-1"></i>
@@ -69,10 +70,10 @@
         </div>
       </div>
 
-      <div v-if="objectdata.object_type != 'CHARACTER'">
+      <div v-if="!isCharacter">
         <div class="header d-flex">
           <span class="mr-auto">Stress</span>
-          <i title="Add stress" @click="addThingToObject('stress')" class="fas fa-plus-circle fa-sm pt-1"></i>
+          <i title="Add stress track" @click="addThingToObject('stress')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="objectdata.show.stress" @click="objectdata.show.stress=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!objectdata.show.stress" @click="objectdata.show.stress=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
@@ -83,30 +84,30 @@
         </div>
       </div>
 
-      <div v-if="objectdata.conditions && objectdata.object_type != 'CHARACTER'">
+      <div v-if="objectdata.conditions">
         <div class="header d-flex">
           <span class="mr-auto">Conditions</span>
-          <i title="Add condition" @click="addThingToObject('condition')" class="fas fa-plus-circle fa-sm pt-1"></i>
+          <i v-if="!isCharacter" title="Add condition" @click="addThingToObject('condition')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="objectdata.show.conditions" @click="objectdata.show.conditions=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!objectdata.show.conditions" @click="objectdata.show.conditions=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
         <div v-if="objectdata.show.conditions">
           <div v-for="condition in this.objectdata.conditions" v-bind:key="condition.id">
-            <stress :stress="condition" location="thing"  />
+            <stress :stress="condition" location="thing" type="CONDITION"  />
           </div>
         </div>
       </div>
 
-      <div v-if="objectdata.consequences && objectdata.object_type != 'CHARACTER'">
+      <div v-if="objectdata.consequences">
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
-          <i title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>
+          <i v-if="!isCharacter" title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>
           <i v-if="objectdata.show.consequences" @click="objectdata.show.consequences=false" class="fas fa-chevron-circle-up fa-sm pt-1"></i>
           <i v-if="!objectdata.show.consequences" @click="objectdata.show.consequences=true" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
         <div v-if="objectdata.show.consequences">
           <div v-for="consequence in objectdata.consequences" v-bind:key="consequence.id">
-            <consequence :consequence="consequence" location="thing"  />
+            <consequence :consequence="consequence" location="thing" :type="objectdata.object_type" />
           </div>
         </div>
       </div>
@@ -134,7 +135,7 @@
         <template v-slot:title>Change Color</template>
         <div v-for="color in colorList" :key="color" :value="color"><div class="p-2" style="cursor:pointer;" :class="color" @click="updateObjectColor(color)">&nbsp;</div></div>      
       </b-popover> 
-      <button v-if="objectdata.object_type != 'CHARACTER'" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
+      <button v-if="!isCharacter" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button type="button" class="btn btn-link p-0 mt-auto" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
@@ -142,6 +143,7 @@
 </template>
 
 <script>
+import DbService from '../assets/js/dbService';
 import SceneAspect from './scene-aspect';
 import SceneStress from './scene-stress';
 import SceneStuntExtra from './scene-stuntextra';
@@ -152,6 +154,7 @@ import Models from '../assets/js/models';
 import interact from 'interactjs';
 import SceneEditableInput from './scene-editable-input';
 
+let dbSvc = null;
 let models = new Models();
 
 export default {
@@ -167,7 +170,9 @@ export default {
     stuntextra: SceneStuntExtra,
     editableinput: SceneEditableInput,
   },
-  created() {    
+  created() {  
+    dbSvc = new DbService(this.$root);
+      
     if (!this.objectdata.x) this.$set(this.objectdata, "x", 40);
     if (!this.objectdata.y) this.$set(this.objectdata, "y", 40);   
 
@@ -196,6 +201,9 @@ export default {
   computed: {
     isFCSObject() {
       return this.objectdata.object_type == "CHARACTER" || this.objectdata.object_type == "ADVERSARY";
+    },
+    isCharacter() {
+      return this.objectdata.object_type == "CHARACTER";
     },
     FCSObjectType() {
       return this.objectdata.object_type;
@@ -370,6 +378,26 @@ export default {
           break;
         default:
           break;
+      }
+    },
+    async syncCharacter() {
+      let data = this.objectdata;      
+      let character = await dbSvc.GetObject(data.id, data.owner_id);
+      
+      if (character) {
+        let type = "CHARACTER";
+        
+        //update aspects
+        data.aspects = this.$parent.$parent.convertThingToGameObject(character.aspects, type, "ASPECT");
+        if (character.consequences) {
+          data.consequences = this.$parent.$parent.convertThingToGameObject(character.consequences, type, "CONSEQUENCE");  
+        }
+        /*
+        TODO: Implement this. Use dresden sheet as example of complicated implemenation
+        if (character.conditions) {
+          data.conditions = this.$parent.$parent.convertThingToGameObject(character.conditions, type, "CONDITION");
+        }
+        */
       }
     },
     toggleTurn() {      

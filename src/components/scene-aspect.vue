@@ -6,7 +6,7 @@
       
       <invoke :invokes="aspect.invokes" class="mx-2" />
       
-      <button type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
+      <button v-if="!isCharacter" type="button" class="btn btn-link p-0 m-0" title="Remove aspect" @click="removeAspect()"><i class="fas fa-trash-alt fa-xs"></i></button>
     </div>    
   </div>
 </template>
@@ -20,13 +20,17 @@ export default {
   name: 'SceneAspect',
   props: {
     aspect: Object,
-    location: String,        
+    location: String,
+    type: String,        
   },
   components: {
     invoke: SceneInvoke,
     editableinput: SceneEditableInput, 
   },
-  computed: {    
+  computed: { 
+    isCharacter() {
+      return this.type && this.type.toLowerCase() == "character";
+    }    
   },
   data () {
     return { 
