@@ -1,30 +1,25 @@
 import CommonService from "./commonService";
+import PeerService from "./peerService";
 
-export default class GameServer {    
+export default class GameServer {
     remotePeers= new Array();// You need this to link with specific DOM element
     connections= new Array(); // This is where you manage multi-connections
     commonSvc = new CommonService();
+    peerSvc = new PeerService();
+
     maxReconnectRetries = 3;
 
     constructor(peerId) {
-        this.peer = null; 
-        this.peerId = peerId;
+        this.peer = null;
         this.conn = null;
         this.call = null;
     }
 
-    initialize = () => {
+    initialize = (peerId) => {
         this.displayChatMessage("Initializing game server...");
-
-        let peerId = this.commonSvc.GeneratePeerId();        
-        
+               
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(peerId, {
-            debug: 3,
-            secure: true,
-            host: "fcs-peer-server.herokuapp.com",
-            port: 443           
-        });
+        this.peer = this.peerSvc.GetPeerConnection(peerId);
 
         console.log('ID: ' + this.peer.id);
 
@@ -48,6 +43,7 @@ export default class GameServer {
             console.log("Connection destroyed. Please refresh.");            
         });
         this.peer.on('error', (e) => {
+            debugger;
             console.log(e);
             alert(e);               
         });   

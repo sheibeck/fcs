@@ -86,11 +86,7 @@ export default class CommonService {
   GenerateUUID = function() {
     return shortid.generate();
   }
-
-  GeneratePeerId = function() {  
-    return (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
-  }
-
+  
   SortObject = (obj) => {
     return Object.keys(obj).sort().reduce(function (result, key) {
         result[key] = obj[key];

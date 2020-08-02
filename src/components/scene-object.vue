@@ -153,6 +153,7 @@ import CommonService from '../assets/js/commonService';
 import Models from '../assets/js/models';
 import interact from 'interactjs';
 import SceneEditableInput from './scene-editable-input';
+import bootbox from 'bootbox';
 
 let dbSvc = null;
 let models = new Models();
@@ -194,7 +195,7 @@ export default {
       commonSvc: new CommonService(fcs),
       selectedZone: null,
       colorList: [
-        "bg-primary", "bg-secondary", "bg-danger", "bg-success", "bg-dark text-white", "bg-warning"
+        "bg-primary", "bg-secondary", "bg-danger text-white", "bg-success", "bg-dark text-white", "bg-warning"
       ]
     }
   },
@@ -245,10 +246,28 @@ export default {
         }); 
     },
     removeObject(id) {
-      let $component = this;       
-      this.$parent.$parent.$props.zone.sceneobjects = this.$parent.$parent.$props.zone.sceneobjects.filter(function( obj ) {
-        return obj.id !== id;
-      });
+      bootbox.confirm({
+        title: "Delete Object?",
+        message: "Are you sure you want to delete this object? This cannot be undone.",
+        buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-danger'
+            },
+            cancel: {
+              label: 'No',
+              className: 'btn-secondary'
+            }
+        },
+        callback: (result) => {
+          if (result) {
+            let $component = this;       
+            this.$parent.$parent.$props.zone.sceneobjects = this.$parent.$parent.$props.zone.sceneobjects.filter(function( obj ) {
+              return obj.id !== id;
+            });
+          }
+        }
+      });      
     },
     moveObjectToZone() {
       //get array
@@ -330,11 +349,13 @@ export default {
       objCopy.id = this.commonSvc.GenerateUUID();
 
       let newObj = JSON.parse( JSON.stringify( objCopy ) );
-      newObj.x = null;
-      newObj.y = null;
+      newObj.x = objCopy.x + 25;
+      newObj.y = objCopy.y + 25;
       this.$parent.$parent.$props.zone.sceneobjects.push(newObj);
+
+      this.commonSvc.Notify(`${objCopy.name} was copied.`, "success");
     },
-    getBgColor(obj) {
+    getBgColor(obj) {      
       if (!obj.bgcolor) {      
         let bgColor = "";       
         switch(obj.object_type) {
@@ -353,6 +374,8 @@ export default {
                 bgColor= "bg-danger text-white";
                 break;
             }
+          break;
+
           case "CHARACTER":
             bgColor = "bg-success";
             break;

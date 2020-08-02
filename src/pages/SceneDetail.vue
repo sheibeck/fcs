@@ -106,8 +106,8 @@
           <button v-if="isSceneRunning" type="button" class="btn-sm btn btn-danger" @click="stopGame()"><i class="fas fa-stop-circle"></i> Stop Game</button>          
         </span>
 
-        <span v-if="isSceneRunning">
-          <button v-if="!isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
+        <span v-if="(isSceneRunning && isHost) || !isHost">
+          <button v-if="!isConnected" type="button" :disabled="waitingToJoin" class="btn-sm btn btn-secondary ml-1" @click="joinGame()"><i class="fas fa-sign-language"></i> Join Game</button>
           <button v-if="isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="exitGame()"><i class="fas fa-sign-language"></i> Exit Game</button>
         </span>
 
@@ -358,7 +358,8 @@ export default {
       microphoneDevices: new Array(),      
       chatLog: "",
       waitingForGameStart: false,
-      isrunning: false,
+      waitingToJoin: false,
+      isrunning: false,      
     }
   },
   computed: {
@@ -387,7 +388,7 @@ export default {
       return this.scene.owner_id == this.userId;
     },
     isSceneRunning() {
-      return this.scene.isrunning;
+      return this.isrunning;
     },
     isConnected() {      
       return this.gameClient && this.gameClient.peer && this.gameClient.peer.open;
@@ -464,7 +465,12 @@ export default {
       this.attachListeners();
     },
     attachListeners() {
-      document.addEventListener('gameserver', (e) => {
+      document.addEventListener('clienterror', (e) => {        
+       this.exitGame();
+       this.commonSvc.Notify("Game may not be running. Please make sure the game was started by the host and try again.");
+      }, false);
+
+      document.addEventListener('gameserver', (e) => {        
         //if the gameserver is running then setup the game
         switch(e.detail.type) {
           case "connected":
@@ -527,17 +533,14 @@ export default {
         }
       }, false);
 
-      document.addEventListener('gameend',  (e) => {           
-        if (this.isHost) {
-          this.scene.isrunning = false;
-        }
+      document.addEventListener('gameend',  (e) => {
+        this.isrunning = false;        
+        this.exitGame();
       }, false);
 
-      document.addEventListener('gameerror',  (e) => {           
-        if (this.isHost) {
-          this.commonSvc.Notify(e.detail.message);
-          this.scene.isrunning = false;    
-        }
+      document.addEventListener('gameerror',  (e) => {
+        this.commonSvc.Notify(e.detail.message);
+        this.isrunning = false;        
       }, false); 
      
       window.addEventListener("message",  (e) => {
@@ -551,12 +554,17 @@ export default {
       document.addEventListener("displaychatmessage", (e) => {
         this.updateChatLog(e.detail.userName, e.detail.message);
       });
+      
+      window.addEventListener("beforeunload", (e) => {                
+        if (this.isSceneRunning) {
+          e.returnValue = 'Your scene is still running! You should shut it down before you exit this page. Do you still want to leave?';          
+        }        
+      });
     },
     startGame() {
       this.waitingForGameStart = true;
-      let peerId = this.scene.gamePeerId ?? commonSvc.GetId(this.scene.id);
-      this.gameServer = new GameServer();
-      this.gameServer.initialize();      
+      this.gameServer = new GameServer();      
+      this.gameServer.initialize(this.scene.gamePeerId);      
     },
     stopGame() {
       if (this.isHost)
@@ -566,12 +574,14 @@ export default {
       }
     },
     joinGame() {      
+      this.waitingToJoin = true;
       const gameServerId = this.scene.gamePeerId;
       this.gameClient = new GameClient(gameServerId, this.userId, this.getUserName, this.isHost);
       this.gameClient.initialize();      
     },
     exitGame() {
       this.waitingForGameStart = false;
+      this.waitingToJoin = false;
       
       if (!this.gameClient) return;
 
@@ -642,12 +652,6 @@ export default {
         });
       }      
 
-      //cleanup from shutdown if we left the game running
-      if (this.isHost && this.isSceneRunning) {
-        this.scene.isrunning = false;
-        //this.saveScene(true);
-      }
-
       this.configureUser();      
     },   
     configureUser() {      
@@ -685,6 +689,7 @@ export default {
         "scale": "",
         "slug": "new-scene",
         "name": "New Scene",
+        "gamePeerId": null,        
       };
       this.$set(this, 'scene', c);
       this.loading = false;
@@ -823,13 +828,15 @@ ${msg}`;
         document.getElementById("game-table").style.height = "85vh";        
       }
     },   
-    setupGameServer(e) {
-      this.scene.isrunning = true;
+    setupGameServer(e) {      
+      this.isrunning = true;      
       this.waitingForGameStart = false;
       
-      if (this.scene.gamePeerId !== e.detail.peerid)
-      {
-        this.scene.gamePeerId = e.detail.peerid;                
+      if (this.isHost) {
+        if (this.scene.gamePeerId !== e.detail.peerid)
+        {
+          this.scene.gamePeerId = e.detail.peerid;                
+        }
       }
     },
     sendToVTT(type, description, data, data2, character) {

@@ -1,8 +1,10 @@
 import { DiceRoller } from 'rpg-dice-roller';
 import CommonService from "./commonService";
+import PeerService from "./peerService";
 
 export default class GameClient {    
     commonSvc = new CommonService();
+    peerSvc = new PeerService();
     players = new Array();    
     connections = new Array();    
     mediaConnections = new Array();
@@ -28,15 +30,8 @@ export default class GameClient {
     initialize = () => {
         this.displayChatMessage({ "userName": "System", "message": "Attempting to connect to scene..." });
         
-        let peerId = this.commonSvc.GeneratePeerId();
-
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(peerId, {
-            debug: 3,
-            secure: true,
-            host: "fcs-peer-server.herokuapp.com",
-            port: 443
-        });
+        this.peer = this.peerSvc.GetPeerConnection();
 
         console.log('ID: ' + this.peer.id);
 
@@ -83,8 +78,8 @@ export default class GameClient {
             console.log('Connection destroyed. Please refresh');
         });        
         this.peer.on('error', (e) => {
-            console.log(e);
-            alert('Game may not be running. ' + e);           
+            let event = new CustomEvent('clienterror', { detail: e });
+            document.dispatchEvent(event);                     
         });        
     };
 
@@ -288,10 +283,10 @@ export default class GameClient {
                         <div class="userheader bg-light text-center d-flex">
                             <div class="mr-auto">${userName}</div>
                             <div class="media-controls small pt-1 text-right">
-                                <i class="fas fa-microphone ${this.mediaSettings.useAudio == "false" ? "d-none" : "" }" data-id="${id}" data-action="mute" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none'); document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                                <i class="fas fa-microphone-slash d-none" data-id="${id}" data-action="unmute" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                                <i class="far fa-pause-circle ${this.mediaSettings.useVideo == "false" ? "d-none" : "" }" data-id="${id}" data-action="pause" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                                <i class="fas fa-play-circle d-none" data-id="${id}" data-action="play" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i title="Mute microphone" class="fas fa-microphone ${this.mediaSettings.useAudio == "false" ? "d-none" : "" }" data-id="${id}" data-action="mute" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none'); document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i title="Unmute microphone" class="fas fa-microphone-slash d-none" data-id="${id}" data-action="unmute" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i title="Pause video" class="far fa-pause-circle ${this.mediaSettings.useVideo == "false" ? "d-none" : "" }" data-id="${id}" data-action="pause" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
+                                <i title="Play video" class="fas fa-play-circle d-none" data-id="${id}" data-action="play" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
                             </div>
                         </div>                       
                     </div>`;
