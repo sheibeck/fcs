@@ -114,6 +114,7 @@ import CommonService from '../assets/js/commonService';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import DbService from '../assets/js/dbService';
 import Models from '../assets/js/models';
+import bootbox from 'bootbox';
 
 let dbSvc = null;
 let models = new Models();
@@ -377,9 +378,27 @@ export default {
       this.zoneImageEdit = !this.zoneImageEdit;
     },
     removeZone() {
-      this.$parent.$data.scene.zones = this.$parent.$data.scene.zones.filter(( obj ) => {
-        return obj.id !== this.zone.id;
-      });       
+      bootbox.confirm({
+        title: "Delete Zone?",
+        message: "Are you sure you want to delete this zone? All objects in this zone will also be removed. Continue?",
+        buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-danger'
+            },
+            cancel: {
+              label: 'No',
+              className: 'btn-secondary'
+            }
+        },
+        callback: (result) => {
+          if (result) {
+            this.$parent.$data.scene.zones = this.$parent.$data.scene.zones.filter(( obj ) => {
+              return obj.id !== this.zone.id;
+            });  
+          }
+        }
+      });
     }
   }
 
