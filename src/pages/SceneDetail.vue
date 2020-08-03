@@ -433,6 +433,11 @@ export default {
       this.canvas = panzoom;
       this.loading = false;
 
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        this.commonSvc.Notify("enumerateDevices() not supported.");
+        return;
+      }
+
       navigator.mediaDevices.enumerateDevices()
       .then( (devices) => {        
         devices.forEach( (device) => {
@@ -446,7 +451,7 @@ export default {
         });
       })
       .catch(function(err) {
-        console.log(err.name + ": " + err.message);
+        this.commonSvc.Notify(err.name + ": " + err.message);
       });
     },      
     setupScene(userId) {

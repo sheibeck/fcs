@@ -178,22 +178,6 @@ export default class GameClient {
       
     }
 
-    gotDevices(mediaDevices) {
-        select.innerHTML = '';
-        select.appendChild(document.createElement('option'));
-        let count = 1;
-        mediaDevices.forEach(mediaDevice => {
-          if (mediaDevice.kind === 'videoinput') {
-            const option = document.createElement('option');
-            option.value = mediaDevice.deviceId;
-            const label = mediaDevice.label || `Camera ${count++}`;
-            const textNode = document.createTextNode(label);
-            option.appendChild(textNode);
-            select.appendChild(option);
-          }
-        });
-    }
-    
     onReceiveStream(stream, metadata) {   
         let player = null;     
         if (typeof(metadata) == "string") {
@@ -223,7 +207,7 @@ export default class GameClient {
         };        
     }
 
-    cleanupConnections() {        
+    cleanupConnections() {
         for (let conn = 0; conn < this.mediaConnections.length; conn++) {
             let mediaStream = this.mediaConnections[conn];            
             if (!mediaStream.open || mediaStream.peerConnection.iceConnectionState === "disconnected") {
@@ -233,24 +217,35 @@ export default class GameClient {
                     player = mediaStream.metadata.receiver;
                 }
                 const playerVidDomId = this.commonSvc.GetPlayerIdForDom(player.playerId);
-                let vidElem = document.getElementById(playerVidDomId);
-                if (vidElem)
-                    vidElem.parentNode.removeChild(vidElem);
+                let playerContainer = document.getElementById(playerVidDomId);
+                
+                if (playerContainer) {
+                    let vidElems = playerContainer.querySelectorAll('video');
+
+                    vidElems.forEach(function(elem){
+                        if (elem.dataset.peerid === player.peerId) {
+                            elem.parentNode.removeChild(elem);                            
+                        }
+                    });
+                }
                 mediaStream.close();
-            }
-            this.mediaConnections = this.mediaConnections.filter( conn => conn.open == true );
+            }            
         }
 
-        //cleanup chat connections
-        this.connections = this.connections.filter( conn => conn.open == true );        
+        //cleanup connections
+        this.mediaConnections = this.mediaConnections.filter( conn => conn.open == true );        
+        this.connections = this.connections.filter( conn => conn.open == true );
     }
     
     createMediaElements(player) {        
-        let id = this.commonSvc.GetPlayerIdForDom(player.playerId);    
-        var vidTemplate = `<video></video>`            
-        document.getElementById(id).insertAdjacentHTML('beforeend', vidTemplate);
-        
-        let videoElem = document.getElementById(id).getElementsByTagName("video")[0];
+        const playerVidDomId = this.commonSvc.GetPlayerIdForDom(player.playerId);
+        let playerContainer = document.getElementById(playerVidDomId);
+        let vidElems = playerContainer.querySelectorAll('video');
+        if (vidElems.length == 0) {
+            var vidTemplate = `<video data-peerid='${player.peerId}'></video>`            
+            playerContainer.insertAdjacentHTML('beforeend', vidTemplate);
+        }
+        let videoElem = playerContainer.getElementsByTagName("video")[0];
         return videoElem;
     }
 
