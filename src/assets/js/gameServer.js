@@ -42,8 +42,7 @@ export default class GameServer {
             this.conn = null;
             console.log("Connection destroyed. Please refresh.");            
         });
-        this.peer.on('error', (e) => {
-            debugger;
+        this.peer.on('error', (e) => {            
             console.log(e);
             alert(e);               
         });   

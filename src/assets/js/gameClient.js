@@ -220,13 +220,12 @@ export default class GameClient {
                 let playerContainer = document.getElementById(playerVidDomId);
                 
                 if (playerContainer) {
-                    let vidElems = playerContainer.querySelectorAll('video');
-
-                    vidElems.forEach(function(elem){
-                        if (elem.dataset.peerid === player.peerId) {
-                            elem.parentNode.removeChild(elem);                            
-                        }
-                    });
+                    let vidElems = playerContainer.querySelectorAll('video')[0];
+ 
+                    if (vidElems.dataset.peerid === player.peerId) {                        
+                        playerContainer.parentNode.removeChild(playerContainer);                           
+                    }
+                   
                 }
                 mediaStream.close();
             }            
@@ -242,10 +241,11 @@ export default class GameClient {
         let playerContainer = document.getElementById(playerVidDomId);
         let vidElems = playerContainer.querySelectorAll('video');
         if (vidElems.length == 0) {
-            var vidTemplate = `<video data-peerid='${player.peerId}'></video>`            
+            var vidTemplate = `<video></video>`            
             playerContainer.insertAdjacentHTML('beforeend', vidTemplate);
-        }
+        }        
         let videoElem = playerContainer.getElementsByTagName("video")[0];
+        videoElem.dataset.peerid=player.peerId;
         return videoElem;
     }
 
