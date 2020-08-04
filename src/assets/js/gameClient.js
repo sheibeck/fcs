@@ -220,28 +220,39 @@ export default class GameClient {
                 let playerContainer = document.getElementById(playerVidDomId);
                 
                 if (playerContainer) {
-                    let vidElems = playerContainer.querySelectorAll('video')[0];
- 
-                    if (vidElems.dataset.peerid === player.peerId) {                        
-                        playerContainer.parentNode.removeChild(playerContainer);                           
+                    let vidElems = playerContainer.querySelectorAll('video'); 
+                    if (vidElems.length > 0)
+                    {
+                        let vidElem = vidElems[0];                        
+                        if (vidElem.dataset.peerid === player.peerId) {
+                            playerContainer.parentNode.removeChild(playerContainer);
+                        }
                     }
-                   
+                    else {
+                        //we don't have video
+                        playerContainer.parentNode.removeChild(playerContainer);
+                    }
                 }
                 mediaStream.close();
-            }            
+            }
         }
 
         //cleanup connections
         this.mediaConnections = this.mediaConnections.filter( conn => conn.open == true );        
         this.connections = this.connections.filter( conn => conn.open == true );
     }
-    
+        
     createMediaElements(player) {        
         const playerVidDomId = this.commonSvc.GetPlayerIdForDom(player.playerId);
         let playerContainer = document.getElementById(playerVidDomId);
         let vidElems = playerContainer.querySelectorAll('video');
         if (vidElems.length == 0) {
-            var vidTemplate = `<video></video>`            
+            let vidTemplate = `<video style="${this.mediaSettings.useVideo ? "-webkit-transform: scaleX(-1);transform: scaleX(-1);" : ""}" poster="${this.getPlaceholderImage(player.userName)}"></video>`;
+            let imgPlaceHolder = playerContainer.getElementsByTagName("img");
+            if (imgPlaceHolder.length > 0) {
+                imgPlaceHolder = imgPlaceHolder[0];
+                imgPlaceHolder.parentNode.removeChild(imgPlaceHolder);
+            }
             playerContainer.insertAdjacentHTML('beforeend', vidTemplate);
         }        
         let videoElem = playerContainer.getElementsByTagName("video")[0];
@@ -282,13 +293,18 @@ export default class GameClient {
                                 <i title="Unmute microphone" class="fas fa-microphone-slash d-none" data-id="${id}" data-action="unmute" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
                                 <i title="Pause video" class="far fa-pause-circle ${this.mediaSettings.useVideo == "false" ? "d-none" : "" }" data-id="${id}" data-action="pause" onclick="this.nextElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
                                 <i title="Play video" class="fas fa-play-circle d-none" data-id="${id}" data-action="play" onclick="this.previousElementSibling.classList.remove('d-none'); this.classList.add('d-none');document.dispatchEvent(new CustomEvent('mediacontrol', { detail: {playerId: this.dataset.id, type: this.dataset.action} }));"></i>
-                            </div>
-                        </div>                       
+                            </div>                            
+                        </div>
+                        <img src="${this.getPlaceholderImage(player.userName)}" />
                     </div>`;
                 playerContainer.insertAdjacentHTML('beforeend', playerTemplate);
             }     
         });        
     };
+
+    getPlaceholderImage(text) {
+        return `https://ipsumimage.appspot.com/130x100,${Math.floor(Math.random()*16777215).toString(16)}?l=${text}`;
+    }
 
     handleRemoteMediaConnection = (player) => {
         //connect to other players, but don't connect to yourself )

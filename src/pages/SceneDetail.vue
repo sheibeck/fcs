@@ -56,9 +56,7 @@
     bottom: 0;
     
     video {      
-      height: 100px;  
-      -webkit-transform: scaleX(-1);
-      transform: scaleX(-1);    
+      height: 100px;
     }
   }
    
@@ -525,9 +523,17 @@ export default {
         this.updatePlayer("peerId", this.gameClient.peer.id);
       }, false);
 
-      document.addEventListener('userdisconnected', (e) => {        
+      document.addEventListener('userdisconnected', (e) => {
         if (this.gameClient) {
           this.gameClient.displayChatMessage({ "userName": "System", "message": `${e.detail.player.userName} disconnected...` });
+
+          if (e.detail.player.playerId) {
+            const playerVidDomId = this.commonSvc.GetPlayerIdForDom(e.detail.player.playerId);
+            let playerContainer = document.getElementById(playerVidDomId);
+            if (playerContainer) {
+                playerContainer.parentNode.removeChild(playerContainer);
+            }
+          }
         }
       }, false);
       
