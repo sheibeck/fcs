@@ -634,16 +634,34 @@ export default {
         return obj.playerId === this.userId
       })
       
-      this.scene.players[idx][key] = value;      
+      this.scene.players[idx][key] = value;
     },
     startNewRound() {
-      commonSvc.Notify("Starting a new round...", "info");
-      for (let zoneIdx in this.scene.zones) {
-        for (let objIdx in this.scene.zones[zoneIdx].sceneobjects) {
-          this.scene.zones[zoneIdx].sceneobjects[objIdx].hasOwnProperty('acted')
-            this.scene.zones[zoneIdx].sceneobjects[objIdx].acted = false;  
+      bootbox.confirm({
+        title: "Start a New Round?",
+        message: "This will update the action icon on all objects. Start a new round?",
+        buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-success'
+            },
+            cancel: {
+              label: 'No',
+              className: 'btn-secondary'
+            }
+        },
+        callback: (result) => {
+          if (result) {
+            commonSvc.Notify("Starting a new round...", "info");
+            for (let zoneIdx in this.scene.zones) {
+              for (let objIdx in this.scene.zones[zoneIdx].sceneobjects) {
+                this.scene.zones[zoneIdx].sceneobjects[objIdx].hasOwnProperty('acted')
+                  this.scene.zones[zoneIdx].sceneobjects[objIdx].acted = false;  
+              }
+            };
+          }
         }
-      };
+      });      
     },
     async getScene(ownerId, id) {
       var $component = this;

@@ -31,8 +31,11 @@
 
             <div v-if="HasSubscription" class="card-body">
               <p>You are a subscriber, thank you!</p>
-              <p>For information on installing the Roll20 integration feature please visit the
+              <p>For information about Roll20 integration please visit the
                 <a href="https://github.com/sheibeck/fcs/wiki/Fate-of-20" target="_blank">Fate of 20 Page</a>.
+              </p>
+              <p>For information about Scene Builder please visit the
+                <a href="https://github.com/sheibeck/fcs/wiki/Scene-Builder" target="_blank">Scene Builder Page</a>.
               </p>
             </div>
 

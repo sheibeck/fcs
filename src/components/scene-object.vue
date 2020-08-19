@@ -4,7 +4,7 @@
     <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column align-items-end">
       <i class="fas fa-bars"></i>
       <button v-if="isFCSObject" :title="`Play ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 m-0 mt-auto text-white btn btn-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
-      <button v-if="isCharacter" :title="`Sync ${FCSObjectType}`" @click="syncCharacter()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-sync-alt fa-xs"></i></button>      
+      <button v-if="isCharacter" :title="`Refresh Data`" @click="syncCharacter()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-sync-alt fa-xs"></i></button>      
     </div>
 
     <div class="mr-auto w-100">
@@ -98,7 +98,7 @@
         </div>
       </div>
 
-      <div v-if="objectdata.consequences">
+      <div v-if="(isCharacter && objectdata.consequences && objectdata.consequences.length > 0) || !isCharacter">
          <div class="header d-flex">
           <span class="mr-auto">Consequences</span>
           <i v-if="!isCharacter" title="Add consequence" @click="addThingToObject('consequence')" class="fas fa-plus-circle fa-sm pt-1"></i>
@@ -421,6 +421,7 @@ export default {
           data.conditions = this.$parent.$parent.convertThingToGameObject(character.conditions, type, "CONDITION");
         }
         */
+        this.commonSvc.Notify(`Refreshed data for: ${character.name}.`, "success");
       }
     },
     toggleTurn() {      
