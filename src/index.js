@@ -119,7 +119,7 @@ const store = new Vuex.Store({
     },
     fcsVttEnabled: (state, getters) => {
       if (!window.opener || window.opener.origin !== window.origin) return false;
-      let enabled = getters.isSubscriber && state.fcsVttEnabled;
+      let enabled = state.fcsVttEnabled && state.isAuthenticated; //you don't need to be a subscriber to play a character
       return enabled;
     },
     vttEnabled: (state, getters) => {      
@@ -127,6 +127,9 @@ const store = new Vuex.Store({
       if (getters.fcsVttEnabled) return "fcsVtt"; //fcs takes priority over roll20
       if (getters.roll20Enabled) return "roll20";
       return false;
+    },
+    vttPlayer: (state, getters) => {
+      return vttEnabled == "fcsVtt" && getters.isAuthenticated;
     },
     isAuthenticated: state => {
       return state.isAuthenticated;

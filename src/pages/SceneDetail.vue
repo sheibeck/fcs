@@ -1036,11 +1036,8 @@ ${msg}`;
           commonSvc.Notify(`Chat saved to campaign ${campaign.name}.`, 'success');
         }
       });
-
-      var doClearChat = confirm("Do you wan to clear the chat log?");
-      if (doClearChat) {
-        this.clearChatLog();
-      }      
+      
+      this.clearChatLog();
     }
     /* end character search */
   },

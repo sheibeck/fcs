@@ -47,7 +47,7 @@ export default {
       if (!this.item.obj) return;      
       let plural = this.item.obj.indexOf("skill") > -1 ? "skills" : "approaches";
       let singular = plural == "skills" ? "skill" : "approach";
-      let label = `${this.item.label ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
+      let label = `${this.$parent.getVal(`${this.item.label}`) ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
       this.$parent.sendToVTT("diceroll", label, plural, this.item.obj, singular);
     }
   }

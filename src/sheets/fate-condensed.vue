@@ -9,7 +9,7 @@
 
 			<div class="form-group d-flex">
 				<label class="mt-2 mr-2">Pronoun</label>
-				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('name')" placeholder="Pronoun" />
+				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
 			</div>
 		</div>
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
