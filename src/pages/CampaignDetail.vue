@@ -262,7 +262,7 @@ export default {
     datetime: Datetime,
     loading: Loading
   },
-  mounted(){
+  created(){
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);    
     this.init();    
@@ -629,7 +629,7 @@ export default {
         "scale": "",
         "slug": "new-campaign",
         "name": "New Campaign",
-        "date": commonSvc.getFormattedDate(new Date()),
+        "date": commonSvc.GetFormattedDate(new Date()),
       };
       this.$set(this, 'campaign', c);
       this.loading = false;
