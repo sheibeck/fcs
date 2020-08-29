@@ -1,5 +1,5 @@
 <template>
-  <div>    
+  <div class="d-flex">
     <div title="Click to edit" v-if="!editing" @click="toggleEdit()" class="editable">
       <label v-if="label">{{label}}</label>
       {{getThing}}
@@ -28,7 +28,7 @@ export default {
     item: String,
     label: String,
     canedit: Boolean,
-    type: String,
+    type: String,    
   },
   data () {
     return { 
@@ -38,6 +38,9 @@ export default {
   computed: {    
     getThing() {
       return this.object ? this.object[this.item] : "";
+    },
+    isInline() {
+      return this.inline;
     }
   },
   methods: {

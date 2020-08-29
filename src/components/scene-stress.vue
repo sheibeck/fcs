@@ -1,17 +1,11 @@
 <template>
-  <div class="pl-1 ml-1">
-    <span title="Click to edit" v-if="!editing" @click="editing = true">{{stress.name.toTitleCase()}}</span>
+  <div class="pl-1 ml-1 d-flex">
+    <editableinput :object="stress" item="name" class="mr-2 font-weight-bold small" />
 
-    <div class="input-group" v-if="editing">  
-      <input class="form-control-sm" v-model="stress.name"  />
-      <div class="input-group-append">
-          <button type="button" class="input-group-text" @click="editing = false"><i class="fas fa-check-circle text-success"></i></button>
-      </div>
+    <div v-for="box in stress.boxes" v-bind:key="box.id" class="d-flex">      
+      <editableinput v-if="typeof box.label == 'string'" :object="box" item="label" class="small" />
+      <input type="checkbox" :checked="box.used" @change="toggleStress($event, box.id)" class="mr-1 mt-1" />      
     </div>
-
-    <span v-for="box in stress.boxes" v-bind:key="box.id">
-      <label v-if="typeof box.label == 'string'">{{box.label.toTitleCase()}}</label><input type="checkbox" :checked="box.used" @change="toggleStress($event, box.id)" class="mr-1" />
-    </span>
     <button v-if="!isCondition" type="button" class="btn btn-link p-0 m-0" title="Add stress box" @click="addStressBox()"><i class="fas fa-plus-square fa-xs"></i></button>    
     <button v-if="!isCondition && stress.boxes.length > 0" type="button" class="btn btn-link p-0 m-0" title="Remove stress box" @click="removeStressBox()"><i class="fas fa-minus-square fa-xs"></i></button>
     <button v-if="!isCondition" class="btn btn-link p-0 m-0 small" type="button"><i title="Remove stress track" @click="removeStressTrack()" class="fas fa-trash-alt fa-xs"></i></button>
@@ -21,6 +15,7 @@
 <script>
 import CommonService from '../assets/js/commonService';
 import Models from '../assets/js/models';
+import SceneEditableInput from './scene-editable-input';
 
 let models = new Models();
 
@@ -30,6 +25,9 @@ export default {
     stress: Object,
     type: String       
   },  
+  components: {    
+    editableinput: SceneEditableInput, 
+  },
   computed: {
     isCondition() {
       return this.type && this.type.toLowerCase() == "condition";
@@ -46,8 +44,10 @@ export default {
       let idx = this.stress.boxes.findIndex(x => x.id === id);
       this.stress.boxes[idx].used = event.target.checked;
     },
-    addStressBox() {      
-      this.stress.boxes.push(models.SceneStressBox());
+    addStressBox() {
+      let box = models.SceneStressBox();
+      box.label = "1";
+      this.stress.boxes.push(box);
     },
     removeStressBox() {      
       this.stress.boxes.pop();

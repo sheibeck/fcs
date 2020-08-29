@@ -311,7 +311,7 @@ export default {
           if (!this.objectdata.consequences) { 
             this.$set(this.objectdata, 'consequences', new Array());
           }
-          let consequence = models.SceneConsequence("", "", "", objectType)           
+          let consequence = models.SceneConsequence("", "-2", "", objectType)           
           this.objectdata.consequences.push(consequence);
           break;
         case "condition":
