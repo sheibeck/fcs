@@ -629,7 +629,7 @@ export default {
         "scale": "",
         "slug": "new-campaign",
         "name": "New Campaign",
-        "date": this.getFormattedDate(new Date()),
+        "date": commonSvc.getFormattedDate(new Date()),
       };
       this.$set(this, 'campaign', c);
       this.loading = false;
