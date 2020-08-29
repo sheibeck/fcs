@@ -3,10 +3,9 @@ import 'noty/lib/noty.css';
 import 'noty/lib/themes/metroui.css';
 import shortid from 'shortid'
 import * as Sentry from '@sentry/browser';
+import {version} from '../../../package.json';
 
-export default class CommonService {
-  latestVersion = "1.5.2";
-
+export default class CommonService {  
   constructor(fcs){
     this.fcs = fcs;
   }
@@ -157,6 +156,7 @@ export default class CommonService {
         Sentry.init({
           dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522',
           environment: this.fcs.$store.state.environment,
+          release: 'fatecharactersheet@' + version
         });
       }
   }
@@ -181,11 +181,12 @@ export default class CommonService {
 
 
   CheckVersion = () => {    
-    var currentVersion = localStorage.getItem("fcsVersion");
+    const currentVersion = localStorage.getItem("fcsVersion");
+    const packageVersion = version;
 
-    if (currentVersion === null || currentVersion !== this.latestVersion) {
-      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/v${this.latestVersion}">v${this.latestVersion}</a>`;
-      let dismiss = `localStorage.setItem('fcsVersion', '${this.latestVersion}')`;
+    if (currentVersion === null || currentVersion !== packageVersion) {
+      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/v${packageVersion}">v${packageVersion}</a>`;
+      let dismiss = `localStorage.setItem('fcsVersion', '${packageVersion}')`;
       this.ShowAlert(msg, "info", dismiss);
     } 
   }
