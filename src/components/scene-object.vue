@@ -394,10 +394,10 @@ export default {
       switch(data.object_type)
       {
         case "CHARACTER":
-          window.open(`/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.related_id)}/${this.commonSvc.GetId(data.id)}/${data.slug}`);
+          window.open(`/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.related_id)}/${this.commonSvc.GetId(data.id)}/${this.commonSvc.Slugify(data.name)}`);
           break;
         case "ADVERSARY":
-          window.open(`/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.originalId)}/${data.slug}`);
+          window.open(`/${data.object_type.toLowerCase()}/${this.commonSvc.GetId(data.originalId)}/${this.commonSvc.Slugify(data.name)}`);
           break;
         default:
           break;
