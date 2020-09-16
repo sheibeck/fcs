@@ -302,8 +302,17 @@ export default class GameClient {
         });        
     };
 
+    getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
     getPlaceholderImage(text) {
-        return `https://ipsumimage.appspot.com/130x100,${Math.floor(Math.random()*16777215).toString(16)}?l=${text}`;
+        return `https://ipsumimage.appspot.com/130x100,${this.getRandomColor()}?l=${text}`;
     }
 
     handleRemoteMediaConnection = (player) => {
