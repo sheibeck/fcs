@@ -146,6 +146,13 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="form-group row">
+                    <label for="name" class="col-sm-12 col-md-2 col-form-label">Portrait Url</label>
+                    <div class="col-sm-12 col-md-10">                        
+                        <input class="form-control" type="text" value="" name="image_url" id="image_url">
+                    </div>
+                </div>
             </div>
         </div>
         <button class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>

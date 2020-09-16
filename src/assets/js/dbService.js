@@ -130,6 +130,9 @@ export default class DbService {
             FilterExpression: ":one = :one",
         }
 
+        //TODO: Allow public search to filter out Private items, while still showing the user their own private items
+        //      and don't show double items by joining the arrays. Ugh!
+
         //if we know the owner then use the sort key, too
         if (ownerId) {
             params.KeyConditionExpression += ' AND owner_id = :owner_id';
@@ -137,8 +140,8 @@ export default class DbService {
         } else {
             //if the user isn't looking at their own stuff, then they are looking at the
             //public list. don't show private_only items in the public list
-            params.FilterExpression += ' AND is_private <> :is_private';
-            params.ExpressionAttributeValues[':is_private'] = true;
+            //params.FilterExpression += ' AND is_private <> :is_private';
+            //params.ExpressionAttributeValues[':is_private'] = true;
         }
 
         //add some search parameters

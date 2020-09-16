@@ -296,8 +296,11 @@ export default {
           }
           break;
         case "SKILL":
-          for (let [key, value] of Object.entries(array)) {            
-            let skill = models.SceneSkill(parseInt(value) ? key : value, parseInt(key) ? value : key, type);
+          for (let [key, value] of Object.entries(array)) {
+            let valIsNum = !isNaN(parseInt(value));      
+            let name = valIsNum ? key : value; //if the value is not a number, then the name is in the value
+            let val = valIsNum ? value : key // if the value is a number, use the value, otherwise the value is in the key
+            let skill = models.SceneSkill(name, val, type);
             gameObject.push(skill);
           }
           break;

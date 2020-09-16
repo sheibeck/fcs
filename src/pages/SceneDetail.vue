@@ -1009,7 +1009,7 @@ ${msg}`;
         }
         
         dbSvc.ListObjects("CAMPAIGN", this.userId, query)
-          .then((data) => {            
+          .then((data) => {
             resolve(data)
           })
       })
