@@ -14,12 +14,10 @@
       </div>    
       <div v-if="hasCampaigns" class='card-columns'>
         <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
+          <img v-if="item.image_url" v-bind:src="item.image_url" class="card-img-top list-image" alt="campaign image">
           <div class='card-body'>
             <h5 class='card-title'>{{item.name}}</h5>
-            <div class='row'>
-              <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
-                <img v-bind:src="item.image_url" class='img-fluid' />
-              </p>
+            <div class='row'>            
               <p class='card-text col'>
                 {{ getShortText(item.description) }}
               </p>

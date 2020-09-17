@@ -28,7 +28,7 @@
 
       <div class='card-columns' id="adversaryDetail">
         <div class='card' v-for="item in adversaries" v-bind:key="item.id">
-          <img v-if="item.image_url" class="card-img-top img-fluid img-thumbnail" style="object-fit: scale-down; object-position:top; max-height: 180px;" v-bind:src="item.image_url" v-bind:alt="item.name + 'Image'">
+          <img v-if="item.image_url" class="card-img-top list-image" v-bind:src="item.image_url" v-bind:alt="item.name + 'Image'">
 
           <h4 class='card-header adversary-name bg-light d-flex'>
             <a v-bind:href="`/adversary/${commonSvc.GetId(item.id)}/${item.slug}`" class="mr-auto" style="text-decoration:none;">{{item.name}}</a>            

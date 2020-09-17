@@ -12,12 +12,10 @@
       </div>
       <div v-if="hasCharacters" class='card-columns'>
         <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
+          <img v-if="item.image_url" v-bind:src="item.image_url" class="card-img-top list-image" alt="character image">
           <div class='card-body'>
             <h5 class='card-title character-name'>{{item.name}}</h5>
-            <div class='row'>
-              <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
-                <img v-bind:src="item.image_url" class='img-fluid' />
-              </p>
+            <div class='row'>             
               <p class='card-text col'>
                 <label class='h6'>High Concept</label>: {{item.aspects ? item.aspects.highconcept : ""}}<br>
                 <label class='h6'>Trouble</label>: {{item.aspects ? item.aspects.trouble : ""}}

@@ -98,6 +98,12 @@ h1 {
   background-color: #f5f5f5;
 }
 
+.list-image {
+  object-fit: cover;
+  object-position:top; 
+  max-height: 200px;
+}
+
 /* print styles */
 @media print {
     div.sheet:last-child {
