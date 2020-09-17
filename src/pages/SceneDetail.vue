@@ -520,7 +520,9 @@ export default {
       }, false);
 
       document.addEventListener('userjoined', (e) => {
-        this.updatePlayer("peerId", this.gameClient.peer.id);
+        if (this.GameClient && this.gameClient.peer) {
+          this.updatePlayer("peerId", this.gameClient.peer.id);
+        }
       }, false);
 
       document.addEventListener('userdisconnected', (e) => {
@@ -590,6 +592,8 @@ export default {
       const gameServerId = this.scene.gamePeerId;
       this.gameClient = new GameClient(gameServerId, this.userId, this.getUserName, this.isHost);
       this.gameClient.initialize();      
+
+      this.getScene(this.userId, this.sceneId);
     },
     exitGame() {
       this.toggleFullScreen(false);
