@@ -109,9 +109,9 @@
           <button v-if="isConnected" type="button" class="btn-sm btn btn-secondary ml-1" @click="exitGame()"><i class="fas fa-sign-language"></i> Exit Game</button>
         </span>
 
-        <span>
-          <button title="Fullscreen" v-if="!fullScreen" type="button" class="btn-sm btn btn-secondary ml-1" @click="toggleFullScreen()"><i class="fas fa-expand-alt"></i></button>
-          <button title="Exit fullscreen" v-if="fullScreen" type="button" class="btn-sm btn btn-secondary ml-1" @click="toggleFullScreen()"><i class="fas fa-compress-alt"></i></button>
+        <span v-if="1==2">
+          <button title="Fullscreen" v-if="!fullScreen" type="button" class="btn-sm btn btn-secondary ml-1" @click="toggleFullScreen(true)"><i class="fas fa-expand-alt"></i></button>
+          <button title="Exit fullscreen" v-if="fullScreen" type="button" class="btn-sm btn btn-secondary ml-1" @click="toggleFullScreen(false)"><i class="fas fa-compress-alt"></i></button>
         </span>
       </div>
 
@@ -157,8 +157,8 @@
           </div>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
-          <VueShowdown id="chat-log" class="border mb-1 px-1" :options="{ emoji: false }" :markdown="chatLog" />          
-          <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1"></textarea>
+          <VueShowdown id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="{ emoji: false }" :markdown="chatLog" />          
+          <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1" v-on:keyup.enter="sendChatMessage()"></textarea>
           <div class="d-flex mt-1">
             <select v-model="selectedPlayer" class="form-control mr-1">
               <option value="everyone">Everyone</option>
@@ -585,12 +585,14 @@ export default {
       }
     },
     joinGame() {      
+      this.toggleFullScreen(true);
       this.waitingToJoin = true;
       const gameServerId = this.scene.gamePeerId;
       this.gameClient = new GameClient(gameServerId, this.userId, this.getUserName, this.isHost);
       this.gameClient.initialize();      
     },
     exitGame() {
+      this.toggleFullScreen(false);
       this.waitingForGameStart = false;
       this.waitingToJoin = false;
       
@@ -846,11 +848,11 @@ ${msg}`;
         this.updateChatLog(this.getUserName, msg);
       }      
     },
-    toggleFullScreen() {
-      this.fullScreen = !this.fullScreen;
+    toggleFullScreen(goFullScreen) {
+      this.fullScreen = goFullScreen;
       if (this.fullScreen) {
         document.getElementsByClassName("navbar")[0].classList.add("d-none");        
-        document.getElementById("game-table").style.height = "94vh";      
+        document.getElementById("game-table").style.height = "82vh";      
       }
       else {
         document.getElementsByClassName("navbar")[0].classList.remove("d-none");         

@@ -58,8 +58,8 @@ export default class Models {
         }
     }
 
-    SceneAspect = (name, label, type, hasInvoke) => {         
-        var aspect = {id: this.commonSvc.GenerateUUID(), invokes: [], name: name || "Aspect Name", label: label || "", object_type: type };
+    SceneAspect = (name, label, type, hasInvoke, sort) => {         
+        var aspect = {sort: sort || 0, id: this.commonSvc.GenerateUUID(), invokes: [], name: name || "Aspect Name", label: label || "", object_type: type };
         if (hasInvoke) {
             aspect.invokes.push(this.SceneInvoke());
         }

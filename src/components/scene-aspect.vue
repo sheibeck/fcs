@@ -2,7 +2,7 @@
   <div class="pl-1 ml-1" :class="getColor(aspect)" :id="`aspect-${commonSvc.GetId(aspect.id)}`">
     <div class="d-flex">
       <span class="dice fo20" v-on:click="sendToVTT()">C</span>
-      <editableinput :object="aspect" item="name" class="font-weight-bold pr-1 mr-auto" />
+      <em v-html="getLabel(aspect)"></em><editableinput :object="aspect" item="name" class="font-weight-bold pr-1 mr-auto" />
       
       <invoke :invokes="aspect.invokes" class="mx-2" />
       
@@ -39,12 +39,17 @@ export default {
     }
   },
   methods: {  
+    getLabel(aspect) {            
+      if (aspect.label.toLowerCase() == "highconcept" ) return "<sup class='text-primary font-weight-bold'>H</sup>";
+      if (aspect.label.toLowerCase() == "trouble") return "<sup class='text-danger font-weight-bold'>T</sup>";
+      return "";
+    },
     getColor(aspect) { 
       switch(aspect.object_type) {
         case "CHARACTER":
         case "ADVERSARY":
         case "NPC":
-          return "small";
+          return "";
         default:
           return "badge badge-warning";
       }

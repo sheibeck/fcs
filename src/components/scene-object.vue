@@ -36,7 +36,7 @@
           <i v-if="!objectdata.show.aspects" @click="objectdata.show.aspects=true" title="Show" class="fas fa-chevron-circle-down fa-sm pt-1"></i>
         </div>
         <div v-if="objectdata.show.aspects">
-          <div v-for="aspect in objectdata.aspects" v-bind:key="aspect.id">
+          <div v-for="aspect in sortedAspects" v-bind:key="aspect.id">
             <aspect :aspect="aspect" location="thing" :type="objectdata.object_type" />
           </div>
         </div>
@@ -120,8 +120,8 @@
     </div>
 
     <div class="d-flex flex-column bg-light ml-1 border toolbar">
-      <button v-if="!objectdata.acted" type="button" class="btn btn-link p-0" title="Has not acted yet" @click="toggleTurn()"><i class="far fa-hourglass"></i></button>
-      <button v-if="objectdata.acted" type="button" class="btn btn-link p-0" title="Has taken an action" @click="toggleTurn()"><i class="fas fa-hourglass"></i></button>
+      <button v-if="!objectdata.acted" type="button" class="btn btn-link p-0" title="Has not acted yet" @click="toggleTurn()"><i class="far fa-hourglass text-warning"></i></button>
+      <button v-if="objectdata.acted" type="button" class="btn btn-link p-0" title="Has taken an action" @click="toggleTurn()"><i class="fas fa-hourglass text-danger"></i></button>
       <button type="button" class="btn btn-link p-0" title="Create advantage/boost" @click="addThingToObject('caAndBoost')"><i class="fas fa-sticky-note"></i></button>      
       <b-button :id="`move-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Move to Zone"><i class="fas fa-expand-arrows-alt"></i></b-button>      
       <b-popover ref="popoverZonePicker" :target="`move-object-${this.objectdata.id}`" triggers="click blur">
@@ -200,6 +200,13 @@ export default {
     }
   },
   computed: {
+    sortedAspects() {      
+      var sortPriority = [ "trouble", "highconcept" ];
+      return this.objectdata.aspects.sort(function(a,b){ 
+        if ( a.label == b.label ) return -1;
+        return sortPriority.indexOf( b.label ) - sortPriority.indexOf( a.label );
+      });
+    },
     isFCSObject() {
       return this.objectdata.object_type == "CHARACTER" || this.objectdata.object_type == "ADVERSARY";
     },
@@ -304,7 +311,7 @@ export default {
           if (!this.objectdata.aspects) { 
             this.$set(this.objectdata, 'aspects', new Array());
           }          
-          let aspect = models.SceneAspect("", "", this.objectdata.object_type);          
+          let aspect = models.SceneAspect("", "", this.objectdata.object_type, Math.max(this.objectdata.sort || 0) + 1);
           this.objectdata.aspects.push(aspect);
           break;
         case "consequence":
