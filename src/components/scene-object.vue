@@ -422,6 +422,11 @@ export default {
         if (character.consequences) {
           data.consequences = this.$parent.$parent.convertThingToGameObject(character.consequences, type, "CONSEQUENCE");  
         }
+
+        //pull in a new image if one is set
+        if (character.image_url) {
+          data.image_url = character.image_url;
+        }
         /*
         TODO: Implement this. Use dresden sheet as example of complicated implemenation
         if (character.conditions) {
