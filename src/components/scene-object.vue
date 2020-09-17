@@ -2,7 +2,7 @@
   <div class="m-1 p-1 bg-light border d-flex scene-object" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`"    
     :style="{ position: 'absolute', top: `${objectdata.y}px`, left: `${objectdata.x}px` }">    
     <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column align-items-end">
-      <i class="fas fa-bars"></i>
+      <i class="fas fa-expand-arrows-alt"></i>
       <button v-if="isFCSObject" :title="`Play ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 m-0 mt-auto text-white btn btn-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
       <button v-if="isCharacter" :title="`Refresh Data`" @click="syncCharacter()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-sync-alt fa-xs"></i></button>      
     </div>
@@ -123,7 +123,7 @@
       <button v-if="!objectdata.acted" type="button" class="btn btn-link p-0" title="Has not acted yet" @click="toggleTurn()"><i class="far fa-hourglass text-warning"></i></button>
       <button v-if="objectdata.acted" type="button" class="btn btn-link p-0" title="Has taken an action" @click="toggleTurn()"><i class="fas fa-hourglass text-danger"></i></button>
       <button type="button" class="btn btn-link p-0" title="Create advantage/boost" @click="addThingToObject('caAndBoost')"><i class="fas fa-sticky-note"></i></button>      
-      <b-button :id="`move-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Move to Zone"><i class="fas fa-expand-arrows-alt"></i></b-button>      
+      <b-button :id="`move-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Move to Zone"><i class="fas fa-running"></i></b-button>      
       <b-popover ref="popoverZonePicker" :target="`move-object-${this.objectdata.id}`" triggers="click blur">
         <template v-slot:title>Move to Zone</template>
         <select v-model="selectedZone" @change="moveObjectToZone">
