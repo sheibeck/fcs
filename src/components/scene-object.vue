@@ -470,7 +470,7 @@ export default {
 
   .portrait {
     object-fit: cover ; /* Do not scale the image */
-    object-position: center; /* Center the image within the element */
+    object-position: top; /* Center the image within the element */
     width: 100%;
     max-height: 250px;
     margin-bottom: 1rem;
