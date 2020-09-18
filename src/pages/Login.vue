@@ -12,11 +12,11 @@
       <div class="col-sm-12 col-md-4">
         <div class="form-group">
           <label for="email">Email address</label>
-          <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" v-on:keyup.13="login">
+          <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" @keyup.enter="login">
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Password" v-on:keyup.13="login">
+          <input type="password" class="form-control" id="password" placeholder="Password" @keyup.enter="login">
         </div>
         <button v-on:click="login" type="button" class="btn btn-primary col-sm-12 col-md-5 mt-1 mb-1">
             Login <i class="fas fa-sign-in-alt"></i>

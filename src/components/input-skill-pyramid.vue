@@ -29,7 +29,7 @@
             <span v-if="$parent.getVal(`${skill.obj}.${item}`)">
               <!--roll20-->
               <span v-if="index != 0">,</span>
-              <span v-if="hasRoll20" class="dice fo20" v-on:click="sendToRoll20($parent.getVal(`${skill.obj}.${item}`), skill.value)">+</span>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT($parent.getVal(`${skill.obj}.${item}`), skill.value)">+</span>
               <span>{{$parent.getVal(`${skill.obj}.${item}`)}}</span>
             </span>
           </span>
@@ -53,11 +53,8 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',      
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    },
+      'vttEnabled'
+    ]),  
     isNewCharacter() {      
       return this.$route.name == "Character Sheet Detail";
     }
@@ -74,9 +71,9 @@ export default {
         this.$parent.$parent.$parent.save();
       } 
     },
-    sendToRoll20(skillName, modifier) {      
+    sendToVTT(skillName, modifier) {      
       if (!skillName) return;      
-      this.$parent.sendToRoll20('skill', skillName, null, modifier, 'skill');
+      this.$parent.sendToVTT('skill', skillName, null, modifier, 'skill');
     }
   }
 }

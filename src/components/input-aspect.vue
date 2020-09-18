@@ -1,11 +1,11 @@
 <template>
   <div class="form-group">    
     <div v-if="showlabel">
-      <label v-if="showlabel">{{aspect.label}}</label>
+      <label>{{aspect.label}}</label>
     </div>
     <div class="d-flex">
-      <span v-if="hasRoll20" class="dice fo20 pt-2 pr-1" v-on:click="sendToRoll20('invoke', 'aspect', 'aspects', aspect.obj)">C</span>      
-      <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" :value="$parent.getVal(aspect.obj)" :placeholder="aspect.label" />
+      <span v-if="vttEnabled" class="dice fo20 pt-2 pr-1" v-on:click="sendToVTT('invoke', 'aspect', 'aspects', aspect.obj)">C</span>      
+      <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" :value="$parent.getVal(aspect.obj)" :placeholder="aspect.label" />      
     </div>
   </div>
 </template>
@@ -22,21 +22,18 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    }
+      'vttEnabled'
+    ]),   
   },
   data () {
     return {
     }
   },
   methods: { 
-    sendToRoll20() {   
+    sendToVTT() {   
       if (!this.aspect || !this.aspect.label) return;   
       let label = `aspect ${this.aspect.label}`;
-      this.$parent.sendToRoll20('invoke', label, "aspects", this.aspect.obj);
+      this.$parent.sendToVTT('invoke', label, "aspects", this.aspect.obj);
     }
   }
 }

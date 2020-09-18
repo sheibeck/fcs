@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-2">    
+  <div class="container mt-2">      
     <form>
       <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" />
 
@@ -18,9 +18,16 @@
         </div>
                 
         <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">
+          <div class="d-flex">
+            <img v-if="exists(characterData, 'image_url')" :src="characterData.image_url" class="img-fluid img-thumbnail mr-1" style="max-width: 100px;" />
+            <div class='form-group w-100'>
+              <label class='' for='image_url'>Portrait Url:</label>
+              <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />            
+            </div>
+          </div>
           <div class='form-group'>
-            <label class='' for='image_url'>Portrait Url:</label>
-            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />
+            <label class='' for='image_url'>Description:</label>
+            <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
           </div>
         </div>
       
@@ -87,7 +94,7 @@ export default {
       characterData: null,        
     }
   },
-  methods : {   
+  methods : {    
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
@@ -117,10 +124,7 @@ export default {
             commonSvc.Notify('Character saved.', 'success');
           }
         });
-      }
-      else {
-          window.print();
-      }
+      }      
     }
   }
 }

@@ -15,17 +15,23 @@
                 </div>
                 <div class="col-6 text-center ">                    
                     <div for="fatepoints" class="fate-header">
-						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
+						FP <span v-if="vttEnabled" class='dice fo20 font-weight-normal small'>A</span>
 					</div>
                     <inputfatepoints />
                 </div>
             </div>
         </div>
 
-        <div class="col-sm-6 col-md-8 order-md-1">
-            <div class="form-group">
-                <div for="name" class="fate-header">ID</div>
-                <input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />
+        <div class="col-sm-6 col-md-8 order-md-1 ">
+            <div class="d-flex">
+                <div class="form-group w-75 mr-1">
+                    <div for="name" class="fate-header">ID</div>
+                    <input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />                
+                </div>
+                <div class="form-group w-25">
+                    <div for="name" class="fate-header">Pronoun</div>
+                    <input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
+                </div>
             </div>
 
             <div class="form-group">
@@ -36,7 +42,7 @@
 
     <div class="row">
         <!-- aspects -->
-        <div class="col-sm-12 col-md-4 fate-aspects">
+        <div class="col-sm-12 col-md-6 fate-aspects">
             <div class="form-group">
                 <div for="" class="fate-header">Aspects</div>
             </div>            
@@ -45,7 +51,7 @@
 			</div>    
         </div>
 
-        <div class="col-sm-12 col-md-8 fate-skills">                       
+        <div class="col-sm-12 col-md-6 fate-skills">                       
             <inputskillpyramid :skills="skills" header="Skills" :skillList="skillList" />            
         </div>
     </div>
@@ -63,7 +69,7 @@
         <div class="col-sm-12 col-md-6 fate-stress">
             <!-- physical stress -->
             <div class="form-group">
-                <div for="" class="fate-header">Physical Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+                <div for="" class="fate-header">Physical Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex d-flex justify-content-between">
 				<div v-for="stress in physicalstress" :key="stress.obj">
@@ -73,7 +79,7 @@
 
             <!-- mental stress -->
             <div class="form-group">
-                <div for="" class="fate-header">Mental Stress <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+                <div for="" class="fate-header">Mental Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex justify-content-between">
 				<div v-for="stress in mentalstress" :key="stress.obj">
@@ -83,7 +89,7 @@
         </div>
         <div class="col-md-6 col-sm-12 fate-consequences">
             <div class="form-group">
-                <div class="fate-header col-12">Consequences <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+                <div class="fate-header col-12">Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div v-for="consequence in consequences" :key="consequence.obj">
                 <inputconsequence :consequence="consequence" />
@@ -122,7 +128,7 @@ export default {
   },
   computed: {
  	...mapGetters([  
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   data () {
@@ -174,23 +180,23 @@ export default {
     setVal(arr, val) {        
         this.$parent.setVal(this.character, arr, val);        
     },
-    sendToRoll20(type, label, obj, item, skillType) {        
+    sendToVTT(type, label, obj, item, skillType) {        
 		switch(type)
 		{			
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				this.$parent.sendToVTT(type, this.character.name, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
-				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				this.$parent.sendToVTT(type, this.character.name, label, item);
                 break;
             case "skill":
-                this.$parent.sendToRoll20("diceroll", this.character.name, label, item, skillType);
+                this.$parent.sendToVTT("diceroll", this.character.name, label, item, skillType);
                 break;
 			default:			
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

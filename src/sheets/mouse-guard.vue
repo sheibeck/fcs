@@ -15,7 +15,7 @@
 				</div>
 				<div class="col-6 text-center ">
 					<div for="fatepoints" class="fate-header">
-						FP <span v-if="roll20Enabled" class='dice fo20 font-weight-normal small'>A</span>
+						FP <span v-if="vttEnabled" class='dice fo20 font-weight-normal small'>A</span>
 					</div>
 					<inputfatepoints />
 				</div>
@@ -73,7 +73,7 @@
 
 	<div class="row fate-conditions">
 		<div class="col-12 form-group">
-			<div for="" class="fate-header">Conditions <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+			<div for="" class="fate-header">Conditions <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 		</div>
 
 		<div class="col-sm-12 col-md-6">
@@ -136,7 +136,7 @@ components: {
   },
   computed: {
  	...mapGetters([      
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   mounted() {
@@ -194,21 +194,21 @@ components: {
     getPortrait() {		
         return this.character.image_url || "/static/sheets/mouse-guard/portrait.jpg";
 	},
-	sendToRoll20(type, label, obj, item, skillType) {		
+	sendToVTT(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				this.$parent.sendToVTT(type, this.character.name, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
             case "condition":
-				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				this.$parent.sendToVTT(type, this.character.name, label, item);
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}
@@ -265,10 +265,8 @@ components: {
 	/deep/ .fate-conditions label {
         font-family: 'IM Fell English', sans-serif;
         text-transform: uppercase;
-		font-size: 30px;
-		font-weight: 700;
-		margin-left: -5px;
-		margin-right: -5px;
+		font-size: 24px;
+		font-weight: 700;		
 	}
 
 	.portrait {

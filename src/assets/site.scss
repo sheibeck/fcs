@@ -2,7 +2,7 @@
 $fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
 @import "./node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
 @import "./node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
-
+@import "./node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
 
 h1 {
   font-family: 'Bowlby One SC', cursive;
@@ -96,6 +96,12 @@ h1 {
   height: 60px;
   line-height: 60px;
   background-color: #f5f5f5;
+}
+
+.list-image {
+  object-fit: cover;
+  object-position:top; 
+  max-height: 200px;
 }
 
 /* print styles */

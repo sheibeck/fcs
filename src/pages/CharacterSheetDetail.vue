@@ -12,7 +12,7 @@
             <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
             <button type='button' class='btn btn-dark' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
             <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
-                Character Properties <i class="fas fa-cog"></i>
+              Character Properties <i class="fas fa-cog"></i>
             </button>
           </div>
         </div>
@@ -20,7 +20,11 @@
         <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
           <div class='form-group'>
             <label class='' for='image_url'>Portrait Url:</label>
-            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
+            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />
+          </div>
+          <div class='form-group'>
+            <label class='' for='image_url'>Description:</label>
+            <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
           </div>
         </div>
       </div>
@@ -108,10 +112,7 @@ export default {
             });            
           }
         });
-      }
-      else {
-          window.print();
-      }
+      }     
     }
   }
 }

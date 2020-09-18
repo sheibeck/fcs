@@ -1,7 +1,7 @@
 <template>
   <div class="form-group d-flex">
     <!--roll20-->
-    <span v-if="hasRoll20" class="dice fo20 pt-2" v-on:click="sendToRoll20()">+</span>
+    <span v-if="vttEnabled" class="dice fo20 pt-2" v-on:click="sendToVTT()">+</span>
 
     <!--non-custom labels-->
     <div v-if="!item.label" class="w-100 mr-auto d-flex flex-column" :class="{ 'pt-1' : item.description }">
@@ -35,23 +35,20 @@ export default {
   computed: {
  	  ...mapGetters([
       'isAuthenticated',      
-      'roll20Enabled'
-    ]),
-    hasRoll20() {
-      return this.isAuthenticated && this.roll20Enabled;
-    }
+      'vttEnabled'
+    ]),   
   },
   data () {
     return {
     }
   },
   methods: { 
-    sendToRoll20() {      
+    sendToVTT() {      
       if (!this.item.obj) return;      
       let plural = this.item.obj.indexOf("skill") > -1 ? "skills" : "approaches";
       let singular = plural == "skills" ? "skill" : "approach";
-      let label = `${this.item.label ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
-      this.$parent.sendToRoll20("diceroll", label, plural, this.item.obj, singular);
+      let label = `${this.$parent.getVal(`${this.item.label}`) ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
+      this.$parent.sendToVTT("diceroll", label, plural, this.item.obj, singular);
     }
   }
 }

@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import { BootstrapVue } from 'bootstrap-vue'
 import Vuex from 'vuex'
 import VueAppend from 'vue-append'
 import VueCookies from 'vue-cookies'
@@ -18,7 +19,10 @@ import 'amazon-cognito-identity-js'
 import 'jquery'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '@trevoreyre/autocomplete-vue/dist/style.css'
 
+Vue.use(BootstrapVue)
 Vue.use(Vuex)
 Vue.use(VueAppend)
 Vue.use(VueCookies)
@@ -42,7 +46,8 @@ const store = new Vuex.Store({
     customerId: null,
     roll20Enabled: true,
     roll20Installed: false,
-    roll20Running: false,    
+    roll20Running: false,
+    fcsVttEnabled: true,    
     sessions: [],
     filteredSessions: [],
     campaigns: [],
@@ -104,12 +109,6 @@ const store = new Vuex.Store({
   },
   getters: {
     isSubscriber : state => {
-      /*
-      * we can pause payments to give people access, no need for super-user group at this point
-      var groups = state.userSession.getIdToken().payload['cognito:groups'];
-      if (groups && groups.includes("super-user")) {
-        return true;
-      }*/     
       return state.hasActiveSubscription;
     },
     roll20Enabled: (state, getters) => {
@@ -117,6 +116,20 @@ const store = new Vuex.Store({
       if (document.location.href.indexOf("/charactersheet") > -1) return false;      
       let enabled = getters.isSubscriber && state.roll20Enabled && state.roll20Installed && state.roll20Running;
       return enabled;
+    },
+    fcsVttEnabled: (state, getters) => {
+      if (!window.opener || window.opener.origin !== window.origin) return false;
+      let enabled = state.fcsVttEnabled && state.isAuthenticated; //you don't need to be a subscriber to play a character
+      return enabled;
+    },
+    vttEnabled: (state, getters) => {      
+      if (!state.isAuthenticated) return false;
+      if (getters.fcsVttEnabled) return "fcsVtt"; //fcs takes priority over roll20
+      if (getters.roll20Enabled) return "roll20";
+      return false;
+    },
+    vttPlayer: (state, getters) => {
+      return vttEnabled == "fcsVtt" && getters.isAuthenticated;
     },
     isAuthenticated: state => {
       return state.isAuthenticated;

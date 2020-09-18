@@ -1,9 +1,15 @@
 <template>
 <div class="sheet">
 	<div class="row">		
-		<div class="col-sm-6">
-			<div class="form-group">
+		<div class="col-sm-6 d-flex">
+			<div class="form-group w-75 d-flex mr-3">
+				<label class="mt-2 mr-2">Name</label>
 				<input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />
+			</div>
+
+			<div class="form-group d-flex">
+				<label class="mt-2 mr-2">Pronoun</label>
+				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
 			</div>
 		</div>
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
@@ -32,7 +38,7 @@
 			<div class="fate-header mb-5 mb-sm-0 d-flex">
 				<div class="mr-auto"></div>
 				<div class="d-flex" style="min-height: 50px;">
-					<span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
+					<span v-if="vttEnabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
 					<inputfatepoints inputclass="fatepoints" placeholder="-" />
 				</div>
 			</div>					
@@ -45,7 +51,7 @@
 			<div class="px-3">				
 				<!-- Stress -->
 				<div class="form-group text-center font-weight-bold">
-					<div class="col-12">STRESS  <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+					<div class="col-12">STRESS  <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 
 				<!-- physical stress -->
@@ -74,7 +80,7 @@
 
 				<!-- consequences -->
 				<div class="form-group text-center font-weight-bold">
-					<div class="col-12">CONSEQUENCES <span v-if="roll20Enabled" class='dice fo20 font-weight-normal'>D</span></div>
+					<div class="col-12">CONSEQUENCES <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
 				<div v-for="consequence in consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
@@ -85,7 +91,7 @@
 			<div class="fate-header col-12">Skills</div>
 
 			<div class="px-3 skills">
-				<div class="small text-muted font-italic">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
+				<div class="small text-muted font-italic d-print-none">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
 				<div v-for="skill in skills" :key="skill.obj" class="py-1">
 					<inputskill :item="skill" />
 				</div>
@@ -119,7 +125,7 @@ export default {
   }, 
   computed: {
  	...mapGetters([  
-      'roll20Enabled'
+      'vttEnabled'
     ]),
   },
   mounted() {
@@ -187,10 +193,10 @@ export default {
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
 
-		if (this.roll20Enabled && arr.indexOf("stress") !== -1)
+		if (this.vttEnabled && arr.indexOf("stress") !== -1)
 		{
 			let label = arr.indexOf("mental") > -1 ? "Mental" : "Physical";
-			this.sendToRoll20("stress", `1 ${label}`, arr, val);		
+			this.sendToVTT("stress", `1 ${label}`, arr, val);		
 			this.$parent.$parent.save();		
 		}		
     },
@@ -207,20 +213,20 @@ export default {
 
         return result;
 	}, 
-	sendToRoll20(type, label, obj, item, skillType) {		
+	sendToVTT(type, label, obj, item, skillType) {		
 		switch(type)
 		{			
 			case "fatepoint":
-				this.$parent.sendToRoll20(type, this.character.name, null, item);
+				this.$parent.sendToVTT(type, this.character.name, null, item);
 				break;
 			case "stress":
 			case "consequence":
 			case "stuntextra":
-				this.$parent.sendToRoll20(type, this.character.name, label, item);
+				this.$parent.sendToVTT(type, this.character.name, label, item);
 				break;
 			default:
 				if (this.getVal(item)) {
-					this.$parent.sendToRoll20(type, this.character.name, label, this.getVal(item), skillType);
+					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
 				}
 				break;
 		}

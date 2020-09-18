@@ -3,10 +3,9 @@ import 'noty/lib/noty.css';
 import 'noty/lib/themes/metroui.css';
 import shortid from 'shortid'
 import * as Sentry from '@sentry/browser';
+import {version} from '../../../package.json';
 
-export default class CommonService {
-  latestVersion = "1.5.2";
-
+export default class CommonService {  
   constructor(fcs){
     this.fcs = fcs;
   }
@@ -86,7 +85,7 @@ export default class CommonService {
   GenerateUUID = function() {
     return shortid.generate();
   }
-
+  
   SortObject = (obj) => {
     return Object.keys(obj).sort().reduce(function (result, key) {
         result[key] = obj[key];
@@ -149,7 +148,7 @@ export default class CommonService {
         {
           environmentLabel = "LOCAL";
         }        
-        $('body').prepend(`<h1 class="d-print-none">${environmentLabel}</h1>`);
+        $('ul.navbar-nav').append(`<span class="d-print-none ml-5 mt-1 text-center text-white h4">** ${environmentLabel} **</span>`);
       }
 
       if (window.location.host !== 'localhost:8080' && window.location.host.indexOf("gitpod.io") == -1)
@@ -157,6 +156,7 @@ export default class CommonService {
         Sentry.init({
           dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522',
           environment: this.fcs.$store.state.environment,
+          release: 'fatecharactersheet@' + version
         });
       }
   }
@@ -181,11 +181,12 @@ export default class CommonService {
 
 
   CheckVersion = () => {    
-    var currentVersion = localStorage.getItem("fcsVersion");
+    const currentVersion = localStorage.getItem("fcsVersion");
+    const packageVersion = version;
 
-    if (currentVersion === null || currentVersion !== this.latestVersion) {
-      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/v${this.latestVersion}">v${this.latestVersion}</a>`;
-      let dismiss = `localStorage.setItem('fcsVersion', '${this.latestVersion}')`;
+    if (currentVersion === null || currentVersion !== packageVersion) {
+      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/v${packageVersion}">v${packageVersion}</a>`;
+      let dismiss = `localStorage.setItem('fcsVersion', '${packageVersion}')`;
       this.ShowAlert(msg, "info", dismiss);
     } 
   }
@@ -195,5 +196,38 @@ export default class CommonService {
     let alertMsg = `<div id="alertdiv" class="d-print-none alert alert-${type}">
                       <a class="close" onclick="eval(${dismiss})" style="cursor:pointer;" data-dismiss="alert">×</a><span>${msg}</span></div>`;
     $('#alert_placeholder').append(alertMsg);
+  }
+
+  GetShortText = function(text) {
+    if (text)
+    {
+      let maxLength = 100;
+      return text.length < maxLength ? text : text.substring(0,maxLength) + "...";
+    }
+    return text;
+  }
+
+  GetPlayerIdForDom = function(playerId) {
+    return playerId.replace(":","-");
+  }
+
+  DeepCopy(objToCopy) {
+    return JSON.parse( JSON.stringify( objToCopy ) );
+  }
+
+  GetFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    var time = date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: false, minute: 'numeric' });
+
+    let dateString =  year + '-' + month + '-' + day + 'T' + time;
+
+    return dateString;
   }
 }

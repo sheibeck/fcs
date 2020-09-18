@@ -6,9 +6,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import CommonService from "./../assets/js/commonService"
-import FateOf20 from '../assets/js/fateof20'
+import { mapGetters } from 'vuex';
+import CommonService from "./../assets/js/commonService";
+import FateOf20 from '../assets/js/fateof20';
+import FCSVTT from '../assets/js/fcsVTT';
+import Models from '../assets/js/models';
+
 
 //sheets
 import SheetFateAccelerated from "./../sheets/fate-accelerated"
@@ -25,14 +28,16 @@ import SheetStarTrek from "./../sheets/star-trek"
 
 let commonSvc = null;
 let fateOf20 = null;
+let fcsVtt = null;
+let models = null;
 
 export default {
   name: 'CharacterSheet',
-  mounted() {       
-    if (!commonSvc) { 
-      commonSvc = new CommonService(this.$root);
-    }
-    fateOf20 = new FateOf20();
+  created() {    
+    commonSvc = new CommonService(this.$root);    
+    fateOf20 = new FateOf20(); 
+    fcsVtt = new FCSVTT();
+    models = new Models();
   },
   components: {
     "fate-accelerated": SheetFateAccelerated,
@@ -52,6 +57,10 @@ export default {
     character: Object,
   },
   computed: {
+     ...mapGetters([
+      'isAuthenticated',
+      'vttEnabled'
+    ]), 
     currentCharacterSheet() {      
       if (!commonSvc) { 
         commonSvc = new CommonService(this.$root);
@@ -64,30 +73,60 @@ export default {
     }
   },
   methods: {
-    sendToRoll20(type, character, description, data, skillType) {         
-      let msg = null;      
-      switch(type) {
-        case "diceroll":          
-          msg = fateOf20.MsgDiceRoll(character, skillType, description, data);
+    sendToVTT(type, character, description, data, skillType) {         
+      let msg = null;
+      
+      switch (this.vttEnabled) {
+        case "fcsVtt":
+          switch(type) {
+            case "diceroll":          
+              msg = models.MsgDiceRoll(character, skillType, description, data);
+              break;
+            case "invoke":
+              msg = models.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":
+              msg = models.MsgStuntExtra(character, data);
+              break;
+            case "fatepoint":          
+              msg = models.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = models.MsgStress(character, description, data);
+              break;
+            case "consequence":
+              msg = models.MsgConsequence(character, description, data);
+              break;      
+          }
+          fcsVtt.SendMessage(msg);
           break;
-        case "invoke":
-          msg = fateOf20.MsgInvoke(character, description, data);
-          break;
-        case "stuntextra":
-          msg = fateOf20.MsgStuntExtra(character, data);
-          break;
-        case "fatepoint":          
-          msg = fateOf20.MsgFatePoint(character, description, data);
-          break;
-        case "stress":
-        case "condition":
-          msg = fateOf20.MsgStress(character, description, data);
-          break;
-        case "consequence":
-          msg = fateOf20.MsgConsequence(character, description, data);
+
+        case "roll20":
+          switch(type) {
+            case "diceroll":          
+              msg = models.MsgDiceRoll(character, skillType, description, data);
+              break;
+            case "invoke":
+              msg = models.MsgInvoke(character, description, data);
+              break;
+            case "stuntextra":
+              msg = models.MsgStuntExtra(character, data);
+              break;
+            case "fatepoint":          
+              msg = models.MsgFatePoint(character, description, data);
+              break;
+            case "stress":
+            case "condition":
+              msg = models.MsgStress(character, description, data);
+              break;
+            case "consequence":
+              msg = models.MsgConsequence(character, description, data);
+              break;      
+          }
+          fateOf20.SendMessage(msg);
           break;      
       }
-      fateOf20.SendMessage(msg);
     },
     getVal(obj, graphPath, defaultValue){
       var parts = graphPath.split(".");
@@ -164,10 +203,8 @@ export default {
       display: none;
     }
 
-    .sheet {
-			margin: 20px;
-			margin-top: 40px;
-			max-width: 1024px;
+    .sheet {			
+			margin-top: 30px;			
 		}
   }
 

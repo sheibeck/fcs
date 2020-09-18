@@ -11,35 +11,30 @@
 
       <div v-if="!hasCampaigns">
         <h2>You have not created any campaigns.</h2>
-      </div>
-
-      <div>
-        <div class='card-columns'>
-          <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
-            <div class='card-body'>
-              <h5 class='card-title campaign-name'>{{item.name}}</h5>
-              <div class='row'>
-                <p v-if="item.image_url" class='col-12 col-md-5 text-center'>
-                  <img v-bind:src="item.image_url" class='img-fluid' />
-                </p>
-                <p class='card-text col'>
-                  {{ getShortText(item.description) }}
-                </p>
-              </div>
-              <hr />
-              <div class="d-flex">
-                <a :href="`/campaign/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-                <a :href="`/campaign-summary/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
-                <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
-              </div>
+      </div>    
+      <div v-if="hasCampaigns" class='card-columns'>
+        <div v-for="item in filteredCampaigns" v-bind:key="item.id" class='card'>
+          <img v-if="item.image_url" v-bind:src="item.image_url" class="card-img-top list-image" alt="campaign image">
+          <div class='card-body'>
+            <h5 class='card-title'>{{item.name}}</h5>
+            <div class='row'>            
+              <p class='card-text col'>
+                {{ getShortText(item.description) }}
+              </p>
             </div>
-            <div class='card-footer text-muted'>
-              <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
-              @ <span class=''>{{getNiceDate(item.date)}}</span>
+            <hr />
+            <div class="d-flex">
+              <a :href="`/campaign/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
+              <a :href="`/campaign-summary/${commonSvc.GetId(item.id)}/${item.slug}`" class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
+              <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteConfirm'><i class='fa fa-trash'></i></a>
             </div>
           </div>
+          <div class='card-footer text-muted'>
+            <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='item.scale' v-on:click="searchByTag">{{item.scale}}</span>
+            @ <span class=''>{{getNiceDate(item.date)}}</span>
+          </div>
         </div>
-      </div>
+      </div>      
     </div>
     <input id='copyUrl' class='hidden' />
     
@@ -197,15 +192,10 @@ export default {
       this.$options.filters.filterCampaigns();
     },
     getShortText : function(text) {
-      if (text)
-      {
-        let maxLength = 100;
-        return text.length < maxLength ? text : text.substring(0,maxLength) + "...";
-      }
-      return text;
+      return commonSvc.GetShortText(text);
     },
     getNiceDate : function(date) {
-        return commonSvc.GetNiceDate(date);
+      return commonSvc.GetNiceDate(date);
     },
   }
 }
