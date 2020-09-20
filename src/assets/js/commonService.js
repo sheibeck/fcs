@@ -230,4 +230,23 @@ export default class CommonService {
 
     return dateString;
   }
+  
+  bringToFrontOfSiblings(id) {
+    let objElem = document.getElementById(id);
+    if (objElem.style.zIndex !== 10) {
+      objElem.style.zIndex = 10;
+
+      // Setup siblings array and get the first sibling
+      var siblings = [];
+      var sibling = objElem.parentNode.firstChild;
+
+      // Loop through each sibling and push to the array
+      while (sibling) {
+        if (sibling.nodeType === 1 && sibling !== objElem) {
+          sibling.style.zIndex = 0;
+        }
+        sibling = sibling.nextSibling
+      }
+    }
+  }
 }
