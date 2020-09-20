@@ -1,5 +1,5 @@
 <template>
-  <div class="m-1 p-1 bg-light border d-flex scene-object" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`"    
+  <div class="m-1 p-1 bg-light border d-flex scene-object" @click="bringToFront(`scene-object-${commonSvc.GetId(objectdata.id)}`)" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`"    
     :style="{ position: 'absolute', top: `${objectdata.y}px`, left: `${objectdata.x}px` }">    
     <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column align-items-end">
       <i class="fas fa-expand-arrows-alt"></i>
@@ -447,6 +447,9 @@ export default {
       else {
         this.objectdata.acted = !this.objectdata.acted
       }
+    },
+    bringToFront(id) {      
+      this.commonSvc.bringToFrontOfSiblings(id);
     }
   }
 
