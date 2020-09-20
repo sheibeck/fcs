@@ -201,7 +201,7 @@ export default {
   },
   computed: {
     sortedAspects() {      
-      var sortPriority = [ "trouble", "highconcept" ];
+      var sortPriority = [ "trouble", "highconcept", "high_concept" ];
       return this.objectdata.aspects.sort(function(a,b){ 
         if ( a.label == b.label ) return -1;
         return sortPriority.indexOf( b.label ) - sortPriority.indexOf( a.label );
