@@ -201,11 +201,15 @@ export default {
   },
   computed: {
     sortedAspects() {      
-      var sortPriority = [ "trouble", "highconcept" ];
-      return this.objectdata.aspects.sort(function(a,b){ 
-        if ( a.label == b.label ) return -1;
-        return sortPriority.indexOf( b.label ) - sortPriority.indexOf( a.label );
-      });
+      if (this.objectdata.aspects) {
+        var sortPriority = [ "trouble", "highconcept", "high_concept" ];
+        return this.objectdata.aspects.sort(function(a,b){ 
+          if ( a.label == b.label ) return -1;
+          return sortPriority.indexOf( b.label ) - sortPriority.indexOf( a.label );
+        });
+      } else {
+        return [];
+      }
     },
     isFCSObject() {
       return this.objectdata.object_type == "CHARACTER" || this.objectdata.object_type == "ADVERSARY";

@@ -40,7 +40,7 @@ export default {
   },
   methods: {  
     getLabel(aspect) {            
-      if (aspect.label.toLowerCase() == "highconcept" ) return "<sup class='text-primary font-weight-bold'>H</sup>";
+      if (aspect.label.toLowerCase().indexOf("high") == 0) return "<sup class='text-primary font-weight-bold'>H</sup>";
       if (aspect.label.toLowerCase() == "trouble") return "<sup class='text-danger font-weight-bold'>T</sup>";
       return "";
     },
