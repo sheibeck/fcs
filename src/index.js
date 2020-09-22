@@ -22,6 +22,26 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '@trevoreyre/autocomplete-vue/dist/style.css'
 
+import * as Sentry from "@sentry/browser";
+import { Vue as VueIntegration } from "@sentry/integrations";
+import { Integrations } from "@sentry/tracing";
+import {version} from '../package.json';
+
+Sentry.init({
+  dsn: "https://2efc80c955be4b38b84e67b30d23610a@o302915.ingest.sentry.io/5174522",
+  environment: process.env.NODE_ENV,
+  release: 'fatecharactersheet@' + version,
+  integrations: [
+    new VueIntegration({
+      Vue,
+      tracing: true,
+      logErrors: true
+    }),
+    new Integrations.BrowserTracing(),
+  ],
+  tracesSampleRate: 1,
+});
+
 Vue.use(BootstrapVue)
 Vue.use(Vuex)
 Vue.use(VueAppend)

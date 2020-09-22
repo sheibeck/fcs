@@ -22,7 +22,9 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
     "@panzoom/panzoom": "^4.3.2",
-    "@sentry/browser": "^5.23.0",
+    "@sentry/browser": "^5.24.2",
+    "@sentry/integrations": "^5.24.2",
+    "@sentry/tracing": "^5.24.2",
     "@trevoreyre/autocomplete-vue": "^2.2.0",
     "amazon-cognito-identity-js": "^4.4.0",
     "aws-sdk": "^2.753.0",
