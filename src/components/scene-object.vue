@@ -200,8 +200,12 @@ export default {
     }
   },
   computed: {
-    sortedAspects() {      
+    sortedAspects() {
       if (this.objectdata.aspects) {
+        //if we have aspects that have labels, try to sort so high concept and trouble are at the top 
+        //TODO: allow adding labels to aspects when adding NPCs     
+        if (this.objectdata.aspects.filter(aspect => aspect.label !== "").length === 0) return this.objectdata.aspects;
+
         var sortPriority = [ "trouble", "highconcept", "high_concept" ];
         return this.objectdata.aspects.sort(function(a,b){ 
           if ( a.label == b.label ) return -1;

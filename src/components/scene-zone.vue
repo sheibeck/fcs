@@ -72,7 +72,7 @@
           </li>
         </template></autocomplete>
         <div class="mt-1 ml-2 small">
-          Searches your characters and the character's of other players in this scene. You can search by name, aspect, character sheet type.
+          Searches your characters and the character's of other players in this scene. You can search by <em>name, aspect, character sheet type</em>.
         </div>
       </b-popover>
       <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
@@ -102,7 +102,7 @@
         </autocomplete>
         <div class="mt-1 ml-2">          
           <input type="checkbox" class="mr-1" ref="adversarySearchMine" />Search only my adversaries?
-          <div class="small">You can search by name, aspect, type, system, or genre.</div>
+          <div class="small">You can search by <em>name, aspect, type, system, or genre</em>.</div>
         </div>
       </b-popover>     
       <b-button :id="`add-npc-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add NPC" @click="addNPC()"><i class="fas fa-users"></i></b-button>

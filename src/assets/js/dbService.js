@@ -140,8 +140,8 @@ export default class DbService {
         } else {
             //if the user isn't looking at their own stuff, then they are looking at the
             //public list. don't show private_only items in the public list
-            //params.FilterExpression += ' AND is_private <> :is_private';
-            //params.ExpressionAttributeValues[':is_private'] = true;
+            params.FilterExpression += ' AND is_private <> :is_private';
+            params.ExpressionAttributeValues[':is_private'] = true;
         }
 
         //add some search parameters
