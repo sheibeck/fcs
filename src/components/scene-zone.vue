@@ -72,14 +72,14 @@
           </li>
         </template></autocomplete>
         <div class="mt-1 ml-2 small">
-          Searches your characters and the character's of other players in this scene.
+          Searches your characters and the character's of other players in this scene. You can search by name, aspect, character sheet type.
         </div>
       </b-popover>
       <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
       <b-popover ref="popoverAdversary" @shown="$refs.adversaryAutocomplete.$refs.input.focus()" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Adversary</template>
         <autocomplete ref="adversaryAutocomplete" :search="searchAdversaries"
-          placeholder="Search My Adversaries"
+          placeholder="Search Adversaries"
           aria-label="Search Adversaries"
           :get-result-value="getAdversaryResultValue"
           @submit="selectAdversaryResult">          
@@ -94,12 +94,15 @@
                 <div v-if="result.aspects.trouble"><label class="p-0 m-0">T:</label> {{result.aspects.trouble||""}}</div>
               </div>
               <div><label class="p-0 m-0">Type:</label> {{result.type||"Unknown"}}</div>
+              <div><label class="p-0 m-0">System:</label> {{result.system||"Unknown"}}</div>
+              <div><label class="p-0 m-0">Genre:</label> {{result.genre||"Unknown"}}</div>
             </div>
           </li>
         </template>
         </autocomplete>
         <div class="mt-1 ml-2">          
-          <input type="checkbox" class="mr-1" ref="adversarySearchAll" />Search All Adversaries?
+          <input type="checkbox" class="mr-1" ref="adversarySearchMine" />Search only my adversaries?
+          <div class="small">You can search by name, aspect, type, system, or genre.</div>
         </div>
       </b-popover>     
       <b-button :id="`add-npc-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add NPC" @click="addNPC()"><i class="fas fa-users"></i></b-button>
@@ -210,9 +213,9 @@ export default {
         if (query.length < 3) {
           return resolve([])
         }        
-        let ownerId = this.$store.state.userId;
-        if (this.$refs.adversarySearchAll.checked) {
-          ownerId = null;
+        let ownerId = null;
+        if (this.$refs.adversarySearchMine.checked) {
+          ownerId = this.$store.state.userId;
         }
         let adversaries = await dbSvc.ListObjects("ADVERSARY", ownerId, query);       
         resolve(adversaries);       
