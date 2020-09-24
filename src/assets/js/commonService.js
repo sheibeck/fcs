@@ -149,16 +149,7 @@ export default class CommonService {
           environmentLabel = "LOCAL";
         }        
         $('ul.navbar-nav').append(`<span class="d-print-none ml-5 mt-1 text-center text-white h4">** ${environmentLabel} **</span>`);
-      }
-
-      if (window.location.host !== 'localhost:8080' && window.location.host.indexOf("gitpod.io") == -1)
-      {
-        Sentry.init({
-          dsn: 'https://2efc80c955be4b38b84e67b30d23610a@sentry.io/5174522',
-          environment: this.fcs.$store.state.environment,
-          release: 'fatecharactersheet@' + version
-        });
-      }
+      }      
   }
 
   GetNiceDate = function(date) {

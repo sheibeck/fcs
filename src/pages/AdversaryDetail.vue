@@ -114,11 +114,15 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="system" class="col-sm-12 col-md-2 col-form-label">Type</label>
+                    <label for="system" class="col-sm-12 col-md-2 col-form-label">System</label>
                     <div class="col-sm-12 col-md-10">
                         <select class="form-control" name="system" id="system">
                             <option>Fate Core</option>
                             <option>Fate Accelerated</option>
+                            <option>Fate Condensed</option>
+                            <option>Fate of Cthulhu</option>                            
+                            <option>Dresden Files Accelerated</option>
+                            <option>Fate Freeport</option>
                             <option>Other</option>
                         </select>
                     </div>

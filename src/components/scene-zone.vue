@@ -50,9 +50,9 @@
     <div class="d-flex flex-column bg-light pl-1">
       <button type="button" class="btn btn-link p-0" title="Add Zone Aspect" @click="addZoneObject('aspect')"><i class="fas fa-sticky-note"></i></button>    
       <b-button :id="`add-character-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Character"><i class="fas fa-user-circle"></i></b-button>  
-      <b-popover ref="popoverCharacter" :target="`add-character-${this.zone.id}`" triggers="click blur">
+      <b-popover ref="popoverCharacter" @shown="$refs.characterAutocomplete.$refs.input.focus()" :target="`add-character-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Character</template>
-        <autocomplete :search="searchCharacters"
+        <autocomplete ref="characterAutocomplete" :search="searchCharacters"
           placeholder="Search Characters"
           aria-label="Search Characters"
           :get-result-value="getCharacterResultValue"
@@ -71,15 +71,18 @@
             </div>
           </li>
         </template></autocomplete>
+        <div class="mt-1 ml-2 small">
+          Searches your characters and the character's of other players in this scene. You can search by <em>name, aspect, character sheet type</em>.
+        </div>
       </b-popover>
       <b-button :id="`add-adversary-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add Adversary"><i class="fas fa-theater-masks"></i></b-button>
-      <b-popover ref="popoverAdversary" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
+      <b-popover ref="popoverAdversary" @shown="$refs.adversaryAutocomplete.$refs.input.focus()" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Adversary</template>
-        <autocomplete :search="searchAdversaries"
+        <autocomplete ref="adversaryAutocomplete" :search="searchAdversaries"
           placeholder="Search Adversaries"
           aria-label="Search Adversaries"
           :get-result-value="getAdversaryResultValue"
-          @submit="selectAdversaryResult">
+          @submit="selectAdversaryResult">          
           <template #result="{ result, props }">
           <li v-bind="props">
             <div class="p-0 m-0 h6">
@@ -91,9 +94,16 @@
                 <div v-if="result.aspects.trouble"><label class="p-0 m-0">T:</label> {{result.aspects.trouble||""}}</div>
               </div>
               <div><label class="p-0 m-0">Type:</label> {{result.type||"Unknown"}}</div>
+              <div><label class="p-0 m-0">System:</label> {{result.system||"Unknown"}}</div>
+              <div><label class="p-0 m-0">Genre:</label> {{result.genre||"Unknown"}}</div>
             </div>
           </li>
-        </template></autocomplete>
+        </template>
+        </autocomplete>
+        <div class="mt-1 ml-2">          
+          <input type="checkbox" class="mr-1" ref="adversarySearchMine" />Search only my adversaries?
+          <div class="small">You can search by <em>name, aspect, type, system, or genre</em>.</div>
+        </div>
       </b-popover>     
       <b-button :id="`add-npc-${this.zone.id}`" type="button" variant="link" class="btn btn-link p-0" title="Add NPC" @click="addNPC()"><i class="fas fa-users"></i></b-button>
       <button type="button" class="btn btn-link p-0" @click="toggleZoneImageEdit()" title="Edit zone image"><i class="fas fa-image"></i></button>
@@ -198,16 +208,17 @@ export default {
       this.zone.sceneobjects.push(npc);
     },
     /* adversary search */
-    searchAdversaries(query) {      
-      return new Promise((resolve) => {
+    searchAdversaries(query) {
+      return new Promise( async (resolve) => {
         if (query.length < 3) {
           return resolve([])
+        }        
+        let ownerId = null;
+        if (this.$refs.adversarySearchMine.checked) {
+          ownerId = this.$store.state.userId;
         }
-
-        dbSvc.ListObjects("ADVERSARY", null, query)          
-          .then((data) => {            
-            resolve(data)
-          })
+        let adversaries = await dbSvc.ListObjects("ADVERSARY", ownerId, query);       
+        resolve(adversaries);       
       })
     },
     getAdversaryResultValue(result) {      
@@ -224,16 +235,23 @@ export default {
 
     /* character search */
     searchCharacters(query) {      
-      return new Promise((resolve) => {
+      return new Promise( async (resolve) => {
         if (query.length < 3) {
           return resolve([])
         }
+        
+        //search through all the players characters
+        let players = this.$parent.$data.scene.players;
+        let characters = [];
+      
+        for (let player = 0; player < players.length; player++) {
+          let data = await dbSvc.ListObjects("CHARACTER", players[player].playerId, query);
+          if (data.length > 0) characters.push(data);
+        }
 
-        //dbSvc.ListObjects("CHARACTER", this.$store.state.userId, query)
-        dbSvc.ListObjects("CHARACTER", null, query)
-          .then((data) => {            
-            resolve(data)
-          })
+        characters = characters.map(o => o).flat();
+
+        resolve(characters);
       })
     },
     getCharacterResultValue(result) {
@@ -253,7 +271,7 @@ export default {
 
       let characterGameObjects = ["ASPECT", "CONSEQUENCE"]
 
-      //only show aspects for characters. We want to drive playes to use the sheets
+      //only show aspects for characters. We want to drive players to use the sheets
       if (thing == "CHARACTER" && !characterGameObjects.includes(type)) return;
 
       switch(type) {        
