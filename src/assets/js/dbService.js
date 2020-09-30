@@ -59,7 +59,8 @@ export default class DbService {
                 KeyConditionExpression: 'id = :id',
                 ExpressionAttributeValues: {
                     ':id': objectId
-                }
+                },
+                Limit: 1,
             }
                 
             const queryOne = async (params) => {
@@ -148,33 +149,8 @@ export default class DbService {
         if (filter) {
             this.GetSearchFilters(filter, params);
         }
-
-        const queryAll = async (params) => {            
-            let lastEvaluatedKey = 'dummy'; // string must not be empty
-            const itemsAll = [];
-            while (lastEvaluatedKey) {
-                try {
-                    await docClient.query(params).promise()
-                    .then((data) => {
-                        itemsAll.push(...data.Items);
-                        lastEvaluatedKey = data.LastEvaluatedKey;
-                        if (lastEvaluatedKey) {
-                            params.ExclusiveStartKey = lastEvaluatedKey;
-                        }
-                    }).catch((err) => {
-                        this.commonSvc.Notify(err.code, 'error');
-                        lastEvaluatedKey = null;                    
-                    });
-                }
-                catch(ex) {                    
-                    this.commonSvc.Notify(ex, 'error');
-                    break;
-                }                
-            }            
-            return itemsAll;
-        }
-
-        return await queryAll(params);
+        
+        return await this.QueryAll(params);
     }
 
     ListRelatedObjects = async (relatedTo, publicOnly) => {
@@ -196,37 +172,35 @@ export default class DbService {
                 "#ispublic": "public",
             }
         }
-   
-        const queryAll = async (params) => {
-            let lastEvaluatedKey = 'dummy'; // string must not be empty
-            const itemsAll = [];
-                       
-            while (lastEvaluatedKey) {
-                try {
-                    await docClient.query(params).promise()
-                    .then((data) => {
-                        itemsAll.push(...data.Items);
-                        lastEvaluatedKey = data.LastEvaluatedKey;
-                        if (lastEvaluatedKey) {
-                            params.ExclusiveStartKey = lastEvaluatedKey;
-                        }
-                    }).catch((err) => {
-                        this.commonSvc.Notify(err.code, 'error');
-                        lastEvaluatedKey = null;
-                    });  
-                }
-                catch(ex) {
-                    this.commonSvc.Notify(ex, 'error');
-                    break;
-                } 
-            }
-           
-            return itemsAll;
-        }
 
-        return await queryAll(params);
+        return await this.QueryAll(params);
     }
     
+    QueryAll = async (params) => {            
+        let lastEvaluatedKey = 'dummy'; // string must not be empty
+        const itemsAll = [];
+        while (lastEvaluatedKey) {
+            try {
+                await docClient.query(params).promise()
+                .then((data) => {
+                    itemsAll.push(...data.Items);
+                    lastEvaluatedKey = data.LastEvaluatedKey;
+                    if (lastEvaluatedKey) {
+                        params.ExclusiveStartKey = lastEvaluatedKey;
+                    }
+                }).catch((err) => {
+                    this.commonSvc.Notify(err.code, 'error');
+                    lastEvaluatedKey = null;                    
+                });
+            }
+            catch(ex) {                    
+                this.commonSvc.Notify(ex, 'error');
+                break;
+            }                
+        }            
+        return itemsAll;
+    }
+
     DeleteObject = async (ownerId, id) => {
         let docClient = await this.GetDbClient();        
 
