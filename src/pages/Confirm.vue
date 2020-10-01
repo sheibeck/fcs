@@ -25,6 +25,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import CommonService from "./../assets/js/commonService";
+import * as  AmazonCognitoIdentity from "amazon-cognito-identity-js";
 
 export default {
   name: 'Recover',

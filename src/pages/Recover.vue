@@ -27,7 +27,7 @@
 import { mapGetters } from 'vuex';
 import CommonService from "./../assets/js/commonService";
 import AWS from 'aws-sdk';
-var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
+import * as  AmazonCognitoIdentity from "amazon-cognito-identity-js";
 
 let commonSvc = null;
 
