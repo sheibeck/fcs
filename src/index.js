@@ -53,7 +53,8 @@ Sentry.init({
     "EBCallBackMessageReceived",
     // See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
     "conduitPage",
-    "Extension context invalidated",
+    "Error: Extension context invalidated.",
+    "ResizeObserver loop limit exceeded",
   ],
   denyUrls: [
     // Facebook flakiness
@@ -73,16 +74,11 @@ Sentry.init({
   ],
   integrations: [
     new VueIntegration({
-      Vue,
-      tracing: true,
-      logErrors: true,
-      tracingOptions: {
-        trackComponents: true,
-      },
-    }),
-    new Integrations.BrowserTracing(),
-  ],
-  tracesSampleRate: 0.25,
+      Vue,      
+      attachProps: true,
+      logErrors: true,          
+    }),    
+  ],  
 });
 
 Vue.use(BootstrapVue)
