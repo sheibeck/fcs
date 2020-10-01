@@ -53,6 +53,7 @@ Sentry.init({
     "EBCallBackMessageReceived",
     // See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
     "conduitPage",
+    "Extension context invalidated",
   ],
   denyUrls: [
     // Facebook flakiness
