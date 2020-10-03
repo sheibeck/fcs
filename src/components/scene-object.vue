@@ -1,8 +1,12 @@
 <template>
   <div class="m-1 p-1 bg-light border d-flex scene-object" @click="bringToFront(`scene-object-${commonSvc.GetId(objectdata.id)}`)" :id="`scene-object-${commonSvc.GetId(objectdata.id)}`"    
     :style="{ position: 'absolute', top: `${objectdata.y}px`, left: `${objectdata.x}px` }">    
-    <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column align-items-end">
-      <i class="fas fa-expand-arrows-alt"></i>
+    <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column justify-content-between">
+      <i title="Move" class="fas fa-expand-arrows-alt"></i>          
+      <i title="Hide All" @click="showAllSections(false)" class="fas fa-eye-slash fa-xs pt-2"></i>      
+      <i title="Show All" @click="showAllSections(true)" class="fas fa-eye fa-xs pt-2"></i>
+      
+            
       <button v-if="isFCSObject" :title="`Play ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 m-0 mt-auto text-white btn btn-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
       <button v-if="isCharacter" :title="`Refresh Data`" @click="syncCharacter()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-sync-alt fa-xs"></i></button>      
     </div>
@@ -134,10 +138,10 @@
       <b-popover ref="popoverColorPicker" :target="`color-object-${this.objectdata.id}`" triggers="click blur">
         <template v-slot:title>Change Color</template>
         <div v-for="color in colorList" :key="color" :value="color"><div class="p-2" style="cursor:pointer;" :class="color" @click="updateObjectColor(color)">&nbsp;</div></div>      
-      </b-popover> 
-      <button v-if="!isCharacter" type="button" class="btn btn-link p-0" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
+      </b-popover>       
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
-      <button type="button" class="btn btn-link p-0 mt-auto" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
+      <button v-if="!isCharacter" type="button" class="btn btn-link p-0 mt-auto" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
+      <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 </template>
@@ -196,7 +200,7 @@ export default {
       selectedZone: null,
       colorList: [
         "bg-primary", "bg-secondary", "bg-danger text-white", "bg-success", "bg-dark text-white", "bg-warning"
-      ]
+      ],      
     }
   },
   computed: {
@@ -223,7 +227,7 @@ export default {
     },
     FCSObjectType() {
       return this.objectdata.object_type;
-    },
+    },    
     zoneList() {       
       var list = this.$parent.$parent.$parent.$data.scene.zones.filter((item) => { return item.id !== this.$parent.$parent.$props.zone.id });
       return list;
@@ -454,6 +458,11 @@ export default {
     },
     bringToFront(id) {      
       this.commonSvc.bringToFrontOfSiblings(id);
+    },
+    showAllSections(val) {        
+      Object.keys(this.objectdata.show).forEach((item) => {        
+        this.objectdata.show[item] = val;
+      });
     }
   }
 

@@ -938,7 +938,7 @@ ${msg}`;
     clearChatLog() {
       bootbox.confirm({
         title: "Clear Chat?",
-        message: "Are you sure you want to clear the chat log? This cannot be undone.",
+        message: "Do you want to clear the chat log? This cannot be undone.",
         buttons: {
             confirm: {
               label: 'Yes',
