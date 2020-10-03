@@ -4,10 +4,10 @@
     <div class="bg-secondary text-white mr-1 p-1 drag-handle d-flex flex-column justify-content-between">
       <i title="Move" class="fas fa-expand-arrows-alt"></i>          
       <i title="Hide All" @click="showAllSections(false)" class="fas fa-eye-slash fa-xs pt-2"></i>      
-      <i title="Show All" @click="showAllSections(true)" class="fas fa-eye fa-xs pt-2"></i>
+      <i title="Show All" @click="showAllSections(true)" class="fas fa-eye fa-xs pt-2 mb-auto"></i>
       
             
-      <button v-if="isFCSObject" :title="`Play ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 m-0 mt-auto text-white btn btn-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
+      <button v-if="isFCSObject" :title="`Play ${FCSObjectType}`" @click="openLink()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-external-link-alt fa-xs"></i></button>
       <button v-if="isCharacter" :title="`Refresh Data`" @click="syncCharacter()" target="blank" class="p-0 m-0 text-white btn btn-link"><i class="fas fa-sync-alt fa-xs"></i></button>      
     </div>
 
