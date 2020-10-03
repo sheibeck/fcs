@@ -126,8 +126,9 @@
           <div v-if="isHost" class="d-flex flex-column">
             <button type="button" title="New Round" class="btn btn-link" @click="startNewRound()"><i class="fas fa-undo"></i></button>
             <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
-            <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>                      
-            <b-button id="save-chatlog" type="button" variant="link" class="btn btn-link" title="Save chat to campaign"><i class="fas fa-book-open"></i></b-button>  
+            <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
+            <button type="button" title="Fate SRD" class="btn btn-link" @click="openFateSRD()"><i class="fas fa-book"></i></button>
+            <b-button id="save-chatlog" type="button" variant="link" class="btn btn-link" title="Save chat to campaign"><i class="fas fa-feather"></i></b-button>  
             <b-popover ref="popoverCampaign" triggers="click blur" target="save-chatlog">
               <template v-slot:title>Save chat log to campaign</template>
               <autocomplete title="Search Campaign" :search="searchCampaigns"
@@ -143,10 +144,10 @@
                 </li>
               </template></autocomplete>
             </b-popover>            
-          </div>
-          <div class="d-flex flex-column mr-auto">
+          </div>          
+          <div class="d-flex flex-column mx-auto">
             <button type="button" title="Settings" class="btn btn-link" data-toggle="modal" data-target="#modalSettings"><i class="fas fa-cog"></i></button>
-            <a :href="`/scene/${id}`" title="Copy scene link" class='btn btn-link' @click="shareUrl"><i class='fa fa-share'></i></a>
+            <a :href="`/scene/${id}`" title="Copy scene link" class='btn btn-link' @click="shareUrl"><i class="fas fa-link"></i></i></a>
             <a href="https://github.com/sheibeck/fcs/wiki/Scene-Builder" target="_blank" class="btn btn-link" title="Help"><i class="fas fa-question"></i></a>
             <button v-if="showchat" title="Hide chat" @click="showchat = false" type="button" class="btn btn-link"><i class="fas fa-angle-double-right"></i></button>
             <button v-if="!showchat" title="Show chat" @click="showchat = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>            
@@ -157,7 +158,7 @@
           </div>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
-          <VueShowdown id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="{ emoji: false }" :markdown="chatLog" />          
+          <VueShowdown id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="{ emoji: false, openLinksInNewWindow: true }" :markdown="chatLog" />          
           <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1" v-on:keyup.enter="sendChatMessage()"></textarea>
           <div class="d-flex mt-1">
             <select v-model="selectedPlayer" class="form-control mr-1">
@@ -1044,8 +1045,13 @@ ${msg}`;
       });
       
       this.clearChatLog();
-    }
+    },
     /* end character search */
-  },
+
+    openFateSRD() {
+      let url = "https://fate-srd.com/fate-core/taking-action-dice-ladder";      
+      window.open(url, "", "toolbar=0,titlebar=0,status=no,width=400,height=800", true);
+    },    
+  }, 
 }
 </script>
