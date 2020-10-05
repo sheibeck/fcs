@@ -127,7 +127,8 @@ const store = new Vuex.Store({
       clientId: '4hds760dsd2acikun12bpcljhk',
       identityPool: 'us-east-1:ba495e76-4ecc-4ae5-b116-62ed4dd2a596',
       CognitoUser: null,      
-    }
+    },
+    vueShowdownOpts: { emoji: false, openLinksInNewWindow: true },
   },
   mutations: {
     authenticate (state, bAuth) {
@@ -220,6 +221,9 @@ const store = new Vuex.Store({
     },
     diceRoller: state => {
       return state.diceRoller;
+    },
+    vueShowdownOpts: state => {
+      return state.vueShowdownOpts;
     }
   }
 })

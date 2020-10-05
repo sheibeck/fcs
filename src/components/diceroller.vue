@@ -57,7 +57,7 @@ export default {
       modifier = (modifier !== '' && modifier.indexOf('-') === -1) ? "+" + modifier : modifier;
 
       this.diceRoller.roll('4dF.2' + modifier);
-
+      
       // get the latest dice rolls from the log
       var latestRoll = this.diceRoller.log.shift();
       var displayDice = '';
