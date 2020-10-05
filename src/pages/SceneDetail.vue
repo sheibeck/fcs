@@ -158,7 +158,7 @@
           </div>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
-          <VueShowdown id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="{ emoji: false, openLinksInNewWindow: true }" :markdown="chatLog" />          
+          <VueShowdown id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="vueShowdownOpts" :markdown="chatLog" />          
           <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1" v-on:keyup.enter="sendChatMessage()"></textarea>
           <div class="d-flex mt-1">
             <select v-model="selectedPlayer" class="form-control mr-1">
@@ -365,7 +365,8 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
-      'currentUser'
+      'currentUser',
+      'vueShowdownOpts'
     ]),
     isNewScene() {
       return this.$route.params.id === "create";
