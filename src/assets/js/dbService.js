@@ -4,8 +4,10 @@ import UserService from "./userService";
 
 export default class DbService {
     TableName = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
+    LastEvaluatedKey = null;
+    PreviousEvaluatedKeys = [];
 
-    constructor(fcs){        
+    constructor(fcs){
         this.fcs = fcs;
         this.commonSvc = new CommonService(fcs);
     }
@@ -117,9 +119,7 @@ export default class DbService {
             });
     }
 
-    ListObjects = async (itemType, ownerId, filter) => {
-        let docClient = await this.GetDbClient();
-
+    ListObjects = async (itemType, ownerId, filter, usePaging) => {        
         let params = {
             TableName: this.TableName,
             IndexName: "type",
@@ -130,10 +130,7 @@ export default class DbService {
             },            
             FilterExpression: ":one = :one",
         }
-
-        //TODO: Allow public search to filter out Private items, while still showing the user their own private items
-        //      and don't show double items by joining the arrays. Ugh!
-
+       
         //if we know the owner then use the sort key, too
         if (ownerId) {
             params.KeyConditionExpression += ' AND owner_id = :owner_id';
@@ -150,7 +147,7 @@ export default class DbService {
             this.GetSearchFilters(filter, params);
         }
         
-        return await this.QueryAll(params);
+        return await this.QueryAll(params, usePaging);
     }
 
     ListRelatedObjects = async (relatedTo, publicOnly) => {
@@ -176,28 +173,67 @@ export default class DbService {
         return await this.QueryAll(params);
     }
     
-    QueryAll = async (params) => {            
-        let lastEvaluatedKey = 'dummy'; // string must not be empty
+    QueryAll = async (params, usePaging) => {   
+        let docClient = await this.GetDbClient();
+
         const itemsAll = [];
-        while (lastEvaluatedKey) {
+        if (!usePaging) {
+            let lastEvaluatedKey = 'dummy'; // string must not be empty
+            while (lastEvaluatedKey) {
+                try {
+                    await docClient.query(params).promise()
+                    .then((data) => {
+                        itemsAll.push(...data.Items);
+                        lastEvaluatedKey = data.LastEvaluatedKey;
+                        if (lastEvaluatedKey) {
+                            params.ExclusiveStartKey = lastEvaluatedKey;
+                        }
+                    }).catch((err) => {
+                        this.commonSvc.Notify(err.code, 'error');
+                        lastEvaluatedKey = null;                    
+                    });
+                }
+                catch(ex) {                    
+                    this.commonSvc.Notify(ex, 'error');
+                    break;
+                }                
+            }            
+        } else {            
+            switch(usePaging) {
+                case 'first':
+                    this.LastEvaluatedKey = null;
+                    this.PreviousEvaluatedKeys = [];
+                    params.Limit = 25;
+                    break;
+                case 'prev':                
+                    this.PreviousEvaluatedKeys.pop(); //pop the current page off
+                    this.LastEvaluatedKey = this.PreviousEvaluatedKeys.pop();
+                    params.Limit = 25;
+                    break;               
+                default:
+                    if (this.LastEvaluatedKey) {
+                        this.PreviousEvaluatedKeys.push(this.LastEvaluatedKey);
+                    }
+                    params.Limit = 25 + 1;
+                    break;
+            }            
+            if (this.LastEvaluatedKey) {
+                params.ExclusiveStartKey = this.LastEvaluatedKey;
+            }
             try {
                 await docClient.query(params).promise()
-                .then((data) => {
-                    itemsAll.push(...data.Items);
-                    lastEvaluatedKey = data.LastEvaluatedKey;
-                    if (lastEvaluatedKey) {
-                        params.ExclusiveStartKey = lastEvaluatedKey;
-                    }
+                .then((data) => {                    
+                    this.LastEvaluatedKey = data.LastEvaluatedKey;
+                    itemsAll.push(...data.Items);                   
                 }).catch((err) => {
                     this.commonSvc.Notify(err.code, 'error');
-                    lastEvaluatedKey = null;                    
+                    LastEvaluatedKey = null;
                 });
             }
-            catch(ex) {                    
-                this.commonSvc.Notify(ex, 'error');
-                break;
+            catch(ex) {
+                this.commonSvc.Notify(ex, 'error');                
             }                
-        }            
+        }
         return itemsAll;
     }
 
