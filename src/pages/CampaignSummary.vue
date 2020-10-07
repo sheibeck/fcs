@@ -74,7 +74,7 @@
               <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up"></i> scroll up</span>              
             </div>            
             <div class="card">              
-              <VueShowdown :extensions="['fcsCampaignHidden']" class="card-body" :markdown="session.description"/>
+              <VueShowdown :extensions="['fcsCampaignHidden']" class="card-body" :options="{ emoji: false, openLinksInNewWindow: true, parseImgDimensions: true }" :markdown="session.description"/>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default {
       'userId',
       'sessions',
       'filteredSessions',
-      'searchText'
+      'searchText',      
     ]),
     isNewCampaign : function() {
       return this.$route.params.id === "create";

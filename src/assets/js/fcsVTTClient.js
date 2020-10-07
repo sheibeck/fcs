@@ -79,7 +79,9 @@ export default class FCSVTTClient {
         let description = message.description||"";
 
         if (message.roll) {            
-            this.diceRoller.roll(`4dF.2+${parseInt(message.roll.modifier)}`);
+            let modifier = (message.roll.modifier !== '' && message.roll.modifier.indexOf('-') === -1) ? "+" + message.roll.modifier : message.roll.modifier;
+
+            this.diceRoller.roll(`4dF.2${modifier !== "+0" ? modifier : ""}`);
             // get the latest dice rolls from the log
             var latestRoll = this.diceRoller.log.shift();
             var displayDice = '';

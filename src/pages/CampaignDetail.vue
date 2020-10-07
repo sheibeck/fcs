@@ -132,8 +132,8 @@
             </div>
             <textarea v-if="currentSession === session.id" placeholder="Session Information..." class="sessionLog form-control mb-2 bg-light" v-model="session.description" @focus="setOldSessionText($event)" @input="setCurrentSessionText($event)" @change="parseSession($event, session)"></textarea>
             <div class="card">
-              <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession === session.id" class="card-body" :markdown="currentSessionText"/>
-              <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession !== session.id" class="card-body" :markdown="session.description"/>
+              <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession === session.id" class="card-body" :markdown="currentSessionText" :options="{ emoji: false, openLinksInNewWindow: true, parseImgDimensions: true }"/>
+              <VueShowdown :extensions="['fcsCampaign']" v-if="currentSession !== session.id" class="card-body" :markdown="session.description" :options="{ emoji: false, openLinksInNewWindow: true, parseImgDimensions: true }"/>
             </div>
           </div>
         </div>
