@@ -150,6 +150,7 @@
             <button type="button" class="btn btn-link" title="Add Scene Aspect" @click="addAspect()"><i class="fas fa-sticky-note"></i></button>
             <button type="button" title="Add Zone" class="btn btn-link" @click="addZone()"><i class="fas fa-shapes"></i></button>
             <button type="button" title="Fate SRD" class="btn btn-link" @click="openFateSRD()"><i class="fas fa-book"></i></button>
+            <button type="button" title="Reset Zoom" class="btn btn-link" @click="resetZoom()"><i class="fas fa-search-plus"></i></button>
             <b-button id="save-chatlog" type="button" variant="link" class="btn btn-link" title="Save chat to campaign"><i class="fas fa-feather"></i></b-button>  
             <b-popover ref="popoverCampaign" triggers="click blur" target="save-chatlog">
               <template v-slot:title>Save chat log to campaign</template>
@@ -1084,6 +1085,9 @@ ${msg}`;
       let url = "https://fate-srd.com/fate-core/taking-action-dice-ladder";      
       window.open(url, "", "toolbar=0,titlebar=0,status=no,width=400,height=800", true);
     },    
+    resetZoom() {      
+      this.canvas.reset();      
+    }
   }, 
 }
 </script>
