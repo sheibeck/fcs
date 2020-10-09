@@ -5,23 +5,44 @@
 
   #game-table {
     height: 85vh;
-
+    
     #canvas-wrapper {
       position:relative;    
       border: solid 2px black; 
       overflow: scroll;
-      cursor:grab;
+      cursor: -webkit-grab !important;
+      cursor: -moz-grab !important;
+      cursor: -o-grab !important;
+      cursor: grab !important;      
+
+      &:active {
+        cursor : -webkit-grabbing !important;
+        cursor : -moz-grabbing !important;
+        cursor : -o-grabbing !important;
+        cursor : grabbing !important;
+      }
     }
 
     #scene-canvas {
       position:relative;
       height: 3600px;
-      width: 4800px;    
+      width: 4800px;      
+      cursor: -webkit-grab !important;
+      cursor: -moz-grab !important;
+      cursor: -o-grab !important;
+      cursor: grab !important;   
 
       background-size: 20px 20px;
       background-image:
         linear-gradient(to right, #F0F0F0 1px, transparent 1px),
         linear-gradient(to bottom, #F0F0F0 1px, transparent 1px);
+
+      &:active {
+        cursor : -webkit-grabbing !important;
+        cursor : -moz-grabbing !important;
+        cursor : -o-grabbing !important;
+        cursor : grabbing !important;
+      }
     }   
   }
 
@@ -31,6 +52,7 @@
       padding: 3px !important;
     }
   }
+ 
 
   /deep/ #chat {
     width: 700px;
@@ -86,7 +108,7 @@
       <button type="button" @click="saveScene()" class="btn btn-success">Create Scene</button>
     </div>
 
-    <div v-show="!isLoading && !isNewScene">
+    <div v-show="!isLoading && !isNewScene" id="scene-detail">
       <div class="d-flex">  
         <div class="mr-auto">
           <em style="vertical-align: top;">Scene Aspects:</em>
@@ -115,9 +137,9 @@
         </span>
       </div>
 
-      <div id="game-table" class="d-flex">       
-        <div id="canvas-wrapper" v-dragscroll:nochilddrag class="mr-auto">
-          <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>      
+      <div id="game-table" class="d-flex">
+        <div id="canvas-wrapper" v-dragscroll.noleft="true" class="mr-auto">
+          <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
           </div>
@@ -280,14 +302,9 @@ export default {
     sceneaspect: SceneAspect,
     editableinput: SceneEditableInput,
     Autocomplete,
-  },
-  created() {
-    vttClient = new FCSVTTClient();
-    fcsVtt = new FCSVTT();
-  },
+  },  
   mounted(){    
-    commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);       
+    this.initialize();    
   },  
   watch: {
     userId() {
@@ -401,6 +418,15 @@ export default {
     }
   },
   methods: {
+    initialize() {
+      let gameTable = document.getElementById("scene-detail");
+      gameTable.addEventListener('contextmenu', event => event.preventDefault());
+      
+      commonSvc = new CommonService(this.$root);
+      dbSvc = new DbService(this.$root);       
+      vttClient = new FCSVTTClient();
+      fcsVtt = new FCSVTT();
+    },
     hasSceneChanged() {
       //ditch the vue js junk from these objects so we can compare them vanilla
       let vscene = commonSvc.DeepCopy(this.scene);
@@ -427,9 +453,14 @@ export default {
       const panzoom = Panzoom(panElem, {
         maxScale: 5,
         overflow: scroll,
+        //disablePan: true,
       });
             
-      panElem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);     
+      panElem.parentElement.addEventListener('wheel', function (event) {
+        if (!event.altKey) return    
+        panzoom.zoomWithWheel(event)
+      });
+
       this.canvas = panzoom;
       this.loading = false;
 
