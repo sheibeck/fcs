@@ -141,7 +141,7 @@
       </b-popover>       
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button v-if="!isCharacter" type="button" class="btn btn-link p-0 mt-auto" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
-      <button type="button" class="btn btn-link p-0" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
+      <button type="button" class="btn btn-link p-0" :class="{'mt-auto': isCharacter}" title="Remove" @click="removeObject(objectdata.id)"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 </template>
