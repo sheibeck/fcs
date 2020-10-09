@@ -436,8 +436,8 @@ export default {
     cursor: drag !important;
   }
 
-  .cancelZoneDrag {
-    cursor:default;
+  .zoneHandle {
+    cursor: pointer;
   }
 
   .drop-preview {
