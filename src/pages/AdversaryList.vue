@@ -12,9 +12,17 @@
           Create Adversary <i class='fa fa-plus'></i>
         </a>
 
-        <div v-if="isAuthenticated" class="pt-2 pl-2 mr-auto ">
-          <input type="checkbox" class="" id="my_adversaries" ref="myAdversaries" v-bind:checked="adversaryListDefault" v-on:change="toggleAdversaryListDefault()" />
-          <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
+        <div v-if="isAuthenticated" class="pt-2 pl-2 mr-auto d-flex justify-content-between w-50">
+          <div>
+            <input type="checkbox" class="" id="my_adversaries" ref="myAdversaries" v-bind:checked="adversaryListDefault" v-on:change="toggleAdversaryListDefault()" />
+            <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
+          </div>
+          <div v-if="!moreAdversaries" class="small">
+            Viewing {{totalAdversaries}} adversaries
+          </div>
+          <div v-if="moreAdversaries" class="small">
+            Found {{totalAdversaries}} adversaries on {{currentPage}} of {{pagesScanned}} pages
+          </div>
         </div>
 
         <search class=""></search>
@@ -25,8 +33,8 @@
         </a>
       </div>      
     </div>
-
-    <pager :show="moreAdversaries" @get-page="handlePage" />
+    
+    <pager :show="moreAdversaries" :more="moreDataAvailable" :firstpage="currentPage == 1" :lastpage="isLastPage" @get-page="handlePage" />
 
     <div class='card-columns' id="adversaryDetail">
       <div class='card' v-for="item in adversaries" v-bind:key="item.id">
@@ -99,7 +107,7 @@
       </div>
     </div>
 
-    <pager :show="moreAdversaries" @get-page="handlePage" />
+    <pager :show="moreAdversaries" :more="moreDataAvailable" :firstpage="currentPage == 1" :lastpage="isLastPage" @get-page="handlePage" />
 
   </div>
 </template>
@@ -179,6 +187,11 @@ export default {
       description: "Fate Adversaries",
       consequences: [],
       moreAdversaries: false,
+      totalAdversaries: 0,
+      pagesScanned: 0,
+      currentPage: 0,
+      moreDataAvailable: false,
+      isLastPage: false,
     }
   },
   methods : {    
@@ -397,18 +410,30 @@ export default {
 
       if (onlyShowMyAdversaries) {
         //don't page while only viewing your own stuff
-        this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, this.searchText); 
-        this.moreAdversaries = false;        
+        results = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, this.searchText); 
+        this.totalAdversaries = results.length;
+        this.adversaries = results;
+        this.moreAdversaries = false;       
       }
       else {
+        /* NOTE: paging is currently only enabled when viewing ALL adversaries
+                  if you view your own adversaries or perform a search we don't page the results
+        */
         if (page) {
           results = await dbSvc.ListObjects("ADVERSARY", null, this.searchText, page);
           if (results) {
+            this.pagesScanned = dbSvc.PageList.length;
+            this.totalAdversaries = this.pagesScanned * 25;
+            this.currentPage = dbSvc.CurrentPage;
+            this.moreDataAvailable = results.meta.hasMoreData && this.currentPage == this.pagesScanned;
+            this.isLastPage = this.currentPage == this.pagesScanned && !results.meta.hasMoreData;            
             this.adversaries = results.data;
             this.moreAdversaries = results.meta.hasMoreData || dbSvc.PageList.length > 1;
-          }      
+          }          
         } else {
-          this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, this.searchText);
+          results = await dbSvc.ListObjects("ADVERSARY", null, this.searchText);          
+          this.totalAdversaries = results.length;
+          this.adversaries = results;
           this.moreAdversaries = false;
         }
       }      

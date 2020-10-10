@@ -145,7 +145,7 @@ export default class DbService {
         if (filter) {
             this.GetSearchFilters(filter, params);
         }
-        
+                
         if (!page) {
             return await this.QueryAll(params);
         } else {
@@ -190,7 +190,7 @@ export default class DbService {
                 this.commonSvc.Notify(ex, 'error');
                 break;
             }
-        } while (!result.Items.length || result.LastEvaluatedKey);
+        } while (!result.Items.length===0 || result.LastEvaluatedKey);
        
         return accumulated;
     }
