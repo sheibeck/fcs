@@ -346,16 +346,16 @@ export default {
       else {        
         console.log("Saving adversary...");
 
-        let response = await dbSvc.SaveObject(result).then((response) => {    
-          if (response) {
-            commonSvc.Notify('Adversary saved.', 'success', null, () => {
-              if (isNew)
-              {
-                location.href = `/adversary/${commonSvc.GetId(result['id'])}/${result['slug']}/edit`;
-              }
-            });
-          }          
-        });
+        let response = await dbSvc.SaveObject(result);
+        if (response) {
+          commonSvc.Notify('Adversary saved.', 'success', null, () => {
+            if (isNew)
+            {
+              location.href = `/adversary/${commonSvc.GetId(result['id'])}/${result['slug']}/edit`;
+            }
+          });
+        }
+               
       }
     },
 

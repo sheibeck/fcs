@@ -60,45 +60,12 @@
 
     <div v-if="!isLoading">
       <div class="d-flex flex-column flex-sm-row">
+        <a role="button" href="/campaign" class="btn btn-success d-print-none mb-1 mr-1">
+          <i class="fas fa-chevron-circle-left"></i> Campaign List
+        </a>
         <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-external-link-alt"></i></a>
       </div>
-
-      <div id="accordion">
-        <div class="card-header" id="campaignProperties">
-          <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
-            Campaign Properties
-          </button>
-        </div>
-        <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
-          <div class="card-body">
-            <div class="form-group">
-              <label for="name">Name</label>
-              <input class="form-control" type="text" id="name" name="name" placeholder="Campaign name" v-model="campaign.name" @change="slugify">
-            </div>
-            <div class="form-group">
-              <label for="scale">Scale</label>
-              <select class="form-control" id="scale" name="scale" v-model="campaign.scale">
-                <option>None</option>
-                <option>Mundane</option>
-                <option>Supernatural</option>
-                <option>Otherworldly</option>
-                <option>Legendary </option>
-                <option>Godlike</option>
-              </select>
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="imageUrl">Campaign Image Url</label>
-                <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="campaign.image_url" />
-            </div>
-
-            <button type="button" class="btn btn-primary" v-on:click="saveCampaign">Save Campaign</button>
-          </div>
-        </div>
-      </div>
+      
       <div class="row mt-2" v-if="!isNewCampaign">
         <!-- session logs -->
         <div class="col-12 col-md-7 col-lg-8 order-2 order-md-1" id="logs">
@@ -179,6 +146,43 @@
                 <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="accordion" class="mt-2">
+        <div class="card-header" id="campaignProperties">
+          <button class="btn btn-link" data-toggle="collapse" data-target="#metadata" aria-expanded="true" aria-controls="metadata">
+            Campaign Properties
+          </button>
+        </div>
+        <div id="metadata" class="collapse" v-bind:class="{ 'show': isNewCampaign }" aria-labelledby="campaignProperties" data-parent="#accordion">
+          <div class="card-body">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input class="form-control" type="text" id="name" name="name" placeholder="Campaign name" v-model="campaign.name" @change="slugify">
+            </div>
+            <div class="form-group">
+              <label for="scale">Scale</label>
+              <select class="form-control" id="scale" name="scale" v-model="campaign.scale">
+                <option>None</option>
+                <option>Mundane</option>
+                <option>Supernatural</option>
+                <option>Otherworldly</option>
+                <option>Legendary </option>
+                <option>Godlike</option>
+              </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" type="text" value="" id="description" name="description" placeholder="Campaign description..." v-model="campaign.description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="imageUrl">Campaign Image Url</label>
+                <input class="form-control" type="text" value="" id="imageUrl" name="imageUrl" placeholder="Image url" v-model="campaign.image_url" />
+            </div>
+
+            <button type="button" class="btn btn-primary" v-on:click="saveCampaign">Save Campaign</button>
           </div>
         </div>
       </div>
@@ -628,7 +632,7 @@ export default {
         "owner_id": this.userId,        
         "scale": "",
         "slug": "new-campaign",
-        "name": "New Campaign",
+        "name": "Campaign Name",
         "date": commonSvc.GetFormattedDate(new Date()),
       };
       this.$set(this, 'campaign', c);
