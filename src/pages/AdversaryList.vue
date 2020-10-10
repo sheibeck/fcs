@@ -26,11 +26,7 @@
       </div>      
     </div>
 
-    <div v-if="showPager" class="pager py-2 w-100 text-center">
-      <button class="btn btn-secondary btn-sm" @click="getPage('first')">First Page </button>
-      <button class="btn btn-secondary btn-sm pager-prev" @click="getPage('prev')">&lt;&lt; Prev Page </button>
-      <button class="btn btn-secondary btn-sm" @click="getPage('next')">Next Page >></button>      
-    </div>
+    <pager :show="moreAdversaries" @get-page="handlePage" />
 
     <div class='card-columns' id="adversaryDetail">
       <div class='card' v-for="item in adversaries" v-bind:key="item.id">
@@ -103,11 +99,7 @@
       </div>
     </div>
 
-    <div v-if="showPager" class="pager py-2 w-100 text-center">
-      <button class="btn btn-secondary btn-sm" @click="getPage('first')">First Page </button>
-      <button class="btn btn-secondary btn-sm pager-prev" @click="getPage('prev')">&lt;&lt; Prev Page </button>
-      <button class="btn btn-secondary btn-sm" @click="getPage('next')">Next Page >></button>      
-    </div>
+    <pager :show="moreAdversaries" @get-page="handlePage" />
 
   </div>
 </template>
@@ -115,6 +107,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import Search from '../components/search'
+import Pager from '../components/pager'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import FateOf20 from '../assets/js/fateof20'
@@ -131,16 +124,17 @@ export default {
   name: 'CharacterList',
   components: {
     search: Search,
+    pager: Pager,
   },
   created(){
-    commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);
+    commonSvc = new CommonService(this.$root);  
+    dbSvc = new DbService(this.$root);  
     fateOf20 = new FateOf20();
     fcsVtt = new FCSVTT();
     models = new Models();
 
     this.adversaryId = this.$route.params.id ? commonSvc.SetId("ADVERSARY", this.$route.params.id) : null;
-  },
+  },  
   metaInfo() {
     return {
        title: `${this.adversaries.length == 1 ? this.adversaries[0].name : this.title}`,
@@ -163,9 +157,7 @@ export default {
       {
        val = true; 
       }
-      
-      this.showPager = this.searchText === "" && !val;
-      
+                      
       return val;
     },  
     commonSvc() {
@@ -185,8 +177,8 @@ export default {
       adversaries: [],
       title: "Adversary List",
       description: "Fate Adversaries",
-      consequences: [], 
-      showPager: true,     
+      consequences: [],
+      moreAdversaries: false,
     }
   },
   methods : {    
@@ -196,9 +188,7 @@ export default {
       }
       else {
         $cookies.remove("fcsAdversaryListDefault");
-      }      
-            
-      this.showPager = this.searchText === "" && !this.$refs.myAdversaries.checked;
+      }
 
       this.list();
     },
@@ -223,7 +213,7 @@ export default {
         }
       }
       else {        
-        this.getPage('first');
+        this.handlePage('first');
         
         $('#adversaryDetail').addClass('card-columns');
 
@@ -400,17 +390,28 @@ export default {
           break;
        }       
     },
-    async getPage(page) {      
+    async handlePage(page) {      
       let onlyShowMyAdversaries = $cookies.get("fcsAdversaryListDefault") ? this.$store.state.userId : null;
+      if (this.searchText !== "") { page = null }; //don't page while searching
+      let results;
 
       if (onlyShowMyAdversaries) {
         //don't page while only viewing your own stuff
-        this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId);
+        this.adversaries = await dbSvc.ListObjects("ADVERSARY", this.$store.state.userId, this.searchText); 
+        this.moreAdversaries = false;        
       }
       else {
-        if (this.searchText !== "") { page = null }; //don't page while searching        
-        this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, this.searchText, page);
-      }
+        if (page) {
+          results = await dbSvc.ListObjects("ADVERSARY", null, this.searchText, page);
+          if (results) {
+            this.adversaries = results.data;
+            this.moreAdversaries = results.meta.hasMoreData || dbSvc.PageList.length > 1;
+          }      
+        } else {
+          this.adversaries = await dbSvc.ListObjects("ADVERSARY", null, this.searchText);
+          this.moreAdversaries = false;
+        }
+      }      
     }
   }
 }

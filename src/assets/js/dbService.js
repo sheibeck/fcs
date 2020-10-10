@@ -1,12 +1,11 @@
 import AWS from 'aws-sdk';
 import CommonService from "./commonService";
 import UserService from "./userService";
+import { getPaginatedResult, decodeCursor } from 'dynamodb-paginator';
 
 export default class DbService {
     TableName = `FateCharacterSheet${process.env.NODE_ENV !== "production" ? "_dev" : ""}`;
-    LastEvaluatedKey = null;
-    PreviousEvaluatedKeys = [];
-
+   
     constructor(fcs){
         this.fcs = fcs;
         this.commonSvc = new CommonService(fcs);
@@ -119,7 +118,7 @@ export default class DbService {
             });
     }
 
-    ListObjects = async (itemType, ownerId, filter, usePaging) => {        
+    ListObjects = async (itemType, ownerId, filter, page) => {        
         let params = {
             TableName: this.TableName,
             IndexName: "type",
@@ -128,7 +127,7 @@ export default class DbService {
               ':item_type': itemType,
               ':one': "1"
             },            
-            FilterExpression: ":one = :one",
+            FilterExpression: ":one = :one"
         }
        
         //if we know the owner then use the sort key, too
@@ -147,7 +146,11 @@ export default class DbService {
             this.GetSearchFilters(filter, params);
         }
         
-        return await this.QueryAll(params, usePaging);
+        if (!page) {
+            return await this.QueryAll(params);
+        } else {
+            return await this.PagedResults(params, page);
+        }
     }
 
     ListRelatedObjects = async (relatedTo, publicOnly) => {
@@ -173,68 +176,87 @@ export default class DbService {
         return await this.QueryAll(params);
     }
     
-    QueryAll = async (params, usePaging) => {   
+    QueryAll = async (params) => {   
         let docClient = await this.GetDbClient();
-
-        const itemsAll = [];
-        if (!usePaging) {
-            let lastEvaluatedKey = 'dummy'; // string must not be empty
-            while (lastEvaluatedKey) {
-                try {
-                    await docClient.query(params).promise()
-                    .then((data) => {
-                        itemsAll.push(...data.Items);
-                        lastEvaluatedKey = data.LastEvaluatedKey;
-                        if (lastEvaluatedKey) {
-                            params.ExclusiveStartKey = lastEvaluatedKey;
-                        }
-                    }).catch((err) => {
-                        this.commonSvc.Notify(err.code, 'error');
-                        lastEvaluatedKey = null;                    
-                    });
-                }
-                catch(ex) {                    
-                    this.commonSvc.Notify(ex, 'error');
-                    break;
-                }                
-            }            
-        } else {            
-            switch(usePaging) {
-                case 'first':
-                    this.LastEvaluatedKey = null;
-                    this.PreviousEvaluatedKeys = [];
-                    params.Limit = 25;
-                    break;
-                case 'prev':                
-                    this.PreviousEvaluatedKeys.pop(); //pop the current page off
-                    this.LastEvaluatedKey = this.PreviousEvaluatedKeys.pop();
-                    params.Limit = 25;
-                    break;               
-                default:
-                    if (this.LastEvaluatedKey) {
-                        this.PreviousEvaluatedKeys.push(this.LastEvaluatedKey);
-                    }
-                    params.Limit = 25 + 1;
-                    break;
-            }            
-            if (this.LastEvaluatedKey) {
-                params.ExclusiveStartKey = this.LastEvaluatedKey;
-            }
+        let result, accumulated = [];
+                    
+        do {
             try {
-                await docClient.query(params).promise()
-                .then((data) => {                    
-                    this.LastEvaluatedKey = data.LastEvaluatedKey;
-                    itemsAll.push(...data.Items);                   
-                }).catch((err) => {
-                    this.commonSvc.Notify(err.code, 'error');
-                    LastEvaluatedKey = null;
-                });
+                result = await docClient.query(params).promise();
+                params.ExclusiveStartKey = result.LastEvaluatedKey;                
+                accumulated = [...accumulated, ...result.Items];
             }
             catch(ex) {
-                this.commonSvc.Notify(ex, 'error');                
-            }                
+                this.commonSvc.Notify(ex, 'error');
+                break;
+            }
+        } while (!result.Items.length || result.LastEvaluatedKey);
+       
+        return accumulated;
+    }
+
+    
+    PageList = [];
+    CurrentPage = 1;
+
+    PagedResults = async (params, page) => {   
+        let docClient = await this.GetDbClient();
+        const limit = 25;        
+        params.Limit = limit;
+        let pageData = null;
+
+        switch(page) {
+            case 'first':
+                this.CurrentPage = 1;
+                if (this.PageList.length > 0) return this.PageList[0];                
+                break;
+            case 'prev':
+                //really the CURRENT page is the last page in the array. So, we go back 2 pages to get the true prev
+                if (this.CurrentPage - 1 >= 1) {
+                    this.CurrentPage = this.CurrentPage-1;
+                    return this.PageList[this.CurrentPage-1];                    
+                }
+                else {
+                    return;
+                }
+                break;                
+            default:                
+                let pageLen = this.PageList.length;
+                if (this.CurrentPage + 1 <= pageLen) {
+                    this.CurrentPage++;
+                    return this.PageList[this.CurrentPage-1]
+                }
+                else {                   
+                    if (!this.PageList[pageLen-1].meta.hasMoreData) {
+                        return;
+                    }
+                    else {
+                        //if we have this page in our tracked items then fetch the data with this tracked info                        
+                        pageData = this.PageList[pageLen-1];
+                        this.CurrentPage++;
+                    }
+                }
+                break;
         }
-        return itemsAll;
+        
+        let cursor = pageData ? pageData.meta.cursor : null;
+        const _params =
+            decodeCursor(cursor)
+            || params;
+    
+        const result = await docClient.query(_params).promise();        
+        let paginatedResult = getPaginatedResult(_params, limit, result);
+
+        //track this page if it's not already been viewed
+        var pageTracked = this.PageList.findIndex(p => {
+            return paginatedResult.meta.cursor === p.meta.cursor;
+        });
+
+        if (pageTracked === -1) {
+            this.PageList.push(paginatedResult);
+        }
+       
+        return paginatedResult;
     }
 
     DeleteObject = async (ownerId, id) => {
