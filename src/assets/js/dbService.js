@@ -154,8 +154,6 @@ export default class DbService {
     }
 
     ListRelatedObjects = async (relatedTo, publicOnly) => {
-        let docClient = await this.GetDbClient();
-
         let params = {
             TableName: this.TableName,
             IndexName: "relations",
