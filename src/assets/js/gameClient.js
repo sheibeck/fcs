@@ -338,26 +338,30 @@ export default class GameClient {
     }
  
     sendChatMessage = (userName, message) => {        
-        message = this.parseDiceRolls(message);
+        if (this.conn) {
+            message = this.parseDiceRolls(message);
+            
+            var msg = {
+                type: "chat",
+                userName: userName,
+                message: message,
+            }
         
-        var msg = {
-            type: "chat",
-            userName: userName,
-            message: message,
+            this.conn.send(msg);
         }
-
-        this.conn.send(msg);
     }
 
-    sendPrivateMessage = (userName, player, message) => {        
-        var msg = {
-            type: "private",
-            player: player,            
-            userName: userName,
-            message: message,
-        }
+    sendPrivateMessage = (userName, player, message) => {   
+        if (this.conn) {     
+            var msg = {
+                type: "private",
+                player: player,            
+                userName: userName,
+                message: message,
+            }
 
-        this.conn.send(msg);
+            this.conn.send(msg);
+        }
     }
 
     parseDiceRolls(message) {        
@@ -407,11 +411,13 @@ export default class GameClient {
     }
     
     updateScene = (scene) => {        
-        var msg = {
-            type: "scene",
-            message: scene     
+        if (this.conn) {
+            var msg = {
+                type: "scene",
+                message: scene     
+            }
+            this.conn.send(msg);
         }
-        this.conn.send(msg);
     } 
 
     drawScene = (data) => {        
