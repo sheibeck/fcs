@@ -27,6 +27,7 @@ jobs:
     - run: npm run beta --if-present
       env:
         CI: true
+        SENTRY_AUTH_TOKEN: 44ea3ff414ec44359595d4fc6cdfebe748e9c66b43e04d96958826b1dc4a5345
     - name: Deploy to S3
       uses: jakejarvis/s3-sync-action@master
       with:
