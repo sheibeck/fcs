@@ -12,15 +12,15 @@
           Create Adversary <i class='fa fa-plus'></i>
         </a>
 
-        <div v-if="isAuthenticated" class="pt-2 pl-2 mr-auto d-flex justify-content-between w-50">
+        <div v-if="isAuthenticated" class="pt-0 pt-md-3 pl-2 mr-auto d-flex justify-content-between">
           <div>
             <input type="checkbox" class="" id="my_adversaries" ref="myAdversaries" v-bind:checked="adversaryListDefault" v-on:change="toggleAdversaryListDefault()" />
             <label class="form-check-label" for="my_adversaries">Show only my adversaries?</label>
           </div>
-          <div v-if="!moreAdversaries" class="small">
+          <div v-if="!moreAdversaries" class="small d-none d-md-block ml-5">
             Viewing {{totalAdversaries}} adversaries
           </div>
-          <div v-if="moreAdversaries" class="small">
+          <div v-if="moreAdversaries" class="small d-none d-md-block ml-5">
             Found {{totalAdversaries}} adversaries on {{currentPage}} of {{pagesScanned}} pages
           </div>
         </div>
