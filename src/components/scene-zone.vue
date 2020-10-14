@@ -175,16 +175,21 @@ export default {
       result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");         
             
       let stuntArray = this.convertThingToGameObject(result.stunts, type, "STUNTEXTRA");
-      result.stunts = null;
       let extrasArray = this.convertThingToGameObject(result.extras, type, "STUNTEXTRA");
+      result.stunts = null;
       result.extras = null;
+      
+      this.$set(result, "stuntextras", new Array())
 
-      result.stuntextras = new Array();      
-      if (stuntArray) {
-        result.stuntextras = result.stuntextras.concat(stuntArray);
+      if(Array.isArray(stuntArray)) {
+        stuntArray.forEach(function (value) {
+          result.stuntextras.push(value);
+        });
       }
-      if (extrasArray) {
-        result.stuntextras = result.stuntextras.concat(extrasArray);
+      if(Array.isArray(extrasArray)) {
+        extrasArray.forEach(function (value) {
+          result.stuntextras.push(value);
+        });
       }
 
       this.zone.sceneobjects.push(result);
