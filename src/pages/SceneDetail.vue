@@ -602,8 +602,8 @@ export default {
         this.updateChatLog(e.detail.userName, e.detail.message);
       });
       
-      window.addEventListener("beforeunload", (e) => {                
-        if (this.isSceneRunning) {
+      window.addEventListener("beforeunload", (e) => {        
+        if (this.isSceneRunning || (this.gameClient.conn && this.gameClient.conn.open)) {
           e.returnValue = 'Your scene is still running! You should shut it down before you exit this page. Do you still want to leave?';          
         }        
       });
