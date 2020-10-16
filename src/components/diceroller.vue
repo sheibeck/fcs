@@ -80,10 +80,12 @@ export default {
       $diceTray.prepend(rollElem);
     },
 
-    ClearDiceTray() {
+    ClearDiceTray() {      
+      if (this.diceRoller) {
         this.diceRoller.clearLog();
         var $diceTray = $('.modal-body', '#modalDiceRoller');
         $diceTray.empty();
+      }
     }
   }
 

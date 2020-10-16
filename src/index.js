@@ -129,42 +129,46 @@ const store = new Vuex.Store({
       CognitoUser: null,      
     },
     vueShowdownOpts: { emoji: false, openLinksInNewWindow: true },
+    lastEvaluatedKey: null,
   },
   mutations: {
     authenticate (state, bAuth) {
-      this.state.isAuthenticated = bAuth;
+      state.isAuthenticated = bAuth;
     },
     userInfo (state, userId) {
-      this.state.userId = userId;
+      state.userId = userId;
     },
     CognitoUser (state, currentUser) {
-      this.state.cognito.CognitoUser = currentUser;
+      state.cognito.CognitoUser = currentUser;
     },
     credentials (state, credentials) {
-      this.state.credentials = credentials;
+      state.credentials = credentials;
     },  
     userSession (state, session) {
-      this.state.userSession = session;
+      state.userSession = session;
     },    
     updateSessions (state, value) {
-      this.state.sessions = value; 
-      this.state.filteredSessions = this.state.sessions;
+      state.sessions = value; 
+      state.filteredSessions = this.state.sessions;
     },
     updateFilteredSessions (state, value) {     
-      this.state.filteredSessions = value;
+      state.filteredSessions = value;
     },
     updateCampaigns (state, value) {      
-      this.state.campaigns = value; 
-      this.state.filteredCampaigns = this.state.campaigns;
+      state.campaigns = value; 
+      state.filteredCampaigns = this.state.campaigns;
     },
     updateFilteredCampaigns (state, value) {     
-      this.state.filteredCampaigns = value;      
+      state.filteredCampaigns = value;      
     },
     updateSearchText (state, value) {
-      this.state.searchText = value;
+      state.searchText = value;
     },
     updateDiceRoller (state, value) {
-      this.state.diceRoller = value;
+      state.diceRoller = value;
+    },
+    updateLastEvaluatedKey (state, value) {
+      state.lastEvaluatedKey = value
     }
   },
   getters: {
@@ -224,6 +228,9 @@ const store = new Vuex.Store({
     },
     vueShowdownOpts: state => {
       return state.vueShowdownOpts;
+    },
+    lastEvaluatedKey: state => {
+      return state.lastEvaluatedKey;
     }
   }
 })
