@@ -1,9 +1,20 @@
-name: Node.js CI
+name: Manual Production Workflow
 
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
 on:
-  push:
-    branches: [ master ]
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      release:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Release Tagname'
+        # Default value if no value is explicitly provided
+        default: ''
+        # Input has to be provided for the workflow to run
+        required: true
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
 
@@ -45,6 +56,7 @@ jobs:
         SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       with:
         environment: production
+        tagName: ${{ github.event.inputs.name }}
     # Invalidate Cloudfront (this action)
     - name: invalidate
       uses: chetan/invalidate-cloudfront-action@master
