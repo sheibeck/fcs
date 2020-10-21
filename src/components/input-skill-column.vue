@@ -17,7 +17,11 @@
     <!--input-->
     <input class="form-control text-center col-3 pr-3 pr-md-0" :class="inputclass" type="number" :id="item.obj" :name="item.obj"  
       @change="$parent.setVal(`${item.obj}`,  $event.target.value)" 
-      :value="$parent.getVal(`${item.obj}`)" :placeholder="'+'">			  
+      :value="$parent.getVal(`${item.obj}`)" :placeholder="'+'" />		
+
+    <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeSkill(item.id)">
+      <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
+    </button>	  
   </div>
 </template>
 
@@ -30,7 +34,8 @@ export default {
   props: {
     item: Object, 
     inputclass: String,
-    labelclass: String,   
+    labelclass: String,  
+    removable: Boolean, 
   },  
   computed: {
  	  ...mapGetters([
@@ -49,6 +54,9 @@ export default {
       let singular = plural == "skills" ? "skill" : "approach";
       let label = `${this.$parent.getVal(`${this.item.label}`) ? this.$parent.getVal(`${this.item.label}`) : this.item.placeholder}`;
       this.$parent.sendToVTT("diceroll", label, plural, this.item.obj, singular);
+    },
+    removeSkill(id) {
+      this.$emit('remove-skill', id);
     }
   }
 }

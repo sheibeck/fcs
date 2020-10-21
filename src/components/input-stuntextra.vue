@@ -7,9 +7,9 @@
         <i class="fas d-print-none pr-2" v-on:click="toggleEdit()" :class="{ 'fa-check-circle' : stuntEdit, 'fa-edit' : !stuntEdit }"></i>
       </a>
 
-      <a v-if="isNewCharacter">
-        <i class="fas d-print-none fa-plus pr-2" v-on:click="addStunt(item)"></i>
-      </a>
+      <div v-if="isNewCharacter">
+        <i title="Add Stunt/Extra" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addStunt(item)"></i>
+      </div>
     </div>
 
     <div class="form-group">    

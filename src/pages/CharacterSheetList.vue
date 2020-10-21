@@ -130,6 +130,15 @@ export default {
         "name": "Mouse Guard",
         "sort": 9,
       },
+      {
+        "system": "Fate Everything",
+        "object_type": "CHARACTERSHEET",
+        "slug": "fate-everything",
+        "description": "A fully customizable fate sheet for whatever you're creative mind can come up with",
+        "id": "CHARACTERSHEET|fate-everything",
+        "name": "Fate Everything",
+        "sort": 10,
+      },
       /*{
         "system": "Fate Core",
         "object_type": "CHARACTERSHEET",
