@@ -4,7 +4,7 @@
       <!--custom labels-->      
       <input v-if="customlabel" class="w-100 mr-auto inputlabel" type="text" 
         @change="$parent.setVal(`${aspect.label}`,  $event.target.value)" 
-        :value="$parent.getVal(`${aspect.label}`)" placeholder="aspect" />
+        :value="$parent.getVal(`${aspect.label}`)" :placeholder="aspect.placeholder" />
       <label v-else>{{aspect.label}}</label>
 
       <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
@@ -14,7 +14,7 @@
     <div class="d-flex">
       <span v-if="vttEnabled" class="dice fo20 pt-2 pr-1" v-on:click="sendToVTT('invoke', 'aspect', 'aspects', aspect.obj)">C</span>      
       <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" 
-        :value="$parent.getVal(aspect.obj)" placeholder="Aspect" />      
+        :value="$parent.getVal(aspect.obj)" :placeholder="getPlaceHolder" />
     </div>
   </div>
 </template>
@@ -35,6 +35,18 @@ export default {
       'isAuthenticated',
       'vttEnabled'
     ]),   
+    getPlaceHolder() {        
+      if (this.customlabel) {
+        let labelValue = this.$parent.getVal(this.aspect.label);
+        if (labelValue) {
+          return labelValue;
+        }
+        else {
+          return this.aspect.placeholder;
+        }
+      }
+      return this.aspect.label;
+    }
   },
   data () {
     return {

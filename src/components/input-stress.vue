@@ -1,6 +1,6 @@
 <template>
-	<div class="px-1 d-flex">
-    <!--custom labels-->      
+	<div class="d-flex">
+    <!--custom labels-->
     <input v-if="customlabel" style="width:30px;" class="mr-auto inputlabel text-center" :class="{ 'd-none' : labelHidden }" type="text" 
       @change="$parent.setVal(`${stress.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
@@ -57,7 +57,7 @@ export default {
       let hasVal = this.$parent.skillHasValue(this.stress.requirement.obj, this.stress.requirement.val);      
       return hasVal;
     },
-    removeStressBox(id) {
+    removeStressBox(id, parentid) {
       this.$emit('remove-stress-box', id, parentid);
     }
   }

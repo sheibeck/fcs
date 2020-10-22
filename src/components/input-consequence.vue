@@ -1,18 +1,28 @@
 <template>
-	<div class="form-group d-flex">
+	<div class="form-group d-flex flex-column">
     <span v-if="vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
 
-    <!--custom labels-->          
-    <input v-if="customlabel" class="w-50 mr-auto inputlabel" type="text" 
-      @change="$parent.setVal(`${consequence.label}`,  $event.target.value)" 
-      :value="$parent.getVal(`${consequence.label}`)" :placeholder="consequence.placeholder" />    
-    <label v-else class="pr-3">{{consequence.value}}</label>
-    <input type="text" class="form-control" :id="consequence.obj" :name="consequence.obj" 
-      @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="$parent.getVal(consequence.label)"
-      :disabled="!skillHasValue()" />
-    <button type="button" v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeConsequence(consequence.id)">
-      <i title="Delete Consequence" class="fas d-print-none fa-minus-circle"></i>
-    </button>
+    <div class="d-flex" v-if="customlabel">
+      <!--custom labels-->
+      <input class="w-75 mr-auto inputlabel" type="text" 
+        @change="$parent.setVal(`${consequence.label}`,  $event.target.value)" 
+        :value="$parent.getVal(`${consequence.label}`)" :placeholder="consequence.placeholder" />
+      
+      <button type="button" v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeConsequence(consequence.id)">
+        <i title="Delete Consequence" class="fas d-print-none fa-minus-circle"></i>
+      </button>
+    </div>
+          
+    <div class="d-flex">
+      <input v-if="customlabel" style="width:40px;" class="mr-auto inputlabel text-center" type="text" 
+        @change="$parent.setVal(`${consequence.value}`,  $event.target.value)" 
+        :value="$parent.getVal(`${consequence.value}`)" :placeholder="consequence.valueplaceholder" />      
+      <label v-else class="pr-3">{{consequence.value}}</label>
+      
+      <input type="text" class="form-control" :id="consequence.obj" :name="consequence.obj" 
+          @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="getPlaceHolder"
+          :disabled="!skillHasValue()" />    
+    </div>
   </div>
 </template>
 
@@ -31,6 +41,18 @@ export default {
       'isAuthenticated',      
       'vttEnabled'
     ]),   
+    getPlaceHolder() {      
+      if (this.customlabel) {
+        let labelValue = this.$parent.getVal(this.consequence.label);
+        if (labelValue) {
+          return labelValue;
+        }
+        else {
+          return this.consequence.placeholder;
+        }
+      }
+      return this.consequence.label;
+    }
   },
   data () {
     return {
