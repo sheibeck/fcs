@@ -147,7 +147,7 @@
 			</div>
 			
 			<div class="row">
-				<div v-for="stress in stresses" :key="stress.obj" class="col">
+				<div v-for="stress in stresses" :key="stress.obj" class="col mx-1">
 					<inputstress :stress="stress" />
 				</div>
 			</div>	

@@ -49,7 +49,7 @@
                     </div>
                     <div class="form-group w-50 d-flex flex-wrap justify-content-center">
                        <div v-for="stress in corruption" :key="stress.obj">
-					        <inputstress :stress="stress" stresstype="Corruption" hidelabel="true" />
+					        <inputstress :stress="stress" stresstype="Corruption" :hidelabel="true" />
 				        </div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                     </div>
                     <div class="d-flex justify-content-between stressbox">
 						<div v-for="stress in physicalstress" :key="stress.obj">
-							<inputstress :stress="stress" stresstype="Physical" hidelabel="true" />
+							<inputstress :stress="stress" stresstype="Physical" :hidelabel="true" />
 						</div>
 					</div>
                 </div>
@@ -78,7 +78,7 @@
                     </div>
                    <div class="d-flex justify-content-between stressbox">
 						<div v-for="stress in mentalstress" :key="stress.obj">
-							<inputstress :stress="stress" stresstype="Mental" hidelabel="true" />
+							<inputstress :stress="stress" stresstype="Mental" :hidelabel="true" />
 						</div>
 					</div>
                 </div>

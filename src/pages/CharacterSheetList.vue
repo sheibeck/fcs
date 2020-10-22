@@ -5,15 +5,15 @@
         <div class="mr-auto d-md-none"></div>
         <search class="mt-0 mt-md-1 mb-1"></search>
       </div>
-      <div class='card-columns'>
-        <div v-for='sheet in sheets' :key="sheet.id" class='card'>
+      <div class='d-flex flex-column flex-md-row flex-wrap justify-content-between'>
+        <div v-for='sheet in sheets' :key="sheet.id" class="card m-1 col col-sm-12 col-md-2 p-0">
           <a v-bind:href="`charactersheet/${sheet.slug}`" v-bind:data-id='sheet.id' role="button">
             <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           </a>
           <div class='card-body'>
             <h5 class='card-title charactersheet-name'>{{sheet.system}}</h5>
-            <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success' v-bind:data-id='sheet.id' role="button">Create Character <i class='fa fa-user'></i></a>
-            <a v-if="sheet.customizable" v-bind:href="`charactersheet/${sheet.slug}-custom`" class='btn btn-success mt-1' v-bind:data-id='sheet.id' role="button">Create Customized <i class='fas fa-user-cog'></i></a>
+            <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success w-100' v-bind:data-id='sheet.id' role="button">Create <i class='fa fa-user'></i></a>
+            <a v-if="sheet.customizable" v-bind:href="`charactersheet/${sheet.slug}-custom`" class='btn btn-success mt-1 w-100' v-bind:data-id='sheet.id' role="button">Customize <i class='fas fa-user-cog'></i></a>
           </div>
           <div class='card-footer text-muted small' v-html="sheet.description">
 
@@ -67,11 +67,29 @@ export default {
         "system": "Fate Core",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-core",
-        "description": "Fate Core default sheet or <em>Create Customized</em> to enter your own skills.",
+        "description": "Fate Core default sheet or <em>Customize</em> to enter your own skills.",
         "id": "CHARACTERSHEET|fate-core",
         "name": "Fate Core",
         "customizable": true,
-        "sort": 4,
+        "sort": 3,
+      }, 
+      {
+        "system": "Fate Accelerated",
+        "object_type": "CHARACTERSHEET",
+        "slug": "fate-accelerated",
+        "description": "Fate Accelerated default sheet or <em>Customize</em> to enter your own approaches.",
+        "id": "CHARACTERSHEET|fate-accelerated",
+        "name": "Fate Accelerated",
+        "customizable": true,
+        "sort": 7,
+      }, {
+        "system": "Fate Everything",
+        "object_type": "CHARACTERSHEET",
+        "slug": "fate-everything",
+        "description": "A fully customizable fate sheet for whatever you're creative mind can come up with",
+        "id": "CHARACTERSHEET|fate-everything",
+        "name": "Fate Everything",
+        "sort": 1,
       }, {
         "system": "Fate Of Cthulhu",
         "object_type": "CHARACTERSHEET",
@@ -79,7 +97,7 @@ export default {
         "description": "Fate of Cthulhu character sheet.",
         "id": "CHARACTERSHEET|fate-of-cthulhu",
         "name": "Fate of Cthulhu",
-        "sort": 2,
+        "sort": 8,
       }, {
         "system": "Dresden Files Accelerated",
         "object_type": "CHARACTERSHEET",
@@ -87,16 +105,7 @@ export default {
         "description": "Dresden Files Accelerated character sheet.",
         "id": "CHARACTERSHEET|dresden-files-accelerated",
         "name": "Dresden Files Accelerated",
-        "sort": 5,      
-      }, {
-        "system": "Fate Accelerated",
-        "object_type": "CHARACTERSHEET",
-        "slug": "fate-accelerated",
-        "description": "Fate Accelerated default sheet or <em>Create Customized</em> to enter your own approaches.",
-        "id": "CHARACTERSHEET|fate-accelerated",
-        "name": "Fate Accelerated",
-        "customizable": true,
-        "sort": 7,
+        "sort": 3,      
       }, {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
@@ -104,7 +113,7 @@ export default {
         "description": "Fate Accelerated with custom approaches and conditions for Middle Earth.",
         "id": "CHARACTERSHEET|middle-earth",
         "name": "Middle Earth",
-        "sort": 3,
+        "sort": 9,
       }, {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
@@ -120,7 +129,7 @@ export default {
         "description": "Fate Accelerated with custom approaches for Fate Freeport.",
         "id": "CHARACTERSHEET|fate-freeport",
         "name": "Fate Freeport",
-        "sort": 8,
+        "sort": 5,
       }, {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
@@ -128,24 +137,9 @@ export default {
         "description": "Fate Accelerated with custom approaches and conditions for Mouse Guard. <a target='_blank' href='https://docs.google.com/document/d/1_dNdDGh_GYyFQ8N7wF9iVNBrdhsCHcBUU68qH0bZeLw'>View Fate of the Guard hack</a>",
         "id": "CHARACTERSHEET|mouse-guard",
         "name": "Mouse Guard",
-        "sort": 9,
-      },
-      /*{
-        "system": "Fate Core",
-        "object_type": "CHARACTERSHEET",
-        "slug": "fate-core-custom",
-        "description": "Fate Core with customizable skills, and default stress and consequences",
-        "id": "CHARACTERSHEET|fate-core-custom",
-        "name": "Fate Core Custom",
-      }, {
-        "system": "Fate Accelerated",
-        "object_type": "CHARACTERSHEET",
-        "slug": "fate-accelerated-custom",
-        "description": "Fate Accelerated with customizable approaches, and default stress and consequences",
-        "id": "CHARACTERSHEET|fate-accelerated-custom",
-        "name": "Fate Accelerated Custom",
-      }*/
-      ].sort((a,b) => (a.sort > b.sort) ? 1 : ((b.sort > a.sort) ? -1 : 0))
+        "sort": 2,
+      },     
+      ]      
     }
   },
   methods : {    
@@ -164,3 +158,6 @@ export default {
   }
 }
 </script>
+
+<style lang="scss"> 
+</style>

@@ -77,7 +77,7 @@ export default {
       title: "",
       description: "",
       characterData: {        
-        related_id: `CHARACTERSHEET|${this.$route.params.id}`
+        related_id: `CHARACTERSHEET|${this.$route.params.id}`        
       },
     }
   },

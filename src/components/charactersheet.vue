@@ -25,6 +25,7 @@ import SheetFateFreeport from "./../sheets/fate-freeport"
 import SheetFateOfCthulhu from "./../sheets/fate-of-cthulhu"
 import SheetMouseGuard from "./../sheets/mouse-guard"
 import SheetStarTrek from "./../sheets/star-trek"
+import SheetFateEverything from "./../sheets/fate-everything"
 
 let commonSvc = null;
 let fateOf20 = null;
@@ -51,6 +52,7 @@ export default {
     "fate-of-cthulhu": SheetFateOfCthulhu,
     "mouse-guard": SheetMouseGuard,
     "star-trek": SheetStarTrek,
+    "fate-everything": SheetFateEverything,
   },
   props: {
     sheetid: String,
@@ -166,15 +168,15 @@ export default {
       {
         if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
         if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
+        if (!obj[arr[0]][arr[1]][arr[2]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
         Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], val);        
       }
       if (arr.length == 5)
       {
         if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
         if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
-        if (!obj[arr[0]][arr[1]][arr[2]])Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], {});
+        if (!obj[arr[0]][arr[1]][arr[2]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
+        if (!obj[arr[0]][arr[1]][arr[2]][arr[3]])Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], {});
         Vue.set(obj[arr[0]][arr[1]][arr[2]][arr[3]], arr[4], val);
       }
     },
