@@ -19,7 +19,7 @@
       @change="$parent.setVal(`${item.obj}`,  $event.target.value)" 
       :value="$parent.getVal(`${item.obj}`)" :placeholder="'+'" />		
 
-    <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeSkill(item.id)">
+    <button type="button" v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeSkill(item.id)">
       <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
     </button>	  
   </div>

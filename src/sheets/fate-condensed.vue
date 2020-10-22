@@ -61,7 +61,7 @@
 					</div>
 					<div class="d-flex justify-content-between">
 						<div v-for="stress in physicalstress" :key="stress.obj">
-							<inputstress :stress="stress" stresstype="Physical" hidelabel="true" />
+							<inputstress :stress="stress" stresstype="Physical" :hidelabel="true" />
 						</div>
 					</div>
 				</div>
@@ -73,7 +73,7 @@
 					</div>
 					<div class="d-flex justify-content-between">
 						<div v-for="stress in mentalstress" :key="stress.obj">
-							<inputstress :stress="stress" stresstype="Mental" hidelabel="true" />
+							<inputstress :stress="stress" stresstype="Mental" :hidelabel="true" />
 						</div>
 					</div>
 				</div>

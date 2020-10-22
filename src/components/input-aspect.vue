@@ -1,10 +1,11 @@
 <template>
   <div class="form-group">    
     <div v-if="showlabel" class="d-flex">
-       <!--custom labels-->
-      <input class="w-100 mr-auto inputlabel" type="text" :id="`${aspect.label}`" :name="`${aspect.label}`" 
+      <!--custom labels-->      
+      <input v-if="customlabel" class="w-100 mr-auto inputlabel" type="text" :id="`${aspect.label}`" :name="`${aspect.label}`" 
         @change="$parent.setVal(`${aspect.label}`,  $event.target.value)" 
         :value="$parent.getVal(`${aspect.label}`)" placeholder="aspect" />
+      <label v-else>{{aspect.label}}</label>
 
       <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
         <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
@@ -26,7 +27,8 @@ export default {
   props: {
     aspect: Object,    
     showlabel: Boolean,
-    removable: Boolean
+    removable: Boolean,
+    customlabel: Boolean,
   },
   computed: {
  	  ...mapGetters([
