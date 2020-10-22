@@ -209,13 +209,18 @@ export default {
 	},   
 	addAspect() {
 		var id = this.getNextId(this.aspects);
-		var obj = {id: id, label:`aspects.label${id}`, obj:`aspects.aspect${id}`, placeholder:"ASPECT"};		
+		var obj = {id: id, obj:`aspects.aspect${id}`, label:`aspects.label${id}`, placeholder:"ASPECT"};		
 		this.aspects.push(obj);		
 	},
 	addSkill() {
 		var id = this.getNextId(this.skills);
 		var obj = {id: id, obj:`skills.skill${id}`, label:`skills.label${id}`, placeholder:"SKILL"}
 		this.skills.push(obj);		
+	},
+	addConsequence() {
+		var id = this.getNextId(this.consequences);
+		var obj = {id: id, label:`consequences.label${id}`, obj:`consequences.consequence${id}`, value:`consequences.value${id}`, placeholder:"CONSEQUENCE", valueplaceholder:"2"};		
+		this.consequences.push(obj);
 	},
 	addStressTrack() {
 		var id = this.getNextId(this.skills);

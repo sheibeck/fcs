@@ -1,7 +1,7 @@
 <template>
 	<div class="px-1 d-flex">
     <!--custom labels-->      
-    <input v-if="customlabel" style="width:30px;" class="mr-auto inputlabel text-center" :class="{ 'd-none' : labelHidden }" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
+    <input v-if="customlabel" style="width:30px;" class="mr-auto inputlabel text-center" :class="{ 'd-none' : labelHidden }" type="text" 
       @change="$parent.setVal(`${stress.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
     <label v-else class="px-1 pt-1" :class="{ 'd-none' : labelHidden }" :for="stress.obj">{{stress.label}}</label>

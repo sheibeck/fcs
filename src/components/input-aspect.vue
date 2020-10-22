@@ -2,7 +2,7 @@
   <div class="form-group">    
     <div v-if="showlabel" class="d-flex">
       <!--custom labels-->      
-      <input v-if="customlabel" class="w-100 mr-auto inputlabel" type="text" :id="`${aspect.label}`" :name="`${aspect.label}`" 
+      <input v-if="customlabel" class="w-100 mr-auto inputlabel" type="text" 
         @change="$parent.setVal(`${aspect.label}`,  $event.target.value)" 
         :value="$parent.getVal(`${aspect.label}`)" placeholder="aspect" />
       <label v-else>{{aspect.label}}</label>

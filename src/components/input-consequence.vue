@@ -1,10 +1,18 @@
 <template>
 	<div class="form-group d-flex">
     <span v-if="vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
-    <label class="pr-3">{{consequence.value}}</label>
+
+    <!--custom labels-->          
+    <input v-if="customlabel" class="w-50 mr-auto inputlabel" type="text" 
+      @change="$parent.setVal(`${consequence.label}`,  $event.target.value)" 
+      :value="$parent.getVal(`${consequence.label}`)" :placeholder="consequence.placeholder" />    
+    <label v-else class="pr-3">{{consequence.value}}</label>
     <input type="text" class="form-control" :id="consequence.obj" :name="consequence.obj" 
-      @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="consequence.label"
+      @change="setVal(consequence.obj,  $event.target.value)" :value="$parent.getVal(consequence.obj)" :placeholder="$parent.getVal(consequence.label)"
       :disabled="!skillHasValue()" />
+    <button type="button" v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeConsequence(consequence.id)">
+      <i title="Delete Consequence" class="fas d-print-none fa-minus-circle"></i>
+    </button>
   </div>
 </template>
 
@@ -14,7 +22,9 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'InputConsequence',
   props: {
-    consequence: Object,    
+    consequence: Object,
+    customlabel: Boolean,
+    removable: Boolean,
   },
   computed: {
  	  ...mapGetters([
@@ -46,6 +56,9 @@ export default {
       if (!this.consequence.requirement) return true;      
       let hasVal = this.$parent.skillHasValue(this.consequence.requirement.obj, this.consequence.requirement.val);      
       return hasVal;
+    },
+    removeConsequence(id) {
+      this.$emit('remove-consequence', id);
     }
   }
 }
