@@ -146,6 +146,10 @@
             <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
             <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.genre' v-on:click="searchByTag">{{item.genre}}</span>
             <span v-bind:class="badgeColor(item.type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.type' v-on:click="searchByTag">{{item.type}}</span>
+            <span v-for="tag in item.tags" class='badge badge-secondary mr-1' style="cursor: pointer;" :key="tag.text"
+              v-bind:data-search-text='tag.text' v-on:click="searchByTag">                
+              {{tag.text}}
+            </span>
         </div>
       </div>
     </div>
