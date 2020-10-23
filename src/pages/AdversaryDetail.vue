@@ -1,50 +1,56 @@
 <template>
   <div class="container mt-2">
-    <form id="adversaryForm" v-on:submit.prevent="save">
+    <div v-if="initialized && adversary">
         <div class="row">
-            <input type="hidden" name="id" id="id" />
-            <input type="hidden" name="owner_id" id="owner_id" />
+            <input type="hidden" name="id" id="id" :value="getVal('id')" />
+            <input type="hidden" name="owner_id" id="owner_id" :value="getVal('owner_id')" />
             <div class="col-sm-12 col-md-8">
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Name</label>
-                    <div class="col-sm-12 col-md-10 d-flex">                      
-                      <input class="form-control mr-auto" type="text" value="" id="name" name="name">                      
+                    <div class="col-sm-12 col-md-10 d-flex">
+                      <input class="form-control mr-auto" type="text" @change="setVal('name',  $event.target.value)" :value="getVal('name')" />
                       <div class="w-25 pt-2 ml-2 form-check">
-                        <input type="checkbox" class="form-check-input" id="is_private" name="is_private">
+                        <input type="checkbox" class="form-check-input" id="is_private" name="is_private" 
+                          @change="setVal('is_private',  $event.target.value)" :checked="getVal('is_private')" />
                           <label class="form-check-label" for="is_private" title="Don't show this adversary in the public adversary list.">Is Private?</label>  
                       </div>
                     </div>
                 </div>                
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">High Concept</label>
-                    <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="hidden" name="aspects[name]" id="aspects[name]" data-name="high_concept" value="high_concept" >
-                        <input class="form-control" type="text" value="" name="aspects[value]" id="aspects[value]">
+                    <div class="col-sm-12 col-md-10">                        
+                        <input class="form-control" type="text" @change="setVal('aspects.high_concept',  $event.target.value)" :value="getVal('aspects.high_concept')" />
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Trouble</label>
-                    <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="hidden" name="aspects[name]" id="aspects[name]" data-name="trouble" value="trouble" >
-                        <input class="form-control" type="text" value="" name="aspects[value]" id="aspects[value]">
+                    <div class="col-sm-12 col-md-10">                        
+                        <input class="form-control" type="text" @change="setVal('aspects.trouble',  $event.target.value)" :value="getVal('aspects.trouble')" />
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Other Aspects</label>
-                    <div class="col-sm-12 col-md-10">
-                        <input class="form-control" type="hidden" name="aspects[name]" id="aspects[name]" data-name="other_aspects" value="other_aspects" >
-                        <input class="form-control" type="text" value="" name="aspects[value]" id="aspects[value]" placeholder="Aspect1; Aspect2; Aspect3">
+                    <div class="col-sm-12 col-md-10">                        
+                        <input class="form-control" type="text" @change="setVal('aspects.other_aspects',  $event.target.value)" 
+                          :value="getVal('aspects.other_aspects')" placeholder="Aspect1; Aspect2; Aspect3" />
+                        <small>Use semicolon for separator</small>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Skills</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-skills">
-                            <div class="col-md-7">
-                                <input class="form-control" type="text" value="" name="skills[name]" id="skills[name]" placeholder="Skill Name (Average, Good OR Sneaky, Quickly)">
+                        <div v-if="adversary.skills.length == 0">Click Add Skill button to add a skill.</div>
+                        <div v-else v-for="(skill,index) in adversary.skills" :key="index" class="row">
+                            <div class="col-md-7 d-flex">
+                                <input class="form-control" type="text" v-model="skill.name"
+                                  placeholder="Skills/Apprach (Fight,Athletics OR Clever)" />
+                                <button type="button" class="input-group-text btn btn-danger" @click="adversary.skills.splice(index,1)">
+                                  <i class="fa fa-trash"></i>
+                                </button>
                             </div>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" value="" name="skills[value]" id="skills[value]" placeholder="Skill Value (Physique, Fight OR +1, +2)">
+                                <input class="form-control" type="text" v-model="skill.value"  
+                                  placeholder="Value (+6 Superb OR +1, +2)" />
                             </div>
                         </div>
                     </div>
@@ -59,12 +65,16 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Stunts &amp; Extras</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-stunts">
-                            <div class="col-12">
-                                <input class="form-control" type="text" value="" name="stunts[name]" id="stunts[name]" placeholder="Stunt/Extra/Gadget Name">
+                        <div v-if="adversary.stunts.length == 0">Click Add Stunt button to add a stunt.</div>
+                        <div v-else v-for="(stunt,index) in adversary.stunts" :key="index" class="row">
+                            <div class="col-12 d-flex">
+                                <input class="form-control" type="text" v-model="stunt.name" placeholder="Stunt/Extra/Gadget Name" />
+                                <button type="button" class="input-group-text btn btn-danger" @click="adversary.stunts.splice(index,1)">
+                                  <i class="fa fa-trash"></i>
+                                </button>
                             </div>
                             <div class="col-12">
-                                <textarea class="form-control" type="text" value="" name="stunts[value]" id="stunts[value]" placeholder="Stunt/Extra/Gadget Description"></textarea>
+                                <textarea class="form-control" type="text" v-model="stunt.value" placeholder="Stunt/Extra/Gadget Description"></textarea>
                             </div>
                         </div>
                     </div>
@@ -77,12 +87,16 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Stress</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-stress">
-                            <div class="col-md-7">
-                                <input class="form-control" type="text" value="" name="stress[name]" id="stress[name]" placeholder="Stress Name (Physical, Mental, etc)">
+                        <div v-if="adversary.stress.length == 0">Click Add Stress button to add a stress track.</div>
+                        <div v-else v-for="(stress,index) in adversary.stress" :key="index" class="row">
+                            <div class="col-md-7 d-flex">
+                                <input class="form-control" type="text" v-model="stress.name" placeholder="Stress Name (Physical, Mental, etc)" />
+                                <button type="button" class="input-group-text btn btn-danger" @click="adversary.stress.splice(index,1)">
+                                  <i class="fa fa-trash"></i>
+                                </button>
                             </div>
                             <div class="col-md-5">
-                                <input class="form-control" type="text" value="" name="stress[value]" id="stress[value]" placeholder="Stress Values (1,1,1 OR 1,2,3,4)">
+                                <input class="form-control" type="text" v-model="stress.value" placeholder="Stress Values (1,1,1 OR 1,2,3,4)" />
                             </div>
                         </div>
                     </div>
@@ -97,14 +111,18 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Consequences</label>
                     <div class="col-sm-12 col-md-10">
-                        <div class="row js-consequences">
-                            <div class="col-12">
-                                <input class="form-control" type="text" value="" name="consequences[name]" id="consequences[name]" placeholder="Consequence Name (Mild, Serious, Exhausted)">
+                        <div v-if="adversary.consequences.length == 0">Click Add Consequence button to add a consequence.</div>
+                        <div v-else v-for="(consequence,index) in adversary.consequences" :key="index" class="row">
+                            <div class="col-12 d-flex">
+                                <input class="form-control" type="text" v-model="consequence.name" placeholder="Consequence Name (Mild, Serious, Exhausted)" />
+                                <button type="button" class="input-group-text btn btn-danger" @click="adversary.consequences.splice(index,1)">
+                                  <i class="fa fa-trash"></i>
+                                </button>
                             </div>
                             <div class="col-12">
-                                <textarea class="form-control" type="text" value="" name="consequences[value]" id="consequences[value]" placeholder="Consequence Values (Recover, Condition, etc)"></textarea>
+                                <textarea class="form-control" type="text" v-model="consequence.value" placeholder="Consequence Values (Recover, Condition, etc)"></textarea>
                             </div>
-                        </div>
+                        </div>                       
                     </div>
                 </div>
                 <div class="form-group row">
@@ -154,15 +172,15 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Portrait Url</label>
                     <div class="col-sm-12 col-md-10">                        
-                        <input class="form-control" type="text" value="" name="image_url" id="image_url">
+                        <input class="form-control" type="text" value="" name="image_url" id="image_url" />
                     </div>
                 </div>
             </div>
         </div>
-        <button class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>
+        <button type="button" @click="save" class="btn btn-primary">Save Adversary <i class='fa fa-plus'></i></button>
         <button type="button" @click="cancel()" role="button" class="btn btn-secondary">Cancel <i class='fa fa-times-circle'></i></button>
         <a v-if="action == 'edit'" href='#' class='btn btn-danger' data-toggle='modal' data-target='#modalDeleteAdversaryConfirm'> Delete <i class='fa fa-trash'></i></a>
-    </form>
+    </div>
 
 
     <!-- delete confirmation modal-->
@@ -209,7 +227,8 @@ export default {
   },
   mounted(){
     commonSvc = new CommonService(this.$root);
-    dbSvc = new DbService(this.$root);    
+    dbSvc = new DbService(this.$root); 
+    this.initialized = true;   
   },
   watch: {
     userId() {
@@ -219,7 +238,8 @@ export default {
   },
   data () {
     return {
-      adversary: {},
+      initialized: false,
+      adversary: null,
       title: "",
       description: "",
       action: this.$route.params.action,      
@@ -232,11 +252,7 @@ export default {
     ]),
   },
   methods: {
-    init : async function() {      
-      $(document).on('click', '.js-delete-item', function (eve) {
-          $(this).parent().parent().remove();
-      });
-
+    init : async function() {
       this.adversaryId = commonSvc.SetId("ADVERSARY", this.$route.params.id);
             
       if (this.action == "copy")
@@ -256,87 +272,86 @@ export default {
 
       this.editAdversary();
     },
+    getVal(graphPath, defaultValue){
+      return commonSvc.getVal(this.adversary, graphPath, defaultValue);
+    },
+    setVal(arr, val) {         
+      commonSvc.setVal(this.adversary, arr, val, Vue);
+    },
     getAdversary : async function(id, ownerId) {      
       let adversary = await dbSvc.GetObject(this.adversaryId, ownerId);
-      this.adversary = adversary;      
+      
+      //convert this to new adversary format      
+      if (!Array.isArray(adversary.skills)) {
+        let arr = [];
+        for (const [key, value] of Object.entries(adversary.skills)) {          
+          arr.push({"name": key, "value": value});
+        }
+        adversary.skills = arr;        
+      }
+      
+      if (!Array.isArray(adversary.stress)) {        
+        let arr = [];
+        for (const [key, value] of Object.entries(adversary.stress)) {          
+          arr.push({"name": key, "value": value.join(",")});
+        }
+        adversary.stress = arr;        
+      }
+
+      if (!Array.isArray(adversary.stunts)) {
+        let arr = [];
+        for (const [key, value] of Object.entries(adversary.stunts)) {          
+          arr.push({"name": key, "value": value});
+        }
+        adversary.stunts = arr;        
+      }
+
+      if (!Array.isArray(adversary.consequences)) {
+        let arr = [];
+        for (const [key, value] of Object.entries(adversary.consequences)) {          
+          arr.push({"name": key, "value": value});
+        }
+        adversary.consequences = arr;        
+      }
+
+      this.adversary = adversary;            
     },   
     editAdversary : function() {
       //if we find an adversary, then we're editing, otherwise we are creating
-      if (this.adversary) {
-        this.clearAdversaryForm();
-        this.populateAdversaryForm(this.adversary);
-
+      if (this.adversary) {                
         this.title = this.adversary.name + ' (Adversary)';
         this.description = this.adversary.type;
       }          
     },
-    save : async function() {      
-      if (!$("#name").val())
+    save : async function() {            
+      if (this.adversary.name === "")
       {
         commonSvc.Notify('You must enter a name', 'error');
         return;
       }
 
-      var data = $('#adversaryForm').serializeArray();            
-
-      var result = {};
-      var currentKey;
-      $.each(data, function () {
-        if (this.name !== '') {
-          if (this.name.indexOf('[name]') > -1)
-          {
-              var label = this.name.replace('[name]',''); //get the name of the parent property
-              if (!result[label]) {
-                  result[label] = {};
-              }
-              currentKey = this.value; //get the value that needs to be appened to the parent
-              result[label][this.value] = null;
-          }
-          else if (this.name.indexOf('[value]') > -1)
-          {
-              var label = this.name.replace('[value]', '');//get the name of the parent property
-              result[label][currentKey] = this.value; //get the last name we stored, should be in order so we assume the previous name is paired with this
-              currentKey = '';
-          }
-          else if (this.name.indexOf('is_private') > -1)
-          {
-            //use true/false instead of on/off
-            result[this.name] = this.value == "on" ? true : false;
-          }
-          else {
-              result[this.name] = this.value;
-          }
-        }
-      });
-
-      if (result.stress) {
-          //iterate over stress and make each value an array
-          $.each(result.stress, function (key, value) {
-              result.stress[key] = value.split(',');
-          });
-      }
-
       var isNew = false;
-      if (!result.id)
+      if (!this.adversary.id)
       {        
         // add a uniqueid
-        result['id'] = commonSvc.SetId("ADVERSARY", commonSvc.GenerateUUID());
-        result['owner_id'] = this.$store.state.userId;
+        this.adversary.id = commonSvc.SetId("ADVERSARY", commonSvc.GenerateUUID());
+        this.adversary.owner_id = this.$store.state.userId;
         isNew = true;
       }
 
       //name is a key field, we're going to force this to title case
-      result.name = result.name.toTitleCase();
-      result.slug = commonSvc.Slugify(result.name); //update the url slug
-      result.object_type = "ADVERSARY";      
+      this.adversary.name = this.adversary.name.toTitleCase();
+      this.adversary.slug = commonSvc.Slugify(this.adversary.name); //update the url slug
+      this.adversary.object_type = "ADVERSARY";      
 
       // clear empty values
-      commonSvc.RemoveEmptyObjects(result);
+      commonSvc.RemoveEmptyObjects(this.adversary);
 
       // if this adversary already exists then warn and don't overwrite
-      let existingAdversaries = await dbSvc.ListObjects("ADVERSARY", null, result.name);
+      let existingAdversaries = await dbSvc.ListObjects("ADVERSARY", null, this.adversary.name);
+
       let foundAdversayWithName = existingAdversaries.filter(obj => {
-        return obj.name.toLowerCase() === result.name.toLowerCase() && obj.id !== result.id;
+        return obj.name.toLowerCase() === this.adversary.name.toLowerCase() && obj.id !== this.adversary.id;
       })
 
       if (foundAdversayWithName.length > 0)
@@ -346,12 +361,12 @@ export default {
       else {        
         console.log("Saving adversary...");
 
-        let response = await dbSvc.SaveObject(result);
+        let response = await dbSvc.SaveObject(this.adversary);
         if (response) {
           commonSvc.Notify('Adversary saved.', 'success', null, () => {
             if (isNew)
             {
-              location.href = `/adversary/${commonSvc.GetId(result['id'])}/${result['slug']}/edit`;
+              location.href = `/adversary/${commonSvc.GetId(this.adversary.id)}/${this.adversary.slug}/edit`;
             }
           });
         }
@@ -360,11 +375,11 @@ export default {
     },
 
     deleteAdversary : async function() {
-      if (!this.isOwner($(owner_id).val())) {
+      if (!this.isOwner(this.adversary.owner_id)) {
         commonSvc.Notify('You are not the owner of this Adversary', 'error');
       }
       else {
-        await dbSvc.DeleteObject( this.userId, $('#id').val() ).then( (response) => { 
+        await dbSvc.DeleteObject( this.userId, this.adversary.id ).then( (response) => { 
           if (response) {
             this.clearAdversaryForm();
             $('#modalDeleteAdversaryConfirm').modal('hide');
@@ -377,138 +392,56 @@ export default {
     },
 
     clearAdversaryForm : function() {
-      //clear the form
-      $('#adversaryForm').trigger("reset");
-      $('.adversary-item-copy', '#adversaryForm').remove();
-
-      $('#id').val('');
-      $('#owner_id').val('');
-    },
-
-    populateAdversaryForm : function (data) {      
-      $.each(data, (name, val) =>{
-          if (typeof val === 'object')
-          {
-            switch(name) {
-              case 'aspects':
-                $.each(val, function(n, t) {
-                  $('input[name="aspects[name]"][data-name=' + n + ']').next().val(t);
-                });
-                break;             
-              default:
-                var objName = name.replace('_', '-');
-                for(var i=0;i<Object.keys(val).length-1;i++) {
-                  this.appendDeletableRow($(".js-" + objName + ":first").clone().addClass('adversary-item-copy').insertAfter(".js-" + objName +":last"));
-                }
-                $(".js-"+objName).each(function(i) {
-                  $(this).find('input[name="'+ name +'[name]"]').val(Object.keys(val)[i]);
-                  $(this).find('input[name="'+ name +'[value]"]').val(Object.values(val)[i]);
-                  $(this).find('textarea[name="'+ name +'[value]"]').val(Object.values(val)[i]);
-                });
-                break;
-            }
-          }
-          else {
-            var $el = $('[name="'+name+'"]', '#adversaryForm');
-            var type = $el.attr('type');
-
-            switch(type){
-              case "checkbox":
-                $el[0].checked = val;
-                break;
-              default:
-                $el.val(val);
-            }
-          }
-      });      
-    },
-
-    appendDeletableRow : function($elem) {
-      $('div:first', $elem).addClass('input-group-prepend')
-        .append('<div class="input-group-text btn btn-danger js-delete-item"><i class="fa fa-trash"><i></div>');
-    },
-
-    adversaryAddSkills : function(aSkills) {
-      $('.js-skills.adversary-item-copy', '#adversaryForm').remove();
-      $('.js-skills input', '#adversaryForm').val('');
-
-      for( var i = 0; i < aSkills.length-1; i++) {
-        this.appendDeletableRow($(".js-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-skills:last"));
-      };
-      $.each($('.js-skills'), function(i, val) {
-        $(this).find('input[name="skills[name]"]').val(aSkills[i]);
-        $(this).find('input[name="skills[value]"]').val('');
-      })
-    },
-
-    adversaryAddStress : function(aStress) {
-      $('.js-stress.adversary-item-copy', '#adversaryForm').remove();
-      $('.js-stress input', '#adversaryForm').val('');
-
-      for( var i = 0; i < aStress.length-1; i++) {
-        this.appendDeletableRow($(".js-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-stress:last"));
-      };
-      $.each($('.js-stress'), function(i, val) {
-        $(this).find('input[name="stress[name]"]').val(aStress[i][0]);
-        $(this).find('input[name="stress[value]"]').val(aStress[i][1]);
-      })
-    },
-
-    adversaryAddConsequences : function(aConsequences) {
-      $('.js-consequences.adversary-item-copy', '#adversaryForm').remove();
-      $('.js-consequences input', '#adversaryForm').val('');
-      $('.js-consequences textarea', '#adversaryForm').val('');
-
-      for( var i = 0; i < aConsequences.length-1; i++) {
-        this.appendDeletableRow($(".js-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-consequences:last"));
-      };
-      $.each($('.js-consequences'), function(i, val) {
-        $(this).find('input[name="consequences[name]"]').val(aConsequences[i][0]);
-        $(this).find('textarea[name="consequences[value]"]').val(aConsequences[i][1]);
-      })
+      this.adversary = {};
     },
 
     addSkill : function() {
-        this.appendDeletableRow($(".js-skills:first").clone().addClass('adversary-item-copy').insertAfter(".js-skills:last"));
+        this.adversary.skills.push({"name": "", "value": ""});
     },
 
-    addSkillFAE : function() {
-        var aSkills = ['Careful','Clever','Flashy','Forceful','Quick','Sneaky'];
-        this.adversaryAddSkills(aSkills);
+    addSkillFAE : function() {        
+        this.adversary.skills.push({"name": "Careful", "value": ""});
+        this.adversary.skills.push({"name": "Clever", "value": ""});
+        this.adversary.skills.push({"name": "Flashy", "value": ""});
+        this.adversary.skills.push({"name": "Forceful", "value": ""});
+        this.adversary.skills.push({"name": "Quick", "value": ""});
+        this.adversary.skills.push({"name": "Sneaky", "value": ""});
     },
 
     addSkillCore : function() {
-        var aSkills = ['(+1) Average','(+2) Fair','(+3) Good','(+4) Great','(+5) Superb', '(+6) Fantastic'];
-        this.adversaryAddSkills(aSkills);
+        this.adversary.skills.push({"name": "(+6) Fantastic", "value": ""});
+        this.adversary.skills.push({"name": "(+5) Superb", "value": ""});
+        this.adversary.skills.push({"name": "(+4) Great", "value": ""});
+        this.adversary.skills.push({"name": "(+3) Good", "value": ""});
+        this.adversary.skills.push({"name": "(+2) Fair", "value": ""});
+        this.adversary.skills.push({"name": "(+1) Average", "value": ""});
     },
 
     addStunt : function() {
-        this.appendDeletableRow($(".js-stunts:first").clone().addClass('adversary-item-copy').insertAfter(".js-stunts:last"));
+        this.adversary.stunts.push({"name": "", "value": ""});
     },
 
     addStress : function() {
-        this.appendDeletableRow($(".js-stress:first").clone().addClass('adversary-item-copy').insertAfter(".js-stress:last"));
+        this.adversary.stress.push({"name": "", "value": ""});
     },
 
-    addStressCore : function() {
-      var aStress = [["Physical","1,2,3"],["Mental","1,2,3"]]
-      this.adversaryAddStress(aStress);
+    addStressCore : function() {      
+      this.adversary.stress.push({"name": "Physical", "value": "1,2,3"});
+      this.adversary.stress.push({"name": "Mental", "value": "1,2,3"});
     },
 
-    addStressFAE : function() {
-      var aStress = [["Stress","1,2,3"]]
-      this.adversaryAddStress(aStress);
+    addStressFAE : function() {      
+      this.adversary.stress.push({"name": "Stress", "value": "1,2,3"});
     },
 
     addConsequence : function() {
-       var $item = $(".js-consequences:first").clone().addClass('adversary-item-copy').insertAfter(".js-consequences:last")
-          $('div:first', $item).addClass('input-group-prepend')
-            .append('<div class="input-group-text btn btn-danger js-delete-item">X</div>');
+      this.adversary.consequences.push({"name": "", "value": ""});
     },
 
     addConsequenceDefault : function() {
-        var aConsequences = [["Mild","-2"],["Moderate","-4"],["Severe","-6"]]
-        this.adversaryAddConsequences(aConsequences);
+        this.adversary.consequences.push({"name": "Mild", "value": "-2"});
+        this.adversary.consequences.push({"name": "Moderate", "value": "-4"});
+        this.adversary.consequences.push({"name": "Severe", "value": "-6"});
     },
     isOwner : function(ownerId) {
       return this.userId === ownerId;
