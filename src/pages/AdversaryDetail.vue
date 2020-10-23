@@ -361,6 +361,8 @@ export default {
       else {        
         console.log("Saving adversary...");
 
+        this.adversary.search_data = commonSvc.parseSearchData(this.adversary);
+
         let response = await dbSvc.SaveObject(this.adversary);
         if (response) {
           commonSvc.Notify('Adversary saved.', 'success', null, () => {
