@@ -74,7 +74,7 @@
 				</div>
 				<div class="d-flex flex-wrap pt-1">
 					<div v-for="box in stress.boxes" :key="box.id" class="pt-1">
-						<inputstress v-on:remove-stress-box="onRemoveStressBox" :parentid="stress.id" :stress="box" :stresstype="stress.label"
+						<inputstress v-on:remove-stress-box="onRemoveStressBox" :parentid="stress.id" :stress="box" :stresstype="getStressType(stress)"
 							:customlabel="true" :removable="true" :hidelabel="false" />
 					</div>
 				</div>
@@ -199,17 +199,20 @@ export default {
 			this.character.template = this.$set(this.character, "template", this.defaultTemplate);
 		}
 	},
+	getStressType(stress) {		
+		if (stress.label !== "") {
+			let label = this.getVal(stress.label);
+			if (label !== "") {
+				return label
+			};
+		}		
+		return stress.placeholder;		
+	},
     getVal(graphPath, defaultValue) {
       return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
-
-		if (this.vttEnabled && arr.indexOf("stress") !== -1)
-		{			
-			this.sendToVTT("stress", `Stress`, arr, val);
-			this.$parent.$parent.save();
-		}		
     },
     skillHasValue(skillList, value) {        
         var skillArray = skillList.split("|");

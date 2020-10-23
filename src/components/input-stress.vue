@@ -42,16 +42,20 @@ export default {
   },
   methods: {    
     setVal(arr, val) {
-      if (this.vttEnabled) {      
-        let label = this.stresstype ? `${this.stress.label} ${this.stresstype}` : this.stress.label;
-        this.$parent.sendToVTT("stress", label, arr, val);
-        this.$parent.setVal(arr, val);
+      this.$parent.setVal(arr, val);
+     
+      if (this.vttEnabled) {
+        let label = null;
+        if (this.customlabel) {
+          let stressVal = this.$parent.getVal(this.stress.label) ? this.$parent.getVal(this.stress.label) : this.stress.placeholder;
+          label = this.stresstype ? `${stressVal} ${this.stresstype}` : `${stressVal} Stress`;
+        } else {
+          label = this.stresstype ? `${this.stress.label} ${this.stresstype}` : this.stress.label;
+        }
+        this.$parent.sendToVTT("stress", label, arr, val);      
         this.$parent.$parent.$parent.save();
       } 
-      else {
-        this.$parent.setVal(arr, val);
-      }
-    },   
+    },
     skillHasValue() {
       if (!this.stress.requirement) return true;      
       let hasVal = this.$parent.skillHasValue(this.stress.requirement.obj, this.stress.requirement.val);      

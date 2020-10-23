@@ -1,8 +1,7 @@
 <template>
-	<div class="form-group d-flex flex-column">
-    <span v-if="vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
-
+	<div class="form-group d-flex flex-column">    
     <div class="d-flex" v-if="customlabel">
+      <span v-if="vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
       <!--custom labels-->
       <input class="w-75 mr-auto inputlabel" type="text" 
         @change="$parent.setVal(`${consequence.label}`,  $event.target.value)" 
@@ -14,6 +13,7 @@
     </div>
           
     <div class="d-flex">
+      <span v-if="!customlabel && vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
       <input v-if="customlabel" style="width:40px;" class="mr-auto inputlabel text-center" type="text" 
         @change="$parent.setVal(`${consequence.value}`,  $event.target.value)" 
         :value="$parent.getVal(`${consequence.value}`)" :placeholder="consequence.valueplaceholder" />      
@@ -62,11 +62,31 @@ export default {
     sendToVTT() {      
       if (!this.consequence || !this.consequence.label) return;
       let label = `consequence ${this.consequence.label}`;
+
+      if (this.customlabel) {
+        let label = this.$parent.getVal(`${this.consequence.label}`);
+        if (label === "") {
+          label = `consequence ${this.consequence.placeholder}`;
+        }
+        else {
+          label = `consequence ${label}`;
+        }        
+      }
+
       this.$parent.sendToVTT('invoke', label, "consequences", this.consequence.obj);
     },
     setVal(arr, val) {       
       if (this.vttEnabled) {
-        this.$parent.sendToVTT("consequence", this.consequence.label, arr, val);
+        let label = this.consequence.label;
+        if (this.customlabel) {
+          label = this.$parent.getVal(this.consequence.label);
+          if (label === "") {
+            label = this.consequence.placeholder;
+          }          
+        }
+        label = `${label} consequence`;
+        
+        this.$parent.sendToVTT("consequence", label, arr, val);
         this.$parent.setVal(arr, val);
         this.$parent.$parent.$parent.save();
       } 

@@ -193,13 +193,6 @@ export default {
     },
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
-
-		if (this.vttEnabled && arr.indexOf("stress") !== -1)
-		{
-			let label = arr.indexOf("mental") > -1 ? "Mental" : "Physical";
-			this.sendToVTT("stress", `1 ${label}`, arr, val);		
-			this.$parent.$parent.save();		
-		}		
     },
     skillHasValue(skillList, value) {        
         var skillArray = skillList.split("|");
