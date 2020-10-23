@@ -65,7 +65,7 @@
 					<input class="w-75 mr-auto inputlabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
 						@change="setVal(`${stress.label}`,  $event.target.value)" 
 						:value="getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
-					<button type="button" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStress(stress.id)">
+					<button type="button" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressTrack(stress.id)">
 						<i title="Delete Stress Track" class="fas d-print-none fa-minus-circle"></i>
 					</button>
 					<button type="button" class="btn btn-link text-secondary m-0 p-0" v-on:click="addStressBox(stress.id)">
@@ -296,7 +296,7 @@ export default {
 		});
 		this.$set(this.character.template, 'skills', arr);
 	},
-	onRemoveStressTrack: function (id) {
+	removeStressTrack: function (id) {
 		let arr = this.character.template.stress.filter(function( obj ) {
 			return obj.id !== id;
 		});
