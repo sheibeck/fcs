@@ -38,7 +38,7 @@
                 v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">
                 {{commonSvc.GetId(item.related_id)}}
               </span>
-              <span v-for="tag in item.tags" class='badge badge-secondary ml-1' style="cursor: pointer;" :key="tag.text"
+              <span v-for="tag in item.tags" class='badge badge-secondary mr-1' style="cursor: pointer;" :key="tag.text"
                 v-bind:data-search-text='tag.text' v-on:click="searchByTag">                
                 {{tag.text}}
               </span>
