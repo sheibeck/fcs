@@ -134,7 +134,7 @@
                 <div class="form-group row">
                     <label for="system" class="col-sm-12 col-md-2 col-form-label">System</label>
                     <div class="col-sm-12 col-md-10">
-                        <select class="form-control" name="system" id="system">
+                        <select class="form-control" v-model="adversary.system">
                             <option>Fate Core</option>
                             <option>Fate Accelerated</option>
                             <option>Fate Condensed</option>
@@ -148,7 +148,7 @@
                 <div class="form-group row">
                     <label for="genre" class="col-sm-12 col-md-2 col-form-label">Genre</label>
                     <div class="col-sm-12 col-md-10">
-                        <select class="form-control" name="genre" id="genre">
+                        <select class="form-control" v-model="adversary.genre">
                             <option>Fantasy</option>
                             <option>Modern</option>
                             <option>Sci-Fi</option>
@@ -160,7 +160,7 @@
                 <div class="form-group row">
                     <label for="type" class="col-sm-12 col-md-2 col-form-label">Type</label>
                     <div class="col-sm-12 col-md-10">
-                        <select class="form-control" name="type" id="type">
+                        <select class="form-control" v-model="adversary.type">
                             <option>Enemy</option>
                             <option>Obstacle</option>
                             <option>Constraint</option>
@@ -170,9 +170,20 @@
                 </div>
 
                 <div class="form-group row">
+                  <label for="name" class="col-sm-12 col-md-2 col-form-label">Tags</label>
+                  <div class="col-sm-12 col-md-10"> 
+                    <vue-tags-input                      
+                      v-model="tag"              
+                      :tags="adversary.tags"
+                      @tags-changed="newTags => this.adversary.tags = newTags"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Portrait Url</label>
                     <div class="col-sm-12 col-md-10">                        
-                        <input class="form-control" type="text" value="" name="image_url" id="image_url" />
+                        <input class="form-control" type="text" v-model="adversary.image_url" />
                     </div>
                 </div>
             </div>
@@ -211,6 +222,7 @@
 import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import VueTagsInput from '@johmun/vue-tags-input';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -224,6 +236,9 @@ export default {
          { vmid: 'description', name: 'description', content: this.description }
        ]
      }
+  },
+  components: {    
+    VueTagsInput
   },
   mounted(){
     commonSvc = new CommonService(this.$root);
@@ -242,7 +257,8 @@ export default {
       adversary: null,
       title: "",
       description: "",
-      action: this.$route.params.action,      
+      action: this.$route.params.action,
+      tag: "",    
     }
   },
   computed: {
