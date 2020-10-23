@@ -21,6 +21,7 @@
   "license": "GPLV3",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
+    "@johmun/vue-tags-input": "^2.1.0",
     "@panzoom/panzoom": "^4.3.2",
     "@sentry/browser": "^5.26.0",
     "@sentry/cli": "^1.58.0",

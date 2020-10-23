@@ -26,6 +26,11 @@
             <label class='' for='image_url'>Description:</label>
             <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
           </div>
+          <vue-tags-input              
+              v-model="tag"              
+              :tags="characterData.tags"
+              @tags-changed="newTags => updateTags(newTags)"
+            />
         </div>
       </div>
       
@@ -38,6 +43,7 @@ import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import CharacterSheet from '../components/charactersheet'
+import VueTagsInput from '@johmun/vue-tags-input';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -45,7 +51,8 @@ let dbSvc = null;
 export default {
   name: 'CharacterSheetDetail',
   components: {
-    "charactersheet": CharacterSheet,    
+    "charactersheet": CharacterSheet, 
+    VueTagsInput   
   },
   metaInfo() {
     return {
@@ -79,9 +86,16 @@ export default {
       characterData: {        
         related_id: `CHARACTERSHEET|${this.$route.params.id}`        
       },
+      tag: "",
     }
   },
   methods : {
+    updateTags(newTags) {      
+      this.characterData.tags = newTags;
+      this.characterData.searchTags = newTags.map(function(elem){
+          return elem.text;
+        }).join(",");
+    },   
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },    

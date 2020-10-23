@@ -34,6 +34,13 @@
         <div class='row' v-if="!isAuthenticated">           
           <input type="hidden" id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
         </div>
+
+        <vue-tags-input
+              v-if="characterData !== null"
+              v-model="tag"              
+              :tags="characterData.tags"
+              @tags-changed="newTags => updateTags(newTags)"
+            />
       </div>
 
     </form>
@@ -45,6 +52,7 @@ import { mapGetters } from 'vuex';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import CharacterSheet from '../components/charactersheet'
+import VueTagsInput from '@johmun/vue-tags-input';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -52,7 +60,8 @@ let dbSvc = null;
 export default {
   name: 'CharacterDetail',
   components: {
-    "charactersheet": CharacterSheet,    
+    "charactersheet": CharacterSheet,
+    VueTagsInput
   },
   metaInfo() {    
     return {
@@ -91,10 +100,17 @@ export default {
       title: "",
       description: "",
       characterid: null,      
-      characterData: null,        
+      characterData: null,      
+      tag: "",        
     }
   },
-  methods : {    
+  methods : {
+    updateTags(newTags) {
+      this.characterData.tags = newTags;
+      this.characterData.searchTags = newTags.map(function(elem){
+          return elem.text;
+        }).join(",");
+    },   
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
