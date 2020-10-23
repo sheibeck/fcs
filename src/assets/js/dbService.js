@@ -323,13 +323,9 @@ export default class DbService {
         FilterExpression += ' OR contains (related_id, :anl)';
         FilterExpression += ' OR contains (related_id, :anu)';
         FilterExpression += ' OR contains (related_id, :ant)';
-
-        FilterExpression += ' OR contains (searchTags, :an)';
-        FilterExpression += ' OR contains (searchTags, :anl)';
-        FilterExpression += ' OR contains (searchTags, :anu)';
-        FilterExpression += ' OR contains (searchTags, :ant)';
-
-        FilterExpression += ' OR contains (playerList, :playerId)';        
+      
+        FilterExpression += ' OR contains (playerList, :playerId)';              
+        FilterExpression += ' OR contains (search_data, :anl)';
 
         FilterExpression += ' OR slug = :anl )';
 

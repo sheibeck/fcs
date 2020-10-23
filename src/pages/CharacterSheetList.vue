@@ -91,14 +91,6 @@ export default {
         "name": "Fate Everything",
         "sort": 1,
       }, {
-        "system": "Fate Of Cthulhu",
-        "object_type": "CHARACTERSHEET",
-        "slug": "fate-of-cthulhu",
-        "description": "Fate of Cthulhu character sheet.",
-        "id": "CHARACTERSHEET|fate-of-cthulhu",
-        "name": "Fate of Cthulhu",
-        "sort": 8,
-      }, {
         "system": "Dresden Files Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "dresden-files-accelerated",
@@ -106,6 +98,14 @@ export default {
         "id": "CHARACTERSHEET|dresden-files-accelerated",
         "name": "Dresden Files Accelerated",
         "sort": 3,      
+      }, {
+        "system": "Fate Of Cthulhu",
+        "object_type": "CHARACTERSHEET",
+        "slug": "fate-of-cthulhu",
+        "description": "Fate of Cthulhu character sheet.",
+        "id": "CHARACTERSHEET|fate-of-cthulhu",
+        "name": "Fate of Cthulhu",
+        "sort": 8,
       }, {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",

@@ -106,10 +106,7 @@ export default {
   },
   methods : {
     updateTags(newTags) {
-      this.characterData.tags = newTags;
-      this.characterData.searchTags = newTags.map(function(elem){
-          return elem.text;
-        }).join(",");
+      this.characterData.tags = newTags;     
     },   
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
@@ -131,9 +128,10 @@ export default {
 
         // make sure we have a proper user id key
         characterData.owner_id = this.userId;
-        characterData.related_id = this.sheetId;        
+        characterData.related_id = this.sheetId;
         characterData.slug = commonSvc.Slugify(characterData.name);
         characterData.object_type = "CHARACTER";
+        characterData.search_data = commonSvc.parseSearchData(characterData);
 
         let response = await dbSvc.SaveObject(characterData).then((response) => { 
           if (response) {

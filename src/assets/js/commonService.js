@@ -240,4 +240,32 @@ export default class CommonService {
       }
     }
   }
+
+  parseSearchData(data) {    
+    var searchData = [];
+    this.addSearchKey("name", data.name, searchData);
+    this.addSearchKey("highconcept", data.highconcept??data.high_concept, searchData);
+    this.addSearchKey("trouble", data.trouble, searchData);
+    this.addSearchKey("aspects", data.other_aspects, searchData);
+    this.addSearchKey("object_type", data.object_type, searchData);
+    this.addSearchKey("system", data.system, searchData);
+    this.addSearchKey("genre", data.genre, searchData);
+    this.addSearchKey("related_id", data.related_id, searchData);
+    this.addSearchKey("type", data.type, searchData);
+
+    if (data.tags) {
+      let tags = data.tags.map(function(elem){
+        return elem.text.toLowerCase();
+      }).join(",");
+      this.addSearchKey("tags", tags, searchData);
+    }
+
+    return searchData.join("||");
+  }
+  addSearchKey(key, value, searchData) {
+    if (value) {
+      searchData.push(`${key}=${value.toLowerCase()}`);
+    }
+  }
+
 }
