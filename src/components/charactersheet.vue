@@ -131,54 +131,10 @@ export default {
       }
     },
     getVal(obj, graphPath, defaultValue){
-      var parts = graphPath.split(".");
-      var root = obj;
-
-      for (var i = 0; i < parts.length; i++)
-      {
-        var part = parts[i];
-        //account for false values in checkboxes
-        if ((root[part] || root[part] == false) && root.hasOwnProperty(part))
-          root = root[part];
-        else
-          return (defaultValue || "");
-      }
-
-      return eval(`obj.${graphPath}`);
+      return commonSvc.getVal(obj, graphPath, defaultValue);
     },
     setVal(obj, arr, val) {      
-      arr = arr.split(".");
-      
-      if (arr.length == 1)
-      {
-        Vue.set(obj, arr[0], val);       
-      }
-      if (arr.length == 2)
-      {        
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        Vue.set(obj[arr[0]], arr[1], val);  
-      }
-      if (arr.length == 3)
-      {
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        Vue.set(obj[arr[0]][arr[1]], arr[2], val);             
-      }
-      if (arr.length == 4)
-      {
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        if (!obj[arr[0]][arr[1]][arr[2]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
-        Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], val);        
-      }
-      if (arr.length == 5)
-      {
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        if (!obj[arr[0]][arr[1]][arr[2]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
-        if (!obj[arr[0]][arr[1]][arr[2]][arr[3]])Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], {});
-        Vue.set(obj[arr[0]][arr[1]][arr[2]][arr[3]], arr[4], val);
-      }
+      commonSvc.setVal(obj, arr, val, Vue);
     },
     GetSheetImage(){
       return `/static/sheets/${commonSvc.GetId(this.sheetid)}/logo.png`;
