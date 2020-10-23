@@ -244,9 +244,18 @@ export default class CommonService {
   parseSearchData(data) {    
     var searchData = [];
     this.addSearchKey("name", data.name, searchData);
-    this.addSearchKey("highconcept", data.highconcept??data.high_concept, searchData);
-    this.addSearchKey("trouble", data.trouble, searchData);
-    this.addSearchKey("aspects", data.other_aspects, searchData);
+    if (data.aspects) {
+      let highconcept = data.aspects.highconcept;
+      if (!highconcept) highconcept = data.aspects.high_concept;
+      if (!highconcept && Object.keys(data.aspects).length > 0) highconcept =  data.aspects[Object.keys(data.aspects).sort()[0]];
+      this.addSearchKey("highconcept", highconcept, searchData);
+
+      let trouble = data.aspects.trouble;            
+      if (!trouble && Object.keys(data.aspects).length > 1) trouble =  data.aspects[Object.keys(data.aspects).sort()[1]];
+      this.addSearchKey("trouble", trouble, searchData);
+
+      this.addSearchKey("aspects", data.aspects.other_aspects, searchData);
+    }
     this.addSearchKey("object_type", data.object_type, searchData);
     this.addSearchKey("system", data.system, searchData);
     this.addSearchKey("genre", data.genre, searchData);

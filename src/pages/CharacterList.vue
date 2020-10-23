@@ -8,7 +8,8 @@
         <search class=""></search>
       </div>
       <div v-if="!hasCharacters">
-        <h2>You have not created any characters.</h2>
+        <h2 v-if="searchText == ''">You have not created any characters.</h2>
+        <h2 v-else>No characters found.</h2>
       </div>
       <div v-if="hasCharacters" class='card-columns'>
         <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
@@ -149,15 +150,15 @@ export default {
       switch(aspect) {
         case "highconcept":
           desc = item.aspects ? (item.aspects.highconcept ? item.aspects.highconcept : "") : "";
-          if (desc === "" && Object.keys.length > 0) {
-            desc = item.aspects[Object.keys(item.aspects)[0]];
+          if (desc === "" && Object.keys(item.aspects).length > 0) {
+            desc = item.aspects[Object.keys(item.aspects).sort()[0]];
           }
           break;
 
-        case "trouble":
-           desc = item.aspects ? (item.aspects.trouble ? item.aspects.trouble : "") : "";
-          if (desc === "" && Object.keys.length > 1) {
-            desc = item.aspects[Object.keys(item.aspects)[1]];
+        case "trouble":          
+          desc = item.aspects ? (item.aspects.trouble ? item.aspects.trouble : "") : "";
+          if (desc === "" && Object.keys(item.aspects).length > 1) {
+            desc = item.aspects[Object.keys(item.aspects).sort()[1]];
           }
           break;
       }
