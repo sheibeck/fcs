@@ -11,7 +11,7 @@
             <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           </a>
           <div class='card-body'>
-            <h5 class='card-title charactersheet-name'>{{sheet.system}}</h5>
+            <h5 class='card-title charactersheet-name'>{{sheet.name}}</h5>
             <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success w-100' v-bind:data-id='sheet.id' role="button">Create <i class='fa fa-user'></i></a>
             <a v-if="sheet.customizable" v-bind:href="`charactersheet/${sheet.slug}-custom`" class='btn btn-success mt-1 w-100' v-bind:data-id='sheet.id' role="button">Customize <i class='fas fa-user-cog'></i></a>
           </div>
@@ -58,7 +58,7 @@ export default {
         "system": "Fate Condensed",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-condensed",
-        "description": "Fate Condensed with customizable skills",
+        "description": "Fate Condensed sheet with customizable skills",
         "id": "CHARACTERSHEET|fate-condensed",
         "name": "Fate Condensed",
         "sort": 1,
@@ -67,7 +67,7 @@ export default {
         "system": "Fate Core",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-core",
-        "description": "Fate Core default sheet or <em>Customize</em> to enter your own skills.",
+        "description": "Fate Core default sheet OR <em>Customize</em> your own skills.",
         "id": "CHARACTERSHEET|fate-core",
         "name": "Fate Core",
         "customizable": true,
@@ -77,7 +77,7 @@ export default {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-accelerated",
-        "description": "Fate Accelerated default sheet or <em>Customize</em> to enter your own approaches.",
+        "description": "Fate Accelerated default sheet OR <em>Customize</em> your own approaches.",
         "id": "CHARACTERSHEET|fate-accelerated",
         "name": "Fate Accelerated",
         "customizable": true,
@@ -86,7 +86,7 @@ export default {
         "system": "Fate Everything",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-everything",
-        "description": "A fully customizable fate sheet for whatever you're creative mind can come up with",
+        "description": "A customizable character sheet for whatever you can come up with.",
         "id": "CHARACTERSHEET|fate-everything",
         "name": "Fate Everything",
         "sort": 1,
@@ -110,15 +110,15 @@ export default {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "middle-earth",
-        "description": "Fate Accelerated with custom approaches and conditions for Middle Earth.",
+        "description": "Fate Accelerated customized for Middle Earth.",
         "id": "CHARACTERSHEET|middle-earth",
-        "name": "Middle Earth",
+        "name": "Fate of Middle Earth",
         "sort": 9,
       }, {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "star-trek",
-        "description": "Fate Accelerated with custom approaches for Star Trek.",
+        "description": "Fate Accelerated customized for Star Trek.",
         "id": "CHARACTERSHEET|star-trek",
         "name": "Star Trek Accelerated",
         "sort": 6,
@@ -126,7 +126,7 @@ export default {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "fate-freeport",
-        "description": "Fate Accelerated with custom approaches for Fate Freeport.",
+        "description": "Fate Freeport character sheet.",
         "id": "CHARACTERSHEET|fate-freeport",
         "name": "Fate Freeport",
         "sort": 5,
@@ -134,9 +134,9 @@ export default {
         "system": "Fate Accelerated",
         "object_type": "CHARACTERSHEET",
         "slug": "mouse-guard",
-        "description": "Fate Accelerated with custom approaches and conditions for Mouse Guard. <a target='_blank' href='https://docs.google.com/document/d/1_dNdDGh_GYyFQ8N7wF9iVNBrdhsCHcBUU68qH0bZeLw'>View Fate of the Guard hack</a>",
+        "description": "Fate Accelerated customized for Mouse Guard. <a target='_blank' href='https://docs.google.com/document/d/1_dNdDGh_GYyFQ8N7wF9iVNBrdhsCHcBUU68qH0bZeLw'>View Fate of the Guard hack</a>",
         "id": "CHARACTERSHEET|mouse-guard",
-        "name": "Mouse Guard",
+        "name": "Fate of the Guard",
         "sort": 2,
       },     
       ]      
