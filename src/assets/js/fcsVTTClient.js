@@ -28,7 +28,7 @@ export default class FCSVTTClient {
                     //flipped these on purpose to make the chat output feel better
                     action: msg.character, 
                     character: "Invoked",
-                    description: msg.aspect
+                    description: msg.aspect.trim()
                 };     
                 break;
             case "fatepoint":               
@@ -39,15 +39,15 @@ export default class FCSVTTClient {
                 };  
                 break;
             case "stuntextra":
-                let stuntextra = msg.stuntextra.match(/(.*?):(.*)/);                
+                let stuntextra = msg.stuntextra.match(/(.*?):(.*)/);                                 
                 chatMessage = {
                     character: msg.character, 
-                    action: `Stunt/Gear: _${stuntextra[1].trim()}_`, 
+                    action: `used stunt:\n##### \`${stuntextra[1].trim()}\``,
                     description: stuntextra[2].trim()
                 };                  
                 break;
             case "stress":               
-                subMessage = `${msg.stress ? "Took" : "Recovered"} ${msg.description} stress`;                
+                subMessage = `${msg.stress ? "Took" : "Recovered"} ${msg.description.trim()} stress`;                
                 chatMessage = {
                     character: msg.character, 
                     action: subMessage,                     
@@ -58,7 +58,7 @@ export default class FCSVTTClient {
                 {                    
                     chatMessage = {
                         character: msg.character, 
-                        action: `Gained ${msg.description}`,
+                        action: `Gained ${msg.description.trim()}`,
                         description: msg.consequence,
                     };  
                     
@@ -66,7 +66,7 @@ export default class FCSVTTClient {
                 else {                    
                     chatMessage = {
                         character: msg.character, 
-                        action: `Recovered ${msg.description}`,
+                        action: `Recovered ${msg.description.trim()}`,
                         description: msg.consequence,
                     };  
                 }

@@ -90,7 +90,7 @@
 
           <div v-if="Array.isArray(item.stunts)">
             <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stuntIndex, stunt)">A</span>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stunt.name, stunt.value)">A</span>
               <strong>{{stunt.name}}</strong> {{fixLabel(stunt.value)}}
             </p>
           </div>

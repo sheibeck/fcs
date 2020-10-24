@@ -294,14 +294,27 @@ export default {
             }
           }
           break;
-        case "STRESS":          
-          for (let [key, value] of Object.entries(array)) {
-            let stress = models.SceneStress(key, type)
-            for (let [skey, svalue] of Object.entries(value)) {
-              let stressbox = models.SceneStressBox(svalue)
-              stress.boxes.push(stressbox)
-            }          
-            gameObject.push(stress);
+        case "STRESS":
+          if (thing == "ADVERSARY" && Array.isArray(array)) {                        
+            array.forEach((track) => {
+              let stress = models.SceneStress(track.name, type);
+              let boxes = track.value.split(',');
+              boxes.forEach((box) => { 
+                let stressbox = models.SceneStressBox(box)
+                stress.boxes.push(stressbox)
+              })
+              gameObject.push(stress);
+            });
+          }
+          else {
+            for (let [key, value] of Object.entries(array)) {
+              let stress = models.SceneStress(key, type)
+              for (let [skey, svalue] of Object.entries(value)) {
+                let stressbox = models.SceneStressBox(svalue)
+                stress.boxes.push(stressbox)
+              }          
+              gameObject.push(stress);
+            }
           }
           break;
         case "CONDITION":          
@@ -312,19 +325,38 @@ export default {
           }
           gameObject = gameObject.sort((a, b) => a.name.localeCompare(b.name));
           break;
-        case "CONSEQUENCE":          
-          for (let [key, value] of Object.entries(array)) {
-            let consequence = models.SceneConsequence(key, (thing == "ADVERSARY" ? value : ''), (thing == "CHARACTER" ? value : ''), type);
-            gameObject.push(consequence);
+        case "CONSEQUENCE": 
+          if (thing == "ADVERSARY" && Array.isArray(array)) {                
+            array.forEach((item) => {
+              let consequence = models.SceneConsequence(item.name, item.value, "", type);
+              gameObject.push(consequence);
+            });
+          }
+          else {       
+            for (let [key, value] of Object.entries(array)) {
+              let consequence = models.SceneConsequence(key, (thing == "ADVERSARY" ? value : ''), (thing == "CHARACTER" ? value : ''), type);
+              gameObject.push(consequence);
+            }
           }
           break;
         case "SKILL":
-          for (let [key, value] of Object.entries(array)) {
-            let valIsNum = !isNaN(parseInt(value));      
-            let name = valIsNum ? key : value; //if the value is not a number, then the name is in the value
-            let val = valIsNum ? value : key // if the value is a number, use the value, otherwise the value is in the key
-            let skill = models.SceneSkill(name, val, type);
-            gameObject.push(skill);
+          if (thing == "ADVERSARY" && Array.isArray(array)) {                
+            array.forEach((item) => {
+              let valIsNum = !isNaN(parseInt(item.value));
+              let name = valIsNum ? item.name : item.value; //if the value is not a number, then the name is in the value
+              let val = valIsNum ? item.value : item.name // if the value is a number, use the value, otherwise the value is in the key
+              let skill = models.SceneSkill(name, val, type);
+              gameObject.push(skill);              
+            });
+          }
+          else {
+            for (let [key, value] of Object.entries(array)) {
+              let valIsNum = !isNaN(parseInt(value));      
+              let name = valIsNum ? key : value; //if the value is not a number, then the name is in the value
+              let val = valIsNum ? value : key // if the value is a number, use the value, otherwise the value is in the key
+              let skill = models.SceneSkill(name, val, type);
+              gameObject.push(skill);
+            }
           }
           break;
         case "STUNTEXTRA":          
@@ -343,11 +375,18 @@ export default {
               gameObject.push(stuntextra);
             })
           }
-          else {
-            //adversaries are already an array
-            for (let [key, value] of Object.entries(array)) {            
-              let stuntextra = models.SceneStuntExtra(key, value, type);
-              gameObject.push(stuntextra);
+          else {            
+            if (Array.isArray(array)) {                
+              array.forEach((item) => {
+                let stuntextra = models.SceneStuntExtra(item.name, item.value, type);
+                gameObject.push(stuntextra);
+              });
+            }
+            else {
+              for (let [key, value] of Object.entries(array)) {            
+                let stuntextra = models.SceneStuntExtra(key, value, type);
+                gameObject.push(stuntextra);
+              }
             }
           }
 
