@@ -85,10 +85,10 @@ export default {
           replacement += lineMatch;
         }
         else {
-          if (itemMatch[1] && itemMatch[2]) {            
-            if (this.vttEnabled) {                      
+          if (itemMatch[1] && itemMatch[2]) {
+            if (this.vttEnabled) {
               var roll20Message = itemMatch[0].trim().replace(/\'/g,"").replace(/"/g,'\\\"');
-              let roll20Btn = `<span class='dice fo20' onclick='fcs.$children[0].$children[0].$children[0].$refs.charactersheet.sendToVTT(\"stuntextra\", \"Stunt\", null, \"${roll20Message}\")'>C</span>`;
+              let roll20Btn = `<span class='dice fo20' onclick='fcs.$children[0].$children[0].$children[1].$refs.charactersheet.sendToVTT(\"stuntextra\", \"Stunt\", null, \"${roll20Message}\")'>C</span>`;
               replacement += `${roll20Btn}<strong>${itemMatch[1].trim()}</strong>:${itemMatch[2]}`;
             }
             else {

@@ -48,61 +48,108 @@
 
         <div v-if="!isEmpty(item.aspects)">
           <h5 class='card-header py-0'>Aspects</h5>
-          <p class='card-text px-4 my-0' v-if="item.aspects.high_concept">
-            <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.high_concept)">A</span>
-            <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept)"></span>
-          </p>
-          <p class='card-text px-4 my-0' v-if="item.aspects.trouble">
-            <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.trouble)">A</span>
-            <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble)"></span>
-          </p>
-          <p class='card-text px-4 my-0' v-if="item.aspects.other_aspects">
-            <strong>Aspects</strong> <span v-html="fixLabel(item.aspects.other_aspects, 'aspect')"></span>
-          </p>
+          <div v-if="Array.isArray(item.aspects)">
+            <p v-for="(aspect,index) in item.aspects" :key="index" class='card-text px-4 my-0'>
+              <strong v-if="index==0">High Concept</strong>
+              <strong v-if="index==1">High Concept</strong>
+              <strong v-if="index>1">Aspect</strong>
+              <span v-html="fixLabel(aspect.name, 'aspect')"></span>
+            </p>
+          </div>
+          <div v-else>
+            <p class='card-text px-4 my-0' v-if="item.aspects.high_concept">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.high_concept)">A</span>
+              <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept)"></span>
+            </p>
+            <p class='card-text px-4 my-0' v-if="item.aspects.trouble">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.trouble)">A</span>
+              <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble)"></span>
+            </p>
+            <p class='card-text px-4 my-0' v-if="item.aspects.other_aspects">
+              <strong>Aspects</strong> <span v-html="fixLabel(item.aspects.other_aspects, 'aspect')"></span>
+            </p>
+          </div>
         </div>
 
         <div v-if="!isEmpty(item.skills)">
           <h5 class='card-header py-0'>Skills</h5>
-
-          <p class='card-text px-4 my-0' v-for="(skill, skillIndex) in item.skills" :key="skillIndex">                
-              <strong>{{skillIndex}}</strong> <span v-html="fixLabel(skill, 'skill', skillIndex)"></span>
-          </p>
+          <div v-if="Array.isArray(item.skills)">
+            <p class='card-text px-4 my-0' v-for="(skill, index) in item.skills" :key="index">                
+                <strong>{{skill.name}}</strong> <span v-html="fixLabel(skill.value, 'skill', index)"></span>
+            </p>
+          </div>
+          <div v-else>
+            <p class='card-text px-4 my-0' v-for="(skill, index) in item.skills" :key="index">                
+                <strong>{{index}}</strong> <span v-html="fixLabel(skill, 'skill', index)"></span>
+            </p>
+          </div>
         </div>
 
         <div v-if="!isEmpty(item.stunts)">
           <h5 class='card-header py-0'>Stunts &amp; Extras</h5>
 
+          <div v-if="Array.isArray(item.stunts)">
             <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex">
-            <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stuntIndex, stunt)">A</span>
-            <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
-          </p>
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stunt.name, stunt.value)">A</span>
+              <strong>{{stunt.name}}</strong> {{fixLabel(stunt.value)}}
+            </p>
+          </div>
+          <div v-else>
+            <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stuntIndex, stunt)">A</span>
+              <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
+            </p>
+          </div>
         </div>
 
         <div v-if="!isEmpty(item.stress)">
           <h5 class='card-header py-0'>Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></h5>
 
-          <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress" :key="stressMainIndex">                
-              <strong>{{stressMainIndex}}</strong>
-              <span v-for="(stressValue, stressIndex) in stressMain" :key="stressIndex">
-                <input type='checkbox' v-bind:value='stressValue' @change="sendToVTT(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
-              </span>
-          </p>
+          <div v-if="Array.isArray(item.stunts)">
+            <p class='card-text px-4 my-0' v-for="(stressTrack, index) in item.stress" :key="index">
+                <strong>{{stressTrack.name}}</strong>
+                <span v-for="(stressBox, boxIndex) in getStressBoxes(stressTrack.value)" :key="boxIndex">
+                  <input type='checkbox' v-bind:value='stressBox.value' @change="sendToVTT(`stress`, `${stressBox}${stressTrack.name !== 'Stress' ? ' '+stressTrack.name : ''}`, $event.target.checked)">{{stressBox}}
+                </span>
+            </p>
+          </div>
+          <div v-else>
+            <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress" :key="stressMainIndex">                
+                <strong>{{stressMainIndex}}</strong>
+                <span v-for="(stressValue, stressIndex) in stressMain" :key="stressIndex">
+                  <input type='checkbox' v-bind:value='stressValue' @change="sendToVTT(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
+                </span>
+            </p>
+          </div>
         </div>
 
         <div v-if="!isEmpty(item.consequences)">
           <h5 class='card-header py-0'>Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></h5>
 
-          <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex">
-            <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'invoke', consequences[conIndex])">A</span>
-            <strong>{{conIndex}}</strong> <span v-html="fixLabel(con)"></span>
-            <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(`consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
-          </p>
+          <div v-if="Array.isArray(item.stunts)">
+            <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'invoke', consequences[conIndex])">A</span>
+              <span v-html="fixLabel(con)"></span> <strong>{{con.value}}</strong> 
+              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(`consequence`, `${con.name} ${con.value}`, $event.target.value, conIndex)">
+            </p>
+          </div>
+          <div v-else>
+            <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'invoke', consequences[conIndex])">A</span>
+              <strong>{{conIndex}}</strong> <span v-html="fixLabel(con)"></span>
+              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(`consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
+            </p>
+          </div>
         </div>
 
         <div class='card-footer'>
             <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.system' v-on:click="searchByTag">{{item.system}}</span>
             <span class='badge badge-dark js-adversary-tag' v-bind:data-search-text='item.genre' v-on:click="searchByTag">{{item.genre}}</span>
             <span v-bind:class="badgeColor(item.type) + ' badge js-adversary-tag'" v-bind:data-search-text='item.type' v-on:click="searchByTag">{{item.type}}</span>
+            <span v-for="tag in item.tags" class='badge badge-secondary mr-1' style="cursor: pointer;" :key="tag.text"
+              v-bind:data-search-text='tag.text' v-on:click="searchByTag">                
+              {{tag.text}}
+            </span>
         </div>
       </div>
     </div>
@@ -235,8 +282,14 @@ export default {
       }        
     },
     fixLabel: function (val, type, data) {
-      let result = val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-      
+      let result = val;     
+      if (!val.name) {
+        result = val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+      }
+      else {
+        result = val.name.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+      }   
+        
       if (this.vttEnabled && type) {
         let r20result = "";
         let separator = type == "aspect" ? ";" : ",";
@@ -244,7 +297,7 @@ export default {
 
         items.forEach( function (item, index) {
           item = item.trim();
-          if (index > 0) r20result+=", ";
+          if (index > 0) r20result+=`${separator} `;
           
           switch(type) {
             case "skill":              
@@ -299,7 +352,7 @@ export default {
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },
-    sendToVTT(type, description, data, data2) {  
+    sendToVTT(type, description, data, data2) {       
       if (!this.vttEnabled) return;
 
       let character = this.adversaries[0].name;
@@ -437,6 +490,14 @@ export default {
           this.moreAdversaries = false;
         }
       }      
+    },  
+    getStressBoxes(obj) {
+      if (Array.isArray(obj)) {
+        return obj;
+      }
+      else {
+        return obj.split(',');
+      }
     }
   }
 }
