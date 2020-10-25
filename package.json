@@ -9,8 +9,8 @@
     "prod": "webpack --config build/webpack.config.prod.js",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
-    "test:unit": "jest --config test/jest.config.js",
-    "test": "npm run lint && npm run test:unit",
+    "test:unit": "jest",
+    "test": "npm run test:unit",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config test/jest.config.js"
   },
   "keywords": [
@@ -19,6 +19,24 @@
   ],
   "author": "Sterling Heibeck",
   "license": "GPLV3",
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",      
+      "vue"
+    ],
+    "transform": {      
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest",      
+      ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest"
+    },    
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^.+\\.(css|less)$": "<rootDir>/test/CSSStub.js"
+    },    
+    "snapshotSerializers": [
+      "<rootDir>/node_modules/jest-serializer-vue"
+    ]
+  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
     "@johmun/vue-tags-input": "^2.1.0",

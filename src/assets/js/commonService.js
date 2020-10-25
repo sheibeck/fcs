@@ -1,7 +1,7 @@
-import Noty from 'noty'
+import Noty from 'noty';
 import 'noty/lib/noty.css';
 import 'noty/lib/themes/metroui.css';
-import shortid from 'shortid'
+import shortid from 'shortid';
 import * as Sentry from '@sentry/browser';
 import {version} from '../../../package.json';
 
