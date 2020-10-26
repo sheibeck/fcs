@@ -68,11 +68,13 @@ export default {
     toggleEdit() {      
       this.editing = !this.editing;     
       if (!this.editing == true) {
-        this.$parent.$parent.$parent.save();
+        this.$emit('save-character');
       } 
     },
     sendToVTT(skillName, modifier) {      
       if (!skillName) return;      
+      //plus character throws an error when sending messages.      
+      modifier = modifier.replace("+","");
       this.$parent.sendToVTT('skill', skillName, null, modifier, 'skill');
     }
   }

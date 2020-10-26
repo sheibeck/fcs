@@ -17,7 +17,7 @@
                     <div for="fatepoints" class="fate-header">
 						FP <span v-if="vttEnabled" class='dice fo20 font-weight-normal small'>A</span>
 					</div>
-                    <inputfatepoints />
+                    <inputfatepoints v-on="$listeners" />
                 </div>
             </div>
         </div>
@@ -47,21 +47,21 @@
                 <div for="" class="fate-header">Aspects</div>
             </div>            
             <div v-for="aspect in aspects" :key="aspect.obj" class="p-0 m-0">
-				<inputaspect :aspect="aspect" />
+				<inputaspect :aspect="aspect" v-on="$listeners" />
 			</div>    
         </div>
 
         <div class="col-sm-12 col-md-6 fate-skills">                       
-            <inputskillpyramid :skills="skills" header="Skills" :skillList="skillList" />            
+            <inputskillpyramid :skills="skills" header="Skills" :skillList="skillList" v-on="$listeners" />            
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-12 col-md-6">
-            <inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
+            <inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" v-on="$listeners" />
         </div>
         <div class="col-sm-12 col-md-6">
-           <inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
+           <inputstuntextra item="extras" :rows="25" :border="true" header="Extras" v-on="$listeners" />
         </div>
     </div>
 
@@ -73,7 +73,7 @@
             </div>
             <div class="d-flex d-flex justify-content-between">
 				<div v-for="stress in physicalstress" :key="stress.obj">
-					<inputstress :stress="stress" stresstype="Physical" />
+					<inputstress :stress="stress" stresstype="Physical" v-on="$listeners" />
 				</div>
 			</div>
 
@@ -83,7 +83,7 @@
             </div>
             <div class="d-flex justify-content-between">
 				<div v-for="stress in mentalstress" :key="stress.obj">
-					<inputstress :stress="stress" stresstype="Mental" />
+					<inputstress :stress="stress" stresstype="Mental" v-on="$listeners"  />
 				</div>
 			</div>
         </div>
@@ -92,7 +92,7 @@
                 <div class="fate-header col-12">Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div v-for="consequence in consequences" :key="consequence.obj">
-                <inputconsequence :consequence="consequence" />
+                <inputconsequence :consequence="consequence" v-on="$listeners" />
             </div>
         </div>
 
@@ -180,7 +180,8 @@ export default {
     setVal(arr, val) {        
         this.$parent.setVal(this.character, arr, val);        
     },
-    sendToVTT(type, label, obj, item, skillType) {        
+    sendToVTT(type, label, obj, item, skillType) {      
+        debugger;  
 		switch(type)
 		{			
 			case "fatepoint":

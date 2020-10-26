@@ -53,8 +53,8 @@ export default {
   methods: {
     toggleEdit() {      
       this.stuntEdit = !this.stuntEdit;     
-      if (!this.stuntEdit == true) {
-        this.$parent.$parent.$parent.save();
+      if (!this.stuntEdit == true) {        
+        this.$emit('save-character');
       } 
     },
     addStunt(item) {      

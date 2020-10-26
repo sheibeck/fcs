@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-2">      
     <form>
-      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" />
+      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" @save-character="save"/>
 
       <div class="d-print-none">
         <hr/>

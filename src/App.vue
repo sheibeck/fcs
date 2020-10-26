@@ -179,15 +179,7 @@ export default {
       };
 
       commonSvc.SetupForEnvironment();
-
-      // initialize the application
-      //domEvents();
-      $(document).on('keyup', '#search-text', function (event) {
-        if (event.keyCode === 13) {
-            $("#search-button").click();
-        }
-      });          
-
+     
       AWS.config.region = 'us-east-1';      
       
       userSvc.Authenticate();

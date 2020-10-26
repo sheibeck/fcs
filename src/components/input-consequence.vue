@@ -75,7 +75,7 @@ export default {
 
       this.$parent.sendToVTT('invoke', label, "consequences", this.consequence.obj);
     },
-    setVal(arr, val) {       
+    setVal(arr, val) {
       if (this.vttEnabled) {
         let label = this.consequence.label;
         if (this.customlabel) {
@@ -88,10 +88,11 @@ export default {
         
         this.$parent.sendToVTT("consequence", label, arr, val);
         this.$parent.setVal(arr, val);
-        this.$parent.$parent.$parent.save();
+        this.$emit('save-character');
       } 
       else {
         this.$parent.setVal(arr, val);
+        this.$emit('save-character');
       }
     },
     skillHasValue() {      

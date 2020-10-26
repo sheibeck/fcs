@@ -40,7 +40,7 @@ export default {
         }
  
         this.$parent.setVal(arr, val);
-        this.$parent.$parent.$parent.save();
+        this.$emit('save-character');
       } 
       else 
       {

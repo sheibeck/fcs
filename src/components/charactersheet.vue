@@ -1,6 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet"></component>
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners"></component>
      
   </div>
 </template>

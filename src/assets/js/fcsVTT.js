@@ -11,7 +11,8 @@ export default class FCSVTT {
         })();
     }  
 
-    SendMessage = (msg) => {        
+    SendMessage = (msg) => {  
+        debugger;      
         try {     
             window.opener.postMessage({type: "fcsVTT", data: msg});
         } 

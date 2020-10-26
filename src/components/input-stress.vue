@@ -53,7 +53,7 @@ export default {
           label = this.stresstype ? `${this.stress.label} ${this.stresstype}` : this.stress.label;
         }
         this.$parent.sendToVTT("stress", label, arr, val);      
-        this.$parent.$parent.$parent.save();
+        this.$emit('save-character');
       } 
     },
     skillHasValue() {

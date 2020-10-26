@@ -54,7 +54,7 @@ export default {
       if (this.vttEnabled) {        
         this.$parent.sendToVTT("condition", label, arr, val);
         this.$parent.setVal(arr, val);
-        this.$parent.$parent.$parent.save();
+        this.$emit('save-character');
       } 
       else {
         this.$parent.setVal(arr, val);
