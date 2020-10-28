@@ -1,7 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners"></component>
-     
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners"></component>     
   </div>
 </template>
 
@@ -75,57 +74,42 @@ export default {
     }
   },
   methods: {
+    formatVTTMessage(type, character, description, data, skillType)
+    {
+      let msg;
+      switch(type) {
+        case "diceroll":          
+          msg = models.MsgDiceRoll(character, skillType, description, data);
+          break;
+        case "invoke":
+          msg = models.MsgInvoke(character, description, data);
+          break;
+        case "stuntextra":
+          msg = models.MsgStuntExtra(character, data);
+          break;
+        case "fatepoint":          
+          msg = models.MsgFatePoint(character, description, data);
+          break;
+        case "stress":
+        case "condition":
+          msg = models.MsgStress(character, description, data);
+          break;
+        case "consequence":
+          msg = models.MsgConsequence(character, description, data);
+          break;      
+      }
+
+      return msg;
+    },
+
     sendToVTT(type, character, description, data, skillType) {         
-      let msg = null;
+      let msg = this.formatVTTMessage(type, character, description, data, skillType);
       
       switch (this.vttEnabled) {
-        case "fcsVtt":
-          switch(type) {
-            case "diceroll":          
-              msg = models.MsgDiceRoll(character, skillType, description, data);
-              break;
-            case "invoke":
-              msg = models.MsgInvoke(character, description, data);
-              break;
-            case "stuntextra":
-              msg = models.MsgStuntExtra(character, data);
-              break;
-            case "fatepoint":          
-              msg = models.MsgFatePoint(character, description, data);
-              break;
-            case "stress":
-            case "condition":
-              msg = models.MsgStress(character, description, data);
-              break;
-            case "consequence":
-              msg = models.MsgConsequence(character, description, data);
-              break;      
-          }
+        case "fcsVtt":          
           fcsVtt.SendMessage(msg);
           break;
-
-        case "roll20":
-          switch(type) {
-            case "diceroll":          
-              msg = models.MsgDiceRoll(character, skillType, description, data);
-              break;
-            case "invoke":
-              msg = models.MsgInvoke(character, description, data);
-              break;
-            case "stuntextra":
-              msg = models.MsgStuntExtra(character, data);
-              break;
-            case "fatepoint":          
-              msg = models.MsgFatePoint(character, description, data);
-              break;
-            case "stress":
-            case "condition":
-              msg = models.MsgStress(character, description, data);
-              break;
-            case "consequence":
-              msg = models.MsgConsequence(character, description, data);
-              break;      
-          }
+        case "roll20":         
           fateOf20.SendMessage(msg);
           break;      
       }
