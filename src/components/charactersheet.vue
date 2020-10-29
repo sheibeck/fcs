@@ -24,7 +24,7 @@ import SheetFateFreeport from "./../sheets/fate-freeport"
 import SheetFateOfCthulhu from "./../sheets/fate-of-cthulhu"
 import SheetMouseGuard from "./../sheets/mouse-guard"
 import SheetStarTrek from "./../sheets/star-trek"
-import SheetFateEverything from "./../sheets/fate-everything"
+import SheetFateAnything from "./../sheets/fate-anything"
 
 let commonSvc = null;
 let fateOf20 = null;
@@ -51,7 +51,7 @@ export default {
     "fate-of-cthulhu": SheetFateOfCthulhu,
     "mouse-guard": SheetMouseGuard,
     "star-trek": SheetStarTrek,
-    "fate-everything": SheetFateEverything,
+    "fate-anything": SheetFateAnything,
   },
   props: {
     sheetid: String,

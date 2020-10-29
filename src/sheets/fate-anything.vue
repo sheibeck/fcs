@@ -1,8 +1,8 @@
 <template>
 <div class="sheet">
 	<div class="row">		
-		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
-			<img alt="Fate Everything" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />
+		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right">
+			<img alt="Fate Anything" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />			
 		</div>
 
 		<div class="col-sm-6 d-flex flex-column flex-md-row order-md-1">
@@ -119,7 +119,7 @@ import InputStuntExtra from '../components/input-stuntextra'
 import InputFatePoints from '../components/input-fatepoints'
 
 export default {
-  name: 'SheetFateEverything',
+  name: 'SheetFateAnything',
   components: {
 	"inputskill": InputSkillColumn,    
 	"inputaspect": InputAspect,
@@ -140,7 +140,7 @@ export default {
 	this.init();
   },
   mounted() {
-	this.$parent.$parent.title = 'Fate Everything (Character Sheet)';
+	this.$parent.$parent.title = 'Fate Anything (Character Sheet)';
   },
   data () {
     return {

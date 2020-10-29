@@ -83,12 +83,12 @@ export default {
         "customizable": true,
         "sort": 7,
       }, {
-        "system": "Fate Everything",
+        "system": "Fate Anything",
         "object_type": "CHARACTERSHEET",
-        "slug": "fate-everything",
-        "description": "A customizable character sheet for whatever you can come up with.",
-        "id": "CHARACTERSHEET|fate-everything",
-        "name": "Fate Everything",
+        "slug": "fate-anything",
+        "description": "A customizable character sheet for anything you can come up with.",
+        "id": "CHARACTERSHEET|fate-anything",
+        "name": "Fate Anything",
         "sort": 1,
       }, {
         "system": "Dresden Files Accelerated",
