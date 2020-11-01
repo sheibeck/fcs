@@ -138,7 +138,7 @@
       </div>
 
       <div id="game-table" class="d-flex">
-        <div id="canvas-wrapper" v-dragscroll.noleft="true" class="mr-auto">
+        <div id="canvas-wrapper" ref="dragscroll" v-dragscroll.noleft="true" class="mr-auto">
           <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
@@ -609,7 +609,7 @@ export default {
       });
       
       window.addEventListener("beforeunload", (e) => {        
-        if (this.isSceneRunning || (this.gameClient.conn && this.gameClient.conn.open)) {
+        if (this.isSceneRunning || (this.gameClient && this.gameClient.conn && this.gameClient.conn.open)) {
           e.returnValue = 'Your scene is still running! You should shut it down before you exit this page. Do you still want to leave?';          
         }        
       });
