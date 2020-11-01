@@ -176,7 +176,7 @@ export default class CommonService {
     const packageVersion = version;
 
     if (currentVersion === null || currentVersion !== packageVersion) {
-      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/v${packageVersion}">v${packageVersion}</a>`;
+      let msg = `<i class="fas fa-bullhorn"></i> Click to see what's new in <a target="_blank" href="https://github.com/sheibeck/fcs/releases/tag/${packageVersion}">v${packageVersion}</a>`;
       let dismiss = `localStorage.setItem('fcsVersion', '${packageVersion}')`;
       this.ShowAlert(msg, "info", dismiss);
     } 
