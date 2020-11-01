@@ -1,7 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet"></component>
-     
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners"></component>     
   </div>
 </template>
 
@@ -25,6 +24,7 @@ import SheetFateFreeport from "./../sheets/fate-freeport"
 import SheetFateOfCthulhu from "./../sheets/fate-of-cthulhu"
 import SheetMouseGuard from "./../sheets/mouse-guard"
 import SheetStarTrek from "./../sheets/star-trek"
+import SheetFateAnything from "./../sheets/fate-anything"
 
 let commonSvc = null;
 let fateOf20 = null;
@@ -51,6 +51,7 @@ export default {
     "fate-of-cthulhu": SheetFateOfCthulhu,
     "mouse-guard": SheetMouseGuard,
     "star-trek": SheetStarTrek,
+    "fate-anything": SheetFateAnything,
   },
   props: {
     sheetid: String,
@@ -73,110 +74,51 @@ export default {
     }
   },
   methods: {
+    formatVTTMessage(type, character, description, data, skillType)
+    {
+      let msg;
+      switch(type) {
+        case "diceroll":          
+          msg = models.MsgDiceRoll(character, skillType, description, data);
+          break;
+        case "invoke":
+          msg = models.MsgInvoke(character, description, data);
+          break;
+        case "stuntextra":
+          msg = models.MsgStuntExtra(character, data);
+          break;
+        case "fatepoint":          
+          msg = models.MsgFatePoint(character, description, data);
+          break;
+        case "stress":
+        case "condition":
+          msg = models.MsgStress(character, description, data);
+          break;
+        case "consequence":
+          msg = models.MsgConsequence(character, description, data);
+          break;      
+      }
+
+      return msg;
+    },
+
     sendToVTT(type, character, description, data, skillType) {         
-      let msg = null;
+      let msg = this.formatVTTMessage(type, character, description, data, skillType);
       
       switch (this.vttEnabled) {
-        case "fcsVtt":
-          switch(type) {
-            case "diceroll":          
-              msg = models.MsgDiceRoll(character, skillType, description, data);
-              break;
-            case "invoke":
-              msg = models.MsgInvoke(character, description, data);
-              break;
-            case "stuntextra":
-              msg = models.MsgStuntExtra(character, data);
-              break;
-            case "fatepoint":          
-              msg = models.MsgFatePoint(character, description, data);
-              break;
-            case "stress":
-            case "condition":
-              msg = models.MsgStress(character, description, data);
-              break;
-            case "consequence":
-              msg = models.MsgConsequence(character, description, data);
-              break;      
-          }
+        case "fcsVtt":          
           fcsVtt.SendMessage(msg);
           break;
-
-        case "roll20":
-          switch(type) {
-            case "diceroll":          
-              msg = models.MsgDiceRoll(character, skillType, description, data);
-              break;
-            case "invoke":
-              msg = models.MsgInvoke(character, description, data);
-              break;
-            case "stuntextra":
-              msg = models.MsgStuntExtra(character, data);
-              break;
-            case "fatepoint":          
-              msg = models.MsgFatePoint(character, description, data);
-              break;
-            case "stress":
-            case "condition":
-              msg = models.MsgStress(character, description, data);
-              break;
-            case "consequence":
-              msg = models.MsgConsequence(character, description, data);
-              break;      
-          }
+        case "roll20":         
           fateOf20.SendMessage(msg);
           break;      
       }
     },
     getVal(obj, graphPath, defaultValue){
-      var parts = graphPath.split(".");
-      var root = obj;
-
-      for (var i = 0; i < parts.length; i++)
-      {
-        var part = parts[i];
-        //account for false values in checkboxes
-        if ((root[part] || root[part] == false) && root.hasOwnProperty(part))
-          root = root[part];
-        else
-          return (defaultValue || "");
-      }
-
-      return eval(`obj.${graphPath}`);
+      return commonSvc.getVal(obj, graphPath, defaultValue);
     },
     setVal(obj, arr, val) {      
-      arr = arr.split(".");
-      
-      if (arr.length == 1)
-      {
-        Vue.set(obj, arr[0], val);       
-      }
-      if (arr.length == 2)
-      {        
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        Vue.set(obj[arr[0]], arr[1], val);  
-      }
-      if (arr.length == 3)
-      {
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        Vue.set(obj[arr[0]][arr[1]], arr[2], val);             
-      }
-      if (arr.length == 4)
-      {
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
-        Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], val);        
-      }
-      if (arr.length == 5)
-      {
-        if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
-        if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
-        if (!obj[arr[0]][arr[1]][arr[2]])Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], {});
-        Vue.set(obj[arr[0]][arr[1]][arr[2]][arr[3]], arr[4], val);
-      }
+      commonSvc.setVal(obj, arr, val, Vue);
     },
     GetSheetImage(){
       return `/static/sheets/${commonSvc.GetId(this.sheetid)}/logo.png`;

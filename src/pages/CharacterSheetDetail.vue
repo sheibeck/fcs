@@ -26,6 +26,11 @@
             <label class='' for='image_url'>Description:</label>
             <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
           </div>
+          <vue-tags-input              
+              v-model="tag"              
+              :tags="characterData.tags"
+              @tags-changed="newTags => updateTags(newTags)"
+            />
         </div>
       </div>
       
@@ -38,6 +43,7 @@ import { mapGetters } from 'vuex'
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import CharacterSheet from '../components/charactersheet'
+import VueTagsInput from '@johmun/vue-tags-input';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -45,11 +51,12 @@ let dbSvc = null;
 export default {
   name: 'CharacterSheetDetail',
   components: {
-    "charactersheet": CharacterSheet,    
+    "charactersheet": CharacterSheet, 
+    VueTagsInput   
   },
   metaInfo() {
     return {
-       title: this.title,
+       title: this.pageTitle,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -67,6 +74,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'pageTitle',
     ]), 
   },
   data () {
@@ -77,11 +85,15 @@ export default {
       title: "",
       description: "",
       characterData: {        
-        related_id: `CHARACTERSHEET|${this.$route.params.id}`
+        related_id: `CHARACTERSHEET|${this.$route.params.id}`        
       },
+      tag: "",
     }
   },
   methods : {
+    updateTags(newTags) {      
+      this.characterData.tags = newTags;     
+    },   
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },    
@@ -104,6 +116,7 @@ export default {
         this.characterId = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());        
         characterData.id = this.characterId;
         characterData.object_type = "CHARACTER";
+        characterData.search_data = commonSvc.parseSearchData(characterData);
 
         let response = await dbSvc.SaveObject(characterData).then((response) => {
           if (response) {

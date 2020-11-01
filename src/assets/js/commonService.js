@@ -1,7 +1,7 @@
-import Noty from 'noty'
+import Noty from 'noty';
 import 'noty/lib/noty.css';
 import 'noty/lib/themes/metroui.css';
-import shortid from 'shortid'
+import shortid from 'shortid';
 import * as Sentry from '@sentry/browser';
 import {version} from '../../../package.json';
 
@@ -238,6 +238,95 @@ export default class CommonService {
         }
         sibling = sibling.nextSibling
       }
+    }
+  }
+
+  parseSearchData(data) {    
+    var searchData = [];
+    this.addSearchKey("name", data.name, searchData);
+    if (data.aspects) {
+      let highconcept = data.aspects.highconcept;
+      if (!highconcept) highconcept = data.aspects.high_concept;
+      if (!highconcept && Object.keys(data.aspects).length > 0) highconcept =  data.aspects[Object.keys(data.aspects).sort()[0]];
+      this.addSearchKey("highconcept", highconcept, searchData);
+
+      let trouble = data.aspects.trouble;            
+      if (!trouble && Object.keys(data.aspects).length > 1) trouble =  data.aspects[Object.keys(data.aspects).sort()[1]];
+      this.addSearchKey("trouble", trouble, searchData);
+
+      this.addSearchKey("aspects", data.aspects.other_aspects, searchData);
+    }
+    this.addSearchKey("object_type", data.object_type, searchData);
+    this.addSearchKey("system", data.system, searchData);
+    this.addSearchKey("genre", data.genre, searchData);
+    this.addSearchKey("related_id", data.related_id, searchData);
+    this.addSearchKey("type", data.type, searchData);
+
+    if (data.tags) {
+      let tags = data.tags.map(function(elem){
+        return elem.text.toLowerCase();
+      }).join(",");
+      this.addSearchKey("tags", tags, searchData);
+    }
+
+    return searchData.join("||");
+  }
+  addSearchKey(key, value, searchData) {
+    if (value) {
+      searchData.push(`${key}=${value.toLowerCase()}`);
+    }
+  }
+
+
+  getVal(obj, graphPath, defaultValue){
+    var parts = graphPath.split(".");
+    var root = obj;
+
+    for (var i = 0; i < parts.length; i++)
+    {
+      var part = parts[i];
+      //account for false values in checkboxes
+      if ((root[part] || root[part] == false) && root.hasOwnProperty(part))
+        root = root[part];
+      else
+        return (defaultValue || "");
+    }
+
+    return eval(`obj.${graphPath}`);
+  }
+
+  setVal(obj, arr, val, Vue) {      
+    arr = arr.split(".");
+    
+    if (arr.length == 1)
+    {
+      Vue.set(obj, arr[0], val);       
+    }
+    if (arr.length == 2)
+    {        
+      if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+      Vue.set(obj[arr[0]], arr[1], val);  
+    }
+    if (arr.length == 3)
+    {
+      if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+      if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
+      Vue.set(obj[arr[0]][arr[1]], arr[2], val);             
+    }
+    if (arr.length == 4)
+    {
+      if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+      if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
+      if (!obj[arr[0]][arr[1]][arr[2]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
+      Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], val);        
+    }
+    if (arr.length == 5)
+    {
+      if (!obj[arr[0]]) Vue.set(obj, arr[0], {});
+      if (!obj[arr[0]][arr[1]]) Vue.set(obj[arr[0]], arr[1], {});
+      if (!obj[arr[0]][arr[1]][arr[2]]) Vue.set(obj[arr[0]][arr[1]], arr[2], {});
+      if (!obj[arr[0]][arr[1]][arr[2]][arr[3]])Vue.set(obj[arr[0]][arr[1]][arr[2]], arr[3], {});
+      Vue.set(obj[arr[0]][arr[1]][arr[2]][arr[3]], arr[4], val);
     }
   }
 }

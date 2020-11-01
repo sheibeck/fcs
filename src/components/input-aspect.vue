@@ -1,11 +1,20 @@
 <template>
   <div class="form-group">    
-    <div v-if="showlabel">
-      <label>{{aspect.label}}</label>
+    <div v-if="showlabel" class="d-flex">
+      <!--custom labels-->      
+      <input v-if="customlabel" class="w-100 mr-auto inputlabel" type="text" 
+        @change="$parent.setVal(`${aspect.label}`,  $event.target.value)" 
+        :value="$parent.getVal(`${aspect.label}`)" :placeholder="aspect.placeholder" />
+      <label v-else>{{aspect.label}}</label>
+
+      <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
+        <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
+      </button>
     </div>
     <div class="d-flex">
       <span v-if="vttEnabled" class="dice fo20 pt-2 pr-1" v-on:click="sendToVTT('invoke', 'aspect', 'aspects', aspect.obj)">C</span>      
-      <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" :value="$parent.getVal(aspect.obj)" :placeholder="aspect.label" />      
+      <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" 
+        :value="$parent.getVal(aspect.obj)" :placeholder="getPlaceHolder" />
     </div>
   </div>
 </template>
@@ -18,12 +27,26 @@ export default {
   props: {
     aspect: Object,    
     showlabel: Boolean,
+    removable: Boolean,
+    customlabel: Boolean,
   },
   computed: {
  	  ...mapGetters([
       'isAuthenticated',
       'vttEnabled'
     ]),   
+    getPlaceHolder() {        
+      if (this.customlabel) {
+        let labelValue = this.$parent.getVal(this.aspect.label);
+        if (labelValue) {
+          return labelValue;
+        }
+        else {
+          return this.aspect.placeholder;
+        }
+      }
+      return this.aspect.label;
+    }
   },
   data () {
     return {
@@ -34,6 +57,9 @@ export default {
       if (!this.aspect || !this.aspect.label) return;   
       let label = `aspect ${this.aspect.label}`;
       this.$parent.sendToVTT('invoke', label, "aspects", this.aspect.obj);
+    },
+    removeAspect(id) {      
+      this.$emit('remove-aspect', id);
     }
   }
 }

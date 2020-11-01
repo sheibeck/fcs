@@ -97,7 +97,7 @@
             </div>
             <div class="d-flex d-flex justify-content-between">
 				<div v-for="stress in corruption" :key="stress.obj">
-					<inputstress :stress="stress" stresstype="Corruption" hidelabel="true" />
+					<inputstress :stress="stress" stresstype="Corruption" :hidelabel="true" />
 				</div>
 			</div>
         </div>
@@ -143,7 +143,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate Freeport (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate Freeport (Character Sheet)');
   },
   data () {
     return {

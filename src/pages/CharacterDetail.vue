@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-2">      
     <form>
-      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" />
+      <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" @save-character="save"/>
 
       <div class="d-print-none">
         <hr/>
@@ -34,6 +34,13 @@
         <div class='row' v-if="!isAuthenticated">           
           <input type="hidden" id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
         </div>
+
+        <vue-tags-input
+              v-if="characterData !== null"
+              v-model="tag"              
+              :tags="characterData.tags"
+              @tags-changed="newTags => updateTags(newTags)"
+            />
       </div>
 
     </form>
@@ -45,6 +52,7 @@ import { mapGetters } from 'vuex';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import CharacterSheet from '../components/charactersheet'
+import VueTagsInput from '@johmun/vue-tags-input';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -52,11 +60,12 @@ let dbSvc = null;
 export default {
   name: 'CharacterDetail',
   components: {
-    "charactersheet": CharacterSheet,    
+    "charactersheet": CharacterSheet,
+    VueTagsInput
   },
   metaInfo() {    
     return {
-       title: `${this.characterData ? this.characterData.name : this.title}`,
+       title: `${this.characterData ? this.characterData.name : this.pageTitle}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -73,6 +82,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'pageTitle',
     ]),
     isOwner() {      
       return this.characterData && this.characterData.owner_id == this.userId;
@@ -91,10 +101,14 @@ export default {
       title: "",
       description: "",
       characterid: null,      
-      characterData: null,        
+      characterData: null,      
+      tag: "",        
     }
   },
-  methods : {    
+  methods : {
+    updateTags(newTags) {
+      this.characterData.tags = newTags;     
+    },   
     exists(parent, value, defaultValue) {
       return parent && parent[value] ? parent[value] : (defaultValue || "");
     },
@@ -115,9 +129,10 @@ export default {
 
         // make sure we have a proper user id key
         characterData.owner_id = this.userId;
-        characterData.related_id = this.sheetId;        
+        characterData.related_id = this.sheetId;
         characterData.slug = commonSvc.Slugify(characterData.name);
         characterData.object_type = "CHARACTER";
+        characterData.search_data = commonSvc.parseSearchData(characterData);
 
         let response = await dbSvc.SaveObject(characterData).then((response) => { 
           if (response) {

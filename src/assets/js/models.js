@@ -26,7 +26,7 @@ export default class Models {
     MsgStuntExtra = (character, stuntextra) => {
         return {
             type: "stuntextra",
-            character: character,            
+            character: character,
             stuntextra: stuntextra,
         }
     }

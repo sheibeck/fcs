@@ -140,7 +140,7 @@ components: {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Mouse Guard (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Mouse Guard (Character Sheet)');
   },
   data () {
     return {

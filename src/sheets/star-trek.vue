@@ -122,7 +122,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Star Trek (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Star Trek (Character Sheet)');
   },
   data () {
     return {

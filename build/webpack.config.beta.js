@@ -14,7 +14,7 @@ module.exports = merge(baseConfig, {
 
   output: {
     filename: '[name].[hash].js',
-    sourceMapFilename: "[name].js.map",
+    sourceMapFilename: "[name].[hash].js.map",
     publicPath: "/",
   },
   devtool: "source-map",

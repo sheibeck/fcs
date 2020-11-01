@@ -138,7 +138,7 @@
       </div>
 
       <div id="game-table" class="d-flex">
-        <div id="canvas-wrapper" v-dragscroll.noleft="true" class="mr-auto">
+        <div id="canvas-wrapper" ref="dragscroll" v-dragscroll.noleft="true" class="mr-auto">
           <div id="scene-canvas" class="bg-light mt-2" data-dragscroll>
             <!-- zones -->        
             <scenezone :zone="zone" v-for="zone in scene.zones" :key="zone.id" class="panzoom-exclude"  />        
@@ -181,7 +181,7 @@
           </div>
         </div>
         <div v-if="showchat" id="chat" class="d-flex flex-column h-100">
-          <VueShowdown id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="vueShowdownOpts" :markdown="chatLog" />          
+          <VueShowdown ref="chatlog" id="chat-log" class="border mb-1 px-1" style="width:300px !important;overflow-wrap: break-word; word-wrap: break-word;" :options="vueShowdownOpts" :markdown="chatLog" />          
           <textarea rows="3" id="chat-input" v-model="chatMessage" class="w-100 mr-1" v-on:keyup.enter="sendChatMessage()"></textarea>
           <div class="d-flex mt-1">
             <select v-model="selectedPlayer" class="form-control mr-1">
@@ -533,18 +533,24 @@ export default {
         let playerId = e.detail.playerId;
         let action = e.detail.type;
 
+        if (!this.gameClient || !this.gameClient.myStream) return;
+
         switch(action) { 
-          case "mute":       
-            this.gameClient.myStream.getAudioTracks()[0].enabled = false;
+          case "mute":
+            if (this.gameClient.myStream.getAudioTracks().length > 0)
+              this.gameClient.myStream.getAudioTracks()[0].enabled = false;
             break;
           case "unmute":
-            this.gameClient.myStream.getAudioTracks()[0].enabled = true;
+            if (this.gameClient.myStream.getAudioTracks().length > 0)
+              this.gameClient.myStream.getAudioTracks()[0].enabled = true;
             break;
           case "pause":            
-            this.gameClient.myStream.getVideoTracks()[0].enabled = false;
+            if(this.gameClient.myStream.getVideoTracks().length > 0)
+              this.gameClient.myStream.getVideoTracks()[0].enabled = false;
             break;
           case "play":
-            this.gameClient.myStream.getVideoTracks()[0].enabled = true;
+            if (this.gameClient.myStream.getVideoTracks().length > 0)
+              this.gameClient.myStream.getVideoTracks()[0].enabled = true;
             break;
         }          
       });
@@ -603,7 +609,7 @@ export default {
       });
       
       window.addEventListener("beforeunload", (e) => {        
-        if (this.isSceneRunning || (this.gameClient.conn && this.gameClient.conn.open)) {
+        if (this.isSceneRunning || (this.gameClient && this.gameClient.conn && this.gameClient.conn.open)) {
           e.returnValue = 'Your scene is still running! You should shut it down before you exit this page. Do you still want to leave?';          
         }        
       });
@@ -1038,8 +1044,11 @@ ${msg}`;
       
     },
     ScrollChatToBottom() {          
-      var chatLogContainer = this.$el.querySelector("#chat-log");
-      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;    
+      let chatLogComponent = this.$refs.chatlog;      
+      if (chatLogComponent) {
+        let chatLogContainer = chatLogComponent.$el;
+        chatLogContainer.scrollTop = chatLogContainer.scrollHeight;    
+      }
     },
      /* campaign search */
     searchCampaigns(query) {      

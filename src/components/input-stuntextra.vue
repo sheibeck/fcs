@@ -7,9 +7,9 @@
         <i class="fas d-print-none pr-2" v-on:click="toggleEdit()" :class="{ 'fa-check-circle' : stuntEdit, 'fa-edit' : !stuntEdit }"></i>
       </a>
 
-      <a v-if="isNewCharacter">
-        <i class="fas d-print-none fa-plus pr-2" v-on:click="addStunt(item)"></i>
-      </a>
+      <div v-if="isNewCharacter">
+        <i title="Add Stunt/Extra" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addStunt(item)"></i>
+      </div>
     </div>
 
     <div class="form-group">    
@@ -53,8 +53,8 @@ export default {
   methods: {
     toggleEdit() {      
       this.stuntEdit = !this.stuntEdit;     
-      if (!this.stuntEdit == true) {
-        this.$parent.$parent.$parent.save();
+      if (!this.stuntEdit == true) {        
+        this.$emit('save-character');
       } 
     },
     addStunt(item) {      
@@ -85,10 +85,10 @@ export default {
           replacement += lineMatch;
         }
         else {
-          if (itemMatch[1] && itemMatch[2]) {            
-            if (this.vttEnabled) {                      
+          if (itemMatch[1] && itemMatch[2]) {
+            if (this.vttEnabled) {
               var roll20Message = itemMatch[0].trim().replace(/\'/g,"").replace(/"/g,'\\\"');
-              let roll20Btn = `<span class='dice fo20' onclick='fcs.$children[0].$children[0].$children[0].$refs.charactersheet.sendToVTT(\"stuntextra\", \"Stunt\", null, \"${roll20Message}\")'>C</span>`;
+              let roll20Btn = `<span class='dice fo20' onclick='fcs.$children[0].$children[0].$children[1].$refs.charactersheet.sendToVTT(\"stuntextra\", \"Stunt\", null, \"${roll20Message}\")'>C</span>`;
               replacement += `${roll20Btn}<strong>${itemMatch[1].trim()}</strong>:${itemMatch[2]}`;
             }
             else {

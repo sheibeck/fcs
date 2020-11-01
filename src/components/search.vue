@@ -4,7 +4,7 @@
         <input id="search-text" class="form-control" type="text" placeholder="Search" v-model="$store.state.searchText" />
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button" v-on:click="clearSearch"><i class="fa fa-times-circle"></i></button>
-          <button id="search-button" class="btn btn-outline-success d-none" type="button" v-on:click="search">Search</button>
+          <button ref="searchbutton" id="search-button" class="btn btn-outline-success d-none" type="button" v-on:click="search">Search</button>
         </div>
       </div>
   </div>
@@ -41,14 +41,11 @@ export default {
       // Init a timeout variable to be used below
       let timeout = null;
 
-      // Listen for keystroke events
-      input.addEventListener('keyup', (e) => {
-          // Clear the timeout if it has already been set.
-          // This will prevent the previous task from executing
-          // if it has been less than <MILLISECONDS>
+      // Listen for keystroke events and give the user a little time
+      // to type before we really search
+      input.addEventListener('keyup', (e) => {      
           clearTimeout(timeout);
-
-          // Make a new timeout set to go off in 1000ms (1 second)
+          
           timeout = setTimeout( () => {
               this.search();
           }, 500);
@@ -57,7 +54,7 @@ export default {
     },
     clearSearch : function() {
       this.$store.commit("updateSearchText", "");
-      $("#search-button").trigger("click");
+      this.$refs.searchbutton.click();
     },
     search : function() {      
       let searchText = this.$store.state.searchText;      

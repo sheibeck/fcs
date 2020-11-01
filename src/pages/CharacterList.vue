@@ -8,7 +8,8 @@
         <search class=""></search>
       </div>
       <div v-if="!hasCharacters">
-        <h2>You have not created any characters.</h2>
+        <h2 v-if="searchText == ''">You have not created any characters.</h2>
+        <h2 v-else>No characters found.</h2>
       </div>
       <div v-if="hasCharacters" class='card-columns'>
         <div v-for="(item, index) in characters" v-bind:key="item.id" class='card'>
@@ -17,15 +18,16 @@
             <h5 class='card-title character-name'>{{item.name}}</h5>
             <div class='row'>             
               <p class='card-text col'>
-                <label class='h6'>High Concept</label>: {{item.aspects ? item.aspects.highconcept : ""}}<br>
-                <label class='h6'>Trouble</label>: {{item.aspects ? item.aspects.trouble : ""}}
+                <label class='h6'>High Concept</label>: {{getAspect(item, "highconcept")}}<br>
+                <label class='h6'>Trouble</label>: {{getAspect(item, "trouble")}}
               </p>
             </div>
             <hr />
             <div class="d-flex">
-              <a :href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-              <a :href='slugify[index]' class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
-              <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
+              <a :href='slugify[index]' class='btn btn-primary' :data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
+              <a :href='slugify[index]' class='btn btn-info ml-1' @click="shareUrl">Share <i class='fa fa-share-square'></i></a>
+              <a href="#" class='btn btn-secondary ml-1 mr-auto' @click="copyCharacter($event, item.id)">Copy <i class='fas fa-copy'></i></a>              
+              <a href='#' class='btn' title="Delete Character" style='color:red' :data-id='item.id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
             </div>
           </div>
           <div class='card-footer text-muted'>
@@ -33,7 +35,14 @@
               {{ getShortText(item.description) }}
             </div> 
             <div>            
-              <span class='badge badge-secondary' style="cursor: pointer;" v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">{{commonSvc.GetId(item.related_id)}}</span>
+              <span class='badge badge-dark' style="cursor: pointer;" 
+                v-bind:data-search-text='commonSvc.GetId(item.related_id)' v-on:click="searchByTag">
+                {{commonSvc.GetId(item.related_id)}}
+              </span>
+              <span v-for="tag in item.tags" class='badge badge-secondary mr-1' style="cursor: pointer;" :key="tag.text"
+                v-bind:data-search-text='tag.text' v-on:click="searchByTag">                
+                {{tag.text}}
+              </span>
             </div>
           </div>
         </div>
@@ -135,7 +144,28 @@ export default {
         $(modal.find('.js-delete-character')).data('id', characterId);
       });
     },
+    getAspect(item, aspect) {
+      let desc = "";
+      if (!item.aspects) return desc;
 
+      switch(aspect) {
+        case "highconcept":
+          desc = item.aspects ? (item.aspects.highconcept ? item.aspects.highconcept : "") : "";
+          if (desc === "" && Object.keys(item.aspects).length > 0) {
+            desc = item.aspects[Object.keys(item.aspects).sort()[0]];
+          }
+          break;
+
+        case "trouble":          
+          desc = item.aspects ? (item.aspects.trouble ? item.aspects.trouble : "") : "";
+          if (desc === "" && Object.keys(item.aspects).length > 1) {
+            desc = item.aspects[Object.keys(item.aspects).sort()[1]];
+          }
+          break;
+      }
+      
+      return desc;
+    },
     list : async function (searchText) {      
       this.characters = await dbSvc.ListObjects("CHARACTER", this.$store.state.userId, searchText);
       this.loading = false;         
@@ -154,6 +184,23 @@ export default {
     shareUrl : function(event) {
       event.preventDefault();
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
+    },
+    copyCharacter : function(event, characterId) {
+      event.preventDefault();      
+      dbSvc.GetObject(  characterId, this.userId ).then( (response) => {  
+        if (response) {
+          response.id = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());
+          response.name += " (Copy)";
+          response.slug = commonSvc.Slugify(response.name);
+
+          dbSvc.SaveObject(response).then ( (result) => {
+            if (result) {
+              let newUrl = '/character/' + commonSvc.GetId(response.related_id) + '/' + commonSvc.GetId(response.id) + '/' + response.slug;
+              document.location = newUrl;
+            }
+          });
+        }   
+      });
     },
     searchByTag : function(event) {
       var tag = $(event.currentTarget).data('search-text');

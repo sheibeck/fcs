@@ -43,7 +43,7 @@ export default {
         
         this.$parent.sendToVTT("stress", label, arr, val);
         this.$parent.setVal(arr, val);
-        this.$parent.$parent.$parent.save();
+        this.$emit('save-character');
       } 
       else {
         this.$parent.setVal(arr, val);

@@ -113,7 +113,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Middle Earth (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Middle Earth (Character Sheet)');
   },
   data () {
     return {

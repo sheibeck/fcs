@@ -147,7 +147,7 @@
 			</div>
 			
 			<div class="row">
-				<div v-for="stress in stresses" :key="stress.obj" class="col">
+				<div v-for="stress in stresses" :key="stress.obj" class="col mx-1">
 					<inputstress :stress="stress" />
 				</div>
 			</div>	
@@ -228,7 +228,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Dresden Files Accelerated (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Dresden Files Accelerated (Character Sheet)');
   },
   data () {
     return {

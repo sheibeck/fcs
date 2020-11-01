@@ -1,27 +1,28 @@
 <template>
 <div class="sheet">
-	<div class="row">		
-		<div class="col-sm-6 d-flex">
-			<div class="form-group w-75 d-flex mr-3">
+	<div class="row">
+		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
+			<img alt="Fate Condensed" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />
+		</div>	
+
+		<div class="col-sm-6 d-flex flex-column flex-md-row order-md-1">
+			<div class="form-group d-flex mr-md-3 col-md-8">
 				<label class="mt-2 mr-2">Name</label>
 				<input type="text" class="form-control" id="name" name="name" @change="setVal('name',  $event.target.value)" :value="getVal('name')" placeholder="Name" />
 			</div>
 
-			<div class="form-group d-flex">
+			<div class="form-group d-flex col-md-4">
 				<label class="mt-2 mr-2">Pronoun</label>
 				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
 			</div>
-		</div>
-		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0">
-			<img alt="Fate Condensed" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />
-		</div>
+		</div>		
 	</div>
 
 	<div class="row">
 		<!-- aspects -->
 		<div class="col-sm-6 col-md-7 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
 			<div for="" class="fate-header">Aspects</div>
-			<div class="px-3">
+			<div class="px-2">
 				<div v-for="aspect in aspects" :key="aspect.obj">
 					<inputaspect :aspect="aspect" :showlabel="true" />
 				</div>
@@ -48,7 +49,7 @@
 		<div class="col-sm-6 col-md-5 fate-skills px-0 mt-3 mt-sm-0">
 			<div class="fate-header col-12">Vitals</div>
 
-			<div class="px-3">				
+			<div class="px-2">				
 				<!-- Stress -->
 				<div class="form-group text-center font-weight-bold">
 					<div class="col-12">STRESS  <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
@@ -61,7 +62,7 @@
 					</div>
 					<div class="d-flex justify-content-between">
 						<div v-for="stress in physicalstress" :key="stress.obj">
-							<inputstress :stress="stress" stresstype="Physical" hidelabel="true" />
+							<inputstress :stress="stress" stresstype="Physical" :hidelabel="true" />
 						</div>
 					</div>
 				</div>
@@ -73,7 +74,7 @@
 					</div>
 					<div class="d-flex justify-content-between">
 						<div v-for="stress in mentalstress" :key="stress.obj">
-							<inputstress :stress="stress" stresstype="Mental" hidelabel="true" />
+							<inputstress :stress="stress" stresstype="Mental" :hidelabel="true" />
 						</div>
 					</div>
 				</div>
@@ -90,7 +91,7 @@
 			<!-- Skills -->
 			<div class="fate-header col-12">Skills</div>
 
-			<div class="px-3 skills">
+			<div class="px-2 skills">
 				<div class="small text-muted font-italic d-print-none">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
 				<div v-for="skill in skills" :key="skill.obj" class="py-1">
 					<inputskill :item="skill" />
@@ -129,7 +130,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate Condensed (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate Condensed (Character Sheet)');
   },
   data () {
     return {
@@ -192,13 +193,6 @@ export default {
     },
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
-
-		if (this.vttEnabled && arr.indexOf("stress") !== -1)
-		{
-			let label = arr.indexOf("mental") > -1 ? "Mental" : "Physical";
-			this.sendToVTT("stress", `1 ${label}`, arr, val);		
-			this.$parent.$parent.save();		
-		}		
     },
     skillHasValue(skillList, value) {        
         var skillArray = skillList.split("|");
