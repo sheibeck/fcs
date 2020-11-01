@@ -72,9 +72,9 @@ export default {
       } 
     },
     sendToVTT(skillName, modifier) {      
-      if (!skillName) return;      
+      if (!skillName) return;     
       //plus character throws an error when sending messages.      
-      modifier = modifier.replace("+","");
+      modifier = modifier.replace("+",""); 
       this.$parent.sendToVTT('skill', skillName, null, modifier, 'skill');
     }
   }
