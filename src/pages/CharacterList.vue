@@ -24,9 +24,10 @@
             </div>
             <hr />
             <div class="d-flex">
-              <a :href='slugify[index]' class='btn btn-primary' v-bind:data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
-              <a :href='slugify[index]' class='btn btn-secondary ml-1 mr-auto' v-on:click="shareUrl">Share <i class='fa fa-share-square'></i></a>
-              <a href='#' class='btn' style='color:red' v-bind:data-id='item.id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
+              <a :href='slugify[index]' class='btn btn-primary' :data-id='item.id'>Play <i class='fa fa-play-circle'></i></a>
+              <a :href='slugify[index]' class='btn btn-info ml-1' @click="shareUrl">Share <i class='fa fa-share-square'></i></a>
+              <a href="#" class='btn btn-secondary ml-1 mr-auto' @click="copyCharacter($event, item.id)">Copy <i class='fas fa-copy'></i></a>              
+              <a href='#' class='btn' title="Delete Character" style='color:red' :data-id='item.id' data-toggle='modal' data-target='#modalDeleteCharacterConfirm'><i class='fa fa-trash'></i></a>
             </div>
           </div>
           <div class='card-footer text-muted'>
@@ -183,6 +184,23 @@ export default {
     shareUrl : function(event) {
       event.preventDefault();
       commonSvc.CopyTextToClipboard(event.currentTarget.href);
+    },
+    copyCharacter : function(event, characterId) {
+      event.preventDefault();      
+      dbSvc.GetObject(  characterId, this.userId ).then( (response) => {  
+        if (response) {
+          response.id = commonSvc.SetId("CHARACTER", commonSvc.GenerateUUID());
+          response.name += " (Copy)";
+          response.slug = commonSvc.Slugify(response.name);
+
+          dbSvc.SaveObject(response).then ( (result) => {
+            if (result) {
+              let newUrl = '/character/' + commonSvc.GetId(response.related_id) + '/' + commonSvc.GetId(response.id) + '/' + response.slug;
+              document.location = newUrl;
+            }
+          });
+        }   
+      });
     },
     searchByTag : function(event) {
       var tag = $(event.currentTarget).data('search-text');

@@ -8,10 +8,10 @@
       <div class='d-flex flex-column flex-md-row flex-wrap justify-content-between'>
         <div v-for='sheet in sheets' :key="sheet.id" class="card m-1 col col-sm-12 col-md-2 p-0">
           <a v-bind:href="`charactersheet/${sheet.slug}`" v-bind:data-id='sheet.id' role="button">
-            <img class='card-img-top img-thumbnail img-fluid' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
+            <img class='card-img-top img-thumbnail sheet-images' v-bind:src="`/static/sheets/${sheet.slug}/logo.png`" v-bind:alt="sheet.displayname + ' Logo'" />
           </a>
           <div class='card-body'>
-            <h5 class='card-title charactersheet-name'>{{sheet.name}}</h5>
+            <h5 class='card-title charactersheet-name mb-auto'>{{sheet.name}}</h5>
             <a v-bind:href="`charactersheet/${sheet.slug}`" class='btn btn-success w-100' v-bind:data-id='sheet.id' role="button">Create <i class='fa fa-user'></i></a>
             <a v-if="sheet.customizable" v-bind:href="`charactersheet/${sheet.slug}-custom`" class='btn btn-success mt-1 w-100' v-bind:data-id='sheet.id' role="button">Customize <i class='fas fa-user-cog'></i></a>
           </div>
@@ -160,4 +160,9 @@ export default {
 </script>
 
 <style lang="scss"> 
+.sheet-images {
+    object-fit: contain;
+    object-position: center;
+    height: 100px !important;
+}
 </style>
