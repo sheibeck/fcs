@@ -65,7 +65,7 @@ export default {
   },
   metaInfo() {    
     return {
-       title: `${this.characterData ? this.characterData.name : this.title}`,
+       title: `${this.characterData ? this.characterData.name : this.pageTitle}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -82,6 +82,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'pageTitle',
     ]),
     isOwner() {      
       return this.characterData && this.characterData.owner_id == this.userId;

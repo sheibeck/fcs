@@ -228,7 +228,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Dresden Files Accelerated (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Dresden Files Accelerated (Character Sheet)');
   },
   data () {
     return {

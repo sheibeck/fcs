@@ -130,6 +130,7 @@ const store = new Vuex.Store({
     },
     vueShowdownOpts: { emoji: false, openLinksInNewWindow: true },
     lastEvaluatedKey: null,
+    pageTitle: null,
   },
   mutations: {
     authenticate (state, bAuth) {
@@ -169,9 +170,15 @@ const store = new Vuex.Store({
     },
     updateLastEvaluatedKey (state, value) {
       state.lastEvaluatedKey = value
+    },
+    updatePageTitle (state, value) {
+      state.pageTitle = value
     }
   },
   getters: {
+    pageTitle : state => {
+      return state.pageTitle;
+    },
     isSubscriber : state => {
       return state.hasActiveSubscription;
     },

@@ -131,7 +131,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate Accelerated (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate Accelerated (Character Sheet)');
   },
   data () {
     return {				

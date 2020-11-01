@@ -130,7 +130,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate Condensed (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate Condensed (Character Sheet)');
   },
   data () {
     return {

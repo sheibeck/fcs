@@ -1,11 +1,11 @@
 // Import the `mount()` method from Vue Test Utils
 import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
-//import VueRouter from 'vue-router'
+
 import CharacterSheetList from '@/pages/CharacterSheetList.vue';
 import CharacterSheetDetail from '@/pages/CharacterSheetDetail.vue';
 import CharacterSheet from '@/components/CharacterSheet.vue';
-import VueShowdown, { showdown } from 'vue-showdown';
+import VueShowdown from 'vue-showdown';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -30,7 +30,7 @@ describe('Fate Core CharacterSheet without authentication', () => {
     path: '/charactersheet',
     params: { id: 'fate-core' },  
   }
-  let getters
+  let getters, mutations
   let store
 
   beforeEach(() => {
@@ -40,8 +40,14 @@ describe('Fate Core CharacterSheet without authentication', () => {
       vttEnabled: () => false,
       vueShowdownOpts: () => {}, 
     }
+    mutations = {
+      updatePageTitle (state, value) {
+        state.pageTitle = value
+      }
+    }
     store = new Vuex.Store({
-      getters
+      getters,
+      mutations,
     })
   })
   
@@ -56,7 +62,7 @@ describe('Fate Core CharacterSheet without authentication', () => {
     });
         
     expect(wrapper.text()).not.toContain('Save Character');
-    const comCharacterSheet = wrapper.findComponent({ name: 'CharacterSheet' });
+    const comCharacterSheet = wrapper.findComponent(CharacterSheet);
     expect(comCharacterSheet.exists()).toBe(true);
     expect(comCharacterSheet.props('sheetid')).toBe('fate-core');
   })
@@ -67,36 +73,43 @@ describe('Fate Core CharacterSheet with authentication', () => {
     path: '/charactersheet',
     params: { id: 'fate-core' },  
   }
-  let getters
+  let getters, mutations
   let store
+  let wrapper
 
   beforeEach(() => {
     getters = {
       isAuthenticated: () => true,
       userId: () => null,      
-      vttEnabled: () => false,
+      vttEnabled: () => true,
       vueShowdownOpts: () => {}, 
     }
+    mutations = {
+      updatePageTitle (state, value) {
+        state.pageTitle = value
+      }
+    }
     store = new Vuex.Store({
-      getters
+      getters,
+      mutations,
     })
-  })
-  
-  it('does not render save character button', async () => {
+
     // mount() returns a wrapped Vue component we can interact with
-    const wrapper = mount(CharacterSheetDetail, {
+    wrapper = mount(CharacterSheetDetail, {
       store,
       localVue,
       mocks: {
         $route
       }
     });
-        
+  })
+  
+  it('renders save character button', async () => {        
     expect(wrapper.text()).toContain('Save Character');
-    const comCharacterSheet = wrapper.findComponent({ name: 'CharacterSheet' });
+    const comCharacterSheet = wrapper.findComponent(CharacterSheet);
     expect(comCharacterSheet.exists()).toBe(true);
     expect(comCharacterSheet.props('sheetid')).toBe('fate-core');
-  })
+  }) 
 })
 
 describe('charactersheet component', () => {
@@ -106,21 +119,9 @@ describe('charactersheet component', () => {
     path: '/charactersheet',
     params: { id: 'fate-core' },  
   }
-  let getters
+  let getters,mutations
   let store
-
-  beforeEach(() => {
-    getters = {
-      isAuthenticated: () => true,
-      userId: () => null,      
-      vttEnabled: () => false,
-      vueShowdownOpts: () => {}, 
-    }
-    store = new Vuex.Store({
-      getters
-    })
-  })
-
+ 
   beforeEach(() => {   
     getters = {
       isAuthenticated: () => true,
@@ -128,20 +129,29 @@ describe('charactersheet component', () => {
       vttEnabled: () => false,
       vueShowdownOpts: () => {}, 
     }
+    mutations = {
+      updatePageTitle (state, value) {
+        state.pageTitle = value
+      }
+    }
     store = new Vuex.Store({
-      getters
+      getters,
+      mutations
     })
     
     // mount() returns a wrapped Vue component we can interact with
     wrapper = mount(CharacterSheetDetail, {
       store,
       localVue,
+      propsData: {
+        sheetid: 'fate-core'      
+      },
       mocks: {
         $route
       }
     });
 
-    charactersheet = wrapper.findComponent({ name: 'CharacterSheet' });
+    charactersheet = wrapper.findComponent(CharacterSheet);
   })
 
   test.each([

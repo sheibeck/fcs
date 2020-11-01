@@ -140,7 +140,7 @@ export default {
 	this.init();
   },
   mounted() {
-	this.$parent.$parent.title = 'Fate Anything (Character Sheet)';
+	this.$store.commit("updatePageTitle", 'Fate Anything (Character Sheet)');
   },
   data () {
     return {

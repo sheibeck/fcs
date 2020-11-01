@@ -44,7 +44,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'InputSkillColumn',
+  name: 'InputSkillPyramid',
   props: {
     skills: Array, 
     skillList: Array, 
@@ -54,7 +54,7 @@ export default {
  	  ...mapGetters([
       'isAuthenticated',      
       'vttEnabled'
-    ]),  
+    ]),
     isNewCharacter() {      
       return this.$route.name == "Character Sheet Detail";
     }

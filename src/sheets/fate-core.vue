@@ -123,13 +123,13 @@ export default {
   props: {
     character: Object,
   }, 
-  mounted() {      
-      this.$parent.$parent.title = 'Fate Core (Character Sheet)';
+  mounted() {
+    this.$store.commit("updatePageTitle", "Fate Core (Character Sheet)");    
   },
   computed: {
  	...mapGetters([  
-      'vttEnabled'
-    ]),
+      'vttEnabled',
+    ])
   },
   data () {
     return {

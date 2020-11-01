@@ -133,7 +133,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate of Cthulhu (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate of Cthulhu (Character Sheet)');
   },
   data () {
     return {

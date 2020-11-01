@@ -56,7 +56,7 @@ export default {
   },
   metaInfo() {
     return {
-       title: this.title,
+       title: this.pageTitle,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -74,6 +74,7 @@ export default {
     ...mapGetters([
       'isAuthenticated',
       'userId',
+      'pageTitle',
     ]), 
   },
   data () {

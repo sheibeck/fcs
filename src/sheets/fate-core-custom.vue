@@ -124,7 +124,7 @@ export default {
     character: Object,
   }, 
   mounted() {
-   this.$parent.$parent.title = 'Fate Core Custom (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate Core Custom (Character Sheet)');
   },
 computed: {
  	...mapGetters([  

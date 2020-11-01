@@ -143,7 +143,7 @@ export default {
     ]),
   },
   mounted() {
-   this.$parent.$parent.title = 'Fate Freeport (Character Sheet)';
+   this.$store.commit("updatePageTitle", 'Fate Freeport (Character Sheet)');
   },
   data () {
     return {
