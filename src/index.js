@@ -29,8 +29,7 @@ import {version} from '../package.json';
 
 Sentry.init({
   dsn: "https://2efc80c955be4b38b84e67b30d23610a@o302915.ingest.sentry.io/5174522",
-  environment: process.env.NODE_ENV,
-  release: 'fatecharactersheet@' + version,
+  environment: process.env.NODE_ENV,  
   ignoreErrors: [
     // Random plugins/extensions
     "top.GLOBALS",
