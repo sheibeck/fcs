@@ -28,19 +28,20 @@
           <div class='form-group'>
             <label class='' for='image_url'>Description:</label>
             <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
-          </div>
-        </div>
-      
-        <div class='row' v-if="!isAuthenticated">           
-          <input type="hidden" id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />
+          </div>      
+
+          <vue-tags-input
+                v-if="characterData !== null"
+                v-model="tag"              
+                :tags="characterData.tags"
+                @tags-changed="newTags => updateTags(newTags)"
+              />
         </div>
 
-        <vue-tags-input
-              v-if="characterData !== null"
-              v-model="tag"              
-              :tags="characterData.tags"
-              @tags-changed="newTags => updateTags(newTags)"
-            />
+        <div class='row' v-if="!isAuthenticated">           
+          <input type="hidden" id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />         
+        </div>
+
       </div>
 
     </form>
