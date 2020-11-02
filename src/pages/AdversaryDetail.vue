@@ -254,7 +254,12 @@ export default {
   data () {
     return {
       initialized: false,
-      adversary: null,
+      adversary: {
+          skills:[],
+          stress:[],
+          stunts:[],
+          consequences:[],
+        },
       title: "",
       description: "",
       action: this.$route.params.action,
@@ -282,7 +287,7 @@ export default {
         this.adversary.name = `Copy of ${this.adversary.name}`;
         this.adversary.slug = commonSvc.Slugify(this.adversary.name);
       }
-      else {
+      else if (this.adversaryId !== "ADVERSARY|create") {
         await this.getAdversary(this.adversaryId, this.userId);
       }
 
