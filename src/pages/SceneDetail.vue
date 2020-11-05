@@ -153,6 +153,7 @@
             <b-popover ref="popoverCampaign" triggers="click blur" target="save-chatlog">
               <template v-slot:title>Save chat log to campaign</template>
               <autocomplete title="Search Campaign" :search="searchCampaigns"
+                :debounce-time="500"
                 placeholder="Select Campaign"
                 aria-label="Select Campaign"
                 :get-result-value="getCampaignResultValue"

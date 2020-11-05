@@ -53,6 +53,7 @@
       <b-popover ref="popoverCharacter" @shown="$refs.characterAutocomplete.$refs.input.focus()" :target="`add-character-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Character</template>
         <autocomplete ref="characterAutocomplete" :search="searchCharacters"
+          :debounce-time="500"
           placeholder="Search Characters"
           aria-label="Search Characters"
           :get-result-value="getCharacterResultValue"
@@ -79,6 +80,7 @@
       <b-popover ref="popoverAdversary" @shown="$refs.adversaryAutocomplete.$refs.input.focus()" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Adversary</template>
         <autocomplete ref="adversaryAutocomplete" :search="searchAdversaries"
+          :debounce-time="500"
           placeholder="Search Adversaries"
           aria-label="Search Adversaries"
           :get-result-value="getAdversaryResultValue"

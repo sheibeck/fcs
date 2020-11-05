@@ -180,8 +180,7 @@ export default {
     setVal(arr, val) {        
         this.$parent.setVal(this.character, arr, val);        
     },
-    sendToVTT(type, label, obj, item, skillType) {      
-        debugger;  
+    sendToVTT(type, label, obj, item, skillType) {        
 		switch(type)
 		{			
 			case "fatepoint":

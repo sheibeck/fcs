@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 import CharacterSheetList from '@/pages/CharacterSheetList.vue';
 import CharacterSheetDetail from '@/pages/CharacterSheetDetail.vue';
 import CharacterSheet from '@/components/CharacterSheet.vue';
+import CharacterDetail from '@/pages/CharacterDetail.vue';
 import VueShowdown from 'vue-showdown';
 
 const localVue = createLocalVue();

@@ -101,7 +101,7 @@
 
 			<div class="px-1 skills">				
 				<div v-for="skill in character.template.skills" :key="skill.obj" class="py-1">
-					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" />
+					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" :customlabel="true" />
 				</div>
 			</div>
 		</div>

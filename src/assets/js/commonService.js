@@ -279,6 +279,8 @@ export default class CommonService {
 
 
   getVal(obj, graphPath, defaultValue){
+    if (!graphPath) return defaultValue;
+    
     var parts = graphPath.split(".");
     var root = obj;
 

@@ -4,13 +4,13 @@
     <span v-if="vttEnabled" class="dice fo20 pt-2" v-on:click="sendToVTT()">+</span>
 
     <!--non-custom labels-->
-    <div v-if="!item.label" class="w-100 mr-auto d-flex flex-column" :class="{ 'pt-1' : item.description }">
+    <div v-if="!item.label && !customlabel" class="w-100 mr-auto d-flex flex-column" :class="{ 'pt-1' : item.description }">
       <label class="col-form-label inputlabel p-1" :class="labelclass">{{item.placeholder}}</label>
       <small v-if="item.description" class="skill-desc">{{item.description}}</small>
     </div>
 
     <!--custom labels-->
-    <input v-if="item.label" class="w-100 mr-auto inputlabel" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 
+    <input v-if="item.label || customlabel" class="w-100 mr-auto inputlabel" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 
       @change="$parent.setVal(`${item.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${item.label}`)" :placeholder="item.placeholder" />
       
@@ -35,7 +35,8 @@ export default {
     item: Object, 
     inputclass: String,
     labelclass: String,  
-    removable: Boolean, 
+    removable: Boolean,
+    customlabel: Boolean, 
   },  
   computed: {
  	  ...mapGetters([
