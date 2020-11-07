@@ -68,7 +68,7 @@
                 </div>
                 <div class="mt-1">
                   <button type="button" class="btn btn-success btn-sm mr-1" data-toggle='modal' data-target='#modalSaveTemplate'>Save Template</button>
-                  <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template" @click="applyTemplate">Apply Template</button>
+                  <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template.id" @click="applyTemplate">Apply Template</button>
                   <button type="button" class="btn btn-danger btn-sm mr-1" v-if="IsTemplateOwner" @click="deleteTemplate">Delete Template</button>
                 </div>
               </div>
