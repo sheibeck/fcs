@@ -37,7 +37,7 @@
 				</div>
 			</div>
 			
-			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" />
+			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" />
 
 			<div class="fate-header mb-5 mb-sm-0">
 				<div class="d-flex">
@@ -105,7 +105,7 @@
 			</div>
 
 			<div class="px-1 skills">				
-				<div v-for="skill in character.template.skills" :key="skill.obj" class="">
+				<div v-for="skill in character.template.skills" :key="skill.obj" class="mt-1">
 					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" :customlabel="true" :editlock="isEditLocked" />
 				</div>
 			</div>
@@ -445,7 +445,7 @@ export default {
 	}
 
 	/deep/ label {
-		font-size: 20px !important;
+		font-size: 22px !important;
 		font-weight: 700;
 		border-width: 0px;
 		margin-top: 0px;

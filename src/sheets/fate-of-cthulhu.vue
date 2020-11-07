@@ -20,11 +20,11 @@
             </div>         
 
             <div class="">
-              <inputstuntextra item="stunts" :rows="18" :border="false" header="Regular Stunts" />
+              <inputstuntextra item="stunts" :rows="18" :border="false" header="Regular Stunts" v-on="$listeners" />
             </div>
                          
             <div class="">
-              <inputstuntextra item="stunts_corrupted" :rows="14" :border="false" header="Corrupted Stunts" />
+              <inputstuntextra item="stunts_corrupted" :rows="14" :border="false" header="Corrupted Stunts" v-on="$listeners" />
             </div>
         </div>
 

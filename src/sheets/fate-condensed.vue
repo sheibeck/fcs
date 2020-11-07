@@ -28,7 +28,7 @@
 				</div>
 			</div>
 			
-			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" />
+			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" />
 
 			<div class="fate-header mb-5 mb-sm-0">
 				<div class="d-flex">

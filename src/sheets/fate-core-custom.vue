@@ -58,10 +58,10 @@
 
     <div class="row">
         <div class="col-sm-12 col-md-6">
-            <inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" />
+            <inputstuntextra item="stunts" :rows="25" :border="true" header="Stunts" v-on="$listeners" />
         </div>
         <div class="col-sm-12 col-md-6">
-           <inputstuntextra item="extras" :rows="25" :border="true" header="Extras" />
+           <inputstuntextra item="extras" :rows="25" :border="true" header="Extras" v-on="$listeners" />
         </div>
     </div>
 

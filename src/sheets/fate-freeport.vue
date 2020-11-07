@@ -59,12 +59,12 @@
     <div class="row">
         <div class="col-sm-12 col-md-6">
             <div class="form-group">                
-                <inputstuntextra item="stunts" :rows="22" :border="true" header="Stunts &amp; Gear" />
+                <inputstuntextra item="stunts" :rows="22" :border="true" header="Stunts &amp; Gear" v-on="$listeners" />
             </div>
         </div>
         <div class="col-sm-12 col-md-6">
             <div class="form-group">                
-                <inputstuntextra item="spells" :rows="22" :border="true" header="Spells" />
+                <inputstuntextra item="spells" :rows="22" :border="true" header="Spells" v-on="$listeners" />
             </div>
         </div>
     </div>
