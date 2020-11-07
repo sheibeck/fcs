@@ -71,7 +71,7 @@ export default class CommonService {
               delete obj[key];
           } else if (Object.prototype.toString.call(value) === '[object Object]') {
               this.RemoveEmptyObjects(value);
-          } else if ($.isArray(value)) {
+          } else if (Array.isArray(value)) {
               $.each(value, function (k,v) {
                 if (v === "") {
                   value.splice(k);
@@ -277,10 +277,7 @@ export default class CommonService {
     }
   }
 
-
-  getVal(obj, graphPath, defaultValue){
-    if (!graphPath) return defaultValue;
-    
+  getVal(obj, graphPath, defaultValue){   
     var parts = graphPath.split(".");
     var root = obj;
 

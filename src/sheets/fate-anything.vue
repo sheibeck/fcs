@@ -182,11 +182,21 @@ export default {
 				{
 					id: 1,
 					label: "stress.stress1.label",
-					placeholder: "Stress",
+					placeholder: "Physical",
 					boxes: [
 						{id: 1, label:"stress.stress1.boxes.label1", obj:"stress.stress1.boxes.stress1", placeholder: "1"},
 						{id: 2, label:"stress.stress1.boxes.label2", obj:"stress.stress1.boxes.stress2", placeholder: "2"},
 						{id: 3, label:"stress.stress1.boxes.label3", obj:"stress.stress1.boxes.stress3", placeholder: "3"},
+					]
+				},
+				{
+					id: 2,
+					label: "stress.stress2.label",
+					placeholder: "Mental",
+					boxes: [
+						{id: 1, label:"stress.stress2.boxes.label1", obj:"stress.stress2.boxes.stress1", placeholder: "1"},
+						{id: 2, label:"stress.stress2.boxes.label2", obj:"stress.stress2.boxes.stress2", placeholder: "2"},
+						{id: 3, label:"stress.stress2.boxes.label3", obj:"stress.stress2.boxes.stress3", placeholder: "3"},
 					]
 				}
 			] 		
@@ -208,8 +218,8 @@ export default {
 		}		
 		return stress.placeholder;		
 	},
-    getVal(graphPath, defaultValue) {
-      return this.$parent.getVal(this.character, graphPath, defaultValue);
+    getVal(graphPath, defaultValue) {		
+      	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
@@ -284,7 +294,7 @@ export default {
 		let max = Math.max.apply(Math, items.map(function(o) { return o.id; }));
 		return max+1;
 	},
-	onRemoveAspect: function (id) {	
+	onRemoveAspect: function (id) {			
 		let arr = this.character.template.aspects.filter(function( obj ) {
 			return obj.id !== id;
 		});

@@ -7,7 +7,7 @@
         :value="$parent.getVal(`${aspect.label}`)" :placeholder="aspect.placeholder" />
       <label v-else>{{aspect.label}}</label>
 
-      <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
+      <button type="button" v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
         <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
       </button>
     </div>
@@ -54,7 +54,7 @@ export default {
   },
   methods: { 
     sendToVTT() {   
-      if (!this.aspect || !this.aspect.label) return;   
+      if (!this.aspect || !this.aspect.label) return;
       let label = `aspect ${this.aspect.label}`;
       this.$parent.sendToVTT('invoke', label, "aspects", this.aspect.obj);
     },
