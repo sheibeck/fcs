@@ -15,7 +15,7 @@
           
     <div class="d-flex">
       <span v-if="!customlabel && vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
-      <input v-if="customlabel && !editlock" style="width:40px;" class="mr-auto inputlabel text-center" type="text" 
+      <input v-if="customlabel && editlock" style="width:40px;" class="mr-auto inputlabel text-center" type="text" 
         @change="$parent.setVal(`${consequence.value}`,  $event.target.value)" 
         :value="$parent.getVal(`${consequence.value}`)" :placeholder="consequence.valueplaceholder" />      
       <label v-else class="pr-3">{{getLabelValue}}</label>
@@ -66,7 +66,7 @@ export default {
     },
     getLabelValue() {
       if (!this.customlabel) {
-        return consequence.value;
+        return this.consequence.value;
       }
       else {
         let value = this.$parent.getVal(`${this.consequence.value}`);

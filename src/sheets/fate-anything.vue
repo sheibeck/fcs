@@ -77,7 +77,7 @@
 						<i title="Add Stress Box" class="fas d-print-none fa-plus-circle"></i>
 					</button>					
 				</div>
-				<div class="d-flex flex-wrap pt-1">
+				<div class="d-flex flex-wrap justify-content-around pt-1">
 					<div v-for="box in stress.boxes" :key="box.id" class="pt-1">
 						<inputstress v-on:remove-stress-box="onRemoveStressBox" :parentid="stress.id" :stress="box" :stresstype="getStressType(stress)"
 							:customlabel="true" :removable="true" :hidelabel="false" :editlock="isEditLocked" />

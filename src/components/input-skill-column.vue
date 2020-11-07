@@ -5,7 +5,7 @@
 
     <!--non-custom labels-->
     <div v-if="(!item.label && !customlabel) || (customlabel && editlock)" class="w-100 mr-auto d-flex flex-column" :class="{ 'mt-1' : item.description }">
-      <label class="col-form-label inputlabel" :class="labelclass">{{getLabel}}</label>
+      <label class="col-form-label inputlabel p-0" :class="labelclass">{{getLabel}}</label>
       <small v-if="item.description" class="skill-desc">{{item.description}}</small>
     </div>
 
