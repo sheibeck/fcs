@@ -23,7 +23,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'InputAspects',
+  name: 'InputAspect',
   props: {
     aspect: Object,    
     showlabel: Boolean,
