@@ -73,12 +73,16 @@ module.exports = merge(baseConfig, {
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "darktier-studios",
       project: "fatecharactersheet",
-      dist: version,
+      //dist: version,
+      release: version,
       validate: true,
       debug: true,
-     
+      deploy: {
+        env: "development",
+        name: version,
+      },
       // webpack specific configuration
-      include: ["./dist", "./src"],
+      include: ["./dist"],
       ignore: ["node_modules", "webpack.config.*.js"],
     }),
   ]

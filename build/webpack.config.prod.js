@@ -8,6 +8,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const utils = require('./utils')
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+var PACKAGE = require('../package.json');
+var version = PACKAGE.version;
 
 module.exports = merge(baseConfig, {
   mode: 'production',
@@ -71,9 +73,16 @@ module.exports = merge(baseConfig, {
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "darktier-studios",
       project: "fatecharactersheet",
-
+      //dist: version,
+      release: version,
+      validate: true,
+      debug: true,
+      deploy: {
+        env: "development",
+        name: version,
+      },
       // webpack specific configuration
-      include: "./dist",
+      include: ["./dist"],
       ignore: ["node_modules", "webpack.config.*.js"],
     }),
   ]
