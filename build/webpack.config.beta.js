@@ -73,8 +73,8 @@ module.exports = merge(baseConfig, {
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "darktier-studios",
       project: "fatecharactersheet",
-      //dist: version,
-      release: version,
+      //use the release hash for dev      
+      //release: version,
       validate: true,
       debug: true,
       deploy: {

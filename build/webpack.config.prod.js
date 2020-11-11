@@ -72,13 +72,11 @@ module.exports = merge(baseConfig, {
       // sentry-cli configuration
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "darktier-studios",
-      project: "fatecharactersheet",
-      //dist: version,
+      project: "fatecharactersheet",      
       release: version,
-      validate: true,
-      debug: true,
+      validate: true,      
       deploy: {
-        env: "development",
+        env: "production",
         name: version,
       },
       // webpack specific configuration
