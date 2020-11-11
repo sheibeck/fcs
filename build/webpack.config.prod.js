@@ -14,8 +14,6 @@ module.exports = merge(baseConfig, {
   
   output: {    
     filename: '[name].[hash].js',
-    sourceMapFilename: "[name].[hash].js.map",
-    publicPath: "/",
   }, 
   devtool: "source-map",
   optimization: {    
@@ -75,7 +73,7 @@ module.exports = merge(baseConfig, {
       project: "fatecharactersheet",
 
       // webpack specific configuration
-      include: ".",
+      include: "./dist",
       ignore: ["node_modules", "webpack.config.*.js"],
     }),
   ]
