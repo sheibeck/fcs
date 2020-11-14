@@ -59,7 +59,7 @@
 
 	<div class="row">
 		<div class="col-sm-12 col-md-6">
-			<inputstuntextra item="stunts" :rows="18" :border="true" header="Stunts, Wises &amp; Gear" />						
+			<inputstuntextra item="stunts" :rows="18" :border="true" header="Stunts, Wises &amp; Gear" v-on="$listeners" />						
 		</div>
 		<div class="col-sm-12 col-md-6">
 			<div class="form-group">

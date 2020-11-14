@@ -1,7 +1,6 @@
 <template>
   <div class="container mt-2">
 
-    <form>
       <charactersheet :character="characterData" :sheetid="id" />        
         <div class="d-print-none">
         <hr/>
@@ -33,8 +32,7 @@
             />
         </div>
       </div>
-      
-    </form>
+          
   </div>
 </template>
 

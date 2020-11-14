@@ -57,10 +57,10 @@
 
     <div class="row">
         <div class="col-sm-12 col-md-6">
-            <inputstuntextra item="stunts" :rows="17" :border="true" header="Stunts" />
+            <inputstuntextra item="stunts" :rows="17" :border="true" header="Stunts" v-on="$listeners" />
         </div>
         <div class="col-sm-12 col-md-6">
-           <inputstuntextra item="gear" :rows="17" :border="true" header="Gear" />
+           <inputstuntextra item="gear" :rows="17" :border="true" header="Gear" v-on="$listeners" />
         </div>
     </div>
 

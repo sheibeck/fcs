@@ -1,13 +1,13 @@
 <template>
 	<div class="d-flex">
     <!--custom labels-->
-    <input v-if="customlabel" style="width:30px;" class="mr-auto inputlabel text-center" :class="{ 'd-none' : labelHidden }" type="text" 
+    <input v-if="customlabel && !editlock" style="width:30px;" class="mr-auto inputlabel text-center" :class="{ 'd-none' : labelHidden }" type="text" 
       @change="$parent.setVal(`${stress.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
-    <label v-else class="px-1 pt-1" :class="{ 'd-none' : labelHidden }" :for="stress.obj">{{stress.label}}</label>
+    <label v-else class="px-1 pt-1" :class="{ 'd-none' : labelHidden }" :for="stress.obj">{{getLabelValue}}</label>
     <input type="checkbox" :value="stress.value" :id="stress.obj" :name="stress.obj" @change="setVal(stress.obj,  $event.target.checked)" 
       :checked="$parent.getVal(stress.obj)" :disabled="!skillHasValue()" />      
-    <button type="button" v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressBox(stress.id, parentid)">
+    <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressBox(stress.id, parentid)">
         <i title="Delete Stress Box" class="fas d-print-none fa-minus-circle"></i>
     </button>
   </div>
@@ -26,6 +26,7 @@ export default {
     removable: Boolean,
     parentid: Number,
     customlabel: Boolean,
+    editlock: Boolean,
   },
   computed: {
  	  ...mapGetters([
@@ -34,6 +35,15 @@ export default {
     ]),   
     labelHidden() {      
       return this.hidelabel && this.hidelabel == "true" ? true : false;
+    },
+    getLabelValue() {
+      if (!this.customlabel) {
+        return this.stress.label;
+      }
+      else {
+        let value = this.$parent.getVal(`${this.stress.label}`);
+        return (!value) ? this.stress.placeholder : value;
+      }
     }
   },
   data () {

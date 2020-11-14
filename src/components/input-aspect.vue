@@ -2,12 +2,12 @@
   <div class="form-group">    
     <div v-if="showlabel" class="d-flex">
       <!--custom labels-->      
-      <input v-if="customlabel" class="w-100 mr-auto inputlabel" type="text" 
+      <input v-if="customlabel && !editlock" class="w-100 mr-auto inputlabel" type="text" 
         @change="$parent.setVal(`${aspect.label}`,  $event.target.value)" 
-        :value="$parent.getVal(`${aspect.label}`)" :placeholder="aspect.placeholder" />
-      <label v-else>{{aspect.label}}</label>
+        :value="$parent.getVal(`${aspect.label}`)" :placeholder="aspect.placeholder" />      
+      <label v-else>{{getLabelValue}}</label>
 
-      <button v-if="removable" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
+      <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
         <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
       </button>
     </div>
@@ -23,12 +23,13 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'InputAspects',
+  name: 'InputAspect',
   props: {
     aspect: Object,    
     showlabel: Boolean,
     removable: Boolean,
     customlabel: Boolean,
+    editlock: Boolean
   },
   computed: {
  	  ...mapGetters([
@@ -46,6 +47,15 @@ export default {
         }
       }
       return this.aspect.label;
+    },
+    getLabelValue() {
+      if (!this.customlabel) {
+        return this.aspect.label;
+      }
+      else {
+        let value = this.$parent.getVal(`${this.aspect.label}`);
+        return (!value) ? this.aspect.placeholder : value;
+      }
     }
   },
   data () {
@@ -54,7 +64,7 @@ export default {
   },
   methods: { 
     sendToVTT() {   
-      if (!this.aspect || !this.aspect.label) return;   
+      if (!this.aspect || !this.aspect.label) return;
       let label = `aspect ${this.aspect.label}`;
       this.$parent.sendToVTT('invoke', label, "aspects", this.aspect.obj);
     },

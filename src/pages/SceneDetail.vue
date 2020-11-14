@@ -153,6 +153,7 @@
             <b-popover ref="popoverCampaign" triggers="click blur" target="save-chatlog">
               <template v-slot:title>Save chat log to campaign</template>
               <autocomplete title="Search Campaign" :search="searchCampaigns"
+                :debounce-time="500"
                 placeholder="Select Campaign"
                 aria-label="Select Campaign"
                 :get-result-value="getCampaignResultValue"
@@ -883,10 +884,10 @@ export default {
 **${userName}**:
 ${msg}`;      
     },  
-    sendFormattedChat(e) {
+    sendFormattedChat(e) {      
       if (e.data.type !== "charactersheet") return;
       let msg = e.data.data;
-      if (this.gameClient) {
+      if (this.gameClient && this.gameClient.conn) {
         this.gameClient.sendChatMessage(this.getUserName, msg);
       } else {
         this.updateChatLog(this.getUserName, msg);

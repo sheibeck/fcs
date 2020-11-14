@@ -210,10 +210,10 @@ export default {
         //TODO: allow adding labels to aspects when adding NPCs     
         if (this.objectdata.aspects.filter(aspect => aspect.label !== "").length === 0) return this.objectdata.aspects;
 
-        var sortPriority = [ "trouble", "highconcept", "high_concept" ];
+        var sortPriority = [ "trouble", "highconcept", "high_concept", "high concept" ];
         return this.objectdata.aspects.sort(function(a,b){ 
-          if ( a.label == b.label ) return -1;
-          return sortPriority.indexOf( b.label ) - sortPriority.indexOf( a.label );
+          if ( a.label.toLowerCase() == b.label.toLowerCase() ) return -1;
+          return sortPriority.indexOf( b.label.toLowerCase() ) - sortPriority.indexOf( a.label.toLowerCase() );
         });
       } else {
         return [];
@@ -423,16 +423,25 @@ export default {
       }
     },
     async syncCharacter() {
-      let data = this.objectdata;      
+      let data = this.objectdata;
       let character = await dbSvc.GetObject(data.id, data.owner_id);
       
       if (character) {
         let type = "CHARACTER";
         
         //update aspects
-        data.aspects = this.$parent.$parent.convertThingToGameObject(character.aspects, type, "ASPECT");
+        if (character.aspects) {
+          if (!data.aspects) {
+            this.$set(this.objectdata, "aspects", new Array());
+          }
+          data.aspects = this.$parent.$parent.convertThingToGameObject(character.aspects, type, "ASPECT", character.template);
+        }
+
         if (character.consequences) {
-          data.consequences = this.$parent.$parent.convertThingToGameObject(character.consequences, type, "CONSEQUENCE");  
+          if (!data.consequences) {
+            this.$set(this.objectdata, "consequences", new Array());
+          }         
+          data.consequences = this.$parent.$parent.convertThingToGameObject(character.consequences, type, "CONSEQUENCE", character.template);
         }
 
         //pull in a new image if one is set

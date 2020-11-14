@@ -20,11 +20,11 @@
             </div>         
 
             <div class="">
-              <inputstuntextra item="stunts" :rows="18" :border="false" header="Regular Stunts" />
+              <inputstuntextra item="stunts" :rows="18" :border="false" header="Regular Stunts" v-on="$listeners" />
             </div>
                          
             <div class="">
-              <inputstuntextra item="stunts_corrupted" :rows="14" :border="false" header="Corrupted Stunts" />
+              <inputstuntextra item="stunts_corrupted" :rows="14" :border="false" header="Corrupted Stunts" v-on="$listeners" />
             </div>
         </div>
 
@@ -61,7 +61,7 @@
 
                 <!-- physical stress -->
                 <div class="d-md-flex flex-row pb-2">
-                    <div class="form-group font-weight-bold pr-2 mr-auto">
+                    <div class="form-group font-weight-bold mr-2 text-right">
                         PHYSICAL
                     </div>
                     <div class="d-flex justify-content-between stressbox">
@@ -73,7 +73,7 @@
 
                 <!-- mental stress -->
                 <div class="d-md-flex flex-row">
-                    <div class="form-group font-weight-bold pr-3 mr-auto">
+                    <div class="form-group font-weight-bold mr-1 ml-3">
                         MENTAL
                     </div>
                    <div class="d-flex justify-content-between stressbox">

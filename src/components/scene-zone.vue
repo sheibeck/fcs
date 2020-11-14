@@ -53,6 +53,7 @@
       <b-popover ref="popoverCharacter" @shown="$refs.characterAutocomplete.$refs.input.focus()" :target="`add-character-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Character</template>
         <autocomplete ref="characterAutocomplete" :search="searchCharacters"
+          :debounce-time="500"
           placeholder="Search Characters"
           aria-label="Search Characters"
           :get-result-value="getCharacterResultValue"
@@ -79,6 +80,7 @@
       <b-popover ref="popoverAdversary" @shown="$refs.adversaryAutocomplete.$refs.input.focus()" :target="`add-adversary-${this.zone.id}`" triggers="click blur">
         <template v-slot:title>Add Adversary</template>
         <autocomplete ref="adversaryAutocomplete" :search="searchAdversaries"
+          :debounce-time="500"
           placeholder="Search Adversaries"
           aria-label="Search Adversaries"
           :get-result-value="getAdversaryResultValue"
@@ -168,8 +170,10 @@ export default {
     makeGameObject(result, type) {
       if (!result || ( type == "CHARACTER" && this.characterExists(result.id) )) return;
                   
-      result.aspects = this.convertThingToGameObject(result.aspects, type, "ASPECT");
-      result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE");      
+      //we need the template for fate anything characters
+      result.aspects = this.convertThingToGameObject(result.aspects, type, "ASPECT", result.template);
+      result.consequences = this.convertThingToGameObject(result.consequences, type, "CONSEQUENCE", result.template);
+
       result.stress = this.convertThingToGameObject(result.stress, type, "STRESS");            
       result.conditions = this.convertThingToGameObject(result.conditions, type, "CONDITION");
       result.skills = this.convertThingToGameObject(result.skills, type, "SKILL");         
@@ -269,8 +273,8 @@ export default {
     },    
     /* end character search */
 
-    convertThingToGameObject(array, thing, type) {
-      if (!array) return;
+    convertThingToGameObject(obj, thing, type, template) {      
+      if (!obj) return;
 
       let gameObject = new Array();
 
@@ -281,7 +285,10 @@ export default {
 
       switch(type) {        
         case "ASPECT":
-          for (let [key, value] of Object.entries(array)) {
+          for (let [key, value] of Object.entries(obj)) {
+            //templated characters can have more keys, we only want the named ones
+            if (template && !key.startsWith("aspect")) continue;
+
             if (thing == "ADVERSARY") {
               var subAspects = value.split(";");
               subAspects.forEach( item => {
@@ -289,14 +296,28 @@ export default {
                 gameObject.push(aspect);
               });                        
             } else {              
-              let aspect = models.SceneAspect(value, key, thing);
+              let label = key;
+              if (thing === "CHARACTER" && template) {                
+                let id = parseInt(label.replace( /^\D+/g, ''));                
+                let templateItem = template.aspects.find((item) => item.id == id);
+                if (!isNaN(id) && templateItem) {                     
+                  //if we have a custom label, use it
+                  label = eval(`obj.label${id}`);
+                  //else, use the placeholder
+                  if (!label) {
+                    label = templateItem.placeholder;
+                  }
+                }
+              }
+
+              let aspect = models.SceneAspect(value, label, thing);
               gameObject.push(aspect);
             }
           }
           break;
         case "STRESS":
-          if (thing == "ADVERSARY" && Array.isArray(array)) {                        
-            array.forEach((track) => {
+          if (thing == "ADVERSARY" && Array.isArray(obj)) {                        
+            obj.forEach((track) => {
               let stress = models.SceneStress(track.name, type);
               let boxes = track.value.split(',');
               boxes.forEach((box) => { 
@@ -307,7 +328,7 @@ export default {
             });
           }
           else {
-            for (let [key, value] of Object.entries(array)) {
+            for (let [key, value] of Object.entries(obj)) {
               let stress = models.SceneStress(key, type)
               for (let [skey, svalue] of Object.entries(value)) {
                 let stressbox = models.SceneStressBox(svalue)
@@ -318,30 +339,46 @@ export default {
           }
           break;
         case "CONDITION":          
-          for (let [key, value] of Object.entries(array)) {            
+          for (let [key, value] of Object.entries(obj)) {            
             let condition = models.SceneCondition(key, type);
             condition.boxes.push(models.SceneStressBox(value))     
             gameObject.push(condition);
           }
           gameObject = gameObject.sort((a, b) => a.name.localeCompare(b.name));
           break;
-        case "CONSEQUENCE": 
-          if (thing == "ADVERSARY" && Array.isArray(array)) {                
-            array.forEach((item) => {
+        case "CONSEQUENCE":         
+          if (thing == "ADVERSARY" && Array.isArray(obj)) {
+            obj.forEach((item) => {            
               let consequence = models.SceneConsequence(item.name, item.value, "", type);
-              gameObject.push(consequence);
+              gameObject.push(consequence);              
             });
           }
-          else {       
-            for (let [key, value] of Object.entries(array)) {
-              let consequence = models.SceneConsequence(key, (thing == "ADVERSARY" ? value : ''), (thing == "CHARACTER" ? value : ''), type);
+          else {
+            for (let [key, value] of Object.entries(obj)) {
+              //templated characters can have more keys, we only want the named ones
+              if (template && !key.startsWith("consequence")) continue;
+
+              let label = key;
+              if (thing === "CHARACTER" && template) {
+                let id = parseInt(label.replace( /^\D+/g, ''));
+                let templateItem = template.consequences.find((item) => item.id == id);                
+                if (!isNaN(id) && templateItem) {                  
+                   //if we have a custom label, use it
+                  label = eval(`obj.label${id}`);
+                  //else, use the placeholder
+                  if (!label) {
+                    label = templateItem.placeholder;
+                  }
+                }
+              }
+              let consequence = models.SceneConsequence(label, (thing == "ADVERSARY" ? value : ''), (thing == "CHARACTER" ? value : ''), type);
               gameObject.push(consequence);
             }
           }
           break;
         case "SKILL":
-          if (thing == "ADVERSARY" && Array.isArray(array)) {                
-            array.forEach((item) => {
+          if (thing == "ADVERSARY" && Array.isArray(obj)) {                
+            obj.forEach((item) => {
               let valIsNum = !isNaN(parseInt(item.value));
               let name = valIsNum ? item.name : item.value; //if the value is not a number, then the name is in the value
               let val = valIsNum ? item.value : item.name // if the value is a number, use the value, otherwise the value is in the key
@@ -350,7 +387,7 @@ export default {
             });
           }
           else {
-            for (let [key, value] of Object.entries(array)) {
+            for (let [key, value] of Object.entries(obj)) {
               let valIsNum = !isNaN(parseInt(value));      
               let name = valIsNum ? key : value; //if the value is not a number, then the name is in the value
               let val = valIsNum ? value : key // if the value is a number, use the value, otherwise the value is in the key
@@ -362,7 +399,7 @@ export default {
         case "STUNTEXTRA":          
           //character stunts/extras are string, so attempt to parse them
           if (thing == "CHARACTER") {        
-            let items = array.split('\n');
+            let items = obj.split('\n');
             items.forEach(item => {
               let stuntextra = null;
               var tempItem = item.split(":");
@@ -376,14 +413,14 @@ export default {
             })
           }
           else {            
-            if (Array.isArray(array)) {                
-              array.forEach((item) => {
+            if (Array.isArray(obj)) {                
+              obj.forEach((item) => {
                 let stuntextra = models.SceneStuntExtra(item.name, item.value, type);
                 gameObject.push(stuntextra);
               });
             }
             else {
-              for (let [key, value] of Object.entries(array)) {            
+              for (let [key, value] of Object.entries(obj)) {            
                 let stuntextra = models.SceneStuntExtra(key, value, type);
                 gameObject.push(stuntextra);
               }
@@ -391,7 +428,7 @@ export default {
           }
 
           break;
-      };
+      }
 
       return gameObject;
     },

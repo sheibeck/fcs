@@ -1,8 +1,12 @@
 <template>
 <div class="sheet">
 	<div class="row">		
-		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right">
-			<img alt="Fate Anything" class="img-fluid fate-logo" :src="$parent.GetSheetImage()" />			
+		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right d-md-flex">
+			<div class="mr-auto d-print-none d-none d-md-inline"></div>
+			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="$parent.GetSheetImage()" />			
+			<div class="d-print-none order-2 order-md-1">
+				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> <button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()"><i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i></button>
+			</div>
 		</div>
 
 		<div class="col-sm-6 d-flex flex-column flex-md-row order-md-1">
@@ -23,17 +27,17 @@
 		<div class="col-sm-6 col-md-7 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
 			<div class="fate-header d-flex">
 				<div class="mr-auto">Aspects</div>
-				<div>
+				<div v-if="!isEditLocked">
 					<i title="Add Aspect" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addAspect()"></i>
 				</div>
 			</div>
 			<div class="px-1">
 				<div v-for="aspect in character.template.aspects" :key="aspect.id">
-					<inputaspect v-on:remove-aspect="onRemoveAspect" :aspect="aspect" :customlabel="true" :showlabel="true" :removable="true" />
+					<inputaspect v-on:remove-aspect="onRemoveAspect" :aspect="aspect" :customlabel="true" :showlabel="true" :removable="true" :editlock="isEditLocked" />
 				</div>
 			</div>
 			
-			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" />
+			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" />
 
 			<div class="fate-header mb-5 mb-sm-0">
 				<div class="d-flex">
@@ -54,7 +58,7 @@
 		<div class="col-sm-6 col-md-5 fate-skills px-0 mt-3 mt-sm-0">
 			<div class="fate-header d-flex">				
 				<div class="mr-auto">Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>	
-				<div>
+				<div v-if="!isEditLocked">
 					<i title="Add Stress Track" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addStressTrack()"></i>
 				</div>
 			</div>
@@ -62,20 +66,21 @@
 			<!-- stress -->
 			<div class="d-md-flex flex-column pb-2 px-1" v-for="stress in character.template.stress" :key="stress.id">
 				<div class="form-group font-weight-bold pr-2 mt-0 border-bottom d-flex">
-					<input class="w-75 mr-auto inputlabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
+					<input v-if="!isEditLocked" class="w-75 mr-auto inputlabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
 						@change="setVal(`${stress.label}`,  $event.target.value)" 
 						:value="getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
-					<button type="button" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressTrack(stress.id)">
+					<label v-else>{{getStressTrackLabel(stress.label, stress.placeholder)}}</label>
+					<button type="button" v-if="!isEditLocked" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressTrack(stress.id)">
 						<i title="Delete Stress Track" class="fas d-print-none fa-minus-circle"></i>
 					</button>
-					<button type="button" class="btn btn-link text-secondary m-0 p-0" v-on:click="addStressBox(stress.id)">
+					<button type="button" v-if="!isEditLocked" class="btn btn-link text-secondary m-0 p-0" v-on:click="addStressBox(stress.id)">
 						<i title="Add Stress Box" class="fas d-print-none fa-plus-circle"></i>
 					</button>					
 				</div>
-				<div class="d-flex flex-wrap pt-1">
+				<div class="d-flex flex-wrap justify-content-around pt-1">
 					<div v-for="box in stress.boxes" :key="box.id" class="pt-1">
 						<inputstress v-on:remove-stress-box="onRemoveStressBox" :parentid="stress.id" :stress="box" :stresstype="getStressType(stress)"
-							:customlabel="true" :removable="true" :hidelabel="false" />
+							:customlabel="true" :removable="true" :hidelabel="false" :editlock="isEditLocked" />
 					</div>
 				</div>
 			</div>				
@@ -83,25 +88,25 @@
 			<!-- consequences -->
 			<div class="fate-header d-flex">				
 				<div class="mr-auto">Consequences</div>	
-				<div>
+				<div v-if="!isEditLocked">
 					<i title="Add Consequence" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addConsequence()"></i>
 				</div>
 			</div>
 			<div class="px-1" v-for="consequence in character.template.consequences" :key="consequence.obj">
-				<inputconsequence v-on:remove-consequence="onRemoveConsequence" :consequence="consequence" :customlabel="true" :removable="true" />
+				<inputconsequence v-on:remove-consequence="onRemoveConsequence" :consequence="consequence" :customlabel="true" :removable="true" :editlock="isEditLocked" />
 			</div>
 
 			<!-- Skills -->
 			<div class="fate-header d-flex mt-2">				
 				<div class="mr-auto">Skills</div>	
-				<div>
+				<div v-if="!isEditLocked">
 					<i title="Add Skill" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addSkill()"></i>
 				</div>
 			</div>
 
 			<div class="px-1 skills">				
-				<div v-for="skill in character.template.skills" :key="skill.obj" class="py-1">
-					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" />
+				<div v-for="skill in character.template.skills" :key="skill.obj" class="mt-1">
+					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" :customlabel="true" :editlock="isEditLocked" />
 				</div>
 			</div>
 		</div>
@@ -182,23 +187,41 @@ export default {
 				{
 					id: 1,
 					label: "stress.stress1.label",
-					placeholder: "Stress",
+					placeholder: "Physical",
 					boxes: [
 						{id: 1, label:"stress.stress1.boxes.label1", obj:"stress.stress1.boxes.stress1", placeholder: "1"},
 						{id: 2, label:"stress.stress1.boxes.label2", obj:"stress.stress1.boxes.stress2", placeholder: "2"},
 						{id: 3, label:"stress.stress1.boxes.label3", obj:"stress.stress1.boxes.stress3", placeholder: "3"},
 					]
+				},
+				{
+					id: 2,
+					label: "stress.stress2.label",
+					placeholder: "Mental",
+					boxes: [
+						{id: 1, label:"stress.stress2.boxes.label1", obj:"stress.stress2.boxes.stress1", placeholder: "1"},
+						{id: 2, label:"stress.stress2.boxes.label2", obj:"stress.stress2.boxes.stress2", placeholder: "2"},
+						{id: 3, label:"stress.stress2.boxes.label3", obj:"stress.stress2.boxes.stress3", placeholder: "3"},
+					]
 				}
 			] 		
-		}
+		},
+		isEditLocked: true,
     }
-  },
+  },  
   methods: {  
 	init() {
 		if (!this.character.template) {
 			this.character.template = this.$set(this.character, "template", this.defaultTemplate);
 		}
 	},
+	updateLockStatus() {		
+		this.isEditLocked = !this.isEditLocked;
+	},
+	getStressTrackLabel(label, placeholder) {     
+    	let value = this.getVal(`${label}`);
+    	return (!value) ? placeholder : value;     
+    },
 	getStressType(stress) {		
 		if (stress.label !== "") {
 			let label = this.getVal(stress.label);
@@ -208,8 +231,8 @@ export default {
 		}		
 		return stress.placeholder;		
 	},
-    getVal(graphPath, defaultValue) {
-      return this.$parent.getVal(this.character, graphPath, defaultValue);
+    getVal(graphPath, defaultValue) {		
+      	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
     setVal(arr, val) {		
 		this.$parent.setVal(this.character, arr, val);
@@ -284,7 +307,7 @@ export default {
 		let max = Math.max.apply(Math, items.map(function(o) { return o.id; }));
 		return max+1;
 	},
-	onRemoveAspect: function (id) {	
+	onRemoveAspect: function (id) {			
 		let arr = this.character.template.aspects.filter(function( obj ) {
 			return obj.id !== id;
 		});
@@ -419,6 +442,15 @@ export default {
 		font-size: 55px;
 		padding-left: 20px;	
 		margin-top: -60px;	
+	}
+
+	/deep/ label {
+		font-size: 22px !important;
+		font-weight: 700;
+		border-width: 0px;
+		margin-top: 0px;
+		margin-bottom: 0px;					
+		text-transform: capitalize !important;
 	}
 
 </style>

@@ -110,4 +110,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .fas {
+    cursor: pointer;
+  }
 </style>

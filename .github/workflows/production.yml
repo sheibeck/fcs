@@ -48,15 +48,15 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}       
         SOURCE_DIR: "dist"
-    - name: Create Sentry release
-      uses: getsentry/action-release@v1
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-      with:
-        environment: production
-        tagName: ${{ github.event.inputs.name }}
+    # - name: Create Sentry release
+    #  uses: getsentry/action-release@v1
+    #  env:
+    #    SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+    #    SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+    #    SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+    #  with:
+    #    environment: production
+    #    tagName: ${{ github.event.inputs.name }}
     # Invalidate Cloudfront (this action)
     - name: invalidate
       uses: chetan/invalidate-cloudfront-action@master

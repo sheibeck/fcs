@@ -5,11 +5,13 @@ import CharacterSheet from '@/components/CharacterSheet.vue';
 import SheetFateCore from '@/sheets/fate-core.vue';
 import SheetFateCondensed from '@/sheets/fate-condensed.vue';
 import SheetFateOfCthulhu from '@/sheets/fate-of-cthulhu.vue';
+import SheetFateAnything from '@/sheets/fate-anything.vue';
 import VueShowdown from 'vue-showdown';
 
 //inputs
 import InputSkillPyramid from '@/components/input-skill-pyramid.vue';
 import InputSkillColumn from '@/components/input-skill-column.vue';
+import InputAspect from '@/components/input-aspect.vue';
 
 function mountComponentWithProps (store, Component, propsData) {
   let $route = {   
@@ -135,4 +137,46 @@ describe('skill components', () => {
       expect(valueInput.element.value).toBe(expectedSkillValue);   
     }
   );
+ 
+  it('AspectInput should render label element if locked', async () => { 
+      wrapper = mountComponentWithProps(store, SheetFateAnything, 
+        {
+          character: {         
+            aspects: [
+              {id: 1, label:"aspects.label1", obj:"aspects.aspect1", placeholder:"High Concept"},
+            ]
+          }
+        }
+      );
+
+      //first skill
+      const comInput = wrapper.findAllComponents(InputAspect).at(0);   
+      expect(comInput.exists()).toBe(true);
+
+      await comInput.setProps({editlock: true, customlabel: true});
+      const comLabel = comInput.find('label');
+      expect(comLabel.exists()).toBe(true);
+    }
+  );
+
+  it('AspectInput should render inputlabel if not locked', async () => { 
+    wrapper = mountComponentWithProps(store, SheetFateAnything, 
+      {
+        character: {         
+          aspects: [
+            {id: 1, label:"aspects.label1", obj:"aspects.aspect1", placeholder:"High Concept"},
+          ]
+        }
+      }
+    );
+            
+    //first skill
+    const comInput = wrapper.findAllComponents(InputAspect).at(0);
+    expect(comInput.exists()).toBe(true);
+
+    await comInput.setProps({editlock: false, customlabel: true});    
+    const comLabel = comInput.find('input.inputlabel');
+    expect(comLabel.exists()).toBe(true) 
+  }
+);
 });

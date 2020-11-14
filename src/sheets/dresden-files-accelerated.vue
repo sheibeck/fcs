@@ -128,7 +128,7 @@
 				<textarea type="text" class="form-control" id="mantles" name="mantles" rows="2" placeholder="Mantles" @change="setVal('mantles',  $event.target.value)" :value="getVal('mantles')"></textarea>
 			</div>
 			<div class="form-group">
-				<inputstuntextra :item="stunts" :rows="13" :border="true" header="Stunts" />
+				<inputstuntextra :item="stunts" :rows="13" :border="true" header="Stunts" v-on="$listeners" />
 			</div>
 			<div class="form-group d-md-flex justify-content-between">
 				<span v-if="vttEnabled" class='dice fo20 pt-2'>A</span><label class="col-form-label pr-1">FP</label>
