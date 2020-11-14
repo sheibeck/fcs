@@ -423,16 +423,25 @@ export default {
       }
     },
     async syncCharacter() {
-      let data = this.objectdata;      
+      let data = this.objectdata;
       let character = await dbSvc.GetObject(data.id, data.owner_id);
       
       if (character) {
         let type = "CHARACTER";
         
         //update aspects
-        data.aspects = this.$parent.$parent.convertThingToGameObject(character.aspects, type, "ASPECT");
+        if (character.aspects) {
+          if (!data.aspects) {
+            this.$set(this.objectdata, "aspects", new Array());
+          }
+          data.aspects = this.$parent.$parent.convertThingToGameObject(character.aspects, type, "ASPECT", character.template);
+        }
+
         if (character.consequences) {
-          data.consequences = this.$parent.$parent.convertThingToGameObject(character.consequences, type, "CONSEQUENCE");  
+          if (!data.consequences) {
+            this.$set(this.objectdata, "consequences", new Array());
+          }         
+          data.consequences = this.$parent.$parent.convertThingToGameObject(character.consequences, type, "CONSEQUENCE", character.template);
         }
 
         //pull in a new image if one is set
