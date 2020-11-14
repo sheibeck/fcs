@@ -210,10 +210,10 @@ export default {
         //TODO: allow adding labels to aspects when adding NPCs     
         if (this.objectdata.aspects.filter(aspect => aspect.label !== "").length === 0) return this.objectdata.aspects;
 
-        var sortPriority = [ "trouble", "highconcept", "high_concept" ];
+        var sortPriority = [ "trouble", "highconcept", "high_concept", "high concept" ];
         return this.objectdata.aspects.sort(function(a,b){ 
-          if ( a.label == b.label ) return -1;
-          return sortPriority.indexOf( b.label ) - sortPriority.indexOf( a.label );
+          if ( a.label.toLowerCase() == b.label.toLowerCase() ) return -1;
+          return sortPriority.indexOf( b.label.toLowerCase() ) - sortPriority.indexOf( a.label.toLowerCase() );
         });
       } else {
         return [];
