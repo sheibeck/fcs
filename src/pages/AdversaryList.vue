@@ -281,14 +281,18 @@ export default {
         this.description = "Fate Adversaries";
       }        
     },
-    fixLabel: function (val, type, data) {
-      let result = val;     
-      if (!val.name) {
+    fixLabel: function (val, type, data) {      
+      let result = val;
+      
+      if (typeof(val) === "string") {
         result = val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
       }
-      else {
+      else if (val.name) {        
         result = val.name.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-      }   
+      }
+      else {        
+        return val;
+      }
         
       if (this.vttEnabled && type) {
         let r20result = "";

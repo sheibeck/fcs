@@ -15,8 +15,8 @@
               <div class="modal-body">
               </div>
               <div class="modal-footer">
-                  <button type="button" class="btn btn-primary" v-on:click="DiceRoller()">Roll</button>
-                  <button type="button" class="btn btn-warning" v-on:click="ClearDiceTray()">Clear</button>
+                  <button type="button" class="btn btn-primary" @click="RollDice">Roll</button>
+                  <button type="button" class="btn btn-warning" @click="ClearDiceTray">Clear</button>
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               </div>
           </div>
@@ -41,8 +41,7 @@ export default {
     }
   },
   methods: {
-
-    DiceRoller() {    
+    RollDice() {    
       if (!this.diceRoller)
       {      
         const roller = new DiceRoller();
