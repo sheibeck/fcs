@@ -66,7 +66,28 @@ export default {
       if (!commonSvc) { 
         commonSvc = new CommonService(this.$root);
       }
-      return `${commonSvc.GetId(this.sheetid)}`;
+      let id = `${commonSvc.GetId(this.sheetid)}`;
+
+      let validSheets = ["fate-accelerated",
+        "fate-accelerated-custom",    
+        "fate-core",
+        "fate-core-custom",
+        "middle-earth",
+        "dresden-files-accelerated",
+        "fate-condensed",
+        "fate-freeport",
+        "fate-of-cthulhu",
+        "mouse-guard",
+        "star-trek",
+        "fate-anything"];
+
+      //validate the sheet
+      if (validSheets.includes(id)) {
+        return id;
+      }
+      else {
+        document.location = "/404";
+      }
     }
   },
   data () {
