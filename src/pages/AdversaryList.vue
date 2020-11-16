@@ -51,7 +51,7 @@
           <div v-if="Array.isArray(item.aspects)">
             <p v-for="(aspect,index) in item.aspects" :key="index" class='card-text px-4 my-0' :id="`aspect-${index}`">
               <strong v-if="index==0">High Concept</strong>
-              <strong v-if="index==1">High Concept</strong>
+              <strong v-if="index==1">Trouble</strong>
               <strong v-if="index>1">Aspect</strong>
               <span v-html="fixLabel(aspect.name, 'aspect')"></span>
             </p>
@@ -281,14 +281,18 @@ export default {
         this.description = "Fate Adversaries";
       }        
     },
-    fixLabel: function (val, type, data) {
-      let result = val;     
-      if (!val.name) {
+    fixLabel: function (val, type, data) {      
+      let result = val;
+      
+      if (typeof(val) === "string") {
         result = val.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
       }
-      else {
+      else if (val.name) {        
         result = val.name.replace(/_/g, ' ').replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-      }   
+      }
+      else {        
+        return val;
+      }
         
       if (this.vttEnabled && type) {
         let r20result = "";
