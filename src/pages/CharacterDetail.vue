@@ -19,12 +19,15 @@
                 
         <div id="characterProperties" class="pt-2 collapse show">
 
-          <div v-if="isAuthenticated"> 
+          <div v-if="isAuthenticated">
             <div class="d-flex">
-              <img v-if="exists(characterData, 'image_url')" :src="characterData.image_url" class="img-fluid img-thumbnail mr-1" style="max-width: 100px;" />
+              <img v-if="hasPortraitUrl" :src="characterData.image_url" class="img-fluid img-thumbnail mr-1" style="max-width: 100px;" />             
               <div class='form-group w-100'>
                 <label class='' for='image_url'>Portrait Url:</label>
-                <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />            
+                <input class='form-control' id='image_url' name='image_url' @change="updateCharacterPortrait($event.target.value)"  :value="exists(characterData, 'image_url')" />
+                <div v-if="IsCustomizableSheet">
+                  <input type="checkbox" class="mr-1 input-sm" @change="updateShowPortrait($event.target.checked)" :checked="exists(characterData.template, 'showPortrait')" /><span>Show on sheet?</span>
+                </div>
               </div>
             </div>
             <div class='form-group'>
@@ -82,12 +85,12 @@
             <div class="d-flex" v-if="IsCustomizableSheet">                
               <div class='form-group w-100'>
                 <label class='' for='sheet_logo'>Template Logo:</label>
-                <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />            
-              </div>
+                <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />
+              </div>              
             </div>
           </div>
                
-          <input v-if="!isAuthenticated" type="hidden" id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')"  />          
+          <input v-if="!isAuthenticated" type="hidden" id='image_url' name='image_url' :value="exists(characterData, 'image_url')"  />          
         </div>
 
       </div>   
@@ -191,6 +194,9 @@ export default {
         return this.characterData.template.color ? this.characterData.template.color : "black";
       }
     },    
+    hasPortraitUrl() {
+      return this.exists(this.characterData, 'image_url');
+    }
   },  
   data () {
     return {
@@ -405,8 +411,14 @@ export default {
       this.$set(this.characterData.template, "color", color.hex);
     }, 
     updateTemplateLogo(logo) {
-      this.$set(this.characterData.template, "logo", logo);      
+      this.$set(this.characterData.template, "logo", logo);
     },   
+    updateCharacterPortrait(portrait) {      
+      this.$set(this.characterData, "image_url", portrait);
+    },
+    updateShowPortrait(show) {
+      this.$set(this.characterData.template, "showPortrait", show);
+    }
   }
 }
 </script>

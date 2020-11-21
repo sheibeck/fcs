@@ -16,7 +16,7 @@
 			</div>
 
 			<div class="form-group d-flex col-md-4">
-				<label class="mt-2 mr-2">Pronoun</label>
+				<label class="mt-2 mr-2">Pron.</label>
 				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
 			</div>
 		</div>		
@@ -56,6 +56,10 @@
 
 		<!-- Vitals and Skills -->
 		<div class="col-sm-6 col-md-5 fate-skills px-0 mt-3 mt-sm-0">
+			<div v-if="showPortrait" class="text-center">
+				<img alt="Fate Anything" class="img-fluid" :src="character.image_url" />	
+			</div>
+
 			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>	
 				<div v-if="!isEditLocked">
@@ -63,7 +67,7 @@
 				</div>
 			</div>
 
-			<!-- stress -->
+			<!-- stress -->					
 			<div class="d-md-flex flex-column pb-2 px-1" v-for="stress in character.template.stress" :key="stress.id">
 				<div class="form-group font-weight-bold pr-2 mt-0 border-bottom d-flex">
 					<input v-if="!isEditLocked" class="w-75 mr-auto inputlabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
@@ -148,6 +152,9 @@ export default {
 		else {
 			return this.character.template.logo ? this.character.template.logo : sheetLogo;
 		}		
+	},
+	showPortrait() {
+		return this.character.template && this.character.template.showPortrait;
 	}
   },
   created() {
