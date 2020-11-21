@@ -1,5 +1,6 @@
 <template>
-  <div class="container mt-2">      
+  <div class="container mt-2"> 
+
       <charactersheet v-if="characterData" :character="characterData" :sheetid="characterData.related_id" @save-character="save"/>
 
       <div class="d-print-none">
@@ -9,7 +10,7 @@
           <div class='col'>
             <button v-if="isAuthenticated && isOwner" type='button' v-on:click="save" class='btn btn-success'>Save Character <i class='fa fa-user'></i></button>
             <a href="/character" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-            <button type='button' class='btn btn-dark' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+            <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>
             <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
               Character Properties <i class="fas fa-cog"></i>
             </button>
@@ -40,30 +41,35 @@
                       @tags-changed="newTags => updateTags(newTags)"
                     />          
               </div>
-              <div class='col px-0' id="TemplateContainer" v-if="DoesSupportTemplates">
+              <div class='col px-0' id="TemplateContainer" v-if="IsCustomizableSheet">                
                 <label class='' for='template'>Template:</label>
-                <div class="d-flex">    
-                  <autocomplete ref="templateAutocomplete" :search="searchTemplates"                    
-                    :debounce-time="500"
-                    placeholder="Find a templates"
-                    aria-label="Find a Templates"                     
-                    :get-result-value="getTemplateResultValue"
-                    @submit="selectTemplateResult"
-                    @update="updateTemplateResult"
-                    class="mr-1">
-                    <template #result="{ result, props }">
-                      <li v-bind="props">
-                        <div class="p-0 m-0 h6">
-                          {{result.name}}
-                        </div>
-                        <div class="small">
-                          {{result.description}}
-                        </div>
-                      </li>
-                    </template>
-                  </autocomplete>
-                  <div class="pt-2">
-                    <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
+                <div>    
+                  <div class="mb-1">                    
+                    <swatches-picker @input="updateTemplateColor"
+                      :value="getTemplateColor" />
+                  </div>
+                  <div class="d-flex">                  
+                    <autocomplete ref="templateAutocomplete" :search="searchTemplates"                    
+                      :debounce-time="500"
+                      placeholder="Find a templates"
+                      aria-label="Find a Templates"                     
+                      :get-result-value="getTemplateResultValue"
+                      @submit="selectTemplateResult"                    
+                      class="mr-1">
+                      <template #result="{ result, props }">
+                        <li v-bind="props">
+                          <div class="p-0 m-0 h6">
+                            {{result.name}}
+                          </div>
+                          <div class="small">
+                            {{result.description}}
+                          </div>
+                        </li>
+                      </template>
+                    </autocomplete>
+                    <div class="pt-2">
+                      <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
+                    </div>
                   </div>
                 </div>
                 <div class="mt-1">
@@ -71,6 +77,12 @@
                   <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template.id" @click="applyTemplate">Apply Template</button>
                   <button type="button" class="btn btn-danger btn-sm mr-1" v-if="IsTemplateOwner" @click="deleteTemplate">Delete Template</button>
                 </div>
+              </div>              
+            </div>
+            <div class="d-flex" v-if="IsCustomizableSheet">                
+              <div class='form-group w-100'>
+                <label class='' for='sheet_logo'>Template Logo:</label>
+                <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />            
               </div>
             </div>
           </div>
@@ -125,6 +137,8 @@ import CharacterSheet from '../components/charactersheet'
 import VueTagsInput from '@johmun/vue-tags-input';
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import bootbox from 'bootbox';
+import DbTools from '../assets/js/dbTools';
+import { Compact } from 'vue-color';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -134,18 +148,19 @@ export default {
   components: {
     "charactersheet": CharacterSheet,
     VueTagsInput,
-    Autocomplete,
+    Autocomplete,   
+    'swatches-picker': Compact,
   },
   metaInfo() {    
-    return {
+    return {      
        title: `${this.characterData ? this.characterData.name : this.pageTitle}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
      }
   },
-  mounted(){       
-    this.init();
+  async mounted(){
+    await this.init();
   },
   computed: {
     ...mapGetters([
@@ -159,22 +174,24 @@ export default {
     IsTemplateOwner() {
       return this.template && this.template.owner_id == this.userId;
     },
-    DoesSupportTemplates() {
+    IsCustomizableSheet() {
       return this.characterData && this.characterData.related_id === "CHARACTERSHEET|fate-anything";
-    },
+    },    
     GetTemplateName() {
       return this.template ? this.template.name : '';
     },
     GetTemplateDescription() {
       return this.template ? this.template.description : '';
-    }
-  },
-  watch: {
-    userId() {
-      //wait for our authenticated user id
-      this.show();
-    }
-  },
+    },
+    getTemplateColor() {
+      if (!this.characterData.template) {
+        return "black";
+      }
+      else {
+        return this.characterData.template.color ? this.characterData.template.color : "black";
+      }
+    },    
+  },  
   data () {
     return {
       sheet: "",      
@@ -186,12 +203,16 @@ export default {
       tag: "",
       template: {
         name: "",
-        description: "",
+        description: "",        
       },
     }
   },
   methods : {
-    init() {
+    migrateData() {
+      let dbToolsSvc = new DbTools(this.$root);
+      dbToolsSvc.UpdateItem(this.characterId, this.userId);
+    },
+    async init() {
       commonSvc = new CommonService(this.$root);    
       dbSvc = new DbService(this.$root); 
       
@@ -202,6 +223,8 @@ export default {
         let form = document.getElementById('formTemplate');
         form.classList.remove('was-validated');
       })
+
+      this.show();
     },
     limit(maxLength)
     {       
@@ -271,7 +294,10 @@ export default {
       }     
       return true;
     },
-    updateTemplateResult() {      
+    print() {
+      if (typeof(window.print) === "function") {
+        window.print();
+      }      
     },
     async deleteTemplate() {
       bootbox.confirm("Are you sure you want delete this template?", async (result) => {        
@@ -374,7 +400,13 @@ export default {
           $('#modalSaveTemplate').modal('hide');
         }            
       }
-    }
+    },
+    updateTemplateColor(color) {      
+      this.$set(this.characterData.template, "color", color.hex);
+    }, 
+    updateTemplateLogo(logo) {
+      this.$set(this.characterData.template, "logo", logo);      
+    },   
   }
 }
 </script>

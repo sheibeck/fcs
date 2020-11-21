@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="fate-header d-flex">
+    <div class="fate-header d-flex" :style="{ backgroundColor: headerColor ? headerColor : 'black' }">
       <span :for="item" class="mr-auto">{{header}}</span>
       <a v-if="!isNewCharacter">
         <i class="fas d-print-none pr-2" v-on:click="addStunt(item)" :class="{ 'fa-plus' : stuntEdit, 'd-none' : !stuntEdit }"></i>
@@ -31,6 +31,7 @@ export default {
     rows: Number,
     border: Boolean,
     header: String,
+    headerColor: String,
   },  
   computed: {
  	  ...mapGetters([

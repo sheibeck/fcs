@@ -9,7 +9,7 @@
           <div class='col'>
             <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
             <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-            <button type='button' class='btn btn-dark' onclick='window.print();'>Print Character <i class='fa fa-print'></i></button>
+            <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>
             <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
               Character Properties <i class="fas fa-cog"></i>
             </button>
@@ -60,13 +60,11 @@ export default {
        ]
      }
   },
-  mounted(){
+  created() {  
     commonSvc = new CommonService(this.$root);
     dbSvc = new DbService(this.$root);
    
     this.sheetId = commonSvc.SetId("CHARACTERSHEET", this.$route.params.id);
-  },
-  watch: {     
   },
   computed: {
     ...mapGetters([
@@ -124,6 +122,11 @@ export default {
           }
         });
       }     
+    },
+    print() {
+      if (typeof(window.print) === "function") {
+        window.print();
+      }      
     }
   }
 }

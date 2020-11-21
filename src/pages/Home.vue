@@ -2,8 +2,8 @@
 <div class="container mt-2">
   <div class="row">
     <div class="col-12 text-center">
-    <img class="img-fluid" src="/static/img/big-logo.png" alt="Big Logo" />
-    </div>
+      <img class="img-fluid" src="/static/img/big-logo.png" alt="Big Logo" />
+    </div>   
   </div>
 
   <div class="row">
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'Home',
@@ -103,7 +103,7 @@ export default {
       'isAuthenticated',
       'userId',
       'isSubscriber'
-    ])  
-  },
+    ]),
+  }  
 }
 </script>

@@ -2,8 +2,8 @@
 <div class="sheet">
 	<div class="row">		
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right d-md-flex">
-			<div class="mr-auto d-print-none d-none d-md-inline"></div>
-			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="$parent.GetSheetImage()" />			
+			<div class="mr-auto d-none d-md-inline"></div>
+			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="getTemplateLogo" />			
 			<div class="d-print-none order-2 order-md-1">
 				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> <button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()"><i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i></button>
 			</div>
@@ -25,7 +25,7 @@
 	<div class="row">
 		<!-- aspects -->
 		<div class="col-sm-6 col-md-7 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
-			<div class="fate-header d-flex">
+			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">
 				<div class="mr-auto">Aspects</div>
 				<div v-if="!isEditLocked">
 					<i title="Add Aspect" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addAspect()"></i>
@@ -37,15 +37,15 @@
 				</div>
 			</div>
 			
-			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" />
+			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" :headerColor="character.template.color" />
 
-			<div class="fate-header mb-5 mb-sm-0">
+			<div class="fate-header mb-5 mb-sm-0" :style="{ backgroundColor: character.template.color }" >
 				<div class="d-flex">
 					<input class="refresh pl-md-3" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="3" /> <div class="pt-0">Refresh</div>
 				</div>
 			</div>
 			<div style="height: 50px;"></div>
-			<div class="fate-header mb-5 mb-sm-0 d-flex">
+			<div class="fate-header mb-5 mb-sm-0 d-flex" :style="{ backgroundColor: character.template.color }" >
 				<div class="mr-auto"></div>
 				<div class="d-flex" style="min-height: 50px;">
 					<span v-if="vttEnabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
@@ -56,7 +56,7 @@
 
 		<!-- Vitals and Skills -->
 		<div class="col-sm-6 col-md-5 fate-skills px-0 mt-3 mt-sm-0">
-			<div class="fate-header d-flex">				
+			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>	
 				<div v-if="!isEditLocked">
 					<i title="Add Stress Track" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addStressTrack()"></i>
@@ -86,7 +86,7 @@
 			</div>				
 			
 			<!-- consequences -->
-			<div class="fate-header d-flex">				
+			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Consequences</div>	
 				<div v-if="!isEditLocked">
 					<i title="Add Consequence" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addConsequence()"></i>
@@ -97,7 +97,7 @@
 			</div>
 
 			<!-- Skills -->
-			<div class="fate-header d-flex mt-2">				
+			<div class="fate-header d-flex mt-2" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Skills</div>	
 				<div v-if="!isEditLocked">
 					<i title="Add Skill" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addSkill()"></i>
@@ -140,6 +140,15 @@ export default {
  	...mapGetters([  
       'vttEnabled'
 	]),	
+	getTemplateLogo() {		
+		let sheetLogo = this.$parent.GetSheetImage();
+		if (!this.character.template) {
+			return sheetLogo;
+		}
+		else {
+			return this.character.template.logo ? this.character.template.logo : sheetLogo;
+		}		
+	}
   },
   created() {
 	this.init();
