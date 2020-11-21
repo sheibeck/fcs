@@ -469,4 +469,13 @@ export default {
 		text-transform: capitalize !important;
 	}
 
+	/deep/ .inputAspect {
+		font-size: 20px;
+		border: 0;
+		border-bottom: solid 1px gray; 
+	}
+	/deep/ .inputAspectLabel {
+		font-size: 16px !important;		
+	}
+
 </style>
