@@ -4,118 +4,118 @@
             <li class="nav-item">
                 <a class="nav-link active" id="character-tab" data-toggle="tab" href="#characterProperties" role="tab" aria-controls="character" aria-selected="true">Character Properties</a>
             </li>
-            <li class="nav-item">
+            <li v-if="isCustomizable" class="nav-item">
                 <a class="nav-link" id="sheet-tab" data-toggle="tab" href="#sheetProperties" role="tab" aria-controls="sheet" aria-selected="false">Sheet Properties</a>
             </li>           
         </ul>
 
         <div class="tab-content" id="tabProperties">
-            <div class="tab-pane fade show active" id="characterProperties" role="tabpanel" aria-labelledby="character-tab">           
-                <div>
-                    <div class="d-flex">
-                        <img v-if="hasPortraitUrl" :src="characterData.image_url" class="img-fluid img-thumbnail mr-1" style="max-width: 100px;" />             
-                        <div class='form-group w-100'>
-                            <label class='' for='image_url'>Portrait Url:</label> <a :href="getImageSearchUrl('concept')" target="_blank">[search]</a>
-                            <input class='form-control' id='image_url' name='image_url' @change="updateCharacterPortrait($event.target.value)"  :value="exists(characterData, 'image_url')" />
-                            <div v-if="isCustomizable">
-                                <input type="checkbox" class="mr-1 input-sm" @change="updateShowPortrait($event.target.checked)" :checked="exists(characterData.template, 'showPortrait')" /><span>Show on sheet?</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class='form-group'>
-                        <label class='' for='image_url'>Description:</label>
-                        <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
-                    </div>
-                    <div class="d-md-flex">
-                        <div class='col px-0'>
-                            <label class='' for='tags'>Tags:</label>
-                            <vue-tags-input id="tags"
-                                v-if="characterData !== null"
-                                v-model="tag"              
-                                :tags="characterData.tags"
-                                @tags-changed="newTags => updateTags(newTags)"
-                                />          
-                        </div>                                    
-                    </div>           
-                </div>                         
-            </div>
+          <div class="tab-pane fade show active" id="characterProperties" role="tabpanel" aria-labelledby="character-tab">           
+              <div>
+                  <div class="d-flex">
+                      <img v-if="hasPortraitUrl" :src="characterData.image_url" class="img-fluid img-thumbnail mr-1" style="max-width: 100px;" />             
+                      <div class='form-group w-100'>
+                          <label class='' for='image_url'>Portrait Url:</label> <a :href="getImageSearchUrl('concept')" target="_blank">[search]</a>
+                          <input class='form-control' id='image_url' name='image_url' @change="updateCharacterPortrait($event.target.value)"  :value="exists(characterData, 'image_url')" />
+                          <div v-if="isCustomizable">
+                              <input type="checkbox" class="mr-1 input-sm" @change="updateShowPortrait($event.target.checked)" :checked="exists(characterData.template, 'showPortrait')" /><span>Show on sheet?</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class='form-group'>
+                      <label class='' for='image_url'>Description:</label>
+                      <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
+                  </div>
+                  <div class="d-md-flex">
+                      <div class='col px-0'>
+                          <label class='' for='tags'>Tags:</label>
+                          <vue-tags-input id="tags"
+                              v-if="characterData !== null"
+                              v-model="tag"              
+                              :tags="characterData.tags"
+                              @tags-changed="newTags => updateTags(newTags)"
+                              />          
+                      </div>                                    
+                  </div>           
+              </div>                         
+          </div>
 
-            <div class="tab-pane fade" id="sheetProperties" role="tabpanel" aria-labelledby="profile-tab"> 
-                 
-                <div class="form-group">
-                    <label class='' for='template'>Template:</label>
-                    <autocomplete ref="templateAutocomplete" :search="searchTemplates"                    
-                        :debounce-time="500"
-                        placeholder="Find a templates"
-                        aria-label="Find a Templates"                     
-                        :get-result-value="getTemplateResultValue"
-                        @submit="selectTemplateResult"                    
-                        class="mr-1">
-                        <template #result="{ result, props }">
-                        <li v-bind="props">
-                            <div class="p-0 m-0 h6">
-                            {{result.name}}
-                            </div>
-                            <div class="small">
-                            {{result.description}}
-                            </div>
-                        </li>
-                        </template>
-                    </autocomplete>
-                    <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
-                    <div class="d-flex">
-                        <button type="button" class="btn btn-success btn-sm mr-1" data-toggle='modal' data-target='#modalSaveTemplate'>Save Template</button>
-                        <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template.id" @click="applyTemplate">Apply Template</button>
-                        <button type="button" class="btn btn-danger btn-sm mr-1" v-if="IsTemplateOwner" @click="deleteTemplate">Delete Template</button>
-                    </div>
-                </div>                
-                
-                <div class='form-group'>
-                    <label class='' for='sheet_logo'>Template Color:</label>
-                    <swatches-picker @input="updateTemplateColor" :value="getTemplateColor" />
+          <div v-if="isCustomizable" class="tab-pane fade" id="sheetProperties" role="tabpanel" aria-labelledby="profile-tab">                 
+            <div class="form-group">
+                <label class='' for='template'>Template:</label>
+                <autocomplete ref="templateAutocomplete" :search="searchTemplates"                    
+                    :debounce-time="500"
+                    placeholder="Find a template"
+                    aria-label="Find a Template"                     
+                    :get-result-value="getTemplateResultValue"
+                    @submit="selectTemplateResult"                    
+                    class="mr-1">
+                    <template #result="{ result, props }">
+                    <li v-bind="props">
+                        <div class="p-0 m-0 h6">
+                        {{result.name}}
+                        </div>
+                        <div class="small">
+                        {{result.description}}
+                        </div>
+                    </li>
+                    </template>
+                </autocomplete>
+                <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-success btn-sm mr-1" data-toggle='modal' data-target='#modalSaveTemplate'>Save Template</button>
+                    <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template.id" @click="applyTemplate">Apply Template</button>
+                    <button type="button" class="btn btn-danger btn-sm mr-1" v-if="IsTemplateOwner" @click="deleteTemplate">Delete Template</button>
                 </div>
+            </div>                
             
-                <div class='form-group w-100'>
-                    <label class='' for='sheet_logo'>Template Logo Url:</label> <a :href="getImageSearchUrl('tv show logos')" target="_blank">[search]</a>
-                    <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />
-                </div>               
+            <div class='form-group'>
+                <label class='' for='sheet_logo'>Template Color:</label>
+                <swatches-picker @input="updateTemplateColor" :value="getTemplateColor" />
             </div>
-        </div>
+        
+            <div class='form-group w-100'>
+                <label class='' for='sheet_logo'>Template Logo Url:</label> <a :href="getImageSearchUrl('tv show logos')" target="_blank">[search]</a>
+                <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />
+            </div>    
 
-        <!-- delete template confirmation modal-->
-        <div class="modal fade" id="modalSaveTemplate" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <form class="needs-validation" novalidate id="formTemplate">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteLabel">Save Template</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Name (Max 50 characters)</label>
-                            <input class="form-control" @input="limit(50)" v-model="template.name" required />
+            <!-- delete template confirmation modal-->
+            <div class="modal fade" id="modalSaveTemplate" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form class="needs-validation" novalidate id="formTemplate">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteLabel">Save Template</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>Description (Max 100 characters)</label>
-                            <textarea maxlength="250" @input="limit(100)" class="form-control" v-model="template.description" required></textarea>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Name (Max 50 characters)</label>
+                                <input class="form-control" @input="limit(50)" v-model="template.name" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Description (Max 100 characters)</label>
+                                <textarea maxlength="250" @input="limit(100)" class="form-control" v-model="template.description" required></textarea>
+                            </div>
+                            <small>
+                                Save this sheet layout as a template that can be applied to other Fate Anything sheets. To update
+                                one of your existing templates choose the same name. To create a new one, choose a new name.
+                                You must enter a short description of your template.
+                            </small>
                         </div>
-                        <small>
-                            Save this sheet layout as a template that can be applied to other Fate Anything sheets. To update
-                            one of your existing templates choose the same name. To create a new one, choose a new name.
-                            You must enter a short description of your template.
-                        </small>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" @click="saveTemplate">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" @click="saveTemplate">Save</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
+                    </form>
                 </div>
-                </form>
-            </div>
-        </div>
+            </div>           
+          </div>
+
+        </div>       
     </div>
 </template>
 

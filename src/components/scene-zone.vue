@@ -39,12 +39,9 @@
         <zoneaspect :aspect="aspect" location="zone" v-for="aspect in zone.aspects" v-bind:key="aspect.id" />
       </header>
 
-      <div v-if="!zoneImageEdit" :id="`drag-container-${commonSvc.GetId(zone.id)}`" class="border" style="min-height:150px;height:94%;width:100%;">
-        
-        <sceneobject :objectdata="item" v-for="item in zone.sceneobjects" :key="item.id" />
-      
-      </div>  
-      
+      <div v-if="!zoneImageEdit" :id="`drag-container-${commonSvc.GetId(zone.id)}`" class="border" style="min-height:150px;height:94%;width:100%;">        
+        <sceneobject :objectdata="item" v-for="item in zone.sceneobjects" :key="item.id" />      
+      </div>        
     </div>
 
     <div class="d-flex flex-column bg-light pl-1">
@@ -184,7 +181,7 @@ export default {
       result.extras = null;
       
       this.$set(result, "stuntextras", new Array())
-
+      
       if(Array.isArray(stuntArray)) {
         stuntArray.forEach(function (value) {
           result.stuntextras.push(value);

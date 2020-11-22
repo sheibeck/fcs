@@ -13,7 +13,7 @@
 
     <div class="mr-auto w-100">
       <div class="d-flex">
-        <div class="d-flex w-100 mr-auto" :class="getBgColor(objectdata)">          
+        <div class="d-flex w-100 mr-auto" :style="getBgColor">          
           <editableinput :object="objectdata" item="name" class="font-weight-bold pl-1" />
           <img v-if="objectdata.image_url && !imageEdit" :src="objectdata.image_url" class="rounded-circle portrait" alt="portrait" />          
         </div>
@@ -137,7 +137,10 @@
       <b-button :id="`color-object-${this.objectdata.id}`" type="button" variant="link" class="btn btn-link p-0" title="Change Color"><i class="fas fa-palette"></i></b-button>
       <b-popover ref="popoverColorPicker" :target="`color-object-${this.objectdata.id}`" triggers="click blur">
         <template v-slot:title>Change Color</template>
-        <div v-for="color in colorList" :key="color" :value="color"><div class="p-2" style="cursor:pointer;" :class="color" @click="updateObjectColor(color)">&nbsp;</div></div>      
+        <label>Background</label>
+        <swatches-picker @input="updateObjectBackgroundColor" :value="getBackgroundColor" />
+        <label>Text</label>
+        <swatches-picker @input="updateObjectTextColor" :value="getTextColor" />
       </b-popover>       
       <button type="button" class="btn btn-link p-0" @click="imageEdit = true" title="Edit portrait"><i class="fas fa-image"></i></button>
       <button v-if="!isCharacter" type="button" class="btn btn-link p-0 mt-auto" title="Make a copy" @click="copyObject()"><i class="fas fa-copy"></i></button>
@@ -158,6 +161,7 @@ import Models from '../assets/js/models';
 import interact from 'interactjs';
 import SceneEditableInput from './scene-editable-input';
 import bootbox from 'bootbox';
+import { Compact } from 'vue-color';
 
 let dbSvc = null;
 let models = new Models();
@@ -174,6 +178,7 @@ export default {
     skill: SceneSkill,
     stuntextra: SceneStuntExtra,
     editableinput: SceneEditableInput,
+    'swatches-picker': Compact,
   },
   created() {  
     dbSvc = new DbService(this.$root);
@@ -198,9 +203,32 @@ export default {
       imageEdit: false,
       commonSvc: new CommonService(fcs),
       selectedZone: null,
-      colorList: [
-        "bg-primary", "bg-secondary", "bg-danger text-white", "bg-success", "bg-dark text-white", "bg-warning"
-      ],      
+      colorList: {                
+        gray: {
+          backgroundColor:"#808080",
+          color: "#000"
+        },
+        red: {
+          backgroundColor:"#9F0500",
+          color: "#fff"
+        },
+        green: {
+          backgroundColor:"#68BC00",
+          color: "#000"
+        },      
+        yellow: {
+          backgroundColor:"#FCC400",
+          color: "#000"
+        },    
+        orange: {
+          backgroundColor:"#FE9200",
+          color: "#fff"
+        },      
+        lightblue: {
+          backgroundColor:"#68CCCA",
+          color: "#000"
+        }   
+      }         
     }
   },
   computed: {
@@ -228,10 +256,56 @@ export default {
     FCSObjectType() {
       return this.objectdata.object_type;
     },    
-    zoneList() {       
+    zoneList() {
       var list = this.$parent.$parent.$parent.$data.scene.zones.filter((item) => { return item.id !== this.$parent.$parent.$props.zone.id });
       return list;
     },    
+    getBgColor() {
+      if (typeof(this.objectdata.bgcolor) !== "object") {
+        let bgColor = "";       
+        switch(this.objectdata.object_type) {
+          case "ADVERSARY":
+            switch(this.objectdata.type.toLowerCase()) {
+              case "obstacle":
+                bgColor = this.colorList.yellow;
+                break;
+              case "constraint":
+                bgColor = this.colorList.orange;
+                break;
+              case "other":
+                bgColor = this.colorList.lightblue;
+                break;
+              default:
+                bgColor = this.colorList.red;
+                break;
+            }
+          break;
+
+          case "CHARACTER":
+            bgColor = this.colorList.green;
+            break;
+
+          default:
+            bgColor = this.colorList.gray;
+            break;
+        }      
+        this.$set(this.objectdata, 'bgcolor', bgColor);
+      }           
+      return this.objectdata.bgcolor;     
+    },  
+    getBackgroundColor() {      
+      if (!this.objectdata.bgcolor) {
+        return this.getBgColor.backgroundColor;
+      }
+      
+      return this.objectdata.bgcolor.backgroundColor;
+    },
+    getTextColor() {
+      if (!this.objectdata.bgcolor) {
+        return this.getBgColor.color;
+      }
+      return this.objectdata.bgcolor.color;
+    }
   },
   methods: {   
     init() {
@@ -305,9 +379,11 @@ export default {
 
       this.selectedZone = null;
     },   
-    updateObjectColor(color) {
-      this.objectdata.bgcolor = color;
-      this.$refs.popoverColorPicker.$emit('close');
+    updateObjectBackgroundColor(color) {
+      this.objectdata.bgcolor.backgroundColor = color.hex;
+    },
+    updateObjectTextColor(color) {      
+      this.objectdata.bgcolor.color = color.hex;      
     },
     addThingToObject(type) {  
       let objectType = "sceneobject";     
@@ -373,41 +449,7 @@ export default {
       this.$parent.$parent.$props.zone.sceneobjects.push(newObj);
 
       this.commonSvc.Notify(`${objCopy.name} was copied.`, "success");
-    },
-    getBgColor(obj) {      
-      if (!obj.bgcolor) {      
-        let bgColor = "";       
-        switch(obj.object_type) {
-          case "ADVERSARY":
-            switch(obj.type.toLowerCase()) {
-              case "obstacle":
-                bgColor = "bg-dark text-white";
-                break;
-              case "constraint":
-                bgColor = "bg-primary";
-                break;
-              case "other":
-                bgColor = "bg-info";
-                break;
-              default:
-                bgColor= "bg-danger text-white";
-                break;
-            }
-          break;
-
-          case "CHARACTER":
-            bgColor = "bg-success";
-            break;
-
-          default:
-            bgColor = "bg-secondary";
-            break;
-        }      
-        this.$set(obj, 'bgcolor', bgColor);
-      }
-
-      return obj.bgcolor;
-    },  
+    },    
     openLink() {      
       let data = this.objectdata;
       switch(data.object_type)
