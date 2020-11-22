@@ -5,8 +5,7 @@ export default class DbTools {
   constructor(fcs){    
     this.fcs = fcs;
     this.commonSvc = new CommonService(fcs);
-    this.dbSvc = new DbService(fcs);
-    this.tablename = "";
+    this.dbSvc = new DbService(fcs);    
   }
 
   UpdateItem = async(id, userId) => {    
@@ -19,22 +18,24 @@ export default class DbTools {
         for (const [childKey, childValue] of Object.entries(value)) {
           count++;
           console.log(`${childKey}: ${childValue}`);
-          array.push({id: count, label:childKey, value:childValue});        
+          array.push({id: count, name:childKey, value:childValue});
         } 
         item[key] = [...array];
       }
     }   
 
     debugger;
-    return;
-    
+        
     //then put the changes
     let params = {
-      TableName: this.tablename,
+      TableName: this.dbSvc.TableName,
       Item: item
     };           
     
-    await docClient.put(params, function (err, data) {          
+    let docClient = await this.dbSvc.GetDbClient();
+    debugger;
+    await docClient.put(params, function (err, data) {
+      debugger;    
       if (err) {         
           console.error("Unable to updated item. Error JSON:", JSON.stringify(err, null, 2));
       } else {
