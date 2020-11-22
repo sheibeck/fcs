@@ -328,4 +328,8 @@ export default class CommonService {
       Vue.set(obj[arr[0]][arr[1]][arr[2]][arr[3]], arr[4], val);
     }
   }
+  
+  GetImageSearchUrl(query) {
+    return `https://www.google.com/search?safe=strict&tbm=isch&q=${query}`
+  }
 }

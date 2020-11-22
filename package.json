@@ -63,6 +63,7 @@
     "shortid": "^2.2.15",
     "taggle": "^1.15.0",
     "vue": "^2.6.12",
+    "vue-color": "^2.7.1",
     "vue-cookies": "^1.7.4",
     "vue-debounce": "^2.5.7",
     "vue-draggable-resizable": "^2.2.0",

@@ -1,6 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners"></component>     
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners" :isOwner="isOwner"></component>     
   </div>
 </template>
 
@@ -56,6 +56,7 @@ export default {
   props: {
     sheetid: String,
     character: Object,
+    isOwner: Boolean,
   },
   computed: {
      ...mapGetters([

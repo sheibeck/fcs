@@ -4,7 +4,7 @@
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right d-md-flex">
 			<div class="mr-auto d-none d-md-inline"></div>
 			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="getTemplateLogo" />			
-			<div class="d-print-none order-2 order-md-1">
+			<div v-if="isOwner" class="d-print-none order-2 order-md-1">
 				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> <button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()"><i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i></button>
 			</div>
 		</div>
@@ -138,7 +138,8 @@ export default {
 	"inputfatepoints": InputFatePoints,
   },
   props: {    
-    character: Object,
+	character: Object,
+	isOwner: Boolean,
   }, 
   computed: {
  	...mapGetters([  
@@ -154,7 +155,7 @@ export default {
 		}		
 	},
 	showPortrait() {
-		return this.character.template && this.character.template.showPortrait;
+		return this.character.template && this.character.template.showPortrait && this.character.image_url;
 	}
   },
   created() {

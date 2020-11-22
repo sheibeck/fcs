@@ -9,29 +9,12 @@
           <div class='col'>
             <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
             <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-            <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>
-            <button v-if="isAuthenticated" class="btn btn-link" type="button" data-toggle="collapse" data-target="#characterProperties" aria-expanded="true" aria-controls="characterProperties">
-              Character Properties <i class="fas fa-cog"></i>
-            </button>
+            <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>           
           </div>
-        </div>
-
-        <div v-if="isAuthenticated" id="characterProperties" class="pt-2 collapse show">        
-          <div class='form-group'>
-            <label class='' for='image_url'>Portrait Url:</label>
-            <input class='form-control' id='image_url' name='image_url' @change="characterData.image_url = $event.target.value" :value="exists(characterData, 'image_url')" />
-          </div>
-          <div class='form-group'>
-            <label class='' for='image_url'>Description:</label>
-            <textarea rows=5 class='form-control' id='description' name='description' @change="characterData.description = $event.target.value" :value="exists(characterData, 'description')"  />
-          </div>
-          <vue-tags-input              
-              v-model="tag"              
-              :tags="characterData.tags"
-              @tags-changed="newTags => updateTags(newTags)"
-            />
         </div>
       </div>
+
+      <characterprops v-if="characterData" class="pt-1" :characterData="characterData" :isCustomizable="IsCustomizableSheet" :isOwner="true"></characterprops>
           
   </div>
 </template>
@@ -42,6 +25,7 @@ import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
 import CharacterSheet from '../components/charactersheet'
 import VueTagsInput from '@johmun/vue-tags-input';
+import CharacterProps from '../components/characterprops'
 
 let commonSvc = null;
 let dbSvc = null;
@@ -50,7 +34,7 @@ export default {
   name: 'CharacterSheetDetail',
   components: {
     "charactersheet": CharacterSheet, 
-    VueTagsInput   
+    "characterprops": CharacterProps    
   },
   metaInfo() {
     return {
@@ -72,6 +56,9 @@ export default {
       'userId',
       'pageTitle',
     ]), 
+    IsCustomizableSheet() {
+      return this.characterData && this.characterData.related_id === "CHARACTERSHEET|fate-anything";
+    },
   },
   data () {
     return {
