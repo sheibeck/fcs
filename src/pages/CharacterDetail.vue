@@ -12,7 +12,7 @@
           <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>          
         </div>
        
-        <characterprops v-if="characterData" class="pt-1" :characterData="characterData" :isCustomizable="IsCustomizableSheet" :isOwner="isOwner"></characterprops>
+        <characterprops v-if="characterData" class="pt-1" :characterData="characterData" :isCustomizable="IsCustomizableSheet" :isOwner="isOwner" @save-character="save"></characterprops>
 
       </div>         
   </div>

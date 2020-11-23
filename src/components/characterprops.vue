@@ -40,10 +40,23 @@
               </div>                         
           </div>
 
-          <div v-if="isCustomizable" class="tab-pane fade" id="sheetProperties" role="tabpanel" aria-labelledby="profile-tab">                 
-            <div class="form-group">
-                <label class='' for='template'>Template:</label>
-                <autocomplete ref="templateAutocomplete" :search="searchTemplates"                    
+          <div v-if="isCustomizable" class="tab-pane fade" id="sheetProperties" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="d-flex flex-column flex-md-row">               
+              <div class="form-group flex-fill mr-2" v-if="characterData.template_id && selectedTemplate">
+                <label>Applied Template:</label>
+                <div>
+                  {{GetTemplateName}}
+                  <div class="small">
+                    {{GetTemplateDescription}}
+                  </div>
+                  <div class="small text-muted" v-if="SheetModifiedAfterTemplate">
+                    Changes have been made to this sheet after applying this template.
+                  </div>
+                </div>
+              </div>
+              <div class="form-group flex-fill">
+                <label class='' for='template'>Find a Template:</label>
+                <autocomplete ref="templateAutocomplete" :search="searchTemplates"                      
                     :debounce-time="500"
                     placeholder="Find a template"
                     aria-label="Find a Template"                     
@@ -67,14 +80,15 @@
                     <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template.id" @click="applyTemplate">Apply Template</button>
                     <button type="button" class="btn btn-danger btn-sm mr-1" v-if="IsTemplateOwner" @click="deleteTemplate">Delete Template</button>
                 </div>
-            </div>                
+              </div> 
+            </div>              
             
-            <div class='form-group'>
+            <div class='form-group flex-fill'>
                 <label class='' for='sheet_logo'>Template Color:</label>
                 <swatches-picker @input="updateTemplateColor" :value="getTemplateColor" />
             </div>
         
-            <div class='form-group w-100'>
+            <div class='form-group'>
                 <label class='' for='sheet_logo'>Template Logo Url:</label> <a :href="getImageSearchUrl('tv show logos')" target="_blank">[search]</a>
                 <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />
             </div>    
@@ -138,8 +152,8 @@ export default {
     isCustomizable: Boolean,  
     isOwner: Boolean,  
   },
-  created() {
-    this.init();
+  async created() {
+    await this.init();
   },
   components: {
     'swatches-picker': Compact,
@@ -148,11 +162,12 @@ export default {
   },
   data() {
       return {
-            tag: "",
-            template: {
-                name: "",
-                description: "",
-            },
+        tag: "",
+        template: {
+            name: "",
+            description: "",
+        },
+        selectedTemplate: null,
       }
   },
   computed: {
@@ -160,6 +175,19 @@ export default {
       'isAuthenticated',
       'userId',
     ]),
+    async GetSelectedTemplate() {      
+      if (this.characterData.template_id) {
+        let template = await dbSvc.GetObject(this.characterData.template_id);
+        if (template) {
+          this.selectedTemplate = template;
+          return;
+        }
+      }
+      this.selectedTemplate = null;
+    },
+    SheetModifiedAfterTemplate() {      
+      return JSON.stringify(this.selectedTemplate.template) !== JSON.stringify(this.characterData.template);
+    },
     GetHighConcept() {        
         let concept = "character portraits";
 
@@ -180,11 +208,11 @@ export default {
     IsTemplateOwner() {
       return this.template && this.template.owner_id == this.userId;
     }, 
-    GetTemplateName() {
-      return this.template ? this.template.name : '';
+    GetTemplateName() {      
+      return this.selectedTemplate ? this.selectedTemplate.name : 'None';
     },
     GetTemplateDescription() {
-      return this.template ? this.template.description : '';
+      return this.selectedTemplate ? this.selectedTemplate.description : '';
     },
     getTemplateColor() {
       if (!this.characterData.template) {
@@ -199,9 +227,11 @@ export default {
     }
   },
   methods: {
-    init() {    
-        commonSvc = new CommonService(this.$root);    
+    async init() {    
+        commonSvc = new CommonService(this.$root);
         dbSvc = new DbService(this.$root); 
+
+        await this.GetSelectedTemplate;
 
         $('#modalSaveTemplate').on('hidden.bs.modal', function (e) {
             let form = document.getElementById('formTemplate');
@@ -264,8 +294,8 @@ export default {
       bootbox.confirm("Are you sure you want to use this template? This will reset any custom labels.", async (result) => {        
         if (result) {      
           //clear out the old template
-          this.characterData.template_id = null;
-          this.characterData.template = null;       
+          //this.characterData.template_id = null;
+          //this.characterData.template = null;
 
           //remove any existing labels so the new template labels/placeholder take effect
           const removeLabels = (obj) => {
@@ -284,10 +314,7 @@ export default {
           //assign the new template to this character
           this.$set(this.characterData, "template_id", this.template.id);
           this.$set(this.characterData, "template", this.template.template);
-
-          //save and refresh the sheet to apply reactivity to the template
-          //await this.save();
-          //document.location = document.location;
+          this.selectedTemplate = this.template;
         }
       })
     },
@@ -345,6 +372,11 @@ export default {
         if (response) {              
           commonSvc.Notify('Template saved.', 'success');
           $('#modalSaveTemplate').modal('hide');
+
+          //apply the template to this character
+          this.$set(this.characterData, "template_id", template.id);
+          this.selectedTemplate = template;
+          this.$emit('save-character');
         }            
       }
     },
