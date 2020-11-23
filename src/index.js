@@ -192,7 +192,7 @@ const store = new Vuex.Store({
       let enabled = state.fcsVttEnabled && state.isAuthenticated; //you don't need to be a subscriber to play a character
       return enabled;
     },
-    vttEnabled: (state, getters) => {      
+    vttEnabled: (state, getters) => {    
       if (!state.isAuthenticated) return false;
       if (getters.fcsVttEnabled) return "fcsVtt"; //fcs takes priority over roll20
       if (getters.roll20Enabled) return "roll20";

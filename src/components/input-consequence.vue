@@ -1,19 +1,19 @@
 <template>
 	<div class="form-group d-flex flex-column">    
-    <div class="d-flex" v-if="customlabel">
+    <div class="d-flex align-items-center" v-if="customlabel">
       <span v-if="vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
       <!--custom labels-->
-      <input v-if="!editlock" class="w-75 mr-auto inputlabel" type="text" 
+      <input v-if="!editlock" class="w-75 mr-auto inputlabel inputConsequenceLabel" type="text" 
         @change="$parent.setVal(`${consequence.label}`,  $event.target.value)" 
         :value="$parent.getVal(`${consequence.label}`)" :placeholder="consequence.placeholder" />
-      <label v-if="editlock">{{getLabel}}</label>
+      <label class="inputConsequenceLabel" v-if="editlock">{{getLabel}}</label>
 
       <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeConsequence(consequence.id)">
         <i title="Delete Consequence" class="fas d-print-none fa-minus-circle"></i>
       </button>
     </div>
           
-    <div class="d-flex">
+    <div class="d-flex align-items-center">
       <span v-if="!customlabel && vttEnabled" class="dice fo20 pt-1 pr-1" v-on:click="sendToVTT()">C</span>
       <input v-if="customlabel && !editlock" style="width:40px;" class="mr-auto inputlabel text-center" type="text" 
         @change="$parent.setVal(`${consequence.value}`,  $event.target.value)" 

@@ -5,7 +5,10 @@
 			<div class="mr-auto d-none d-md-inline"></div>
 			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="getTemplateLogo" />			
 			<div v-if="isOwner" class="d-print-none order-2 order-md-1">
-				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> <button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()"><i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i></button>
+				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> 
+				<button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()">
+					<i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i>
+				</button>
 			</div>
 		</div>
 
@@ -70,10 +73,10 @@
 			<!-- stress -->					
 			<div class="d-md-flex flex-column pb-2 px-1" v-for="stress in character.template.stress" :key="stress.id">
 				<div class="form-group font-weight-bold pr-2 mt-0 border-bottom d-flex">
-					<input v-if="!isEditLocked" class="w-75 mr-auto inputlabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
+					<input v-if="!isEditLocked" class="w-75 mr-auto inputlabel inputStressLabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
 						@change="setVal(`${stress.label}`,  $event.target.value)" 
 						:value="getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
-					<label v-else>{{getStressTrackLabel(stress.label, stress.placeholder)}}</label>
+					<label class="inputStressLabel" v-else>{{getStressTrackLabel(stress.label, stress.placeholder)}}</label>
 					<button type="button" v-if="!isEditLocked" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressTrack(stress.id)">
 						<i title="Delete Stress Track" class="fas d-print-none fa-minus-circle"></i>
 					</button>
@@ -81,8 +84,8 @@
 						<i title="Add Stress Box" class="fas d-print-none fa-plus-circle"></i>
 					</button>					
 				</div>
-				<div class="d-flex flex-wrap justify-content-around pt-1">
-					<div v-for="box in stress.boxes" :key="box.id" class="pt-1">
+				<div class="d-flex flex-wrap justify-content-around">
+					<div v-for="box in stress.boxes" :key="box.id" class="">
 						<inputstress v-on:remove-stress-box="onRemoveStressBox" :parentid="stress.id" :stress="box" :stresstype="getStressType(stress)"
 							:customlabel="true" :removable="true" :hidelabel="false" :editlock="isEditLocked" />
 					</div>
@@ -109,7 +112,7 @@
 			</div>
 
 			<div class="px-1 skills">				
-				<div v-for="skill in character.template.skills" :key="skill.obj" class="mt-1">
+				<div v-for="skill in character.template.skills" :key="skill.obj" class="">
 					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" :customlabel="true" :editlock="isEditLocked" />
 				</div>
 			</div>
@@ -130,7 +133,7 @@ import InputFatePoints from '../components/input-fatepoints'
 export default {
   name: 'SheetFateAnything',
   components: {
-	"inputskill": InputSkillColumn,    
+	"inputskill": InputSkillColumn,
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
 	"inputstress": InputStress,
@@ -360,7 +363,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
+	@import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
 
 	.fate-logo {
 		margin-top: -27px;
@@ -375,8 +378,8 @@ export default {
 		font-weight: 700;
 		padding-bottom: 0px;
 		margin-bottom: 0px;
-		font-size: 36px;
-		height: 43px;
+		font-size: 28px;
+		height: 34px;
 	}
 
 
@@ -434,7 +437,8 @@ export default {
 		min-height: 500px;
 	}
 
-	/deep/ input.inputlabel {
+	/deep/ input.inputlabel,
+	/deep/ .inputStressBoxLabel {
 		font-size: 22px;
 		font-weight: 700;
 		border-width: 0px;
@@ -461,8 +465,7 @@ export default {
 		margin-top: -60px;	
 	}
 
-	/deep/ label {
-		font-size: 22px !important;
+	/deep/ label {		
 		font-weight: 700;
 		border-width: 0px;
 		margin-top: 0px;
@@ -470,12 +473,19 @@ export default {
 		text-transform: capitalize !important;
 	}
 
-	/deep/ .inputAspect {
-		font-size: 20px;
+	/deep/ input {	
+		font-size: 18px;
 		border: 0;
-		border-bottom: solid 1px gray; 
+		border-bottom: solid 1px gray;		
 	}
-	/deep/ .inputAspectLabel {
+
+	/deep/ textarea {	
+		font-size: 17px;
+	}
+
+	/deep/ .inputAspectLabel, 
+	/deep/ .inputStressLabel,
+	/deep/ .inputConsequenceLabel {
 		font-size: 16px !important;		
 	}
 

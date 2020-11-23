@@ -1,21 +1,20 @@
 <template>
   <div class="container mt-2">
 
-      <charactersheet :character="characterData" :sheetid="id" />        
-        <div class="d-print-none">
+      <charactersheet :character="characterData" :sheetid="id" :isOwner="true" />        
+        
+      <div class="d-print-none">
         <hr/>
 
-        <div class='row'>
-          <div class='col'>
-            <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none'>Save Character <i class='fa fa-user'></i></button>
-            <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none'>Close <i class='fa fa-times-circle'></i></a>
-            <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>           
-          </div>
+        <div class='d-flex'>
+          <button v-if="isAuthenticated" type='button' v-on:click="save" class='btn btn-success d-print-none  mr-1'>Save Character <i class='fa fa-user'></i></button>
+          <a href="/charactersheet" role='button' class='btn btn-secondary d-print-none mr-1'>Close <i class='fa fa-times-circle'></i></a>
+          <button type='button' class='btn btn-dark' @click='print'>Print Character <i class='fa fa-print'></i></button>           
         </div>
-      </div>
+        
+        <characterprops v-if="characterData" class="pt-1" :characterData="characterData" :isCustomizable="IsCustomizableSheet" :isOwner="true"></characterprops>
 
-      <characterprops v-if="characterData" class="pt-1" :characterData="characterData" :isCustomizable="IsCustomizableSheet" :isOwner="true"></characterprops>
-          
+      </div>                
   </div>
 </template>
 
