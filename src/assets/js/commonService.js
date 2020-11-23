@@ -281,13 +281,14 @@ export default class CommonService {
     var parts = graphPath.split(".");
     var root = obj;
     
+    /*
     if (parts.length > 1 && Array.isArray(obj[parts[0]])) {
       let item = obj[parts[0]].find(elem => elem.name == parts[1]);
       if (item) {
         return item.value;
       }
       return (defaultValue || "");
-    }
+    }*/
 
     for (var i = 0; i < parts.length; i++)
     {
@@ -305,12 +306,13 @@ export default class CommonService {
   setVal(obj, arr, val, Vue) {
     arr = arr.split(".");
 
+    /*
     if (arr.length > 1 && Array.isArray(obj[arr[0]])) {
       let idx = obj[arr[0]].findIndex(elem => elem.name == arr[1]);
       let item = obj[arr[0]][idx];
       item.value = val;
       Vue.set(obj[arr[0]], idx, item);
-    }
+    }*/
     
     if (arr.length == 1)
     {

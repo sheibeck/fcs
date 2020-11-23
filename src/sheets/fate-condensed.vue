@@ -23,7 +23,7 @@
 		<div class="col-sm-6 col-md-7 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
 			<div for="" class="fate-header">Aspects</div>
 			<div class="px-2">
-				<div v-for="aspect in aspects" :key="aspect.obj">
+				<div v-for="aspect in template.aspects" :key="aspect.obj">
 					<inputaspect :aspect="aspect" :showlabel="true" />
 				</div>
 			</div>
@@ -61,7 +61,7 @@
 						PHYSICAL
 					</div>
 					<div class="d-flex justify-content-between">
-						<div v-for="stress in physicalstress" :key="stress.obj">
+						<div v-for="stress in template.physicalstress" :key="stress.obj">
 							<inputstress :stress="stress" stresstype="Physical" :hidelabel="true" />
 						</div>
 					</div>
@@ -73,7 +73,7 @@
 						MENTAL
 					</div>
 					<div class="d-flex justify-content-between">
-						<div v-for="stress in mentalstress" :key="stress.obj">
+						<div v-for="stress in template.mentalstress" :key="stress.obj">
 							<inputstress :stress="stress" stresstype="Mental" :hidelabel="true" />
 						</div>
 					</div>
@@ -83,7 +83,7 @@
 				<div class="form-group text-center font-weight-bold">
 					<div class="col-12">CONSEQUENCES <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
 				</div>
-				<div v-for="consequence in consequences" :key="consequence.obj">
+				<div v-for="consequence in template.consequences" :key="consequence.obj">
 					<inputconsequence :consequence="consequence" />
 				</div>
 			</div>
@@ -93,7 +93,7 @@
 
 			<div class="px-2 skills">
 				<div class="small text-muted font-italic d-print-none">Click to edit skill names. Bonus stress is still calculated from value of physique/will slots even if you rename them.</div>
-				<div v-for="skill in skills" :key="skill.obj" class="py-1">
+				<div v-for="skill in template.skills" :key="skill.obj" class="py-1">
 					<inputskill :item="skill" />
 				</div>
 			</div>
@@ -110,6 +110,9 @@ import InputConsequence from '../components/input-consequence'
 import InputStress from '../components/input-stress'
 import InputStuntExtra from '../components/input-stuntextra'
 import InputFatePoints from '../components/input-fatepoints'
+import Templates from '../assets/js/templates';
+
+let template = new Templates();
 
 export default {
   name: 'SheetFateCondensed',
@@ -134,57 +137,7 @@ export default {
   },
   data () {
     return {
-		skills:  [
-			{placeholder:"ACADEMICS", obj:"skills.skill1", label:"skills.label1"},
-			{placeholder:"ATHLETICS", obj:"skills.skill2", label:"skills.label2"},
-			{placeholder:"BURGLARY", obj:"skills.skill3", label:"skills.label3"},
-			{placeholder:"CONTACTS", obj:"skills.skill4", label:"skills.label4"},
-			{placeholder:"CRAFTS", obj:"skills.skill5", label:"skills.label5"},
-			{placeholder:"DECEIVE", obj:"skills.skill6", label:"skills.label6"},
-			{placeholder:"DRIVE", obj:"skills.skill7", label:"skills.label7"},
-			{placeholder:"EMPATHY", obj:"skills.skill8", label:"skills.label8"},
-			{placeholder:"FIGHT", obj:"skills.skill9", label:"skills.label9"},
-			{placeholder:"INVESTIGATE", obj:"skills.skill10", label:"skills.label10"},
-			{placeholder:"LORE", obj:"skills.skill11", label:"skills.label11"},
-			{placeholder:"NOTICE", obj:"skills.skill12", label:"skills.label12"},
-			{placeholder:"PHYSIQUE", obj:"skills.skill13", label:"skills.label13"},
-			{placeholder:"PROVOKE", obj:"skills.skill14", label:"skills.label14"},
-			{placeholder:"RAPPORT", obj:"skills.skill15", label:"skills.label15"},
-			{placeholder:"RESOURCES", obj:"skills.skill16", label:"skills.label16"},
-			{placeholder:"SHOOT", obj:"skills.skill17", label:"skills.label17"},
-			{placeholder:"STEALTH", obj:"skills.skill18", label:"skills.label18"},
-			{placeholder:"WILL", obj:"skills.skill19", label:"skills.label19"},			
-		],
-		aspects: [
-			{label:"High Concept", obj:"aspects.highconcept"},
-			{label:"Trouble", obj:"aspects.trouble"},
-			{label:"Relationship", obj:"aspects.relationship"},
-			{label:"Aspect", obj:"aspects.other1"},
-			{label:"Aspect", obj:"aspects.other2"},			
-		],
-		consequences: [
-			{label:"Mild", obj:"consequences.mild", value: "2"},
-			{label:"Moderate", obj:"consequences.moderate", value: "4"},
-			{label:"Severe", obj:"consequences.severe", value: "6"},
-			{label:"Mild", obj:"consequences.mild2", value: "2", requirement: {obj:"skill13|skill19", val:"5" } },
-		],
-		physicalstress: [
-			{label:"1", obj:"stress1"},
-			{label:"1", obj:"stress2"},
-			{label:"1", obj:"stress3"},
-            {label:"1", obj:"stress4", requirement: {obj:"skill13", val:"1" }},
-			{label:"1", obj:"stress5", requirement: {obj:"skill13", val:"3" }},
-			{label:"1", obj:"stress6", requirement: {obj:"skill13", val:"3" }},
-        ],
-        mentalstress: [
-			{label:"1", obj:"mental1"},
-			{label:"1", obj:"mental2"},
-			{label:"1", obj:"mental3"},
-            {label:"1", obj:"mental4", requirement: {obj:"skill19", val:"1" }},
-			{label:"1", obj:"mental5", requirement: {obj:"skill19", val:"3" }},
-			{label:"1", obj:"mental6", requirement: {obj:"skill19", val:"3" }},						
-		],        
-		
+		template: template.FateCondensed		
     }
   },
   methods: {  

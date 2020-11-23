@@ -47,7 +47,7 @@
 				<div for="" class="fate-header">Aspects</div>
 			</div>
 
-			<div v-for="aspect in aspects" :key="aspect.obj">
+			<div v-for="aspect in template.aspects" :key="aspect.obj">
 				<inputaspect :aspect="aspect" />
 			</div>
 		</div>
@@ -58,7 +58,7 @@
 				<div class="fate-header col-12">Approaches</div>
 			</div>
 
-			<div v-for="approach in approaches" :key="approach.obj">
+			<div v-for="approach in template.approaches" :key="approach.obj">
 				<inputapproach :item="approach" />
 			</div>
 		</div>
@@ -82,7 +82,7 @@
 			</div>
 
 			<div class="d-flex justify-content-between">
-				<div v-for="stress in stresses" :key="stress.obj">
+				<div v-for="stress in template.stresses" :key="stress.obj">
 					<inputstress :stress="stress" />
 				</div>
 			</div>
@@ -93,7 +93,7 @@
 				<div class="fate-header col-12">Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal small'>D</span></div>
 			</div>
 
-			<div v-for="consequence in consequences" :key="consequence.obj">
+			<div v-for="consequence in template.consequences" :key="consequence.obj">
 				<inputconsequence :consequence="consequence" />
 			</div>
 
@@ -104,13 +104,16 @@
 </template>
 
 <script>
-import InputSkillColumn from '../components/input-skill-column'
-import InputAspect from '../components/input-aspect'
-import InputConsequence from '../components/input-consequence'
-import InputStress from '../components/input-stress'
-import InputStuntExtra from '../components/input-stuntextra'
-import InputFatePoints from '../components/input-fatepoints'
-import { mapGetters } from 'vuex'
+import InputSkillColumn from '../components/input-skill-column';
+import InputAspect from '../components/input-aspect';
+import InputConsequence from '../components/input-consequence';
+import InputStress from '../components/input-stress';
+import InputStuntExtra from '../components/input-stuntextra';
+import InputFatePoints from '../components/input-fatepoints';
+import { mapGetters } from 'vuex';
+import Templates from '../assets/js/templates';
+
+let template = new Templates();
 
 export default {
   name: 'SheetFateAccelerated',
@@ -126,7 +129,7 @@ export default {
     character: Object,
   },
   computed: {
- 	...mapGetters([      
+ 	...mapGetters([
       'vttEnabled'
     ]),
   },
@@ -135,31 +138,7 @@ export default {
   },
   data () {
     return {				
-		approaches:  [
-			{placeholder:"Careful", obj:"approaches.careful"},
-			{placeholder:"Clever", obj:"approaches.clever"},
-			{placeholder:"Flashy", obj:"approaches.flashy"},
-			{placeholder:"Forceful", obj:"approaches.forceful"},
-			{placeholder:"Quick", obj:"approaches.quick"},
-			{placeholder:"Sneaky", obj:"approaches.sneaky"},
-		],
-		aspects: [
-			{label:"High Concept", obj:"aspects.highconcept"},
-			{label:"Trouble", obj:"aspects.trouble"},
-			{label:"Aspect", obj:"aspects.other1"},
-			{label:"Aspect", obj:"aspects.other2"},
-			{label:"Aspect", obj:"aspects.other3"},			
-		],
-		consequences: [
-			{label:"Mild", obj:"consequences.mild", value: "2"},
-			{label:"Moderate", obj:"consequences.moderate", value: "4"},
-			{label:"Severe", obj:"consequences.severe", value: "6"},
-		],
-		stresses: [
-			{label:"1", obj:"stress1"},
-			{label:"2", obj:"stress2"},
-			{label:"3", obj:"stress3"},
-		]			
+		template: template.FateAccelerated
     }
   },
   methods: {	

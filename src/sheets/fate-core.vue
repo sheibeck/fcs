@@ -46,13 +46,13 @@
             <div class="form-group">
                 <div for="" class="fate-header">Aspects</div>
             </div>            
-            <div v-for="aspect in aspects" :key="aspect.obj" class="p-0 m-0">
+            <div v-for="aspect in template.aspects" :key="aspect.obj" class="p-0 m-0">
 				<inputaspect :aspect="aspect" v-on="$listeners" />
 			</div>    
         </div>
 
         <div class="col-sm-12 col-md-6 fate-skills">                       
-            <inputskillpyramid :skills="skills" header="Skills" :skillList="skillList" v-on="$listeners" />            
+            <inputskillpyramid :skills="template.skills" header="Skills" :skillList="skillList" v-on="$listeners" />            
         </div>
     </div>
 
@@ -72,7 +72,7 @@
                 <div for="" class="fate-header">Physical Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex d-flex justify-content-between">
-				<div v-for="stress in physicalstress" :key="stress.obj">
+				<div v-for="stress in template.physicalstress" :key="stress.obj">
 					<inputstress :stress="stress" stresstype="Physical" v-on="$listeners" />
 				</div>
 			</div>
@@ -82,7 +82,7 @@
                 <div for="" class="fate-header">Mental Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
             <div class="d-flex justify-content-between">
-				<div v-for="stress in mentalstress" :key="stress.obj">
+				<div v-for="stress in template.mentalstress" :key="stress.obj">
 					<inputstress :stress="stress" stresstype="Mental" v-on="$listeners"  />
 				</div>
 			</div>
@@ -91,7 +91,7 @@
             <div class="form-group">
                 <div class="fate-header col-12">Consequences <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>
             </div>
-            <div v-for="consequence in consequences" :key="consequence.obj">
+            <div v-for="consequence in template.consequences" :key="consequence.obj">
                 <inputconsequence :consequence="consequence" v-on="$listeners" />
             </div>
         </div>
@@ -109,6 +109,9 @@ import InputStress from '../components/input-stress'
 import InputStuntExtra from '../components/input-stuntextra'
 import InputFatePoints from '../components/input-fatepoints'
 import { mapGetters } from 'vuex'
+import Templates from '../assets/js/templates';
+
+let template = new Templates();
 
 export default {
   name: 'SheetFateCore',
@@ -138,38 +141,7 @@ export default {
                 , 'Fight', 'Investigate', 'Lore', 'Notice', 'Physique', 'Provoke', 'Rapport'
                 , 'Resources', 'Shoot', 'Stealth', 'Will'],
         
-        skills: [
-            {label: "Superb", value:"+5", obj:"skills.superb",  items:["s1", "s2", "s3", "s4", "s5"] },
-            {label: "Great", value:"+4", obj:"skills.great",  items:["s1", "s2", "s3", "s4", "s5"] },
-            {label: "Good", value:"+3", obj:"skills.good",  items:["s1", "s2", "s3", "s4", "s5"] },
-            {label: "Fair", value:"+2", obj:"skills.fair",  items:["s1", "s2", "s3", "s4", "s5"] },
-            {label: "Average", value:"+1", obj:"skills.average",  items:["s1", "s2", "s3", "s4", "s5"] }			
-        ],
-        aspects: [
-			{label:"High Concept", obj:"aspects.highconcept"},
-			{label:"Trouble", obj:"aspects.trouble"},
-			{label:"Aspect", obj:"aspects.other1"},
-			{label:"Aspect", obj:"aspects.other2"},
-			{label:"Aspect", obj:"aspects.other3"},
-		],
-		consequences: [
-			{label:"Mild", obj:"consequences.mild", value: "2"},
-			{label:"Moderate", obj:"consequences.moderate", value: "4"},
-            {label:"Severe", obj:"consequences.severe", value: "6"},
-            {label:"Mild", obj:"consequences.mild2", value: "2", requirement: {obj:"physique|will", val:"5" }},
-		],
-		physicalstress: [
-			{label:"1", obj:"stress1"},
-			{label:"2", obj:"stress2"},
-            {label:"3", obj:"stress3", requirement: {obj:"physique", val:"1" }},
-            {label:"4", obj:"stress4", requirement: {obj:"physique", val:"3" }},						
-        ],
-        mentalstress: [
-			{label:"1", obj:"mental1"},
-			{label:"2", obj:"mental2"},
-            {label:"3", obj:"mental3", requirement: {obj:"will", val:"1" }},
-            {label:"4", obj:"mental4", requirement: {obj:"will", val:"3" }},						
-		],        
+        template: template.FateCore
     }
   },
   methods: {  
