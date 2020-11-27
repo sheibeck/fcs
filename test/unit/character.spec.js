@@ -1,9 +1,10 @@
 // Import the `mount()` method from Vue Test Utils
-import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 
-import CharacterSheet from '@/components/CharacterSheet.vue';
 import CharacterDetail from '@/pages/CharacterDetail.vue';
+import CharacterSheet from '@/components/charactersheet'
+import CharacterProps from '@/components/characterprops'
 import VueShowdown from 'vue-showdown';
 window.$ = require('../../node_modules/jquery');
 
@@ -47,29 +48,50 @@ describe('Character with authentication', () => {
       localVue,      
       mocks: {
         $route
-      }
+      },
+      data() {
+        return {
+          sheet: "",
+          sheetId: "fate-anything",
+          title: "Character",
+          description: "Hello World",
+          characterid: "12345",
+          characterData: {
+            related_id: "CHARACTERSHEET|fate-anything"
+          },    
+        }
+      }      
     });
   })
  
-  it('renders template container when fate-anything sheet', async () => {  
+  it('renders sheet properties tab when fate-anything sheet', async () => {  
+
     await wrapper.setData({ 
+      sheetId: "fate-anything",
       characterData: {
         related_id: "CHARACTERSHEET|fate-anything"
       }
     });
-
-    const templateContainer = wrapper.find("#TemplateContainer");    
+    
+    const characterProps = wrapper.findComponent(CharacterProps);   
+    expect(characterProps.exists()).toBe(true);
+    const templateContainer = characterProps.find("#TabSheetProperties");
+    console.log(templateContainer)
     expect(templateContainer.exists()).toBe(true);    
   }) 
 
-  it('does not render template container when not fate-anything sheet', async () => {  
+  it('does not render sheet properties tab when not fate-anything sheet', async () => {  
     await wrapper.setData({ 
+      sheetId: "fate-core",
       characterData: {
         related_id: "CHARACTERSHEET|fate-core"
       }
     });
 
-    const templateContainer = wrapper.find("#TemplateContainer");    
+    const characterProps = wrapper.findComponent(CharacterProps);   
+    expect(characterProps.exists()).toBe(true);
+
+    const templateContainer = characterProps.find("#TabSheetProperties");    
     expect(templateContainer.exists()).toBe(false);    
   }) 
 })

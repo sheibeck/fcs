@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="fate-header d-flex" :style="{ backgroundColor: headerColor ? headerColor : 'black' }">
+    <div class="fate-header d-flex" :style="{ backgroundColor: headerColor ? headerColor : '' }">
       <span :for="item" class="mr-auto">{{header}}</span>
       <a v-if="!isNewCharacter">
         <i class="fas d-print-none pr-2" v-on:click="addStunt(item)" :class="{ 'fa-plus' : stuntEdit, 'd-none' : !stuntEdit }"></i>

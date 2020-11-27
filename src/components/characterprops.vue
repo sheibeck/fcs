@@ -4,7 +4,7 @@
             <li class="nav-item">
                 <a class="nav-link active" id="character-tab" data-toggle="tab" href="#characterProperties" role="tab" aria-controls="character" aria-selected="true">Character Properties</a>
             </li>
-            <li v-if="isCustomizable" class="nav-item">
+            <li v-if="isCustomizable" class="nav-item" id="TabSheetProperties">
                 <a class="nav-link" id="sheet-tab" data-toggle="tab" href="#sheetProperties" role="tab" aria-controls="sheet" aria-selected="false">Sheet Properties</a>
             </li>           
         </ul>
@@ -56,14 +56,15 @@
               </div>
               <div class="form-group flex-fill">
                 <label class='' for='template'>Find a Template:</label>
-                <autocomplete ref="templateAutocomplete" :search="searchTemplates"                      
+                <autocomplete ref="templateAutocomplete"
+                    :search="searchTemplates"
                     :debounce-time="500"
                     placeholder="Find a template"
-                    aria-label="Find a Template"                     
+                    aria-label="Find a template"       
                     :get-result-value="getTemplateResultValue"
-                    @submit="selectTemplateResult"                    
+                    @submit="selectTemplateResult"
                     class="mr-1">
-                    <template #result="{ result, props }">
+                  <template #result="{ result, props }">
                     <li v-bind="props">
                         <div class="p-0 m-0 h6">
                         {{result.name}}
@@ -72,7 +73,7 @@
                         {{result.description}}
                         </div>
                     </li>
-                    </template>
+                  </template>
                 </autocomplete>
                 <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
                 <div class="d-flex">
@@ -215,10 +216,7 @@ export default {
       return this.selectedTemplate ? this.selectedTemplate.description : '';
     },
     getTemplateColor() {
-      if (!this.characterData.template) {
-        return "black";
-      }
-      else {
+      if (this.characterData.template) {        
         return this.characterData.template.color ? this.characterData.template.color : "black";
       }
     },    

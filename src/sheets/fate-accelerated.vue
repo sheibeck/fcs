@@ -166,26 +166,11 @@ export default {
     getVal(graphPath, defaultValue) {
     	return this.$parent.getVal(this.character, graphPath, defaultValue);
     },
-    setVal(arr, val) {		
-		this.$parent.setVal(this.character, arr, val);		
+    setVal(arr, val) {
+		this.$parent.setVal(this.character, arr, val);
 	},
 	sendToVTT(type, label, obj, item, skillType) {		
-		switch(type)
-		{			
-			case "fatepoint":
-				this.$parent.sendToVTT(type, this.character.name, null, item);
-				break;
-			case "stress":
-			case "consequence":
-			case "stuntextra":
-				this.$parent.sendToVTT(type, this.character.name, label, item);
-				break;
-			default:
-				if (this.getVal(item)) {
-					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
-				}
-				break;
-		}
+		this.$parent.parseVTTMessage(type, label, obj, item, skillType);
 	},	
   }
 }

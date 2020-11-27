@@ -123,8 +123,37 @@ export default {
 
       return msg;
     },
+    parseVTTMessage(type, label, obj, item, skillType) {
+      debugger;
+      let characterName = this.character.name;
 
-    sendToVTT(type, character, description, data, skillType) {         
+      switch(type)
+      {
+        case "fatepoint":
+          this.sendToVTT(type, characterName, null, item);
+          break;
+        case "stress":
+        case "consequence":
+        case "stuntextra":
+        case "condition":
+          this.sendToVTT(type, characterName, label, item);
+          break;
+        case "diceroll":
+          let diceVal = this.getVal(this.character, item) ?? "0";
+          this.sendToVTT(type, characterName, label, diceVal, skillType);
+          break;          
+        default:
+          let val = this.getVal(this.character, item);
+          if (type == "skill" && this.sheetid.indexOf('fate-core') > -1) {
+            this.sendToVTT("diceroll", characterName, label, item, skillType);
+          } else if (val) {
+            this.sendToVTT(type, characterName, label, val, skillType);
+          }
+          break;
+      }
+    },
+    sendToVTT(type, character, description, data, skillType) { 
+      debugger;        
       let msg = this.formatVTTMessage(type, character, description, data, skillType);
       
       switch (this.vttEnabled) {
