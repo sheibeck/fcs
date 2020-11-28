@@ -4,10 +4,9 @@ import Vuex from 'vuex';
 
 import CharacterSheetList from '@/pages/CharacterSheetList.vue';
 import CharacterSheetDetail from '@/pages/CharacterSheetDetail.vue';
-import CharacterSheet from '@/components/CharacterSheet.vue';
-import CharacterDetail from '@/pages/CharacterDetail.vue';
+import CharacterSheet from '@/components/charactersheet.vue';
 import VueShowdown from 'vue-showdown';
-window.$ = require('../../node_modules/jquery');
+window.$ = require('../../../node_modules/jquery');
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

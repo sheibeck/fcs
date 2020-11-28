@@ -1,7 +1,6 @@
 // Import the `mount()` method from Vue Test Utils
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import CharacterSheetList from '@/pages/CharacterSheetList.vue';
 import Home from '@/pages/Home.vue';
 
 const localVue = createLocalVue();

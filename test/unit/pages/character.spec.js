@@ -3,10 +3,10 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 
 import CharacterDetail from '@/pages/CharacterDetail.vue';
-import CharacterSheet from '@/components/charactersheet'
+import CharacterSheet from '@/components/charactersheet.vue';
 import CharacterProps from '@/components/characterprops'
 import VueShowdown from 'vue-showdown';
-window.$ = require('../../node_modules/jquery');
+window.$ = require('../../../node_modules/jquery');
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -63,6 +63,30 @@ describe('Character with authentication', () => {
       }      
     });
   })
+
+  it('renders character sheet and props', async () => {  
+    await wrapper.setData({ 
+      sheetId: "fate-anything",
+      characterData: {
+        related_id: "CHARACTERSHEET|fate-anything"
+      }
+    });
+        
+    const characterSheet = wrapper.findComponent(CharacterSheet);   
+    expect(characterSheet.exists()).toBe(true);    
+  }) 
+
+  it('renders character props', async () => {  
+    await wrapper.setData({ 
+      sheetId: "fate-anything",
+      characterData: {
+        related_id: "CHARACTERSHEET|fate-anything"
+      }
+    });
+        
+    const characterProps = wrapper.findComponent(CharacterProps);   
+    expect(characterProps.exists()).toBe(true);    
+  }) 
  
   it('renders sheet properties tab when fate-anything sheet', async () => {  
 
@@ -72,11 +96,9 @@ describe('Character with authentication', () => {
         related_id: "CHARACTERSHEET|fate-anything"
       }
     });
-    
-    const characterProps = wrapper.findComponent(CharacterProps);   
-    expect(characterProps.exists()).toBe(true);
-    const templateContainer = characterProps.find("#TabSheetProperties");
-    console.log(templateContainer)
+        
+    const characterProps = wrapper.findComponent(CharacterProps);      
+    const templateContainer = characterProps.find("#TabSheetProperties");    
     expect(templateContainer.exists()).toBe(true);    
   }) 
 
@@ -89,8 +111,6 @@ describe('Character with authentication', () => {
     });
 
     const characterProps = wrapper.findComponent(CharacterProps);   
-    expect(characterProps.exists()).toBe(true);
-
     const templateContainer = characterProps.find("#TabSheetProperties");    
     expect(templateContainer.exists()).toBe(false);    
   }) 

@@ -123,10 +123,8 @@ export default {
 
       return msg;
     },
-    parseVTTMessage(type, label, obj, item, skillType) {
-      debugger;
+    parseVTTMessage(type, label, obj, item, skillType) {      
       let characterName = this.character.name;
-
       switch(type)
       {
         case "fatepoint":
@@ -152,8 +150,7 @@ export default {
           break;
       }
     },
-    sendToVTT(type, character, description, data, skillType) { 
-      debugger;        
+    sendToVTT(type, character, description, data, skillType) {            
       let msg = this.formatVTTMessage(type, character, description, data, skillType);
       
       switch (this.vttEnabled) {
