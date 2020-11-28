@@ -1,6 +1,6 @@
 <template>
   <div class="">
-     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners"></component>     
+     <component v-bind:is="currentCharacterSheet" :character="character" ref="charactersheet" v-on="$listeners" :isOwner="isOwner"></component>     
   </div>
 </template>
 
@@ -56,6 +56,7 @@ export default {
   props: {
     sheetid: String,
     character: Object,
+    isOwner: Boolean,
   },
   computed: {
      ...mapGetters([
@@ -66,7 +67,28 @@ export default {
       if (!commonSvc) { 
         commonSvc = new CommonService(this.$root);
       }
-      return `${commonSvc.GetId(this.sheetid)}`;
+      let id = `${commonSvc.GetId(this.sheetid)}`;
+
+      let validSheets = ["fate-accelerated",
+        "fate-accelerated-custom",    
+        "fate-core",
+        "fate-core-custom",
+        "middle-earth",
+        "dresden-files-accelerated",
+        "fate-condensed",
+        "fate-freeport",
+        "fate-of-cthulhu",
+        "mouse-guard",
+        "star-trek",
+        "fate-anything"];
+
+      //validate the sheet
+      if (validSheets.includes(id)) {
+        return id;
+      }
+      else {
+        document.location = "/404";
+      }
     }
   },
   data () {
@@ -101,8 +123,34 @@ export default {
 
       return msg;
     },
-
-    sendToVTT(type, character, description, data, skillType) {         
+    parseVTTMessage(type, label, obj, item, skillType) {      
+      let characterName = this.character.name;
+      switch(type)
+      {
+        case "fatepoint":
+          this.sendToVTT(type, characterName, null, item);
+          break;
+        case "stress":
+        case "consequence":
+        case "stuntextra":
+        case "condition":
+          this.sendToVTT(type, characterName, label, item);
+          break;
+        case "diceroll":
+          let diceVal = this.getVal(this.character, item) ?? "0";
+          this.sendToVTT(type, characterName, label, diceVal, skillType);
+          break;          
+        default:
+          let val = this.getVal(this.character, item);
+          if (type == "skill" && this.sheetid.indexOf('fate-core') > -1) {
+            this.sendToVTT("diceroll", characterName, label, item, skillType);
+          } else if (val) {
+            this.sendToVTT(type, characterName, label, val, skillType);
+          }
+          break;
+      }
+    },
+    sendToVTT(type, character, description, data, skillType) {            
       let msg = this.formatVTTMessage(type, character, description, data, skillType);
       
       switch (this.vttEnabled) {

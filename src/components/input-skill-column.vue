@@ -1,25 +1,25 @@
 <template>
-  <div class="form-group d-flex">
+  <div class="form-group d-flex align-items-center">
     <!--roll20-->
-    <span v-if="vttEnabled" class="dice fo20 pt-2" v-on:click="sendToVTT()">+</span>
+    <span v-if="vttEnabled" class="dice fo20 pt-2 order-1" v-on:click="sendToVTT()">+</span>
 
     <!--non-custom labels-->
-    <div v-if="(!item.label && !customlabel) || (customlabel && editlock)" class="w-100 mr-auto d-flex flex-column" :class="{ 'mt-1' : item.description }">
+    <div v-if="(!item.label && !customlabel) || (customlabel && editlock)" class="w-100 mr-auto d-flex flex-column order-3 ml-2" :class="{ 'mt-1' : item.description }">
       <label class="col-form-label inputlabel p-0" :class="labelclass">{{getLabel}}</label>
       <small v-if="item.description" class="skill-desc">{{item.description}}</small>
     </div>
 
     <!--custom labels-->
-    <input v-if="(item.label || customlabel) && !editlock" class="w-100 mr-auto inputlabel" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 
+    <input v-if="(item.label || customlabel) && !editlock" class="w-100 mr-auto inputlabel order-3 ml-2" :class="labelclass" type="text" :id="`${item.label}`" :name="`${item.label}`" 
       @change="$parent.setVal(`${item.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${item.label}`)" :placeholder="item.placeholder" />
 
     <!--input-->
-    <input class="form-control text-center col-3 pr-3 pr-md-0" :class="inputclass" type="number" :id="item.obj" :name="item.obj"  
+    <input class="form-control text-center col-3 pr-3 pr-md-0 order-2" :class="inputclass" type="number" :id="item.obj" :name="item.obj"  
       @change="$parent.setVal(`${item.obj}`,  $event.target.value)" 
       :value="$parent.getVal(`${item.obj}`)" :placeholder="'+'" />		
 
-    <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeSkill(item.id)">
+    <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0 order-5" v-on:click="removeSkill(item.id)">
       <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
     </button>	  
   </div>

@@ -181,25 +181,7 @@ export default {
         this.$parent.setVal(this.character, arr, val);        
     },
     sendToVTT(type, label, obj, item, skillType) {        
-		switch(type)
-		{			
-			case "fatepoint":
-				this.$parent.sendToVTT(type, this.character.name, null, item);
-				break;
-			case "stress":
-			case "consequence":
-			case "stuntextra":
-				this.$parent.sendToVTT(type, this.character.name, label, item);
-                break;
-            case "skill":
-                this.$parent.sendToVTT("diceroll", this.character.name, label, item, skillType);
-                break;
-			default:			
-				if (this.getVal(item)) {
-					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
-				}
-				break;
-		}
+		this.$parent.parseVTTMessage(type, label, obj, item, skillType);
 	},
     skillHasValue(skillList, value) {        
         try {            

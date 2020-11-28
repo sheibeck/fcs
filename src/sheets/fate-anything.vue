@@ -2,10 +2,13 @@
 <div class="sheet">
 	<div class="row">		
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right d-md-flex">
-			<div class="mr-auto d-print-none d-none d-md-inline"></div>
-			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="$parent.GetSheetImage()" />			
-			<div class="d-print-none order-2 order-md-1">
-				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> <button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()"><i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i></button>
+			<div class="mr-auto d-none d-md-inline"></div>
+			<img alt="Fate Anything" class="img-fluid fate-logo order-1 order-md-2" :src="getTemplateLogo" />			
+			<div v-if="isOwner" class="d-print-none order-2 order-md-1">
+				<small class="text-muted">{{`Customizations ${isEditLocked ? 'locked' : 'unlocked'}`}}</small> 
+				<button type="button" :title="`Click to ${isEditLocked ? 'unlock' : 'lock'}`" class="btn btn-link" @click="updateLockStatus()">
+					<i :class="`fa fa-${isEditLocked ? 'lock' : 'unlock'}`"></i>
+				</button>
 			</div>
 		</div>
 
@@ -16,7 +19,7 @@
 			</div>
 
 			<div class="form-group d-flex col-md-4">
-				<label class="mt-2 mr-2">Pronoun</label>
+				<label class="mt-2 mr-2">Pron.</label>
 				<input type="text" class="form-control" id="pronoun" name="pronoun" @change="setVal('pronoun',  $event.target.value)" :value="getVal('pronoun')" placeholder="Pronoun" />
 			</div>
 		</div>		
@@ -25,7 +28,7 @@
 	<div class="row">
 		<!-- aspects -->
 		<div class="col-sm-6 col-md-7 fate-aspects px-0" style="border-right: 2px solid #3A5224;">
-			<div class="fate-header d-flex">
+			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">
 				<div class="mr-auto">Aspects</div>
 				<div v-if="!isEditLocked">
 					<i title="Add Aspect" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addAspect()"></i>
@@ -37,15 +40,15 @@
 				</div>
 			</div>
 			
-			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" />
+			<inputstuntextra item="stunts" :rows="30" :border="false" header="Stunts" v-on="$listeners" :headerColor="character.template.color" />
 
-			<div class="fate-header mb-5 mb-sm-0">
+			<div class="fate-header mb-5 mb-sm-0" :style="{ backgroundColor: character.template.color }" >
 				<div class="d-flex">
 					<input class="refresh pl-md-3" type="number" id="refresh" name="refresh" @change="setVal('refresh',  $event.target.value)" :value="getVal('refresh')" placeholder="3" /> <div class="pt-0">Refresh</div>
 				</div>
 			</div>
 			<div style="height: 50px;"></div>
-			<div class="fate-header mb-5 mb-sm-0 d-flex">
+			<div class="fate-header mb-5 mb-sm-0 d-flex" :style="{ backgroundColor: character.template.color }" >
 				<div class="mr-auto"></div>
 				<div class="d-flex" style="min-height: 50px;">
 					<span v-if="vttEnabled" class='dice fo20 font-weight-normal'>A</span><div class="pt-0">Fate Points</div>
@@ -56,20 +59,24 @@
 
 		<!-- Vitals and Skills -->
 		<div class="col-sm-6 col-md-5 fate-skills px-0 mt-3 mt-sm-0">
-			<div class="fate-header d-flex">				
+			<div v-if="showPortrait" class="text-center">
+				<img alt="Fate Anything" class="img-fluid" :src="character.image_url" />	
+			</div>
+
+			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Stress <span v-if="vttEnabled" class='dice fo20 font-weight-normal'>D</span></div>	
 				<div v-if="!isEditLocked">
 					<i title="Add Stress Track" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addStressTrack()"></i>
 				</div>
 			</div>
 
-			<!-- stress -->
+			<!-- stress -->					
 			<div class="d-md-flex flex-column pb-2 px-1" v-for="stress in character.template.stress" :key="stress.id">
 				<div class="form-group font-weight-bold pr-2 mt-0 border-bottom d-flex">
-					<input v-if="!isEditLocked" class="w-75 mr-auto inputlabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
+					<input v-if="!isEditLocked" class="w-75 mr-auto inputlabel inputStressLabel" type="text" :id="`${stress.label}`" :name="`${stress.label}`" 
 						@change="setVal(`${stress.label}`,  $event.target.value)" 
 						:value="getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
-					<label v-else>{{getStressTrackLabel(stress.label, stress.placeholder)}}</label>
+					<label class="inputStressLabel" v-else>{{getStressTrackLabel(stress.label, stress.placeholder)}}</label>
 					<button type="button" v-if="!isEditLocked" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressTrack(stress.id)">
 						<i title="Delete Stress Track" class="fas d-print-none fa-minus-circle"></i>
 					</button>
@@ -77,8 +84,8 @@
 						<i title="Add Stress Box" class="fas d-print-none fa-plus-circle"></i>
 					</button>					
 				</div>
-				<div class="d-flex flex-wrap justify-content-around pt-1">
-					<div v-for="box in stress.boxes" :key="box.id" class="pt-1">
+				<div class="d-flex flex-wrap justify-content-around">
+					<div v-for="box in stress.boxes" :key="box.id" class="">
 						<inputstress v-on:remove-stress-box="onRemoveStressBox" :parentid="stress.id" :stress="box" :stresstype="getStressType(stress)"
 							:customlabel="true" :removable="true" :hidelabel="false" :editlock="isEditLocked" />
 					</div>
@@ -86,7 +93,7 @@
 			</div>				
 			
 			<!-- consequences -->
-			<div class="fate-header d-flex">				
+			<div class="fate-header d-flex" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Consequences</div>	
 				<div v-if="!isEditLocked">
 					<i title="Add Consequence" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addConsequence()"></i>
@@ -97,7 +104,7 @@
 			</div>
 
 			<!-- Skills -->
-			<div class="fate-header d-flex mt-2">				
+			<div class="fate-header d-flex mt-2" :style="{ backgroundColor: character.template.color }">				
 				<div class="mr-auto">Skills</div>	
 				<div v-if="!isEditLocked">
 					<i title="Add Skill" class="fas d-print-none fa-plus pr-2" style="cursor: pointer;" v-on:click="addSkill()"></i>
@@ -105,7 +112,7 @@
 			</div>
 
 			<div class="px-1 skills">				
-				<div v-for="skill in character.template.skills" :key="skill.obj" class="mt-1">
+				<div v-for="skill in character.template.skills" :key="skill.obj" class="">
 					<inputskill v-on:remove-skill="onRemoveSkill" :removable="true" :item="skill" :customlabel="true" :editlock="isEditLocked" />
 				</div>
 			</div>
@@ -126,7 +133,7 @@ import InputFatePoints from '../components/input-fatepoints'
 export default {
   name: 'SheetFateAnything',
   components: {
-	"inputskill": InputSkillColumn,    
+	"inputskill": InputSkillColumn,
 	"inputaspect": InputAspect,
 	"inputconsequence": InputConsequence,
 	"inputstress": InputStress,
@@ -134,12 +141,25 @@ export default {
 	"inputfatepoints": InputFatePoints,
   },
   props: {    
-    character: Object,
+	character: Object,
+	isOwner: Boolean,
   }, 
   computed: {
  	...mapGetters([  
       'vttEnabled'
 	]),	
+	getTemplateLogo() {		
+		let sheetLogo = this.$parent.GetSheetImage();
+		if (!this.character.template) {
+			return sheetLogo;
+		}
+		else {
+			return this.character.template.logo ? this.character.template.logo : sheetLogo;
+		}		
+	},
+	showPortrait() {
+		return this.character.template && this.character.template.showPortrait && this.character.image_url;
+	}
   },
   created() {
 	this.init();
@@ -251,22 +271,7 @@ export default {
         return result;
 	}, 
 	sendToVTT(type, label, obj, item, skillType) {		
-		switch(type)
-		{			
-			case "fatepoint":
-				this.$parent.sendToVTT(type, this.character.name, null, item);
-				break;
-			case "stress":
-			case "consequence":
-			case "stuntextra":
-				this.$parent.sendToVTT(type, this.character.name, label, item);
-				break;
-			default:
-				if (this.getVal(item)) {
-					this.$parent.sendToVTT(type, this.character.name, label, this.getVal(item), skillType);
-				}
-				break;
-		}
+		this.$parent.parseVTTMessage(type, label, obj, item, skillType);
 	},   
 	addAspect() {
 		var id = this.getNextId(this.character.template.aspects);
@@ -343,7 +348,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
+	@import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
 
 	.fate-logo {
 		margin-top: -27px;
@@ -358,8 +363,8 @@ export default {
 		font-weight: 700;
 		padding-bottom: 0px;
 		margin-bottom: 0px;
-		font-size: 36px;
-		height: 43px;
+		font-size: 28px;
+		height: 34px;
 	}
 
 
@@ -417,7 +422,8 @@ export default {
 		min-height: 500px;
 	}
 
-	/deep/ input.inputlabel {
+	/deep/ input.inputlabel,
+	/deep/ .inputStressBoxLabel {
 		font-size: 22px;
 		font-weight: 700;
 		border-width: 0px;
@@ -444,13 +450,28 @@ export default {
 		margin-top: -60px;	
 	}
 
-	/deep/ label {
-		font-size: 22px !important;
+	/deep/ label {		
 		font-weight: 700;
 		border-width: 0px;
 		margin-top: 0px;
 		margin-bottom: 0px;					
 		text-transform: capitalize !important;
+	}
+
+	/deep/ input {	
+		font-size: 18px;
+		border: 0;
+		border-bottom: solid 1px gray;		
+	}
+
+	/deep/ textarea {	
+		font-size: 17px;
+	}
+
+	/deep/ .inputAspectLabel, 
+	/deep/ .inputStressLabel,
+	/deep/ .inputConsequenceLabel {
+		font-size: 16px !important;		
 	}
 
 </style>

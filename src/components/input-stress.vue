@@ -1,10 +1,10 @@
 <template>
 	<div class="d-flex">
     <!--custom labels-->
-    <input v-if="customlabel && !editlock" style="width:30px;" class="mr-auto inputlabel text-center" :class="{ 'd-none' : labelHidden }" type="text" 
+    <input v-if="customlabel && !editlock" style="width:30px;" class="mr-auto inputlabel text-center inputStressBoxLabel" :class="{ 'd-none' : labelHidden }" type="text" 
       @change="$parent.setVal(`${stress.label}`,  $event.target.value)" 
       :value="$parent.getVal(`${stress.label}`)" :placeholder="stress.placeholder" />
-    <label v-else class="px-1 pt-1" :class="{ 'd-none' : labelHidden }" :for="stress.obj">{{getLabelValue}}</label>
+    <label v-else class="px-1 pt-1 inputStressBoxLabel" :class="{ 'd-none' : labelHidden }" :for="stress.obj">{{getLabelValue}}</label>
     <input type="checkbox" :value="stress.value" :id="stress.obj" :name="stress.obj" @change="setVal(stress.obj,  $event.target.checked)" 
       :checked="$parent.getVal(stress.obj)" :disabled="!skillHasValue()" />      
     <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeStressBox(stress.id, parentid)">

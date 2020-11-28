@@ -2,10 +2,10 @@
   <div class="form-group">    
     <div v-if="showlabel" class="d-flex">
       <!--custom labels-->      
-      <input v-if="customlabel && !editlock" class="w-100 mr-auto inputlabel" type="text" 
+      <input v-if="customlabel && !editlock" class="w-100 mr-auto inputlabel inputAspectLabel" type="text" 
         @change="$parent.setVal(`${aspect.label}`,  $event.target.value)" 
         :value="$parent.getVal(`${aspect.label}`)" :placeholder="aspect.placeholder" />      
-      <label v-else>{{getLabelValue}}</label>
+      <label class="inputAspectLabel" v-else>{{getLabelValue}}</label>
 
       <button type="button" v-if="removable && !editlock" class="btn btn-link text-secondary m-0 p-0" v-on:click="removeAspect(aspect.id)">
         <i title="Delete Aspect" class="fas d-print-none fa-minus-circle pr-2"></i>
@@ -13,7 +13,7 @@
     </div>
     <div class="d-flex">
       <span v-if="vttEnabled" class="dice fo20 pt-2 pr-1" v-on:click="sendToVTT('invoke', 'aspect', 'aspects', aspect.obj)">C</span>      
-      <input type="text" class="form-control" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" 
+      <input type="text" class="form-control inputAspect" :id="aspect.obj" :name="'aspects.' + aspect.obj" @change="$parent.setVal(aspect.obj,  $event.target.value)" 
         :value="$parent.getVal(aspect.obj)" :placeholder="getPlaceHolder" />
     </div>
   </div>

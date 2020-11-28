@@ -39,7 +39,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Skills</label>
                     <div class="col-sm-12 col-md-10">
-                        <div v-if="adversary.skills.length == 0">Click Add Skill button to add a skill.</div>
+                        <div v-if="!adversary.skills || adversary.skills.length == 0">Click Add Skill button to add a skill.</div>
                         <div v-else v-for="(skill,index) in adversary.skills" :key="index" class="row">
                             <div class="col-md-7 d-flex">
                                 <input class="form-control" type="text" v-model="skill.name"
@@ -65,7 +65,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Stunts &amp; Extras</label>
                     <div class="col-sm-12 col-md-10">
-                        <div v-if="adversary.stunts.length == 0">Click Add Stunt button to add a stunt.</div>
+                        <div v-if="!adversary.stunts || adversary.stunts.length == 0">Click Add Stunt button to add a stunt.</div>
                         <div v-else v-for="(stunt,index) in adversary.stunts" :key="index" class="row">
                             <div class="col-12 d-flex">
                                 <input class="form-control" type="text" v-model="stunt.name" placeholder="Stunt/Extra/Gadget Name" />
@@ -87,7 +87,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Stress</label>
                     <div class="col-sm-12 col-md-10">
-                        <div v-if="adversary.stress.length == 0">Click Add Stress button to add a stress track.</div>
+                        <div v-if="!adversary.stress || adversary.stress.length == 0">Click Add Stress button to add a stress track.</div>
                         <div v-else v-for="(stress,index) in adversary.stress" :key="index" class="row">
                             <div class="col-md-7 d-flex">
                                 <input class="form-control" type="text" v-model="stress.name" placeholder="Stress Name (Physical, Mental, etc)" />
@@ -111,7 +111,7 @@
                 <div class="form-group row">
                     <label for="name" class="col-sm-12 col-md-2 col-form-label">Consequences</label>
                     <div class="col-sm-12 col-md-10">
-                        <div v-if="adversary.consequences.length == 0">Click Add Consequence button to add a consequence.</div>
+                        <div v-if="!adversary.consequences || adversary.consequences.length == 0">Click Add Consequence button to add a consequence.</div>
                         <div v-else v-for="(consequence,index) in adversary.consequences" :key="index" class="row">
                             <div class="col-12 d-flex">
                                 <input class="form-control" type="text" v-model="consequence.name" placeholder="Consequence Name (Mild, Serious, Exhausted)" />
@@ -231,7 +231,7 @@ export default {
   name: 'AdversaryDetail',
   metaInfo() {
     return {
-       title: this.title,
+       title: `${this.adversary.name ? this.adversary.name + " (Adversary)" : "Create Adversary"}`,
        meta: [
          { vmid: 'description', name: 'description', content: this.description }
        ]
@@ -290,8 +290,6 @@ export default {
       else if (this.adversaryId !== "ADVERSARY|create") {
         await this.getAdversary(this.adversaryId, this.userId);
       }
-
-      this.editAdversary();
     },
     getVal(graphPath, defaultValue){
       return commonSvc.getVal(this.adversary, graphPath, defaultValue);
@@ -337,13 +335,6 @@ export default {
 
       this.adversary = adversary;            
     },   
-    editAdversary : function() {
-      //if we find an adversary, then we're editing, otherwise we are creating
-      if (this.adversary) {                
-        this.title = this.adversary.name + ' (Adversary)';
-        this.description = this.adversary.type;
-      }          
-    },
     save : async function() {            
       if (this.adversary.name === "")
       {
