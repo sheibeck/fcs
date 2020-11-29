@@ -92,7 +92,12 @@
             <div class='form-group'>
                 <label class='' for='sheet_logo'>Template Logo Url:</label> <a :href="getImageSearchUrl('tv show logos')" target="_blank">[search]</a>
                 <input class='form-control' ref="sheet_logo" id='sheet_logo' name='sheet_logo' @change="updateTemplateLogo($event.target.value)" :value="exists(characterData.template, 'logo')" />
-            </div>    
+            </div>   
+
+            <div class='form-group'>
+                <label class='' for='sheet_logo'>Template Font:</label>
+                <font-picker :api-key="'AIzaSyBPXSM04gZ5XajTtMnXr_z83loTBJ7qgDA'" :options="fontPickerOptions" :active-font="GetFont" @change="applyFont"></font-picker> 
+            </div>              
 
             <!-- delete template confirmation modal-->
             <div class="modal fade" id="modalSaveTemplate" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
@@ -142,6 +147,7 @@ import Autocomplete from '@trevoreyre/autocomplete-vue';
 import bootbox from 'bootbox';
 import CommonService from "./../assets/js/commonService";
 import DbService from '../assets/js/dbService';
+import FontPicker from 'font-picker-vue';
 
 let commonSvc = null;
 let dbSvc = null;
@@ -160,6 +166,7 @@ export default {
     'swatches-picker': Compact,
     VueTagsInput,
     Autocomplete,
+    'font-picker': FontPicker
   },
   data() {
       return {
@@ -169,6 +176,12 @@ export default {
             description: "",
         },
         selectedTemplate: null,
+        fontPickerOptions: {
+          name: "main",  
+          variants: ['regular', '700'],
+          //categories: ['sans-serif', 'serif', 'display'],
+          limit: 200,          
+        }
       }
   },
   computed: {
@@ -177,14 +190,20 @@ export default {
       'userId',
     ]),
     async GetSelectedTemplate() {      
-      if (this.characterData.template_id) {
+      if (this.characterData.template_id && !this.selectedTemplate) {       
         let template = await dbSvc.GetObject(this.characterData.template_id);
         if (template) {
-          this.selectedTemplate = template;
-          return;
+          this.selectedTemplate = template;           
         }
       }
-      this.selectedTemplate = null;
+    },
+    GetFont() {
+      if (this.characterData.template.fontFamily) {
+        return this.characterData.template.fontFamily;
+      }
+      else {
+        return "Open Sans";
+      }      
     },
     SheetModifiedAfterTemplate() {      
       return JSON.stringify(this.selectedTemplate.template) !== JSON.stringify(this.characterData.template);
@@ -394,7 +413,10 @@ export default {
         if (query == "concept") {
             query = this.GetHighConcept;
         }
-        return commonSvc.GetImageSearchUrl(query);       
+        return commonSvc.GetImageSearchUrl(query);
+    },
+    applyFont(font) {      
+      this.$set(this.characterData.template, "fontFamily", font.family);
     }
   }
 }
