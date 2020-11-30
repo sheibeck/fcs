@@ -1,5 +1,6 @@
 <template>
-    <div v-if="characterData && isAuthenticated && isOwner">
+<div>
+    <div v-if="characterData && isAuthenticated && isOwner">      
         <ul class="nav nav-tabs" id="propertyTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="character-tab" data-toggle="tab" href="#characterProperties" role="tab" aria-controls="character" aria-selected="true">Character Properties</a>
@@ -134,9 +135,13 @@
                 </div>
             </div>           
           </div>
-
         </div>       
     </div>
+    <div v-else style="visibility:hidden">
+      <!-- need this to properly render selected fonts -->      
+      <font-picker :api-key="'AIzaSyBPXSM04gZ5XajTtMnXr_z83loTBJ7qgDA'" :options="fontPickerOptions" :active-font="GetFont" @change="applyFont"></font-picker>
+    </div>
+</div>
 </template>
 
 <script>
