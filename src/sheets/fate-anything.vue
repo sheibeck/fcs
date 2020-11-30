@@ -408,10 +408,6 @@ export default {
 	}
 
 	/* IMAGE STYLES */	
-	textarea {
-		border: 0 !important;
-	}
-
 	#stunts {
 		height: 500px;		
 		min-height: 500px;
@@ -460,13 +456,15 @@ export default {
 	}
 
 	/deep/ textarea {	
-		font-size: 17px;
+		font-size: 18px;
+		border: 0 !important;
 	}
 
 	/deep/ .inputAspectLabel, 
 	/deep/ .inputStressLabel,
-	/deep/ .inputConsequenceLabel {
-		font-size: 16px !important;		
+	/deep/ .inputConsequenceLabel,
+	/deep/ .stuntText > * {
+		font-size: 18px !important;		
 	}
 
 </style>
