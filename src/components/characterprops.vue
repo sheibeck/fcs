@@ -384,6 +384,10 @@ export default {
                 value.forEach( (item) => {
                   let labelVal = commonSvc.getVal(this.characterData, item.label, "");
                   item.placeholder = labelVal ? labelVal : item.placeholder;
+                  if (item.value) {
+                    let valueVal = commonSvc.getVal(this.characterData, item.value, "");
+                    item.valueplaceholder = valueVal ? valueVal : item.valueplaceholder;
+                  }
 
                   parseTemplate(item);
                 });              
