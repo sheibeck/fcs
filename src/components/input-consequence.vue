@@ -128,8 +128,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  label {
-    font-family: 'Archivo Black', sans-serif;
+  label {    
     text-transform: uppercase;
     font-size: 22px;
     font-weight: 700;
