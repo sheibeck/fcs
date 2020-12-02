@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="form-group">    
+    <div class="form-group stuntText">    
       <textarea v-if="stuntEdit || isNewCharacter" class="form-control" :id="item" :name="item" :rows="rows" :placeholder="header" @change="$parent.setVal(item,  $event.target.value)" :value="$parent.getVal(item)"></textarea>
       <VueShowdown v-if="!stuntEdit && !isNewCharacter" class="h-auto p-2" :class="{border: border}" :options="vueShowdownOpts" :style="{ 'min-height': minHeight + 'px' }" :markdown="getMarkupVal(item)" />
     </div>  

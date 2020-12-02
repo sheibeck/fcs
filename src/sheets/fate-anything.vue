@@ -1,5 +1,5 @@
 <template>
-<div class="sheet">
+<div class="sheet apply-font-main">
 	<div class="row">		
 		<div class="col-sm-6 text-center order-md-2 text-md-right pb-2 pb-md-0 text-right d-md-flex">
 			<div class="mr-auto d-none d-md-inline"></div>
@@ -347,16 +347,13 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-	@import url('https://fonts.googleapis.com/css?family=Open+Sans:800');
-
+<style lang="scss" scoped>	
 	.fate-logo {
 		margin-top: -27px;
 		max-height: 80px;
 	}
 
-	/deep/ .fate-header {
-		font-family: 'Open Sans', sans-serif;
+	/deep/ .fate-header {		
 		text-transform: uppercase;
 		background-color: black;
 		color: white;
@@ -369,7 +366,6 @@ export default {
 
 
 	/deep/ .col-form-label {
-		font-family: 'Open Sans', sans-serif;
 		text-transform: uppercase;
 		font-size: 22px;
 		font-weight: 700;
@@ -394,8 +390,7 @@ export default {
 		width: 38px;
 	}
 
-	/deep/ .fate-conditions label {
-		font-family: 'IM Fell English', sans-serif;
+	/deep/ .fate-conditions label {		
 		text-transform: uppercase;
 		font-size: 30px;
 		font-weight: 700;
@@ -413,10 +408,6 @@ export default {
 	}
 
 	/* IMAGE STYLES */	
-	textarea {
-		border: 0 !important;
-	}
-
 	#stunts {
 		height: 500px;		
 		min-height: 500px;
@@ -465,13 +456,15 @@ export default {
 	}
 
 	/deep/ textarea {	
-		font-size: 17px;
+		font-size: 18px;
+		border: 0 !important;
 	}
 
 	/deep/ .inputAspectLabel, 
 	/deep/ .inputStressLabel,
-	/deep/ .inputConsequenceLabel {
-		font-size: 16px !important;		
+	/deep/ .inputConsequenceLabel,
+	/deep/ .stuntText > * {
+		font-size: 18px !important;		
 	}
 
 </style>

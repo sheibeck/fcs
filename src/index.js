@@ -11,6 +11,7 @@ import 'vue-datetime/dist/vue-datetime.css'
 import VueShowdown, { showdown } from 'vue-showdown'
 import App from './App'
 import router from './router'
+
 import 'whatwg-fetch'
 import './assets/site.scss'
 
