@@ -303,10 +303,7 @@ export default {
         if (result) {
           let response = await dbSvc.DeleteObject( this.userId, this.template.id );
           if (response) {
-            this.template = {
-              name: "",
-              description: "",
-            };              
+            this.clearTemplateSelection();            
             commonSvc.Notify('Template deleted.', 'success');
           }
         }        
