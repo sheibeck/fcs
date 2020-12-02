@@ -43,7 +43,7 @@
 
           <div v-if="isCustomizable" class="tab-pane fade" id="sheetProperties" role="tabpanel" aria-labelledby="profile-tab">
             <div class="d-flex flex-column flex-md-row">               
-              <div class="form-group flex-fill mr-2" v-if="characterData.template_id && selectedTemplate">
+              <div class="form-group col-12 col-md-6" v-if="characterData.template_id && appliedTemplate">
                 <label>Applied Template:</label>
                 <div>
                   {{GetTemplateName}}
@@ -51,32 +51,37 @@
                     {{GetTemplateDescription}}
                   </div>
                   <div class="small text-muted" v-if="SheetModifiedAfterTemplate">
-                    Changes have been made to this sheet after applying this template.
+                    Changes have been made to this sheet or the applied template has changed.
                   </div>
                 </div>
               </div>
-              <div class="form-group flex-fill">
+              <div class="form-group col-12 col-md 6 d-flex flex-column">
                 <label class='' for='template'>Find a Template:</label>
-                <autocomplete ref="templateAutocomplete"
-                    :search="searchTemplates"
-                    :debounce-time="500"
-                    placeholder="Find a template"
-                    aria-label="Find a template"       
-                    :get-result-value="getTemplateResultValue"
-                    @submit="selectTemplateResult"
-                    class="mr-1">
-                  <template #result="{ result, props }">
-                    <li v-bind="props">
-                        <div class="p-0 m-0 h6">
-                        {{result.name}}
-                        </div>
-                        <div class="small">
-                        {{result.description}}
-                        </div>
-                    </li>
-                  </template>
-                </autocomplete>
-                <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
+                <div class="d-flex">                  
+                  <autocomplete ref="templateAutocomplete"
+                      :search="searchTemplates"
+                      :debounce-time="500"
+                      placeholder="Find a template"
+                      aria-label="Find a template"       
+                      :get-result-value="getTemplateResultValue"
+                      @submit="selectTemplateResult"
+                      class="mr-1 flex-fill">
+                    <template #result="{ result, props }">
+                      <li v-bind="props">
+                          <div class="p-0 m-0 h6">
+                          {{result.name}}
+                          </div>
+                          <div class="small">
+                          {{result.description}}
+                          </div>
+                      </li>                    
+                    </template>                  
+                  </autocomplete>                
+                  <button type="button" class="btn btn-link" @click="clearTemplateSelection()"><i class="far fa-times-circle"></i></button>
+                </div>
+                <div>
+                  <input type="checkbox" class="mr-1 input-sm" ref="templateSearchMine" /><span>Search only my templates?</span>
+                </div>
                 <div class="d-flex">
                     <button type="button" class="btn btn-success btn-sm mr-1" data-toggle='modal' data-target='#modalSaveTemplate'>Save Template</button>
                     <button type="button" class="btn btn-primary btn-sm mr-1" v-if="template.id" @click="applyTemplate">Apply Template</button>
@@ -180,7 +185,7 @@ export default {
             name: "",
             description: "",
         },
-        selectedTemplate: null,
+        appliedTemplate: null,
         fontPickerOptions: {
           name: "main",  
           variants: ['regular', '700'],
@@ -194,26 +199,26 @@ export default {
       'isAuthenticated',
       'userId',
     ]),
-    async GetSelectedTemplate() {      
-      if (this.characterData.template_id && !this.selectedTemplate) {       
+    async GetAppliedTemplate() {      
+      if (this.characterData.template_id && !this.appliedTemplate) {       
         let template = await dbSvc.GetObject(this.characterData.template_id);
         if (template) {
-          this.selectedTemplate = template;           
+          this.appliedTemplate = template;           
         }
       }
     },
     GetFont() {
-      if (this.characterData.template.fontFamily) {
+      if (this.characterData.template && this.characterData.template.fontFamily) {
         return this.characterData.template.fontFamily;
       }
       else {
         return "Open Sans";
       }      
     },
-    SheetModifiedAfterTemplate() {      
-      return JSON.stringify(this.selectedTemplate.template) !== JSON.stringify(this.characterData.template);
+    SheetModifiedAfterTemplate() {
+      return JSON.stringify(this.appliedTemplate.template) !== JSON.stringify(this.characterData.template);
     },
-    GetHighConcept() {        
+    GetHighConcept() {
         let concept = "character portraits";
 
         if (this.characterData.aspects)
@@ -234,10 +239,10 @@ export default {
       return this.template && this.template.owner_id == this.userId;
     }, 
     GetTemplateName() {      
-      return this.selectedTemplate ? this.selectedTemplate.name : 'None';
+      return this.appliedTemplate ? this.appliedTemplate.name : 'None';
     },
     GetTemplateDescription() {
-      return this.selectedTemplate ? this.selectedTemplate.description : '';
+      return this.characterData.template ? this.characterData.template.description : '';
     },
     getTemplateColor() {
       if (this.characterData.template) {        
@@ -253,7 +258,7 @@ export default {
         commonSvc = new CommonService(this.$root);
         dbSvc = new DbService(this.$root); 
 
-        await this.GetSelectedTemplate;
+        await this.GetAppliedTemplate;
 
         $('#modalSaveTemplate').on('hidden.bs.modal', function (e) {
             let form = document.getElementById('formTemplate');
@@ -273,12 +278,7 @@ export default {
       this.characterData.tags = newTags;     
     }, 
      /* template search */
-    async searchTemplates(query) {
-      this.template = {
-        name: "",
-        description: "",
-      }
-
+    async searchTemplates(query) {     
       return new Promise( async (resolve) => {                       
         let ownerId = null;
         if (this.$refs.templateSearchMine.checked) {
@@ -314,11 +314,7 @@ export default {
     },
     applyTemplate() {
       bootbox.confirm("Are you sure you want to use this template? This will reset any custom labels.", async (result) => {        
-        if (result) {      
-          //clear out the old template
-          //this.characterData.template_id = null;
-          //this.characterData.template = null;
-
+        if (result) {               
           //remove any existing labels so the new template labels/placeholder take effect
           const removeLabels = (obj) => {
             if (!obj) return;
@@ -336,7 +332,7 @@ export default {
           //assign the new template to this character
           this.$set(this.characterData, "template_id", this.template.id);
           this.$set(this.characterData, "template", this.template.template);
-          this.selectedTemplate = this.template;
+          this.appliedTemplate = this.template;
         }
       })
     },
@@ -379,26 +375,40 @@ export default {
 
         //convert the placeholder values to the custom label names
         let charTemplate = commonSvc.DeepCopy(this.characterData.template);
-        for (const [key, value] of Object.entries(charTemplate)) {
-          console.log(`${key}: ${value}`);
-          if (Array.isArray(value)) {
-            value.forEach( (item) => {
-              let labelVal = commonSvc.getVal(this.characterData, item.label, "");
-              item.placeholder = labelVal ? labelVal : item.placeholder;
-            });
+
+        let parseTemplate = (thingToParse) => {
+          if (typeof(thingToParse) == "object")
+          {
+            for (const [key, value] of Object.entries(thingToParse)) {
+              if (Array.isArray(value)) {
+                value.forEach( (item) => {
+                  let labelVal = commonSvc.getVal(this.characterData, item.label, "");
+                  item.placeholder = labelVal ? labelVal : item.placeholder;
+
+                  parseTemplate(item);
+                });              
+              }
+            }
           }
         }
+        parseTemplate(charTemplate);
+
+        //we are copying the template from the existing character 
+        //changes so we need to pickup the updated name/description
+        charTemplate.name = this.template.name;
+        charTemplate.description = this.template.description;
         template.template = charTemplate;
        
-        let response = await dbSvc.SaveObject(template);            
-        if (response) {              
+        let response = await dbSvc.SaveObject(template);
+        if (response) {
           commonSvc.Notify('Template saved.', 'success');
           $('#modalSaveTemplate').modal('hide');
 
           //apply the template to this character
           this.$set(this.characterData, "template_id", template.id);
-          this.selectedTemplate = template;
-          this.$emit('save-character');
+          this.$set(this.characterData, "template", charTemplate);
+          this.appliedTemplate = template;
+          this.$emit('save-character');          
         }            
       }
     },
@@ -422,6 +432,13 @@ export default {
     },
     applyFont(font) {      
       this.$set(this.characterData.template, "fontFamily", font.family);
+    },
+    clearTemplateSelection() {
+      this.$refs.templateAutocomplete.value = '';
+      this.template = {
+            name: "",
+            description: "",
+        }
     }
   }
 }
