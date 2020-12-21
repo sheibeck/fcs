@@ -336,7 +336,7 @@ export default {
       this.adversary = adversary;            
     },   
     save : async function() {            
-      if (this.adversary.name === "")
+      if (!this.adversary.name)
       {
         commonSvc.Notify('You must enter a name', 'error');
         return;
