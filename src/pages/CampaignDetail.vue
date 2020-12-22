@@ -122,7 +122,7 @@
         </div>
 
         <!-- important things -->
-        <div v-if="showimportant" class="order-1 order-md-2 px-1" id="summary">
+        <div v-if="showimportant" class="order-1 order-md-2 px-1 col-12 col-md-5 col-lg-4" id="summary">
           <div class="d-flex header">
             <h4 class="mr-auto">
               Important Things               
