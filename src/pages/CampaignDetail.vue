@@ -43,7 +43,7 @@
 
   #summary {
     ul {
-      padding-left: 10px;
+      padding-left: 5px;
 
       li {
         list-style: none;
@@ -63,15 +63,27 @@
         <a role="button" href="/campaign" class="btn btn-success d-print-none mb-1 mr-1">
           <i class="fas fa-chevron-circle-left"></i> Campaign List
         </a>
-        <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3> <a class="" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">Public Campaign Summary <i class="fas fa-external-link-alt"></i></a>
+        <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3>
+        <div class="d-flex p-1"> 
+          <a class="mr-auto" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">
+            Public Campaign Summary 
+            <i class="fas fa-external-link-alt"></i>
+          </a>
+          <button v-if="!showimportant" title="Show Important Things" @click="showimportant = true" type="button" class="btn btn-link d-sm-block d-md-none p-0 m-0">
+            Show Important <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button v-if="showimportant" title="Hide Important Things" @click="showimportant = false" type="button" class="btn btn-link d-sm-block d-md-none m-0 p-0 pl-1">
+            Hide Important <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
       </div>
       
-      <div class="row mt-2" v-if="!isNewCampaign">
+      <div class="d-flex flex-column flex-md-row" v-if="!isNewCampaign">
         <!-- session logs -->
-        <div class="col-12 col-md-7 col-lg-8 order-2 order-md-1" id="logs">
+        <div class="order-2 order-md-1 px-1" :class="{ 'col-md-7':showimportant, 'col-lg-8':showimportant }" id="logs">
           <div class="header d-flex">
             <span class="h4">Session Log</span>
-              <a class="pl-1 pt-1 mr-auto" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Campaigns"><i class="fas fa-question-circle"></i></a>
+            <a class="pl-1 pt-1 mr-auto" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Campaigns"><i class="fas fa-question-circle"></i></a>
             <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
             <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fas fa-book"></i> Add Session</button>
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
@@ -105,44 +117,66 @@
           </div>
         </div>
 
+        <div v-if="!showimportant" class="order-1 order-md-2 d-none d-md-block" id="summary">
+          <button title="Show Important Things" @click="showimportant = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>
+        </div>
+
         <!-- important things -->
-        <div class="col-12 col-md-5 col-lg-4 order-1 order-md-2" id="summary">
+        <div v-if="showimportant" class="order-1 order-md-2 px-1 col-12 col-md-5 col-lg-4" id="summary">
           <div class="d-flex header">
-            <h4 class="mr-auto">Important Things</h4> <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
+            <h4 class="mr-auto">
+              Important Things               
+            </h4> 
+            <span class="d-md-none mt-1" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
+            <button title="Hide Important Things" @click="showimportant = false" type="button" class="btn btn-link d-none d-md-block m-0 p-0 pl-1">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
           </div>
           <div class="">
             <h5><span class="text-danger">!</span>Issues</h5>
             <ul>
-              <li v-for="thing in sortedAlphaSessions" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
-                <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+              <li v-for="thing in sortedAlphaSessions" :key="thing.id" class="d-flex">
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
+                <button class="btn btn-link p-0 text-danger text-left" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
                 <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
             <h5><span class="text-success">#</span>Characters</h5>
             <ul>
-              <li v-for="thing in sortedAlphaCharacters" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
-                <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+              <li v-for="thing in sortedAlphaCharacters" :key="thing.id" class="d-flex">
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
+                <button class="btn btn-link p-0 text-success text-left" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
                 <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
             <h5><span class="text-info">@</span>Faces &amp; Places</h5>
             <ul>
-              <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
-                <button class="btn btn-link p-0 text-info" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+              <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id" class="d-flex">
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
+                <button class="btn btn-link p-0 text-info text-left" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
                 <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
 
             <h5><span class="text-muted">~</span>Campaign Aspects</h5>
             <ul>
-              <li v-for="thing in sortedAlphaAspects" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i> <span class="badge badge-secondary">x{{thing.sessionids.length}}</span>
-                <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
+              <li v-for="thing in sortedAlphaAspects" :key="thing.id" class="d-flex">
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
+                <button class="btn btn-link p-0 text-muted text-left" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>
                 <small class="" v-bind:class="{ 'mark': niceDescription(thing.description) }" v-html="niceDescription(thing.description)"></small>
               </li>
             </ul>
@@ -283,6 +317,7 @@ export default {
       name: "",
       description: "",
       loading: true,
+      showimportant: true,
       campaign : {},
       currentSessionId: "",
       currentSessionValue: "",
