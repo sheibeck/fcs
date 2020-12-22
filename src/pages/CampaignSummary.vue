@@ -38,7 +38,7 @@
   
   #summary {
     ul { 
-      padding-left: 10px;
+      padding-left: 5px;
 
       li {
         list-style: none;
@@ -53,15 +53,23 @@
     <loading :loading="isLoading" />
 
     <div v-if="!isLoading">     
-      <div class="d-flex">
+      <div class="d-flex flex-column flex-sm-row">
         <h3 class="mr-auto">{{campaign.name}} - Campaign Summary</h3>
+         <div class="d-flex p-1">        
+          <button v-if="!showimportant" title="Show Important Things" @click="showimportant = true" type="button" class="btn btn-link d-sm-block d-md-none p-0 m-0">
+            Show Important <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button v-if="showimportant" title="Hide Important Things" @click="showimportant = false" type="button" class="btn btn-link d-sm-block d-md-none m-0 p-0 pl-1">
+            Hide Important <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="row mt-2">
+      <div class="d-flex flex-column flex-md-row">
         <!-- session logs -->
-        <div class="col-12 col-md-8 order-2 order-md-1" id="logs">        
+        <div class="order-2 order-md-1 px-1 col-12" :class="{ 'col-md-7':showimportant, 'col-lg-8':showimportant }" id="logs">     
           <div class="header d-flex">
-            <span class="h4 mr-auto">Session Log</span>              
+            <span class="h4 mr-auto flex-fill">Session Log</span>            
             <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button> 
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
@@ -72,23 +80,34 @@
             <div class="d-flex p-1 pt-0 bg-light">            
               <span class="badge badge-secondary mt-1 mr-2 mr-auto">{{getNiceDate(session.date)}}</span>            
               <span class="cursor" v-on:click="jumpTo('#logs')"><i class="fas fa-arrow-circle-up"></i> scroll up</span>              
-            </div>            
+            </div>
             <div class="card">              
               <VueShowdown :extensions="['fcsCampaignHidden']" class="card-body" :options="{ emoji: false, openLinksInNewWindow: true, parseImgDimensions: true }" :markdown="session.description"/>
             </div>
           </div>
         </div>
 
+        <div v-if="!showimportant" class="order-1 order-md-2 d-none d-md-block" id="summary">
+          <button title="Show Important Things" @click="showimportant = true" type="button" class="btn btn-link"><i class="fas fa-angle-double-left"></i></button>
+        </div>
+
         <!-- campaign summary -->      
-        <div class="col-12 col-md-4 order-1 order-md-2" id="summary">
+        <div v-if="showimportant" class="order-1 order-md-2 px-1 col-12 col-md-5 col-lg-4" id="summary">
           <div class="d-flex header">
-            <h4 class="mr-auto">Important Things</h4> <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
+            <h4 class="mr-auto">Important Things</h4>
+            <span class="d-md-none d-lg-none d-xl-none" v-on:click="jumpTo('#logs')">scroll down <i class="fas fa-arrow-circle-down"></i></span>
+            <button title="Hide Important Things" @click="showimportant = false" type="button" class="btn btn-link d-none d-md-block m-0 p-0 pl-1">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
           </div>
           <div class="">
             <h5><span class="text-danger">!</span>Issues</h5>
             <ul>
               <li v-for="thing in sortedAlphaSessions" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i>
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
                 <button class="btn btn-link p-0 text-danger" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>                 
               </li>
             </ul>
@@ -96,7 +115,10 @@
             <h5><span class="text-success">#</span>Characters</h5>
             <ul>
               <li v-for="thing in sortedAlphaCharacters" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i>
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
                 <button class="btn btn-link p-0 text-success" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>                
               </li>
             </ul>
@@ -104,7 +126,10 @@
             <h5><span class="text-info">@</span>Faces &amp; Places</h5>
             <ul>
               <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id">              
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i>
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
                 <button class="btn btn-link p-0 text-info" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>                
               </li>
             </ul> 
@@ -112,7 +137,10 @@
             <h5><span class="text-muted">~</span>Campaign Aspects</h5>
             <ul>
               <li v-for="thing in sortedAlphaAspects" :key="thing.id">
-                <i class="fas fa-filter" v-on:click="filterBy(thing.thing)"></i>
+                <div class="d-flex align-self-center pr-1">
+                  <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
+                  <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
+                </div>
                 <button class="btn btn-link p-0 text-muted" type="button" @click="copyThingToClipboard(thing.thing)">{{niceThingDisplay(thing.thing)}}</button>                
               </li>
             </ul>  
@@ -191,7 +219,8 @@ export default {
     return {
       title: "",
       description: "",
-      loading: true,    
+      loading: true,
+      showimportant: true,
       campaign : {},    
       currentSessionId: "",
       currentSessionValue: "",
