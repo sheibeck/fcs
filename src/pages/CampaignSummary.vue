@@ -103,7 +103,7 @@
           <div class="">
             <h5><span class="text-danger">!</span>Issues</h5>
             <ul>
-              <li v-for="thing in sortedAlphaSessions" :key="thing.id">
+              <li v-for="thing in sortedAlphaSessions" :key="thing.id" class="d-flex">
                 <div class="d-flex align-self-center pr-1">
                   <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
                   <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
@@ -114,7 +114,7 @@
 
             <h5><span class="text-success">#</span>Characters</h5>
             <ul>
-              <li v-for="thing in sortedAlphaCharacters" :key="thing.id">
+              <li v-for="thing in sortedAlphaCharacters" :key="thing.id" class="d-flex">
                 <div class="d-flex align-self-center pr-1">
                   <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
                   <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
@@ -125,7 +125,7 @@
 
             <h5><span class="text-info">@</span>Faces &amp; Places</h5>
             <ul>
-              <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id">              
+              <li v-for="thing in sortedAlphaFacePlaces" :key="thing.id" class="d-flex">              
                 <div class="d-flex align-self-center pr-1">
                   <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
                   <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
@@ -136,7 +136,7 @@
 
             <h5><span class="text-muted">~</span>Campaign Aspects</h5>
             <ul>
-              <li v-for="thing in sortedAlphaAspects" :key="thing.id">
+              <li v-for="thing in sortedAlphaAspects" :key="thing.id" class="d-flex">
                 <div class="d-flex align-self-center pr-1">
                   <i class="fas fa-filter pr-1" v-on:click="filterBy(thing.thing)"></i>
                   <span class="badge badge-secondary mt-0">x{{thing.sessionids.length}}</span>
