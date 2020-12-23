@@ -80,7 +80,7 @@
       
       <div class="d-flex flex-column flex-md-row" v-if="!isNewCampaign">
         <!-- session logs -->
-        <div class="order-2 order-md-1 px-1" :class="{ 'col-md-7':showimportant, 'col-lg-8':showimportant }" id="logs">
+        <div class="order-2 order-md-1 px-1 col-12" :class="{ 'col-md-7':showimportant, 'col-lg-8':showimportant }" id="logs">
           <div class="header d-flex">
             <span class="h4">Session Log</span>
             <a class="pl-1 pt-1 mr-auto" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Campaigns"><i class="fas fa-question-circle"></i></a>
