@@ -57,13 +57,11 @@
             </p>
           </div>
           <div v-else>
-            <p class='card-text px-4 my-0' v-if="item.aspects.high_concept" id="highconcept">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.high_concept)">A</span>
-              <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept)"></span>
+            <p class='card-text px-4 my-0' v-if="item.aspects.high_concept" id="highconcept">              
+              <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept, 'aspect')"></span>
             </p>
-            <p class='card-text px-4 my-0' v-if="item.aspects.trouble" id="trouble">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'aspect', item.aspects.trouble)">A</span>
-              <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble)"></span>
+            <p class='card-text px-4 my-0' v-if="item.aspects.trouble" id="trouble">              
+              <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble, 'aspect')"></span>
             </p>
             <p class='card-text px-4 my-0' v-if="item.aspects.other_aspects" id="otherapsects">
               <strong>Aspects</strong> <span v-html="fixLabel(item.aspects.other_aspects, 'aspect')"></span>
@@ -75,12 +73,12 @@
           <h5 class='card-header py-0'>Skills</h5>
           <div v-if="Array.isArray(item.skills)">
             <p class='card-text px-4 my-0' v-for="(skill, index) in item.skills" :key="index" :id="`skill-${index}`">                
-                <strong>{{skill.name}}</strong> <span v-html="fixLabel(skill.value, 'skill', index)"></span>
+                <strong>{{skill.name}}</strong> <span v-html="fixLabel(skill.value, 'skill', skill.name)"></span>
             </p>
           </div>
           <div v-else>
             <p class='card-text px-4 my-0' v-for="(skill, index) in item.skills" :key="index" :id="`skill-${index}`">                
-                <strong>{{index}}</strong> <span v-html="fixLabel(skill, 'skill', index)"></span>
+                <strong>{{index}}</strong> <span v-html="fixLabel(skill, 'skill', item.skills[index])"></span>
             </p>
           </div>
         </div>
@@ -281,7 +279,7 @@ export default {
         this.description = "Fate Adversaries";
       }        
     },
-    fixLabel: function (val, type, data) {      
+    fixLabel: function (val, type, data) {          
       let result = val;
       
       if (typeof(val) === "string") {
@@ -369,15 +367,17 @@ export default {
               let desc2 = data2;
               let rollModifier = parseInt(data);  //try to match it straight up
 
+              //if data does not contain the skill modifier then try 
+              // to extract the modifier out of string
               if (isNaN(rollModifier))
               {
-                var findModifier = data.match(/(\d)/);
+                var findModifier = data.match(/([+-]?\d)/);
                 if (findModifier) {
                   rollModifier = findModifier[0];
-                  desc2 = data2;            
+                  desc2 = data2;
                 }
                 else {
-                  findModifier = data2.match(/(\d)/);
+                  findModifier = data2.match(/([+-]?\d)/);
                   if(findModifier) {
                     rollModifier = findModifier[0];
                   }
@@ -385,7 +385,7 @@ export default {
                 }
               }
 
-              msg = fcsVtt.MsgDiceRoll(character, description, desc2, rollModifier);
+              msg = models.MsgDiceRoll(character, description, desc2, rollModifier);
               break;
             case "invoke":
               if (!data) return;
@@ -419,13 +419,13 @@ export default {
 
               if (isNaN(rollModifier))
               {
-                var findModifier = data.match(/(\d)/);
+                var findModifier = data.match(/([+-]?\d)/);
                 if (findModifier) {
                   rollModifier = findModifier[0];
                   desc2 = data2;            
                 }
                 else {
-                  findModifier = data2.match(/(\d)/);
+                  findModifier = data2.match(/([+-]?\d)/);
                   if(findModifier) {
                     rollModifier = findModifier[0];
                   }
