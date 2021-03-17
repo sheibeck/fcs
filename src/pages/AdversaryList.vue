@@ -53,18 +53,18 @@
               <strong v-if="index==0">High Concept</strong>
               <strong v-if="index==1">Trouble</strong>
               <strong v-if="index>1">Aspect</strong>
-              <span v-html="fixLabel(aspect.name, 'aspect')"></span>
+              <span v-html="fixLabel(item.name, aspect.name, 'aspect')"></span>
             </p>
           </div>
           <div v-else>
             <p class='card-text px-4 my-0' v-if="item.aspects.high_concept" id="highconcept">              
-              <strong>High Concept</strong> <span v-html="fixLabel(item.aspects.high_concept, 'aspect')"></span>
+              <strong>High Concept</strong> <span v-html="fixLabel(item.name, item.aspects.high_concept, 'aspect')"></span>
             </p>
             <p class='card-text px-4 my-0' v-if="item.aspects.trouble" id="trouble">              
-              <strong>Trouble</strong> <span v-html="fixLabel(item.aspects.trouble, 'aspect')"></span>
+              <strong>Trouble</strong> <span v-html="fixLabel(item.name, item.aspects.trouble, 'aspect')"></span>
             </p>
             <p class='card-text px-4 my-0' v-if="item.aspects.other_aspects" id="otherapsects">
-              <strong>Aspects</strong> <span v-html="fixLabel(item.aspects.other_aspects, 'aspect')"></span>
+              <strong>Aspects</strong> <span v-html="fixLabel(item.name, item.aspects.other_aspects, 'aspect')"></span>
             </p>
           </div>
         </div>
@@ -73,12 +73,12 @@
           <h5 class='card-header py-0'>Skills</h5>
           <div v-if="Array.isArray(item.skills)">
             <p class='card-text px-4 my-0' v-for="(skill, index) in item.skills" :key="index" :id="`skill-${index}`">                
-                <strong>{{skill.name}}</strong> <span v-html="fixLabel(skill.value, 'skill', skill.name)"></span>
+                <strong>{{skill.name}}</strong> <span v-html="fixLabel(item.name, skill.value, 'skill', skill.name)"></span>
             </p>
           </div>
           <div v-else>
             <p class='card-text px-4 my-0' v-for="(skill, index) in item.skills" :key="index" :id="`skill-${index}`">                
-                <strong>{{index}}</strong> <span v-html="fixLabel(skill, 'skill', item.skills[index])"></span>
+                <strong>{{index}}</strong> <span v-html="fixLabel(item.name, skill, 'skill', index)"></span>
             </p>
           </div>
         </div>
@@ -88,14 +88,14 @@
 
           <div v-if="Array.isArray(item.stunts)">
             <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex" :id="`stunt-${stuntIndex}`">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stunt.name, stunt.value)">A</span>
-              <strong>{{stunt.name}}</strong> {{fixLabel(stunt.value)}}
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT(item.name, 'stuntextra', stunt.name, stunt.value)">A</span>
+              <strong>{{stunt.name}}</strong> {{fixLabel(item.name, stunt.value)}}
             </p>
           </div>
           <div v-else>
             <p class='card-text px-4 my-0' v-for="(stunt, stuntIndex) in item.stunts" :key="stuntIndex" :id="`stunt-${stuntIndex}`">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('stuntextra', stuntIndex, stunt)">A</span>
-              <strong>{{stuntIndex}}</strong> {{fixLabel(stunt)}}
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT(item.name, 'stuntextra', stuntIndex, stunt)">A</span>
+              <strong>{{stuntIndex}}</strong> {{fixLabel(item.name, stunt)}}
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@
             <p class='card-text px-4 my-0' v-for="(stressTrack, index) in item.stress" :key="index" :id="`stresstrack-${index}`">
                 <strong>{{stressTrack.name}}</strong>
                 <span v-for="(stressBox, boxIndex) in getStressBoxes(stressTrack.value)" :key="boxIndex" :id="`stresstrack-${index}-stressbox-${boxIndex}`">
-                  <input type='checkbox' v-bind:value='stressBox.value' @change="sendToVTT(`stress`, `${stressBox}${stressTrack.name !== 'Stress' ? ' '+stressTrack.name : ''}`, $event.target.checked)">{{stressBox}}
+                  <input type='checkbox' v-bind:value='stressBox.value' @change="sendToVTT(item.name, `stress`, `${stressBox}${stressTrack.name !== 'Stress' ? ' '+stressTrack.name : ''}`, $event.target.checked)">{{stressBox}}
                 </span>
             </p>
           </div>
@@ -115,7 +115,7 @@
             <p class='card-text px-4 my-0' v-for="(stressMain, stressMainIndex) in item.stress" :key="stressMainIndex" :id="`stresstrack-${stressMainIndex}`">                
                 <strong>{{stressMainIndex}}</strong>
                 <span v-for="(stressValue, stressIndex) in stressMain" :key="stressIndex">
-                  <input type='checkbox' v-bind:value='stressValue' @change="sendToVTT(`stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
+                  <input type='checkbox' v-bind:value='stressValue' @change="sendToVTT(item.name, `stress`, `${stressValue}${stressMainIndex !== 'Stress' ? ' '+stressMainIndex : ''}`, $event.target.checked)">{{stressValue}}
                 </span>
             </p>
           </div>
@@ -126,16 +126,16 @@
 
           <div v-if="Array.isArray(item.stunts)">
             <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex" :id="`consequence-${conIndex}`">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'invoke', consequences[conIndex])">A</span>
-              <span v-html="fixLabel(con)"></span> <strong>{{con.value}}</strong> 
-              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(`consequence`, `${con.name} ${con.value}`, $event.target.value, conIndex)">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT(item.name, 'invoke', 'invoke', consequences[conIndex])">A</span>
+              <span v-html="fixLabel(item.name, con)"></span> <strong>{{con.value}}</strong> 
+              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(item.name, `consequence`, `${con.name} ${con.value}`, $event.target.value, conIndex)">
             </p>
           </div>
           <div v-else>
             <p class='form-inline card-text px-4 my-0 d-flex' v-for="(con, conIndex) in item.consequences" :key="conIndex" :id="`consequence-${conIndex}`">
-              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT('invoke', 'invoke', consequences[conIndex])">A</span>
-              <strong>{{conIndex}}</strong> <span v-html="fixLabel(con)"></span>
-              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(`consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
+              <span v-if="vttEnabled" class="dice fo20" v-on:click="sendToVTT(item.name, 'invoke', 'invoke', consequences[conIndex])">A</span>
+              <strong>{{conIndex}}</strong> <span v-html="fixLabel(item.name, con)"></span>
+              <input v-if="vttEnabled" class="ml-2 form-control input-sm" @change="sendToVTT(item.name, `consequence`, `${con} ${conIndex}`, $event.target.value, conIndex)">
             </p>
           </div>
         </div>
@@ -279,7 +279,7 @@ export default {
         this.description = "Fate Adversaries";
       }        
     },
-    fixLabel: function (val, type, data) {          
+    fixLabel: function (adversary, val, type, data) {          
       let result = val;
       
       if (typeof(val) === "string") {
@@ -303,11 +303,11 @@ export default {
           
           switch(type) {
             case "skill":              
-              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToVTT('diceroll', 'skill', '${item.replace(/\'/,'')}', '${data}')">+</span>`
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToVTT('${adversary}', 'diceroll', 'skill', '${item.replace(/\'/,'')}', '${data}')">+</span>`
               r20result += item;
               break;
             case "aspect":            
-              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToVTT('invoke', '${type}', '${item.replace(/\'/,'')}')">A</span>`
+              r20result += `<span class="dice fo20" onclick="fcs.$children[0].$children[0].sendToVTT('${adversary}', 'invoke', 'invoke', '${item.replace(/\'/,'')}')">A</span>`
               r20result += item;            
               break;                         
           }
@@ -354,10 +354,9 @@ export default {
     isOwner : function(ownerId) {
       return this.userId === ownerId;
     },
-    sendToVTT(type, description, data, data2) {       
+    sendToVTT(character, type, description, data, data2) {       
       if (!this.vttEnabled) return;
-
-      let character = this.adversaries[0].name;
+      
       let msg = null;      
 
        switch (this.vttEnabled) {
