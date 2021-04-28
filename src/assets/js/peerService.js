@@ -7,7 +7,7 @@ export default class PeerService {
             peerId = this.GeneratePeerId();
         }
         return new Peer(peerId, {
-            debug: 1,
+            debug: 3,
             secure: true,
             host: "fcs-peer-server.herokuapp.com",
             port: 443           
