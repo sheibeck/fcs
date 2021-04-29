@@ -911,7 +911,8 @@ ${msg}`;
       if (this.isHost) {
         if (this.scene.gamePeerId !== e.detail.peerid)
         {
-          this.scene.gamePeerId = e.detail.peerid;                
+          this.scene.gamePeerId = e.detail.peerid;
+          this.saveScene(true);
         }
       }
     },
