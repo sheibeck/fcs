@@ -221,8 +221,7 @@ const store = new Vuex.Store({
       return state.credentials;
     }, 
     filteredSessions: state => {      
-      return state.filteredSessions.sort((a, b) => (a.date < b.date) ? 1 : -1);
-      //return state.filteredSessions;
+      return state.filteredSessions.sort((a, b) => (a.date < b.date) ? 1 : -1);      
     },
     filteredCampaigns: state => {      
       return state.filteredCampaigns;
