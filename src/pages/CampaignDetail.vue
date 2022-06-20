@@ -84,13 +84,15 @@
           <div class="header d-flex">
             <span class="h4">Session Log</span>
             <a class="pl-1 pt-1 mr-auto" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Campaigns"><i class="fas fa-question-circle"></i></a>
-            <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>
-            <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fas fa-book"></i> Add Session</button>
+            <button type="button" v-if="sortDescending" @click="sortDescending = false" class="btn btn-secondary mr-1 cursor">Sort <i class="fas fa-arrow-down fa-lg"></i></button>
+            <button type="button" v-if="!sortDescending" @click="sortDescending = true" class="btn btn-secondary mr-1 cursor">Sort <i class="fas fa-arrow-up fa-lg"></i></button>
+            <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>            
+            <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fas fa-book"></i> Add Session</button>            
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
           <div class="p-5 h2" v-if="isLoading">Loading sessions...</div>
 
-          <div v-for="session in filteredSessions" :key="session.id" class="mt-1" v-bind:class="{ 'mark': currentSession === session.id }">
+          <div v-for="session in getSortedSessions" :key="session.id" class="mt-1" v-bind:class="{ 'mark': currentSession === session.id }">
             <div class="px-1 bg-light" :id="`editor-${commonSvc.GetId(session.id)}`">
               <div>
                 <span v-if="currentSession !== session.id" class="badge badge-secondary">{{getNiceDate(session.date)}}</span>
@@ -330,6 +332,7 @@ export default {
         issues: [],
         aspects: [],
       },
+      sortDescending: false,
     }
   },
   computed: {
@@ -350,6 +353,15 @@ export default {
       },
       set : function(value) {
         this.$store.commit('updateSessions', value);
+      }
+    },
+    getSortedSessions : {
+      get: function() {
+        if (this.sortDescending) {
+          return this.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? -1 : 1);
+        }
+        
+        return this.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);        
       }
     },
     currentSession : {
@@ -393,6 +405,9 @@ export default {
     },
     sortedAlphaAspects : function() {
       return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+    },
+    setSortBy : function() {
+      this.sortDescending = !this.sortDescending;
     },
     commonSvc() {
       return commonSvc;
