@@ -66,7 +66,7 @@
         <h3 class="mr-auto">{{campaign.name}} &mdash; Campaign</h3>
         <div class="d-flex p-1"> 
           <a class="mr-auto" :href="`/campaign-summary/${commonSvc.GetId(campaign.id)}/${campaign.slug}`" target="_blank">
-            Public Campaign Summary 
+            Public Campaign
             <i class="fas fa-external-link-alt"></i>
           </a>
           <button v-if="!showimportant" title="Show Important Things" @click="showimportant = true" type="button" class="btn btn-link d-sm-block d-md-none p-0 m-0">
@@ -84,10 +84,26 @@
           <div class="header d-flex">
             <span class="h4">Session Log</span>
             <a class="pl-1 pt-1 mr-auto" target="_blank" href="https://github.com/sheibeck/fcs/wiki/Campaigns"><i class="fas fa-question-circle"></i></a>
-            <button type="button" v-if="sortDescending" @click="sortDescending = false" class="btn btn-secondary mr-1 cursor">Sort <i class="fas fa-arrow-down fa-lg"></i></button>
-            <button type="button" v-if="!sortDescending" @click="sortDescending = true" class="btn btn-secondary mr-1 cursor">Sort <i class="fas fa-arrow-up fa-lg"></i></button>
-            <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()"><i class="fas fa-times"></i> Clear Filter</button>            
-            <button type="button" class="btn btn-primary btn-sm" @click="addSession()"><i class="fas fa-book"></i> Add Session</button>            
+            <button type="button" v-if="sortDescending" @click="sortDescending = false" class="btn btn-secondary btn-sm mr-1">
+              <div class="d-flex">
+                <i class="fas fa-sort-amount-down mt-1 mr-1"></i><span class="d-none d-md-block">Sort</span>
+              </div>
+            </button>
+            <button type="button" v-if="!sortDescending" @click="sortDescending = true" class="btn btn-secondary btn-sm mr-1">
+              <div class="d-flex">
+                <i class="fas fa-sort-amount-up mt-1 mr-1"></i><span class="d-none d-md-block">Sort</span>
+              </div>
+            </button>
+            <button type="button" class="btn btn-warning btn-sm mr-1" v-show="isFiltered" v-on:click="clearFilter()">
+              <div class="d-flex">
+                <i class="fas fa-times mt-1 mr-1"></i> <span class="d-none d-md-block">Clear Filter</span>
+              </div>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" @click="addSession()">
+              <div class="d-flex">
+                <i class="fas fa-book mt-1 mr-1"></i> <span class="d-none d-md-block">Add Session</span>
+              </div>
+            </button>            
             <span v-on:click="jumpTo('#summary')" class="d-md-none d-lg-none d-xl-none pt-1 ml-1"><i class="fas fa-arrow-circle-up"></i></span>
           </div>
           <div class="p-5 h2" v-if="isLoading">Loading sessions...</div>
@@ -249,7 +265,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import VueShowdown, { showdown } from 'vue-showdown';
+import { showdown } from 'vue-showdown';
 import { Datetime } from 'vue-datetime';
 import NamedRegExp from 'named-regexp-groups';
 import CommonService from "./../assets/js/commonService";
@@ -348,22 +364,19 @@ export default {
     },
     sessions : {
       get : function() {
-        return this.$store.state.sessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);
-        //return this.$store.state.sessions;
+        return this.$store.state.sessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);        
       },
       set : function(value) {
         this.$store.commit('updateSessions', value);
       }
     },
-    getSortedSessions : {
-      get: function() {
-        if (this.sortDescending) {
-          return this.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? -1 : 1);
-        }
-        
-        return this.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);        
+    getSortedSessions : function() {
+      if (this.sortDescending) {
+        return this.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? -1 : 1);
       }
-    },
+      
+      return this.filteredSessions.sort((a, b) => (new Date(a.date) < new Date(b.date)) ? 1 : -1);      
+    },  
     currentSession : {
       get : function() {
         return this.currentSessionId
@@ -405,10 +418,7 @@ export default {
     },
     sortedAlphaAspects : function() {
       return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
-    },
-    setSortBy : function() {
-      this.sortDescending = !this.sortDescending;
-    },
+    },    
     commonSvc() {
       return commonSvc;
     },
@@ -458,12 +468,9 @@ export default {
       return thing.replace(/[#~!@]"(.+?)"/g,"$1");
     },
     parseSessionAll: function() {
-      if (this.sessions && this.sessions.length > 0) {
-        for(let i = 0; i < this.sessions.length; i++) {
-          let session = this.sessions[i];
-          this.parseThings(session.description, session.id);
-        }
-      }
+      this.sessions.forEach( session => {                   
+        this.parseThings(session.description, session.id);             
+      });
     },
     parseSession: function(event, session) {
       //let newDescription = event.target.innerHTML;
@@ -552,8 +559,6 @@ export default {
 
         //if the thing does not exist at all, add it and associate it with this session
         if (thingIdx === -1) {
-          let displayText =  `${display} ${description ? "[" + description + "]" : ""}`;
-
           let newThing = {id: commonSvc.GenerateUUID(), sessionids: [sessionId], thing: thing, description: [description] || null}
           list.unshift(newThing);
         }
