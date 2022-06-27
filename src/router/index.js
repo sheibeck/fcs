@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
 import Meta from 'vue-meta'
 import Router from 'vue-router'
 import Home from 'pages/Home'
