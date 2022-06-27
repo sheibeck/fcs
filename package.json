@@ -46,7 +46,7 @@
     "@sentry/integrations": "^5.24.2",
     "@sentry/tracing": "^5.27.6",
     "@trevoreyre/autocomplete-vue": "^2.2.0",
-    "aws-sdk": "^2.799.0",
+    "aws-sdk": "^2.814.0",
     "bootbox": "^5.4.0",
     "bootstrap": "^4.5.2",
     "bootstrap-vue": "^2.17.0",
