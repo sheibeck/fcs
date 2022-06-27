@@ -1,4 +1,4 @@
-import { DiceRoller } from 'rpg-dice-roller';
+import { DiceRoller } from '@dice-roller/rpg-dice-roller';
 import CommonService from "./commonService";
 import PeerService from "./peerService";
 

@@ -1,4 +1,4 @@
-import { DiceRoller } from 'rpg-dice-roller';
+import { DiceRoller } from '@dice-roller/rpg-dice-roller';
 
 export default class FCSVTTClient {    
     constructor() {

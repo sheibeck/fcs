@@ -25,8 +25,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { DiceRoller } from 'rpg-dice-roller';
+import { DiceRoller } from '@dice-roller/rpg-dice-roller';
 
 export default {
   name: 'DiceRoller',
