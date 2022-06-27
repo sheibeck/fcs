@@ -1,3 +1,5 @@
+import { Peer } from 'peerjs';
+
 export default class PeerService {    
     constructor(){        
     }
