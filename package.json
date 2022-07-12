@@ -1,6 +1,6 @@
 {
   "name": "fatecharactersheet",
-  "version": "2.4.7",
+  "version": "2.4.8",
   "description": "Website for managing all things for Fate-based roleplaying games.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "test:unit": "jest",
-    "test": "npm run test:unit",
+    "test": "yarn run test:unit",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config test/jest.config.js"
   },
   "keywords": [
@@ -104,6 +104,7 @@
     "vue-showdown": "^2.4.1",
     "vue-template-compiler": "^2.6.12",
     "vuex": "^3.5.1",
+    "webpack": "^4.44.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^3.11.3",
     "webpack-merge": "^4.2.2",

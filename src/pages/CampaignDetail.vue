@@ -278,7 +278,8 @@ let dbSvc = null;
 showdown.extension('fcsCampaign', () => [
   {
     type: 'lang',
-    regex: /([#@!~])"(.+?)"(?:\s?\[(.*?)\])?/g,
+    //regex: /([#@!~])"(.+?)"(?:\s?\[(.*?)\])?/g,
+    regex: /([#@!~])([\w\-]+|"\s*[^"]*\s*")(?:\s?\[(.*?)\])?/g,
     replace: function (wm, type, thing, description) {
       let color = "success";
       switch(type) {
@@ -453,10 +454,10 @@ export default {
         var displayText = description.join(", ");
         if (/[#~!@]/.test(displayText)) {
           //add some html formatting so if we reference another thing in the description it looks nice
-          displayText = displayText.replace(/[#]"(.+?)"/g,"<span class=\"text-success\">$1</span>");
-          displayText = displayText.replace(/[!]"(.+?)"/g,"<span class=\"text-danger\">$1</span>");
-          displayText = displayText.replace(/[@]"(.+?)"/g,"<span class=\"text-info\">$1</span>");
-          displayText = displayText.replace(/[~]"(.+?)"/g,"<span class=\"text-muted\">$1</span>");
+          displayText = displayText.replace(/[#]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-success\">$1</span>");
+          displayText = displayText.replace(/[!]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-danger\">$1</span>");
+          displayText = displayText.replace(/[@]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-info\">$1</span>");
+          displayText = displayText.replace(/[~]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-muted\">$1</span>");
         }
         return displayText;
       } else {
@@ -465,7 +466,7 @@ export default {
     },
     niceThingDisplay(thing) {
       //cut out the special characters when displaying the thing names
-      return thing.replace(/[#~!@]"(.+?)"/g,"$1");
+      return thing.replace(/[#~!@]([\w\-]+|"\s*[^"]*\s*")/g,"$1");
     },
     parseSessionAll: function() {
       this.sessions.forEach( session => {                   
@@ -490,9 +491,9 @@ export default {
 
       this.saveSession(session);
     },
-    parseThings: function(stringToParse, sessionId, removeThing){
-      var $component = this;
-      let regexString = `(?<thing>[#@!~]"(?<display>.+?)")(?:\\s?\\[(?<description>.*?)\\])?`;
+    parseThings: function(stringToParse, sessionId, removeThing){      
+      var $component = this;      
+      let regexString = `(?<thing>[#@!~](?<display>[\\w\\-]+|"\\s*[^"]*\\s*"))(?:\\s?\\[(?<description>.*?)\\])?`;      
       let regex = new NamedRegExp(regexString, "g");
       let match = regex.exec(stringToParse);
 
