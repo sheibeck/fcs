@@ -189,8 +189,8 @@ let dbSvc = null;
 
 showdown.extension('fcsCampaignHidden', () => [ 
   {
-    type: 'lang',
-    regex: /([#@!~])"(.+?)"(?:\s?\[(.*?)\])?/g,
+    type: 'lang',    
+    regex: /([#@!~])([\w\-]+|"\s*[^"]*\s*")(?:\s?\[(.*?)\])?/g,
     replace: function (wm, type, thing, description) { 
       let color = "success";
       switch(type) {
@@ -236,7 +236,7 @@ export default {
     userId() {
       //wait for our authenticated user id
       this.campaignId = commonSvc.SetId("CAMPAIGN", fcs.$route.params.id);
-      this.getCampaign(this.userId, this.campaignId);
+      this.getCampaign(this.campaignId);
     }
   },
   data () {
@@ -312,7 +312,7 @@ export default {
     },        
     niceThingDisplay(thing) {
       //cut out the special characters when displaying the thing names
-      return thing.replace(/[#~!@]"(.+?)"/g,"$1");
+      return thing.replace(/[#~!@]([\w\-]+|"\s*[^"]*\s*")/g,"$1");
     },
     parseSessionAll: function() {
       this.sessions.forEach( session => {
@@ -320,8 +320,8 @@ export default {
       });
     },    
     parseThings: function(stringToParse, sessionId, removeThing){
-      var $component = this;
-      let regexString = `(?<thing>[#@!~]"(?<display>.+?)")(?:\\s?\\[(?<description>.*?)\\])?`;
+      var $component = this;      
+      let regexString = `(?<thing>[#@!~](?<display>[\\w\\-]+|"\\s*[^"]*\\s*"))(?:\\s?\\[(?<description>.*?)\\])?`;
       let regex = new NamedRegExp(regexString, "g");
       let match = regex.exec(stringToParse);
 
@@ -435,7 +435,7 @@ export default {
         return commonSvc.GetNiceDate(date);
     },    
   
-    getCampaign : function(ownerId, id) {
+    getCampaign : function(id) {
       var $component = this;
 
       if (this.id === "create") {
@@ -443,7 +443,7 @@ export default {
         return;
       }
 
-      dbSvc.GetObject(id, ownerId).then ( (response) => {   
+      dbSvc.GetObject(id, null).then ( (response) => {   
         if (!response)
         {
           commonSvc.Notify(`Could not find campaign with id <b>${commonSvc.GetId(id)}</b>`, 'error', 2000, () => {
