@@ -299,6 +299,8 @@ showdown.extension('fcsCampaign', () => [
 
       let displayDesc = description ? ` <mark>${description}</mark>` : "";
 
+      //don't show the quotes when we're displaying nice tags in the sesssion log
+      thing = thing.replace(/\"/g, "");
       return `<span class="text-${color}">${type}${thing}</span>${displayDesc}`;
     }
   },
@@ -409,16 +411,16 @@ export default {
       return this.loading;
     },
     sortedAlphaSessions : function() {
-      return this.things.issues.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+      return this.things.issues.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },
     sortedAlphaCharacters : function() {
-      return this.things.characters.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+      return this.things.characters.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },
     sortedAlphaFacePlaces : function() {
-      return this.things.faceplaces.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+      return this.things.faceplaces.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },
     sortedAlphaAspects : function() {
-      return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+      return this.things.aspects.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },    
     commonSvc() {
       return commonSvc;
@@ -450,14 +452,15 @@ export default {
       this.oldSessionText = event.target.value || "";
     },
     niceDescription(description) {
+      //this is for formatting tagged items nicely when inside [ brackets ]       
       if (description !== null) {
         var displayText = description.join(", ");
         if (/[#~!@]/.test(displayText)) {
           //add some html formatting so if we reference another thing in the description it looks nice
-          displayText = displayText.replace(/[#]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-success\">$1</span>");
-          displayText = displayText.replace(/[!]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-danger\">$1</span>");
-          displayText = displayText.replace(/[@]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-info\">$1</span>");
-          displayText = displayText.replace(/[~]([\w\-]+|"\s*[^"]*\s*")/g,"<span class=\"text-muted\">$1</span>");
+          displayText = displayText.replace(/\"/g, "").replace(/[#](.*)/g,"<span class=\"text-success\">$1</span>");
+          displayText = displayText.replace(/\"/g, "").replace(/[!](.*)/g,"<span class=\"text-danger\">$1</span>");
+          displayText = displayText.replace(/\"/g, "").replace(/[@](.*)/g,"<span class=\"text-info\">$1</span>");
+          displayText = displayText.replace(/\"/g, "").replace(/[~](.*)/g,"<span class=\"text-muted\">$1</span>");
         }
         return displayText;
       } else {
@@ -465,8 +468,8 @@ export default {
       }
     },
     niceThingDisplay(thing) {
-      //cut out the special characters when displaying the thing names
-      return thing.replace(/[#~!@]([\w\-]+|"\s*[^"]*\s*")/g,"$1");
+      //cut out the special characters when displaying the thing names on the important things list
+      return thing.replace(/\"/g, "").replace(/[#~!@](.*)/g,"$1");
     },
     parseSessionAll: function() {
       this.sessions.forEach( session => {                   
