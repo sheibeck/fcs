@@ -207,7 +207,9 @@ showdown.extension('fcsCampaignHidden', () => [
           color = "muted";
           break;
       }      
-
+      
+      //don't show the quotes when we're displaying nice tags in the sesssion log
+      thing = thing.replace(/\"/g, "");
       return `<span class="text-${color}">${type}${thing}</span>`;
     }  
   },
@@ -290,18 +292,18 @@ export default {
     isLoading : function() {
       return this.loading;
     },
-    sortedAlphaSessions : function() {
-      return this.things.issues.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+     sortedAlphaSessions : function() {
+      return this.things.issues.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },
     sortedAlphaCharacters : function() {
-      return this.things.characters.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+      return this.things.characters.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },
     sortedAlphaFacePlaces : function() {
-      return this.things.faceplaces.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
+      return this.things.faceplaces.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
     },
     sortedAlphaAspects : function() {
-      return this.things.aspects.sort((a, b) => (a.thing > b.thing) ? 1 : -1);
-    },    
+      return this.things.aspects.sort((a, b) => (a.thing.replace(/\"/g, "") > b.thing.replace(/\"/g, "")) ? 1 : -1);
+    }, 
     commonSvc() {
       return commonSvc;
     },
@@ -311,8 +313,8 @@ export default {
       this.parseSessionAll();
     },        
     niceThingDisplay(thing) {
-      //cut out the special characters when displaying the thing names
-      return thing.replace(/[#~!@]([\w\-]+|"\s*[^"]*\s*")/g,"$1");
+      //cut out the special characters when displaying the thing names on the important things list
+      return thing.replace(/\"/g, "").replace(/[#~!@](.*)/g,"$1");
     },
     parseSessionAll: function() {
       this.sessions.forEach( session => {
