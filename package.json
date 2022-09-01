@@ -1,6 +1,6 @@
 {
   "name": "fatecharactersheet",
-  "version": "2.4.8",
+  "version": "2.4.9",
   "description": "Website for managing all things for Fate-based roleplaying games.",
   "main": "index.js",
   "scripts": {
