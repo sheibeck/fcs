@@ -3,7 +3,6 @@ import SubService from "./subService";
 import AWS from 'aws-sdk';
 import * as  AmazonCognitoIdentity from "amazon-cognito-identity-js";
 
-
 export default class UserService {    
   constructor(fcs, commonSvc)
   {
@@ -275,8 +274,30 @@ export default class UserService {
       AccessToken: token,      
     };
         
-    let result = await this.UpdateCognitoUser(params);    
+    let result = await this.UpdateCognitoUser(params);
     return result;
+  }
+
+  ResendConfirmationCode = async (email) => {
+    if (!email) {      
+      this.commonSvc.Notify("Please enter your email address to resend your confirmation code.");
+      return;      
+    }
+
+    var params = {
+      ClientId: this.fcs.$store.state.cognito.clientId,
+      Username: email,
+    };
+    
+    let cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+    cognitoidentityserviceprovider.resendConfirmationCode(params, (err, data) => {
+      if (err) {
+        this.commonSvc.Notify(err.message);        
+      }
+      else {
+        this.commonSvc.Notify("Confirmation resent. Please check your email.", "success");
+      }
+    });
   }
 
   Logout = () => {        

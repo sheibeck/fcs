@@ -12,11 +12,11 @@
       <div class="col-sm-12 col-md-4">
         <div class="form-group">
           <label for="email">Email address</label>
-          <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" @keyup.enter="login">
+          <input v-model="email" type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" @keyup.enter="login">          
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Password" @keyup.enter="login">
+          <input v-model="password" type="password" class="form-control" id="password" placeholder="Password" @keyup.enter="login">
         </div>
         <button v-on:click="login" type="button" class="btn btn-primary col-sm-12 col-md-5 mt-1 mb-1">
             Login <i class="fas fa-sign-in-alt"></i>
@@ -26,6 +26,10 @@
         </a>
         <a href='/recover' class="col-sm-12 col-md-5 mt-1 mb-1">
             Forgot your password?
+        </a>
+        <br />
+        <a href="#" @click="resendConfirmationCode" class="col-sm-12 col-md-5 mt-1 mb-1">
+            Resend your confirmation email?            
         </a>
       </div>
     </div>
@@ -40,11 +44,13 @@ export default {
   name: 'Login',
   metaInfo: {
       // if no subcomponents specify a metaInfo.title, this title will be used
-      title: 'Login',      
+      title: 'Login'     
   },
   data () {
     return {
-      title: "Login"
+      title: "Login",
+      email: "",     
+      password: "",
     }
   },
   computed: {
@@ -56,7 +62,13 @@ export default {
   methods: {
     login: function() {
       let userSvc = new UserService(this.$root);
-      userSvc.Login($('#email').val(), $('#password').val());
+      userSvc.Login(this.$data.email, this.$data.password);
+    },
+    
+    resendConfirmationCode: function(e) {
+      e.preventDefault();
+      let userSvc = new UserService(this.$root);
+      userSvc.ResendConfirmationCode(this.$data.email);
     }
   }
 }
