@@ -4,3 +4,6 @@ dist/
 debug.log
 
 *.orig
+
+# graphify transient build output — canonical graph lives in .planning/graphs/
+graphify-out/
