@@ -49,9 +49,8 @@
                   <a class="nav-link" target="_blank" href="https://sterlingheibeck.wordpress.com/category/fate-character-sheet/"><i class="fas fa-scroll"></i> Blog</a>
                 </div>
               </li>
-              <li v-if="!HasSubscription" class="nav-item" ref="el">
-                  <a v-if="!isAuthenticated" class="nav-link" href="/register"><span class="dice">C</span> Register</a>
-                  <a v-if="isAuthenticated" class="nav-link" href="/account"><span class="dice">C</span> Subscribe</a>
+              <li v-if="!isAuthenticated" class="nav-item" ref="el">
+                  <a class="nav-link" href="/register"><span class="dice">C</span> Register</a>
               </li>
               
           </ul>
