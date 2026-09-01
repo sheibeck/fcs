@@ -15,6 +15,22 @@ Paying subscribers keep full, uninterrupted access to their existing characters,
 - **Success metric**: Retained paying subscribers with zero migration-related churn
 - **Strategy notes**: Two-milestone modernization — frontend/tooling first, backend platform migration second
 
+## Current Milestone: v2.0 Ground-up Rebuild on Firebase
+
+**Goal:** Rebuild Fate Character Sheet from scratch as a modern app hosted on Firebase, preserving 100% of existing functionality and migrating all existing users and their data — with zero loss for paying subscribers.
+
+**Non-negotiable premise:** On-screen character sheets must look like the printed, at-the-table Fate character sheets. This print fidelity is the product's reason to exist and is the primary lens for stack/framework selection.
+
+**Target features:**
+- Fresh stack — framework is open (Vue 3 or a better-fit alternative), decided by research and judged on print-fidelity sheet rendering, Firebase fit, and solo-maintainer DX
+- Firebase Hosting (replaces S3/CloudFront), Firebase Auth (replaces Cognito), Firestore (replaces DynamoDB)
+- Stripe subscriptions preserved as-is (billing continuity for paying users)
+- All 12 Fate game-system sheets, campaigns/scenes/adversaries CRUD, Fate dice roller
+- Peer-to-peer VTT (PeerJS) re-verified; signaling server moved off Heroku onto Firebase-family infra (Cloud Run / Functions / managed alternative — TBD by research)
+- User + data migration from Cognito/DynamoDB into Firebase Auth/Firestore, with safe cutover for the FULL user base (not just active users)
+
+**Key context:** Live product, paying Stripe subscribers. ~259 *active* users / ~1.3k views per 7 days per Google Analytics — but the TOTAL registered user base (Cognito user pool + DynamoDB records) is unknown and likely much larger; determining the true user/record count is an early migration task. "From scratch" means a new codebase but the same product surface and the same migrated data. This greenfield rebuild **supersedes** the earlier incremental two-milestone plan (Vue 2→3 modernization, then Firebase).
+
 ## Requirements
 
 ### Validated
@@ -78,6 +94,10 @@ Paying subscribers keep full, uninterrupted access to their existing characters,
 | Defer `aws-sdk` v2→v3 upgrade | Milestone 2 removes the AWS client stack entirely; upgrading it now is throwaway work | — Pending |
 | Introduce a backend service abstraction during Milestone 1 | Makes the Milestone 2 Firebase swap a contained change instead of a codebase-wide rewrite | — Pending |
 | Feature-freeze during modernization | Keep the migration a like-for-like port; reduce surface area for regressions | — Pending |
+| **v2.0 pivot: greenfield rebuild on Firebase instead of incremental migration** | User chose to rebuild from scratch on a best-fit stack rather than migrate the aging Vue 2 app in place; supersedes the two-milestone incremental plan | — Active (v2.0) |
+| Framework left open (research & recommend) | Print-fidelity sheet rendering + Firebase fit + solo-maintainer DX should drive the choice, not concept-continuity with the old app | — Pending research |
+| Keep Stripe as the billing processor; integration approach open | Stripe is an accepted, working payment system and stays. HOW it's wired is open — evaluate the official Firebase "Run Subscriptions with Stripe" extension vs. porting the `FCSStripe` logic to a Cloud Function, chosen on which better preserves billing continuity for existing subscribers. Prefer the extension if it can adopt existing Stripe customers. | — Decided (integration TBD) |
+| Move PeerJS signaling off Heroku onto Firebase-family infra | Consolidate hosting under Firebase/GCP; Cloud Run is the likely fit (persistent WebSockets), pending research | — Pending research |
 
 ## Evolution
 
@@ -98,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Update Context with current state
 
 ---
-*Last updated: 2026-07-23 after initialization*
+*Last updated: 2026-08-31 — started milestone v2.0 (greenfield Firebase rebuild)*

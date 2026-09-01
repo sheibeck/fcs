@@ -1,239 +1,201 @@
-# Feature Research — Vue 2→3 Migration Workstreams
+# Feature Research — Functionality Parity Inventory
 
-**Domain:** Live production SPA framework migration (Vue 2.6 → Vue 3, Fate Character Sheet)
-**Researched:** 2026-07-23
-**Confidence:** MEDIUM overall (HIGH for core Vue 3 breaking-change facts, cross-checked against the official `v3-migration.vuejs.org` guide; LOW for individual third-party library Vue-3-readiness claims below — verify each at implementation time, since small ecosystem libraries drift fast)
+**Domain:** Greenfield rebuild of a live, in-production Fate RPG character-management SPA (v2.0, Firebase target)
+**Researched:** 2026-08-31
+**Confidence:** HIGH (all findings sourced directly from the current codebase — `src/components`, `src/pages`, `src/sheets`, `src/assets/js`, `.planning/codebase/*` — not inferred from docs or competitor research; this is a "what exists" inventory, not a market survey)
 
-> Note on framing: this project's "features" are migration workstreams, not end-user product features. The template sections below are reinterpreted accordingly: **Table Stakes = required to run on Vue 3 at all**, **Differentiators = optional modernization** (deferrable, opt-in value-adds), **Anti-Features = anti-scope** (explicitly not to be done during this migration). Feature Dependencies become workstream sequencing/blocking order — this is the most roadmap-critical section.
+> **Framing note:** This is a *parity* inventory for a like-for-like rebuild, not a feature-landscape/competitor analysis. The template's "Table Stakes / Differentiators / Anti-Features" vocabulary is reused as instructed: **Table Stakes = must rebuild exactly** (parity-critical), **Differentiators = thin/edge, rebuild but low effort or reduced scope acceptable**, **Anti-Features = candidates to drop or intentionally not carry forward as-is**. Nothing here is a *new* feature proposal.
+
+---
 
 ## Feature Landscape
 
-### Table Stakes (Required to Run on Vue 3)
+### Table Stakes — Must Rebuild for Parity
 
-Non-negotiable. Skipping any of these means the app does not boot, does not compile, or silently breaks for users.
+These are the product's core, load-bearing behaviors. Dropping or materially changing any of these breaks the deal for existing paying subscribers.
 
-| Workstream | Why Required | Complexity | Notes |
+| Feature | Current Behavior | Complexity | Notes |
 |---|---|---|---|
-| Compiler/loader toolchain bump (`vue-loader` v15→v17, `vue-template-compiler`→`@vue/compiler-sfc`, matching Babel/webpack peer versions) | Current `vue-loader@15` + `vue-template-compiler` only understand Vue 2 SFCs; Vue 3 SFCs need `@vue/compiler-sfc`. Nothing else in this list compiles without this. | MEDIUM | Verify exact peer-dependency requirement on Webpack major version before locking the approach (LOW confidence, unverified live) — this single decision also determines whether Webpack 4→5 is forced now or can wait. |
-| Adopt `@vue/compat` (the official "migration build") as transitional runtime | Vue core team's recommended path for large, live Vue 2 apps: run Vue 3 internals in a configurable Vue-2-compatibility mode, then flip deprecations off one at a time with runtime warnings guiding you. Matches this project's "shippable in safe increments, zero downtime" constraint far better than a big-bang rewrite. | MEDIUM (setup) / ongoing (burn-down) | Source: v3-migration.vuejs.org/migration-build. This is the backbone strategy the rest of the table-stakes list burns down against. |
-| Global app bootstrap rewrite (`new Vue()` → `createApp()`) | Vue 3 restructured the global API into a per-app instance API entirely; global `Vue.use/.filter/.prototype/.config` are gone. Everything registered in `src/index.js` (Vuex/Vue Router/BootstrapVue/Sentry, global filters, `window.fcs`/`window.Vue` globals) must move onto the `app` instance. | MEDIUM | Single-file blast radius (`src/index.js`) but every plugin registration point depends on this happening first. |
-| Vue Router 2→4 upgrade | `vue-router@3` is Vue-2-only. Breaking API: `new VueRouter()`→`createRouter()`, `mode:'history'`→`createWebHistory()`, catch-all `*` route syntax→`:pathMatch(.*)*`, some guard/`next()` signature nuances. | MEDIUM | 19 routes to re-verify (history mode already in use, so no mode-strategy decision needed, just syntax). |
-| State store upgrade — Vuex 3→4 minimum | `vuex@3` doesn't run on Vue 3; `vuex@4` is a near-drop-in Vue-3-compatible release (`createStore()` instead of `new Vuex.Store()`, otherwise same mutations/getters/actions API). This is the *minimum* to keep functioning — see Pinia under Optional Modernization for the bigger rewrite. | LOW–MEDIUM | Contained: whole store is inlined in one file (`src/index.js:102-241`) per ARCHITECTURE.md, so blast radius is small even though it's a "core" workstream. |
-| Remove `Vue.set`/`Vue.delete`/`this.$set`/`this.$delete` calls | Removed entirely in Vue 3 — proxy-based reactivity makes them unnecessary, but any code calling them will throw/no-op. | HIGH | Character sheets read/write via `getVal`/`setVal` on a shared character object (ARCHITECTURE.md); this dynamic-property pattern is exactly what `Vue.set` was for in Vue 2. Audit all 12 sheets + shared input components for this pattern — likely the single riskiest reactivity change in this codebase. |
-| Remove global filters (`Vue.filter`, `{{ x \| filter }}` template syntax) | Filters were removed from Vue 3 entirely. | MEDIUM | Mechanical but *widespread* — must grep all 12 sheet templates plus shared components for pipe syntax and convert to computed properties/methods, or use the documented `app.config.globalProperties.$filters` workaround for a faster mechanical port. |
-| `v-model` contract changes on custom components | Vue 2 default prop/event pair (`value`/`input`) becomes `modelValue`/`update:modelValue`; multiple/named `v-model` bindings are now supported. Any custom component using `model: { prop, event }` or emitting `input` needs its prop/emit contract rewritten. | HIGH | Cascades through nearly every reusable input component (`input-aspect`, `input-stress`, `input-condition`, `input-consequence`, `input-fatepoints`, `input-skill-*`, `scene-editable-input`, etc.) — these are shared across all 12 sheets, so a mistake here fans out everywhere. |
-| Root-instance event bus removal | Vue 3 removed `$on`/`$off`/`$once` from component instances, killing the common "use `this.$root` as an event bus" pattern. ARCHITECTURE.md already flags GameClient's DOM `CustomEvent` dispatching as an anti-pattern that predates this — audit for any *additional* `$root.$emit`/`$on` usage elsewhere (e.g. Noty wrapper, modal coordination) that isn't yet on that path. | MEDIUM | Replace with an explicit event-emitter library (e.g. `mitt`), direct props/emits, or store actions. |
-| Custom directive hook renaming | Directive lifecycle hooks renamed: `bind`→`beforeMount`, `inserted`→`mounted`, `update`+`componentUpdated`→`updated`, `unbind`→`unmounted`. | LOW–MEDIUM | Applies to any `Vue.directive(...)` registrations wiring up interactjs/panzoom/dragscroll-style DOM behaviors — scope depends on how many custom directives exist versus direct library calls in `mounted()`. |
-| Template edge-case audit: `v-if`/`v-for` priority swap, `key` on `v-if`/`v-else`, slot API unification (`$scopedSlots`→`$slots`), `.native` modifier removal, `$listeners` merged into `$attrs`, `$children` removed | Several small breaking changes that only bite where the specific pattern is used. `v-if`+`v-for` on the same element is the highest-risk one since Vue 2 gave `v-for` priority and Vue 3 gives `v-if` priority — silent behavior change, not a compile error. | MEDIUM | Needs a codebase grep pass across sheets/components/pages before flipping the relevant `@vue/compat` flags off. |
-| Test tooling upgrade to stay Vue-3-aware (`@vue/test-utils` v1→v2, `vue-jest`→`@vue/vue3-jest`, `jest-serializer-vue` v2→v3) | PROJECT.md requires keeping the existing Jest suite green through the migration — the current test toolchain only understands Vue 2 component internals. | MEDIUM | Do this early (right after the compiler/loader bump), not last — you want the regression net back in place *before* touching component internals, not after. |
-| Sentry SDK bump with Vue 3 integration (`@sentry/vue`) | Current `@sentry/browser@5` + manual Vue error-hook wiring predates Vue 3's `app.config.errorHandler` API; the modern Sentry SDK ships a dedicated `@sentry/vue` integration that hooks the Vue 3 app instance correctly. | LOW–MEDIUM | Bundled naturally with the app-bootstrap rewrite; low risk, contained to `src/index.js`. |
-| Vue-2-only third-party library triage and replacement (see full list below) | Several installed libraries hard-depend on Vue 2 internals and will not run under Vue 3 regardless of compat-mode flags. | HIGH (aggregate) | See dedicated sub-table below — this is the largest single chunk of migration effort and should get its own roadmap phase(s). |
-| jQuery reliance reduction where it blocks the upgrade | PROJECT.md explicitly scopes this in ("reduce... where it blocks the Vue 3 upgrade," not "eliminate entirely"). Direct DOM manipulation via jQuery alongside Vue's virtual DOM patching is a known source of desync bugs, and gets riskier once BootstrapVue (which drags jQuery + Bootstrap 4's JS plugins in) is replaced. | MEDIUM–HIGH | Tightly coupled to the BootstrapVue replacement workstream below — most jQuery usage should shrink organically once Bootstrap 4 JS components are swapped for Vue-native equivalents; audit for jQuery calls that are independent of BootstrapVue and decide case-by-case. |
-| Final compat-flag burn-down and removal of `@vue/compat` | `@vue/compat` is explicitly a *temporary* scaffold, not a destination — Vue core docs are explicit that it needs a clear exit strategy. | MEDIUM (mostly mechanical once prior items are done) | This is the "migration is actually done" gate — every deprecation warning resolved, package swapped from `@vue/compat` to plain `vue@3`. |
+| **12 Fate character sheet systems** | `fate-core`, `fate-core-custom`, `fate-accelerated`, `fate-accelerated-custom`, `fate-condensed`, `fate-freeport`, `fate-of-cthulhu`, `mouse-guard`, `star-trek`, `middle-earth`, `dresden-files-accelerated`, `fate-anything` — each a distinct Vue component in `src/sheets/*.vue`, registered in `charactersheet.vue`'s `components` map **and** a separate `validSheets` whitelist array (both must be updated together or the app 404s: `document.location = "/404"` if a sheet id isn't in the whitelist). | HIGH (×12) | See "Print-fidelity sheet rendering" below — this is the single highest-risk area of the whole rebuild. |
+| **Print-fidelity rendering** | Sheets are laid out with Bootstrap grid classes (`col-sm-6 col-md-4 order-md-2`, etc.) tuned so the on-screen layout visually matches a printed at-the-table Fate sheet; `@media print` CSS rules (`.d-print-none`, explicit margin overrides in `charactersheet.vue`'s `<style>` block) hide UI chrome (edit icons, VTT dice buttons, nav) when printing. `window.print()` triggers native browser print (`CharacterDetail.vue` / `CharacterSheetDetail.vue` "Print Character" buttons). | HIGH | This is explicitly the product's reason to exist per PROJECT.md. Per-sheet layout differences (Fate Core's skill pyramid vs. FAE's 6 approaches vs. Cthulhu's corruption/sanity vitals column) are hand-tuned CSS, not data-driven — a schema-driven engine would need to reproduce each layout pixel-for-pixel, not just field-for-field. |
+| **`getVal`/`setVal` shared character data model** | `commonService.js`: `getVal(obj, "a.b.c", default)` walks a dot-path into the character object; falls back to `defaultValue \|\| ""` if any segment is falsy-but-not-`false` (special-cased for stress checkboxes) or missing, **then re-reads the value via `eval(\`obj.${graphPath}\`)`** instead of returning the already-walked reference. `setVal(obj, "a.b.c", val, Vue)` hand-unrolls `Vue.set()` calls up to **5 levels deep** (arrays of length 1–5 are explicitly coded; a 6-level path silently does nothing). Sheet inputs never use `v-model`; every field is `:value="getVal(...)"` + `@change="setVal(...)"`, meaning **fields commit on blur/change, not on keystroke** — a deliberate (if implicit) choice that avoids the perf cost of a reactive setter on every keypress across ~50-150 fields per sheet. | HIGH | **This is the single most subtle, easy-to-get-wrong piece of the whole app.** A naive rebuild using two-way bound reactive objects/refs will *look* right in dev and then diverge in edge cases: (1) the `eval()` re-read means `getVal` silently returns `undefined`/throws if the path contains anything eval-unsafe — characters with certain names/tags could already be exploiting or crashing this; (2) the 5-level hardcoded depth is a real ceiling — nested paths like `stress.physical.boxes.0.used` are exactly 4 levels and work, one level deeper would silently fail; (3) blur-commit (not keystroke-commit) is relied on by the VTT `parseVTTMessage` flow, which reads the *already-committed* value via `getVal` right after the `@change` fires — a framework with debounced/instant reactivity needs an equivalent "commit point" for VTT messages to read the right value. Do not silently "fix" this to real-time binding without re-verifying VTT message timing. |
+| **Character CRUD (create/edit/save/delete/copy)** | `CharacterList.vue` (list, delete w/ modal confirm, copy-as-new via `dbSvc.GetObject`+mutate id/name+`SaveObject`, share-URL-to-clipboard), `CharacterSheetDetail.vue` (create new character from a chosen sheet template), `CharacterDetail.vue` (edit existing, requires name, sets `owner_id`/`related_id`/`slug`/`search_data` on save). Save always does a DynamoDB `put` (never `update`) because a character's field shape varies per sheet type. | MEDIUM | Straightforward CRUD, but the "always full-object put, never partial update" pattern matters for a Firestore rebuild — mirror it (full-document writes) or explicitly redesign around it, don't silently switch to partial-update semantics that could leave stale fields from a different sheet shape. |
+| **Character sheet template picker (`/charactersheet`)** | Hardcoded array of 10 sheet metadata entries (name, slug, description, "customizable" flag) rendered as a card grid; clicking "Create" or "Customize" routes into `CharacterSheetDetail.vue` for that sheet id. | LOW | Static data, not DB-driven — trivial to port. |
+| **Custom "Fate Anything" sheet + reusable templates** | `fate-anything.vue` sheet is placeholder/label-driven (fields render from a `template` object on the character rather than being hardcoded). `characterprops.vue` "Sheet Properties" tab lets an owner: search/apply a shared `CHARACTERSHEETTEMPLATE` entity (by name/description, "search only my templates" toggle), save the current custom sheet's labels/placeholders as a new named template (or overwrite one they own — same-name collision is name-uniqueness-per-owner, not globally unique), pick a template color (swatch picker), logo URL, and Google Fonts font family (`font-picker-vue`, hardcoded API key in source). Templates are a first-class shared DB entity other users can find and apply. | HIGH | This is effectively a mini "build your own Fate hack" system with a public template marketplace, not just a form. The `removeLabels`/`parseTemplate` recursive object-walking logic (strip/restore custom labels on apply) is fiddly and easy to get subtly wrong. |
+| **Campaigns — session log with cross-reference tagging** | `CampaignDetail.vue`: freeform Markdown session log entries (date, public/private toggle, rich text via `vue-showdown` + a **custom Showdown extension** `fcsCampaign` that parses inline tags `#thing`, `!issue`, `@face-or-place`, `~aspect` — optionally quoted `#"Multi Word Thing"` and with a bracketed description `#thing [description]` — into colored `<span>`s). A regex pass (`parseThings`, using `named-regexp-groups`) extracts every tagged "thing" across all sessions into an aggregated, alphabetized "Important Things" sidebar (Issues/Characters/Faces & Places/Campaign Aspects), each showing an occurrence count and a "filter by this tag" click-through that filters the session list. Sort ascending/descending by date. Copy-tagged-thing-to-clipboard. | HIGH | The tag-parsing regex + Showdown extension + sidebar aggregation is genuinely complex bespoke logic (not a generic markdown editor) — budget real time for this, it's not "add a textarea." |
+| **Campaign metadata + public summary view** | Name, scale (None/Mundane/Supernatural/Otherworldly/Legendary/Godlike dropdown), description, image URL. `CampaignSummary.vue` is a read-only public-facing mirror of `CampaignDetail.vue` (same session log + Important Things UI, no edit controls) reachable via a separate `/campaign-summary/:id` route without requiring the viewer to be the owner. | MEDIUM | Two full page components sharing ~90% of the same rendering logic (currently near-duplicated, not shared) — a rebuild should extract this into one component with an `isOwner`/read-only prop rather than copy the file again. |
+| **Adversaries — list/detail CRUD with public/private visibility** | `AdversaryList.vue` renders both the "my adversaries" and public list (owner-scoped vs. `is_private <> true` filtered public query) in the same component depending on route/cookie state (`fcsAdversaryListDefault` cookie remembers "show only mine"). Supports aspects/skills/stunts/stress/consequences in **two possible data shapes** (array-of-objects vs. legacy plain-object-keyed-by-name — every render branch has an `Array.isArray()` check), `is_private` checkbox, copy-as-new, type badges (Enemy=danger, Obstacle=warning, Constraint=info) that double as clickable search filters. | MEDIUM–HIGH | The dual legacy/array data-shape handling throughout is real historical debt that must be preserved for existing saved adversaries (old records may still be in the plain-object shape) — a migration script to normalize shapes during the Firestore data migration would remove this complexity permanently; flag as a migration-phase decision, not a rebuild-UI decision. |
+| **Server-side (DynamoDB) search/filter** | `dbService.GetSearchFilters` builds a DynamoDB `FilterExpression` doing case-variant (`OR contains(..., :an/:anl/:anu/:ant)`) substring matching across name, aspects (multiple possible key names), system, genre, related_id, tags, and a precomputed `search_data` denormalized string (`commonService.parseSearchData`) — plus exact-match on `slug`. Client-side "click a badge/tag to search" pattern reused across Character/Adversary/CharacterSheet lists. | MEDIUM | DynamoDB `contains`/`FilterExpression` scanning doesn't map 1:1 to Firestore (no native substring search) — this is a real architectural decision point for the Firebase migration (Firestore + a search index like Algolia/Typesense, or client-side filtering, or a precomputed `search_data`-style field with array-contains). Flag for STACK research, not assumed solvable by a literal port. |
+| **Pagination** | `dbService.PagedResults` — custom cursor-based pager (`dynamodb-paginator`) tracking a `PageList` array + `CurrentPage` index so "prev" can go back without re-querying; 25 items/page; only enabled on the public (no-owner) Adversary list, disabled during search or "only mine" filtering. `pager.vue` component (first/prev/next/last-page-aware button state). | MEDIUM | DynamoDB-cursor-specific implementation; Firestore has its own cursor pagination (`startAfter`) — logic must be reimplemented, not ported verbatim. |
+| **Account registration, login, logout** | Cognito `signUp`/`authenticateUser`/`signOut` via `amazon-cognito-identity-js`. Register page does client-side email-regex + password-match validation before calling Cognito. On login success, redirects to `?redirect=` query param or `/character`. | HIGH | Full Cognito→Firebase Auth swap is Milestone 2 scope per PROJECT.md, but the *behavior* (validation rules, redirect handling, "resend confirmation" affordance) must be preserved 1:1 in the new UI regardless of backend. |
+| **Email verification** | Cognito's built-in confirmation-code-via-email flow; `Login.vue` has a standalone "Resend your confirmation email?" link calling `userSvc.ResendConfirmationCode(email)`. | LOW | Straightforward with Firebase Auth's equivalent (email verification link) — behavior differs slightly (Cognito uses a *code*, Firebase Auth typically uses a *link*); note as a UX change to communicate to users, not silently swap. |
+| **Password recovery (2-step)** | `/recover` (enter email → Cognito `forgotPassword()` → redirects to `/confirm?u=email`) then the code-confirmation step (enter new password + emailed code → `CognitoUser.confirmPassword(code, newPassword, ...)`, on success redirects to `/login`). **Note:** in the current codebase the *code-confirmation* logic actually lives in the file `src/pages/Confirm.vue` even though its internal Vue component name is `'Recover'` — a naming quirk in the existing code, not a bug in the flow itself. | MEDIUM | Preserve the two-step UX (request → confirm) regardless of which Firebase Auth API replaces it. |
+| **Session refresh** | `dbService.RefreshUserSession()` checks `credentials.needsRefresh()` before every DB call and calls `userService.RefreshSession()` (Cognito refresh-token exchange) if needed — this runs on literally every `GetObject`/`SaveObject`/`ListObjects`/`DeleteObject` call. | MEDIUM | Firebase Auth's ID-token refresh model is different (SDK auto-refreshes) — behavior should get *simpler*, not ported literally, but the guarantee ("every DB call has a valid, fresh token") must hold. |
+| **User-attribute-backed subscription flag caching** | `userService.CheckSubscription()` reads a custom Cognito user attribute `custom:stripe_customer` (env-suffixed `_dev` in non-prod), calls Stripe via Lambda to check `subscriptions.total_count`/status (`active`/`trialing` = has access), and separately tracks/writes `custom:stripe_had_trial` to prevent trial abuse on re-subscription. Result cached in Vuex (`hasActiveSubscription`) so it's computed once per session, not per page. | MEDIUM | Firebase has no equivalent to Cognito custom attributes tied 1:1 — likely needs a Firestore `users/{uid}` doc holding `stripeCustomerId`/`hadTrial`/cached subscription status. This is a real design decision, not a mechanical port. |
+| **Stripe subscription checkout, management portal, trial** | `subService.js` calls an AWS Lambda (`FCSStripe`) for `createcustomer`/`getcustomer`/`checkout` (Stripe Checkout session, redirects via `stripe.redirectToCheckout`)/`manage` (Stripe customer billing portal redirect). Two fixed price plans (monthly $1.99, yearly $14.99, price IDs hardcoded per env). 30-day free trial (server enforces one-trial-per-customer via the `hadTrial` attribute passed to the Lambda). `Account.vue` shows subscribe CTAs (with Roll20-integration+Scene-Builder benefit copy) or current status + "Manage" link depending on state. | HIGH | PROJECT.md says "keep Stripe billing as-is" — but "as-is" currently means "as-is via an AWS Lambda." The rebuild needs an equivalent server-side function (Cloud Functions) doing the same 4 operations against the same Stripe account/price IDs; this is backend-migration-adjacent work, flag it for the Firebase-functions phase, not pure frontend. |
+| **Scene creation & CRUD** | `SceneDetail.vue` "create" mode (name/description form) → `SceneList.vue` list → full scene detail is the VTT scene builder (below). Share-scene-URL-to-clipboard. | MEDIUM | |
+| **VTT Scene Builder — canvas, zones, objects** | Fixed 4800×3600px pannable/zoomable canvas (`@panzoom/panzoom`, Alt+wheel to zoom, drag to pan) with a light grid background. **Zones** (`vue-draggable-resizable`, drag/resize, z-index front/back, editable name, optional background image, zone-level aspects) contain **scene objects**: characters (searched/added from the player's own + other connected players' character list), adversaries (searched from public/owned adversaries), or ad-hoc NPCs (`models.SceneNPC()` — blank stub). Each scene object independently supports: aspects, skills, stunts/extras, stress tracks, conditions, consequences, "create advantage/boost" temporary aspects, acted/not-acted turn-order toggle, background/text color picker (`vue-color` swatches), portrait image URL, move-to-another-zone dropdown, copy, delete, collapsible sections (show/hide each category), draggable positioning with z-index "bring to front" on click. | HIGH | This is a full ad-hoc virtual tabletop object system, not a simple list — genuinely one of the largest single features in the app. The "sync a character's live sheet data into a scene object" path is explicitly flagged as **broken today** for conditions (`scene-object.vue:493-498`, commented-out code per CONCERNS.md) — decide whether to fix-on-rebuild or preserve the same gap. |
+| **VTT — PeerJS host/join, chat, dice** | Scene owner ("host") starts the game (`GameServer`, PeerJS peer keyed by scene id) via a shared external PeerJS signaling server (currently `fcs-peer-server.herokuapp.com`, PROJECT.md flags this for migration off Heroku); players "join" as `GameClient`s. Real-time chat (markdown-rendered via `VueShowdown`) with `/roll` slash-command dice parsing (`@dice-roller/rpg-dice-roller`, supports Fate dice `4dF` and arbitrary `NdX+mod` notation), private (whisper) messages to a specific player, "roll 4dF" quick button, "save chat log to campaign" (writes the whole chat transcript as a new campaign session via an autocomplete campaign picker), "clear chat log", scene state (zones/objects/aspects) broadcast host→all clients on every change via a `scene` message type, new-round button, per-player fate-point tracking for the host, storyteller-only "stop/clear scene" controls. | HIGH | State sync model is host-authoritative broadcast, not CRDT/OT — last full scene state wins, no conflict resolution. `gameServer.js`/`gameClient.js` are flagged in CONCERNS.md as fragile, untested, and using synchronous unbatched `CustomEvent` dispatch — preserve behavior but this is a good candidate to actually add test coverage for during rebuild given VTT's 100+ event-handler surface. |
+| **VTT — audio/video (WebRTC via PeerJS)** | Per-player webcam/mic toggle at join time (persisted device selection in `localStorage`), live per-player video tile grid rendered into `#player-container`, self-mute-own-audio-playback, per-remote-player mute/pause/play controls dispatched as `CustomEvent`s, ICE-disconnect cleanup removes stale video tiles. Placeholder avatar image (random-colored initials) shown when video is off. | HIGH | Full WebRTC media feature, not just data channels — meaningfully increases VTT rebuild scope beyond "just sync scene JSON." Confirm with the user whether A/V is still actively used before assuming full parity is required (worth a usage-data gut-check, not just an assumption) — flagging as a scope question for the roadmapper, not unilaterally downgrading it here. |
+| **Companion character-sheet popup ("fcsVtt" mode)** | When a character sheet is opened as a **popup window from a running scene** (`window.opener` set and same-origin), the sheet UI shows inline dice/invoke icons (small "A"/"D"/"+"  glyphs) next to skills, aspects, stress boxes, consequences, stunts, and fate points. Clicking one posts a structured message (`window.opener.postMessage({type:"fcsVTT", data: msg})`) back to the Scene page, where `FCSVTTClient` formats it into a Markdown chat card (e.g. "Bob rolled: *Fight* **[+][-][0][+] +2 = +3**") and injects it into the scene's chat log. This is a *separate* mechanism from the PeerJS scene-state sync — it's a lightweight postMessage IPC specifically for broadcasting individual sheet actions into scene chat. Distinct from, and mutually exclusive with (`vttEnabled` picks one), the Roll20 mode below. | MEDIUM–HIGH | Easy to conflate with the PeerJS scene sync above — it is not the same wiring. The `window.parent.postMessage` call inside `FCSVTTClient.chatMessage()` (rather than a more direct callback) is worth a fresh look during rebuild rather than a literal port, since `FCSVTTClient` is instantiated inside `SceneDetail` itself, not inside a nested iframe — confirm actual runtime behavior before assuming the existing wiring is fully correct. |
+| **Character/adversary/campaign "share" (copy URL)** | Every list view (`CharacterList`, `SceneDetail`) has a "Share" button that copies the detail URL to the clipboard via a hidden-input `document.execCommand('copy')` shim (`commonService.CopyTextToClipboard`) and a toast confirmation. | LOW | `document.execCommand('copy')` is legacy/deprecated in modern browsers — trivial one-line modernization to `navigator.clipboard.writeText` during rebuild, not a functional change. |
+| **Images throughout** | Character portrait URL (shown on card + on sheet if the custom template's `showPortrait` flag is set), campaign image URL, adversary portrait, scene-object portrait, template logo URL — all are **plain external URLs typed/pasted by the user**, not uploaded files. A "[search]" link opens a Google Images search prefilled with the character's high concept or a generic query. No image hosting/upload/CDN in this app at all. | LOW | Genuinely simple to port — it's just a URL string field. Confirm this stays URL-only (no upload) unless the user explicitly wants to add real image upload as a v2.0 feature (would be new scope, not parity). |
+| **Fate dice roller (standalone)** | `diceroller.vue` — a modal (`#modalDiceRoller`) with a roll-modifier input, "Roll"/"Clear" buttons, running log of individual 4dF rolls with totals, rendered via jQuery DOM manipulation (`$diceTray.prepend(...)`) rather than reactive Vue state. | LOW | Small, self-contained, easy full rewrite; the only "gotcha" is it's currently jQuery-DOM-driven rather than data-bound — trivial to make properly reactive in the rebuild (net simplification, not a risk). |
+| **Notifications (toast)** | `CommonService.Notify()` wraps `Noty` — used everywhere for save-success, validation errors, DB errors, async operation feedback; supports an optional `callback` fired on close (used for post-notify redirects, e.g. "Character saved." → navigate to detail URL). | LOW | Straightforward; any toast library works, but preserve the "callback on close" pattern since several flows depend on sequencing a redirect after the user sees the message. |
+| **Version/changelog banner** | `CommonService.CheckVersion()` compares `localStorage.fcsVersion` to `package.json` version on load; if different, shows a dismissible "what's new" banner linking to a GitHub release tag. | LOW | Cosmetic, trivial. |
 
-#### Vue-2-only dependency replacement sub-table (part of the table-stakes list above)
+### Differentiators — Thin/Edge, Rebuild But Lower Priority/Effort
 
-| Library (current) | Status | Recommended Vue 3 path | Complexity |
+Real, currently-shipped functionality, but narrower in scope, lower usage-risk, or reasonably deferrable to a fast-follow phase without breaking the core product promise.
+
+| Feature | Current Behavior | Complexity | Notes |
 |---|---|---|---|
-| `bootstrap-vue@2.17` | Vue-2-only, unmaintained for Vue 3 (confirmed via search — the BootstrapVue project itself never shipped a Vue 3 version) | `bootstrap-vue-next` — an independent full rewrite targeting Vue 3 + Bootstrap 5, actively maintained (recent releases). Explicitly **not a drop-in**: component/prop names differ in places, and it pulls in Bootstrap 5 (a version bump from the current Bootstrap 4). | HIGH — likely the single biggest workstream in the whole migration; touches nearly every page/sheet (modals, tabs, forms, tables, buttons) |
-| `vuex@3.5` | Vue-2-only | `vuex@4` (near drop-in, table stakes) now, `pinia` later (optional, see below) | LOW–MEDIUM |
-| `vue-router@3.4` | Vue-2-only | `vue-router@4` | MEDIUM |
-| `vuedraggable@2.24` (SortableJS wrapper) | Vue-2-only major version | `vuedraggable@4.x` ("vuedraggable-next") — Vue-3-targeted major version from the same maintainer, near-compatible API | LOW–MEDIUM |
-| `vue-color@2.7` | No confirmed Vue 3 release from original maintainer | Community Vue 3 forks exist (e.g. `@ckpack/vue-color`); verify current maintenance status before committing | MEDIUM (unverified — flag for STACK-phase deep dive) |
-| `vue-datetime@1.0-beta` | Already beta/stale even for Vue 2 | Replace with `@vuepic/vue-datepicker` (actively maintained, Vue-3-native) rather than seeking a Vue-3 fork of the old library | MEDIUM (different API surface) |
-| `vue-meta@2.4` | Vue-2-only | `@unhead/vue` (the officially recommended head-management library for Vue 3, successor to `vue-meta`) or `@vueuse/head` | LOW–MEDIUM |
-| `vue-cookies@1.7` | Unclear Vue 3 status (later majors claim framework-agnostic wrapper) | Verify current major version's Vue 3 support before reuse; fallback is `vue-cookie-next` or a plain non-Vue cookie utility | LOW (small surface area) |
-| `vue-showdown@2.4` | No confirmed Vue 3 release found | Drop the Vue wrapper, use `showdown` (or `marked`) directly with `v-html` in a small wrapper component | LOW |
-| `@johmun/vue-tags-input@2.1` | Vue-2-only, low recent activity | Needs a Vue-3-compatible tag input replacement (evaluate options at implementation time — this is a narrow, replaceable UI widget, not core logic) | MEDIUM (verify at STACK phase) |
-| `@trevoreyre/autocomplete-vue@2.2` | Unverified current Vue 3 support | Check current major version before reuse; this library has historically tracked Vue versions closely | LOW–MEDIUM |
-| `vue-draggable-resizable@2.2` | Old version, unclear Vue 3 status | Community forks target Vue 3; verify before reuse — relevant mainly to VTT/scene UI | MEDIUM |
-| `vue-dragscroll@2.1` | Unclear Vue 3 status | Verify or replace with a small custom directive (narrow feature surface) | LOW |
-| `vue-debounce@2.5` | Directive-based; unclear Vue 3 status | Verify, or replace with a hand-rolled debounce directive/composable (trivial to reimplement) | LOW |
-| `vue-append@2.0` | Tiny plugin, unclear Vue 3 status | Trivial to reimplement natively or drop entirely — low value, low risk either way | LOW |
-| `font-picker-vue@1.0` | Unclear current Vue 3 support | Verify at implementation time | LOW |
-| `interactjs`, `@panzoom/panzoom`, `bootbox`, `peerjs`, `shortid`, `luxon`, `lodash-es`, `weekstart`, `whatwg-fetch` | Framework-agnostic JS libraries, not Vue-coupled | No migration action needed — these keep working regardless of Vue version | NONE |
-| `amazon-cognito-identity-js`, `aws-sdk@2` | Framework-agnostic AWS SDKs | Out of scope for this milestone per PROJECT.md — do not touch unless directly blocking | NONE (deliberately deferred) |
+| **Environment banner (dev/beta indicator)** | `CommonService.SetupForEnvironment()` appends a "** BETA **" / "** LOCAL **" span to the navbar via jQuery when `NODE_ENV !== "production"`. | LOW | Dev-only cosmetic; trivial to reproduce with a framework-native conditional render instead of jQuery DOM injection. |
+| **"Fate SRD" quick-link button** | Scene toolbar button opens `fate-srd.com` in a small popup window. | LOW | One `window.open()` call. |
+| **Campaign "Important Things" filter-by-tag / copy-to-clipboard** | Clicking a filter icon next to an aggregated tag filters the session log to sessions mentioning it; clicking the tag text copies it (with its `#`/`!`/`@`/`~` prefix) to clipboard for reuse. | LOW | Nice-to-have UX sugar on top of the core tagging system (which *is* table-stakes); the filter/copy affordances themselves are simple event handlers. |
+| **"Only show my adversaries" cookie preference** | `fcsAdversaryListDefault` cookie (`vue-cookies`) toggles the adversary list default and disables server pagination while active. | LOW | Simple persisted UI preference; any storage mechanism works. |
+| **Character sheet field-level VTT icons ("A"/"D"/"+")** | Nearly every sheet field (skills, aspects, stress boxes, consequences, stunts, fate points) conditionally renders a small clickable glyph when `vttEnabled` that triggers `sendToVTT(...)`. This is spread across ~12 sheet files × ~6 input components (dozens of near-duplicate `v-if="vttEnabled"` blocks). | MEDIUM (breadth, not depth) | Individually trivial, but there are *many* of them and they must be correctly wired per sheet/input-widget pair — good candidate for a shared composable/mixin in the rebuild rather than copy-pasted per component (reduces both effort and regression risk vs. a literal per-file port). |
+| **Manual Fate-of-20 extension ID override** | `Account.vue` "Manual Extension Installation" collapsible section lets a user paste a dev/sideloaded extension ID into `localStorage` for testing, bypassing the published extension ID lookup. | LOW | Only relevant if Roll20 integration is kept at all (see Anti-Features) — a dev/support convenience, not end-user-facing value. |
+| **Campaign session sort order toggle** | Ascending/descending date sort button on the session log. | LOW | Single computed-property flip. |
+| **"Jump to" scroll anchors (mobile campaign layout)** | Small up/down arrow links to jump between the session log and "Important Things" panels on narrow viewports. | LOW | Cosmetic mobile UX affordance. |
+| **Custom `label`/`placeholder` overrides on `fate-anything` fields** | Every field on the custom sheet supports a per-character label override (stored via `getVal(character, item.label)`), independent of the applied template's default placeholder — i.e. the same template can be re-labeled per-character on top of template defaults. | MEDIUM | Meaningfully increases the complexity of the "Fate Anything" template system beyond what's described above; worth explicitly scoping/testing during rebuild rather than assuming template application alone covers it. |
 
-### Optional Modernization (Defer or Opt-In)
+### Anti-Features / Candidates to Drop or Descope
 
-Real value, but none of these are required to get the app running on Vue 3. Bundling them into the same PRs as the forced changes multiplies regression risk in a live, paying-subscriber app — sequence them as clearly separate, later phases.
+Currently-shipped, but either explicitly broken, low-confidence-in-current-usage, or carrying disproportionate rebuild cost for what looks like narrow value. **None of these should be dropped unilaterally** — flag each for an explicit go/no-go decision with the user before roadmap phases are locked, since this is a live product with paying subscribers who may depend on any of them.
 
-| Workstream | Value Proposition | Complexity | Notes |
+| Feature | Why It's Tempting to Keep As-Is | Why It's a Real Question Mark | Recommendation |
 |---|---|---|---|
-| Vuex 4 → Pinia migration | Pinia is now the Vue core team's officially recommended state library — simpler API, first-class Composition API/TypeScript support, better devtools. ARCHITECTURE.md already flags the current inline, unmodular Vuex store as an anti-pattern. | MEDIUM | Do this *after* Vuex 4 already runs cleanly on Vue 3 — it's a rewrite of the store's shape, not a forced compatibility fix. Natural pairing with... |
-| Splitting the monolithic store into modules (auth/characters/campaigns/etc.) | Fixes the "unbounded inline store in `index.js`" anti-pattern called out in ARCHITECTURE.md. | LOW–MEDIUM | Can be done independent of the Pinia decision, or combined with it. |
-| Service-layer container / DI pattern for `DbService`/`UserService`/`GameClient`/etc. | Fixes the "new service instance per component" anti-pattern (ARCHITECTURE.md) and is a natural on-ramp toward the "backend service abstraction" active requirement PROJECT.md wants *this* milestone. | MEDIUM | Note: PROJECT.md lists a service abstraction as an *Active* requirement for this milestone, not purely optional — but it is not something Vue 3 itself forces. Keep this refactor's scope thin (an abstraction seam for Milestone 2), not a full architectural overhaul. |
-| Composition API adoption (rewriting Options API `.vue` files to `setup()`) | Enables logic reuse — e.g. extracting the shared `getVal`/`setVal` character-sheet reactivity pattern into a composable usable by all 12 sheets instead of duplicated per-sheet logic. | HIGH (if done broadly) | Fully optional: Vue 3 supports Options API indefinitely. Recommend touching only components already being rewritten for other forced reasons (e.g. the `v-model` contract changes above) rather than a blanket rewrite. |
-| `<script setup>` syntax | Sugar over Composition API. | Same as above | Same deferral logic — only worth it where Composition API is already being adopted. |
-| TypeScript adoption | High long-term value for a solo maintainer (catches the exact class of bugs this migration risks — prop/emit contract mismatches, reactivity misuse). | HIGH | Big, separate initiative; do not layer onto a migration that's already touching every file. Best done once Vue 3 is stable in production. |
-| Webpack 4 → Vite migration | Webpack 4 is old, unmaintained, and has known friction with modern Node.js; Vite is the de-facto standard Vue 3 build tool with far better DX (fast HMR, simpler config). Strongly recommended given the "solo maintainer, low-maintenance" constraint in PROJECT.md. | HIGH | Sequence *after* Vue 3 already boots on the minimum-required loader bump (Webpack 5 + `vue-loader@17`) — don't combine a bundler swap with the framework version bump in the same risk window. Requires porting the dev/beta/prod env split and the Sentry release-tracking webpack plugin to Vite equivalents (`vite-plugin-sentry` or the Sentry Vite plugin). |
-| Jest → Vitest migration | Natural pairing with a Vite adoption; faster, simpler config, same assertion API mostly. | MEDIUM | Not required — Jest runs fine against Vue 3 via `@vue/vue3-jest`. Defer until/unless Vite is adopted. |
-| ESLint config modernization (flat config, `eslint-plugin-vue` Vue-3 rules) | Cleaner linting, catches more Vue-3-specific mistakes. | LOW | Cheap win, low risk, can happen anytime after the Vue 3 SFCs compile. |
-| Consolidating the 12 character-sheet variants toward a shared engine/schema-driven renderer | Reduces duplication across sheet files long-term. | HIGH | Valuable idea, but explicitly tempting scope creep — see Anti-Features below. |
+| **Roll20 "Fate of 20" browser extension integration** | It's explicitly named in PROJECT.md's Validated requirements and in the milestone context as something to inventory. A working Chrome-extension bridge (`fateof20.js`, `fateof20-extension/` separate codebase) already exists and is marketed on the Account/subscribe page as a subscriber benefit. | It depends on: (1) a *separately maintained* browser extension codebase outside this repo's rebuild scope, (2) Chrome/Chromium-family browsers only ("requires a browser that can run Chrome extensions"), (3) a specific Roll20 DOM/API integration point that can silently break whenever Roll20 changes their site, with **no test coverage at all** today. It is architecturally identical in spirit to the in-house "fcsVtt" companion-window mode (same `vttEnabled`-gated message-passing pattern in every sheet/list component) but doubles the integration-surface maintenance burden for a solo maintainer. | **Explicitly ask the user for a go/no-go before roadmapping this.** If usage data (subscriber count actively using Roll20 vs. the in-house Scene Builder) isn't available, treat this as unverified-value and propose deferring the extension-side rebuild to a post-v2.0 fast-follow, while still shipping the identical `vttEnabled` message-passing hook point so it *could* be re-connected later without a sheet-level rewrite. Do not silently drop the subscribe-page marketing copy referencing it without a product decision. |
+| **VTT "fullscreen" toggle** | Buttons exist in the markup (`toggleFullScreen`). | The button is gated behind `v-if="1==2"` — i.e. **permanently disabled/dead code** in the current production app; it's aspirational, unshipped. | Not parity-required at all (nothing to have parity *with* — it's already off). Only worth building if the user wants it as new v2.0 scope, which would need to be tracked as a new requirement, not a parity item. |
+| **Character "conditions" sync from character sheet into scene objects** | Scene objects render a Conditions section (used for e.g. Fate of Cthulhu's corruption-linked conditions). | Explicitly broken today per CONCERNS.md — the `convertThingToGameObject` sync path for conditions is commented out (`scene-object.vue:493-498`); characters must be manually re-entered in-scene. | Decide explicitly: fix it properly in the rebuild (real bug, arguably in-scope for "no regressions" since it's *already* broken so "no regression" is a low bar), or preserve the same known gap and document it. Flag for the user, don't silently fix scope-creep or silently carry the bug forward without a decision. |
+| **Duplicate-character-in-scene prevention** | Missing today (`scene-zone.vue:267` TODO) — same character can be dragged into a scene twice. | Same reasoning as above: already a known gap, not a regression risk either way. | Cheap to fix properly in the rebuild (a single existence check before `makeGameObject()`); low effort, low risk — reasonable to just fix without a big discussion, but note it as an intentional behavior change from v1. |
+| **Host subscription-gating on scene creation** | CONCERNS.md flags `SceneDetail.vue:406` — any authenticated user (not just subscribers) can currently host/start a scene; there's a `TODO` for a missing `hasActiveSubscription` check. | This is a **known revenue-model gap**, not a feature to "keep." | Flag explicitly to the user as a monetization decision (enforce subscriber-only hosting in v2.0, closing the gap) vs. intentionally-generous current behavior (some users may already rely on hosting without subscribing). Do not silently change monetization behavior without sign-off, but also don't silently perpetuate a possibly-unintended revenue leak. |
+| **`eval()`-based `getVal`/label-parsing paths** | Works today, low visible bug rate. | CONCERNS.md flags 3+ production `eval()` call sites (`commonService.getVal`, `commonService.ShowAlert`'s dismiss callback, `scene-zone.vue` label access, `fate-core.vue` skill-level regex) as an arbitrary-code-execution risk surface. | Not a feature to drop, but the **implementation must not be ported literally** — reimplement the equivalent behavior (safe nested-path get, safe callback dispatch) without `eval`. This is an implementation-safety note more than a scope question, called out here because it's tightly bound to the `getVal`/`setVal` table-stakes item above. |
 
-### Anti-Features (Deliberately Out of Scope for This Migration)
+---
 
-Things that look like reasonable "while we're in there" additions but would blow up the risk profile of a live-app migration.
-
-| Anti-Feature | Why It's Tempting | Why It's Problematic Here | Alternative |
-|---|---|---|---|
-| New product features / new game systems | Momentum — "we're touching the sheets anyway" | PROJECT.md explicit feature freeze during modernization; every extra feature is untested surface area during an already-risky framework swap | Land the migration first; resume feature work once Vue 3 is stable in production |
-| Visual redesign / UX overhaul | BootstrapVue→bootstrap-vue-next forces some component swaps anyway, so "might as well restyle" | PROJECT.md explicitly rules this out; conflates two kinds of risk (behavioral regression vs. intentional visual change) making regressions hard to attribute | Keep visual parity through the dependency swap; treat any *forced* visual changes as bugs to minimize, not opportunities |
-| AWS → Firebase backend migration | The "isolate behind a service abstraction" work makes the seam visible | Explicitly Milestone 2; starting it now migrates a moving target (Vue 3 frontend) against another moving target (backend) simultaneously | Finish and stabilize Vue 3 first; the service abstraction seam is deliberately kept thin in this milestone |
-| `aws-sdk` v2 → v3 upgrade | Also old/deprecated, feels like "same kind of work" | PROJECT.md explicitly calls this throwaway effort — Milestone 2 removes the AWS client stack entirely | Only touch it if it directly blocks the Vue 3 build/runtime; otherwise leave it alone |
-| Blanket Composition API rewrite of all 12 sheets "while we're touching them" | Every sheet file gets opened anyway during the `v-model`/`Vue.set` audit | Multiplies the diff size and regression surface of an already-large migration; conflates "make it compile on Vue 3" with "make it idiomatic Vue 3" | Defer broad Composition API adoption to a later, dedicated phase (see Optional Modernization) |
-| Full TypeScript conversion mid-migration | Same "touching every file anyway" logic | Adds a second large, unrelated risk dimension on top of the framework swap | Separate initiative, after Vue 3 ships |
-| Rewriting working service/business logic (`DbService`, `UserService`, `GameClient` internals) beyond what compatibility requires | Code review often surfaces real quality issues while migrating | Not forced by Vue 3 at all — these are plain ES6 classes, framework-agnostic; rewriting them here mixes "must change" with "want to change" and complicates rollback | Log improvement ideas for Milestone 2 or a dedicated refactor phase; touch only what the Vue 3 API surface actually requires |
-| Consolidating/merging the 12 character-sheet variants into one schema-driven engine | Legitimate long-term architectural improvement | High-effort, high-risk structural change unrelated to "does it run on Vue 3"; conflates migration with a product-architecture redesign | Revisit as its own initiative once Vue 3 is stable |
-| Replacing PeerJS or the VTT protocol | Old-feeling dependency, "might need updating too" | Framework-agnostic, unaffected by the Vue version; no forcing function exists | Leave untouched; PeerJS works identically under Vue 2 or Vue 3 |
-| Big-bang full rewrite instead of the incremental `@vue/compat` burn-down | Feels "cleaner" than living with a temporary compat shim | Directly conflicts with PROJECT.md's "shippable in safe increments, no big-bang cutover" constraint; unacceptably risky for a live, paying-subscriber app maintained solo | Use `@vue/compat` as the transitional scaffold; ship incrementally, flip deprecation flags module by module |
-
-## Feature Dependencies (Workstream Sequencing)
+## Feature Dependencies
 
 ```
-[1. Compiler/loader toolchain bump: vue-loader→v17, @vue/compiler-sfc, webpack≥5 as forced]
-    └──requires──> nothing (foundation; gates all Vue-3-aware compilation)
+[getVal/setVal shared data model]
+    └──requires──> nothing (foundation; every sheet + most components depend on it)
 
-[2. Install Vue 3 core in @vue/compat (migration-build) mode]
-    └──requires──> [1]
+[12 sheet type components] ──requires──> [getVal/setVal], [print-fidelity CSS/layout patterns]
+[sheet-type registration (components map + validSheets whitelist)] ──requires──> [12 sheet type components]
+[Character CRUD] ──requires──> [getVal/setVal], [sheet-type registration]
+[Fate Anything custom sheet] ──requires──> [Character CRUD], [reusable sheet templates]
+[reusable sheet templates] ──requires──> [Character CRUD] (templates are a sibling entity, applied onto a character)
 
-[3. Test tooling upgrade: @vue/test-utils v2, @vue/vue3-jest, jest-serializer-vue v3]
-    └──requires──> [1], [2]   (bring the regression net back online BEFORE touching component internals)
+[Campaign session log] ──requires──> nothing sheet-related (independent subsystem)
+[Campaign tag-parsing / Important Things] ──requires──> [Campaign session log]
+[Campaign public summary view] ──requires──> [Campaign session log], [Campaign tag-parsing]
 
-[4. Global app bootstrap rewrite: new Vue() → createApp()]
-    └──requires──> [2]
+[Adversary CRUD] ──requires──> nothing sheet-related (independent subsystem, own data shape)
+[Adversary public/private + search + pagination] ──requires──> [Adversary CRUD], [server-side search/filter]
 
-[5. Vue Router 3→4 upgrade]        [6. Vuex 3→4 upgrade]        [7. Sentry SDK → @sentry/vue]
-    └──requires──> [4]                 └──requires──> [4]            └──requires──> [4]
-    (5, 6, 7 can proceed in parallel once [4] lands — all are plugin registrations on the new `app` instance)
+[Scene creation] ──requires──> nothing (independent)
+[VTT Scene Builder canvas/zones/objects] ──requires──> [Scene creation], [Character CRUD] (to search/add characters), [Adversary CRUD] (to search/add adversaries)
+[VTT PeerJS host/join/chat/dice] ──requires──> [VTT Scene Builder canvas/zones/objects] (broadcasts scene state), [PeerJS signaling server]
+[VTT audio/video] ──requires──> [VTT PeerJS host/join]
+[Companion sheet popup ("fcsVtt" mode)] ──requires──> [VTT Scene Builder] (must be opened as a popup FROM a running scene), [getVal/setVal] (reads committed sheet values), [sheet-type VTT icons]
+[Sheet-type VTT icons] ──requires──> [getVal/setVal], [12 sheet type components]
+[Roll20 Fate of 20 integration] ──requires──> [Sheet-type VTT icons] (same `vttEnabled` hook), external browser extension (out-of-repo)
 
-[8. Vue-2-only dependency replacement triage]
-    ├── BootstrapVue → bootstrap-vue-next   (largest sub-item; own phase)
-    ├── vuedraggable, vue-color, vue-datetime, vue-meta, vue-tags-input, etc.
-    └──requires──> [4]  (each is a plugin/component registered at or after bootstrap)
+[Account registration/login/logout] ──requires──> nothing (foundation for everything auth-gated)
+[Email verification] ──requires──> [Account registration]
+[Password recovery] ──requires──> [Account registration]
+[Session refresh] ──requires──> [Account login] (every DB call depends on this)
+[Subscription flag caching] ──requires──> [Account login], [Stripe checkout/portal]
+[Stripe checkout/management/trial] ──requires──> [Account login] (customer tied to Cognito user attribute)
+[Host-must-be-subscriber gating] ──enhances──> [VTT Scene Builder] (currently NOT enforced — see Anti-Features)
 
-[9. Component-by-component compat burn-down]
-    ├── Remove Vue.set/$set usage (character sheet getVal/setVal reactivity)
-    ├── Remove filters, convert to computed/methods
-    ├── Fix v-model contracts on shared input-*.vue components
-    ├── Remove root-instance event bus usage
-    ├── Rename custom directive hooks
-    ├── Audit v-if/v-for priority, slot API, key-on-v-else, etc.
-    └──requires──> [3] (tests must exist to safely verify), [4]–[8] (infrastructure must exist first)
-
-[10. jQuery reduction]
-    └──requires──> [8] (specifically the BootstrapVue replacement — most jQuery usage is pulled in via Bootstrap 4 JS plugins)
-
-[11. Remove @vue/compat entirely — pure Vue 3]
-    └──requires──> [9] fully complete across all 12 sheets + shared components, [10]
-    (this is the "migration done" gate)
-
---- everything below is optional modernization, explicitly sequenced AFTER [11] ---
-
-[12. Vuex 4 → Pinia]  ──enhances──>  [13. Store modularization]
-[14. Service-layer DI/container]  ──enables──>  (thin seam for Milestone 2, kept minimal per PROJECT.md)
-[15. Webpack → Vite]  ──enables──>  [16. Jest → Vitest]
-[17. Composition API / <script setup> adoption]  ──optional, only where already touching a file for another reason──
-[18. TypeScript adoption]  ──separate initiative, after [11] is stable in production──
+[Dice roller (standalone modal)] ──requires──> nothing (fully independent utility)
+[Sharing (copy URL)] ──requires──> [Character/Adversary/Scene CRUD] (needs a detail URL to copy)
+[Images (URL fields)] ──requires──> nothing (plain string fields on every entity)
 ```
 
 ### Dependency Notes
 
-- **Everything requires [1] and [2] first:** no Vue 3 SFC compiles, and no compat-mode runtime exists, until the toolchain understands `@vue/compiler-sfc`. This is the true foundation and should be the first roadmap phase.
-- **[3] (test tooling) must land before [9] (component-by-component fixes):** PROJECT.md requires the Jest suite stay green throughout; fixing components without a working Vue-3-aware test runner means flying blind on regressions in a live app.
-- **[8] BootstrapVue replacement is the long pole:** it's both the single highest-complexity item and a hard dependency for [10] jQuery reduction. Give it its own dedicated phase(s) rather than folding it into general "component compatibility" work.
-- **[11] (removing @vue/compat) is a hard gate, not optional:** the Vue core team is explicit that the compat build is a transitional tool with an expected exit, not a permanent runtime mode.
-- **[12]–[18] deliberately depend on [11], not the other way around:** none of the optional modernization items should block or be blocked by getting a working Vue 3 app shipped; sequencing them after keeps the core migration's risk surface minimal, matching PROJECT.md's "ship in safe increments" constraint.
-- **[14] service-layer DI is the one item that straddles both lists:** PROJECT.md lists "isolate the backend behind a clean service abstraction" as an Active (in-scope) requirement for *this* milestone, even though it's not something Vue 3 forces. Scope it as a thin seam only — resist expanding it into a full architecture rewrite (see Anti-Features).
+- **`getVal`/`setVal` is the true foundation, not the 12 sheets themselves.** Every sheet, every input component (`input-aspect`, `input-stress`, `input-skill-pyramid`, etc.), the VTT message formatting (`parseVTTMessage` reads via `getVal` immediately after a `setVal` commits), and the custom-template label system all read/write through this one utility. **Rebuild and stabilize the data-access pattern before porting any individual sheet** — porting sheets first against a wrong/incomplete reactive-data abstraction means redoing all 12 later.
+- **Sheet-type registration is a single point of failure by design today** (component map + separate whitelist array, both manually kept in sync) — CONCERNS.md already flags this as fragile. The rebuild should collapse this into one source of truth (e.g. a single sheet-registry module both the router-guard and the component-resolver read from) rather than porting the two-list pattern as-is.
+- **Campaigns and Adversaries are architecturally independent of the sheet system** — neither depends on `getVal`/`setVal` or the 12 sheet components. They can be built, tested, and shipped as an earlier/parallel phase without waiting on the (much higher-risk) sheet-rendering work.
+- **The VTT Scene Builder depends on both Character CRUD and Adversary CRUD** (it searches and imports live entities from both), so it must come after those, not before or in parallel.
+- **The two VTT integration modes (`fcsVtt` companion-popup and Roll20) share one hook point** (`vttEnabled` + `sendToVTT`/`parseVTTMessage` in `charactersheet.vue`, replicated per sheet field) — build that hook generically once, then the in-house mode and (if kept) Roll20 mode are two backends behind the same interface, not two separate integration efforts.
+- **Stripe billing is entangled with the Auth provider today** (`custom:stripe_customer` is a Cognito user attribute) — this is explicitly a Milestone-2-adjacent decision (how does subscription state attach to a Firebase Auth user / Firestore user doc), not a pure-frontend rebuild concern, even though PROJECT.md scopes "keep Stripe as-is."
+
+---
 
 ## MVP Definition
 
-### Launch With (v1) — the minimum to ship Vue 3 to production with zero regressions
+Framed as: what must exist for the *first* rebuilt release users see, given this is a like-for-like parity rebuild with a full data migration, not an incremental feature launch.
 
-- [ ] Compiler/loader toolchain updated to compile Vue 3 SFCs (vue-loader/webpack bump)
-- [ ] `@vue/compat` migration build installed and booting
-- [ ] Test tooling upgraded (`@vue/test-utils` v2, `@vue/vue3-jest`) — regression net restored
-- [ ] App bootstrap rewritten to `createApp()`
-- [ ] Vue Router upgraded to v4
-- [ ] Vuex upgraded to v4 (minimum viable; Pinia is a fast-follow, not launch-blocking)
-- [ ] Sentry SDK upgraded with `@sentry/vue` integration
-- [ ] BootstrapVue replaced with `bootstrap-vue-next` (or an equivalent decision reached after a dedicated spike) across all pages/sheets
-- [ ] All Vue-2-only small libraries triaged and replaced/upgraded (see sub-table)
-- [ ] `Vue.set`/`$set` usage removed from character-sheet reactivity paths
-- [ ] Global filters removed/converted across all 12 sheets
-- [ ] `v-model` contracts fixed on all shared `input-*.vue` components
-- [ ] Root-instance event bus usage removed
-- [ ] Custom directive hooks renamed
-- [ ] `v-if`/`v-for`/slot/`.native`/`$listeners` edge cases audited and fixed
-- [ ] jQuery reliance reduced to whatever remains non-blocking
-- [ ] `@vue/compat` fully removed; pure Vue 3 in production
-- [ ] Existing Jest/Vue Test Utils suite green, with expanded coverage around every item above
+### Launch With (v2.0 — required for cutover, no regressions for existing subscribers)
 
-### Add After Validation (v1.x) — fast-follow, once Vue 3 is stable in production
+- [ ] `getVal`/`setVal`-equivalent shared character data access pattern, verified against all known depth/edge cases (5-level nesting, checkbox-false handling, VTT commit-timing)
+- [ ] All 12 sheet systems, pixel-fidelity-checked against printed output for each
+- [ ] Character CRUD (create from template, edit, save, delete, copy, share URL)
+- [ ] Custom "Fate Anything" sheet + shared template system (search/apply/save-as-new/color/logo/font)
+- [ ] Campaign CRUD + session log + `#`/`!`/`@`/`~` tag parsing + Important Things aggregation + public summary view
+- [ ] Adversary CRUD + public/private visibility + search + pagination
+- [ ] VTT Scene Builder (canvas/zones/objects/aspects/skills/stress/consequences/turn order/colors)
+- [ ] VTT PeerJS host/join/chat/dice-roll/save-to-campaign (data-channel features)
+- [ ] Standalone Fate dice roller modal
+- [ ] Full auth flow (register, email verify, login, logout, password recovery 2-step, session refresh)
+- [ ] Stripe subscription checkout/portal/trial-abuse-prevention (via new backend function)
+- [ ] User + character/campaign/scene/adversary data migration from DynamoDB → Firestore, preserving legacy dual-shape adversary data
+- [ ] Sharing (copy URL) across characters/adversaries/scenes
+- [ ] Image URL fields (no upload) across all entities
 
-- [ ] Vuex 4 → Pinia migration — trigger: once store logic is confirmed stable post-cutover
-- [ ] Store modularization (split `index.js`'s inline store into modules) — trigger: pairs naturally with the Pinia move
-- [ ] Thin service-abstraction seam for `DbService`/`UserService`/etc. — trigger: needed before Milestone 2 (Firebase) can start; keep it minimal
-- [ ] Webpack → Vite migration — trigger: once Vue 3 is stable and the team wants the DX/maintenance win
-- [ ] ESLint config modernization — trigger: cheap, anytime after SFCs compile on Vue 3
+### Add After Validation (v2.0.x — fast-follow, once core is stable in production)
 
-### Future Consideration (v2+) — defer until well past this milestone
+- [ ] VTT audio/video (WebRTC) — confirm actual usage before assuming full parity is required; candidate for a short post-launch gap if usage is low
+- [ ] Companion sheet popup ("fcsVtt" mode) — depends on Scene Builder being stable first
+- [ ] Known-bug fixes carried as intentional decisions: character→scene condition sync, duplicate-character-in-scene prevention, host subscription-gating
 
-- [ ] Broad Composition API / `<script setup>` adoption across all sheets — defer until a dedicated refactor initiative, not bundled with routine touches
-- [ ] TypeScript conversion — defer; separate large initiative
-- [ ] Jest → Vitest — defer; only worth it if/when Vite lands
-- [ ] Consolidating the 12 sheet variants into a shared schema-driven engine — defer; product-architecture change, not a migration task
+### Future Consideration / Explicit Go-No-Go Needed (not assumed in v2.0 scope)
+
+- [ ] Roll20 "Fate of 20" extension integration — **requires an explicit user decision**; do not build without confirming current usage/value, since it's a second full integration surface with no test coverage today and depends on a separately-maintained extension codebase
+- [ ] VTT "fullscreen" mode — currently dead code (`v-if="1==2"`), not real parity scope; only build if requested as new v2.0 functionality
 
 ## Feature Prioritization Matrix
 
-| Workstream | User/Business Value | Implementation Cost | Priority |
+| Feature Area | User/Business Value | Rebuild Cost | Priority |
 |---|---|---|---|
-| Toolchain + `@vue/compat` foundation | HIGH (nothing else possible without it) | MEDIUM | P1 |
-| Test tooling upgrade | HIGH (protects against regressions in a live paying-subscriber app) | MEDIUM | P1 |
-| App bootstrap + Router + Vuex 4 upgrade | HIGH | LOW–MEDIUM | P1 |
-| BootstrapVue → bootstrap-vue-next | HIGH (blocks nearly every page) | HIGH | P1 |
-| Small Vue-2-only library triage | MEDIUM (each is narrow, but they add up) | MEDIUM (aggregate) | P1 |
-| `Vue.set`/filters/`v-model`/event-bus/directive fixes | HIGH (silent runtime breakage if skipped) | HIGH | P1 |
-| jQuery reduction | MEDIUM | MEDIUM–HIGH | P1 (coupled to BootstrapVue swap) |
-| `@vue/compat` removal (final gate) | HIGH (defines "done") | MEDIUM | P1 |
-| Vuex → Pinia | MEDIUM (maintainability, future TS support) | MEDIUM | P2 |
-| Service-layer DI / thin abstraction seam | MEDIUM (unblocks Milestone 2) | MEDIUM | P2 |
-| Webpack → Vite | MEDIUM (solo-maintainer DX/maintenance win) | HIGH | P2 |
-| Store modularization | LOW–MEDIUM | LOW–MEDIUM | P2 |
-| ESLint modernization | LOW | LOW | P3 |
-| Composition API broad adoption | MEDIUM (long-term code reuse) | HIGH | P3 |
-| TypeScript adoption | MEDIUM–HIGH (long-term, solo-maintainer safety net) | HIGH | P3 |
-| Jest → Vitest | LOW–MEDIUM | MEDIUM | P3 |
-| Sheet-engine consolidation | LOW (nice-to-have architecture cleanup) | HIGH | P3 |
+| getVal/setVal data model + print-fidelity sheets (12 systems) | HIGH (the whole product premise) | HIGH | P1 |
+| Character CRUD + custom sheet/templates | HIGH | MEDIUM–HIGH | P1 |
+| Campaigns (session log + tagging) | HIGH (heavily bespoke, clearly valued feature) | HIGH | P1 |
+| Adversaries CRUD + public list + search/pagination | MEDIUM–HIGH | MEDIUM–HIGH | P1 |
+| VTT Scene Builder (canvas/zones/objects) | HIGH (marketed subscriber benefit) | HIGH | P1 |
+| VTT PeerJS data sync (chat/dice/scene state) | HIGH | HIGH | P1 |
+| Auth (register/login/recover/verify/session) | HIGH (gates everything) | MEDIUM (behavior) / HIGH (backend swap) | P1 |
+| Stripe billing | HIGH (revenue) | MEDIUM (behavior) / HIGH (new backend function) | P1 |
+| Standalone dice roller | MEDIUM | LOW | P1 (cheap, keep) |
+| Sharing / image URL fields | MEDIUM | LOW | P1 (cheap, keep) |
+| VTT audio/video (WebRTC) | UNKNOWN (usage unverified) | HIGH | P2 — confirm value first |
+| Companion sheet popup ("fcsVtt") | MEDIUM | MEDIUM–HIGH | P2 |
+| Roll20 Fate of 20 integration | UNKNOWN (usage unverified) | HIGH (2nd integration surface, external codebase) | P3 / go-no-go decision required |
+| Known-bug fixes (condition sync, dup-character, host gating) | LOW–MEDIUM | LOW | P2/P3 per-item decision |
+| VTT fullscreen | N/A (currently dead code) | N/A | Not in scope unless newly requested |
 
 **Priority key:**
-- P1: Required for this milestone to ship (table stakes for running on Vue 3)
-- P2: Should have, natural fast-follow once Vue 3 is stable
-- P3: Nice to have, defer to a future, separate initiative
-
-## Reference Migration Case Studies / Prior Art
-
-No direct "competitors" apply to internal tooling, so this section substitutes prior-art from comparable real-world Vue 2→3 migrations of live apps, used to validate the workstream breakdown above:
-
-| Source | Relevant Takeaway | Confidence |
-|---|---|---|
-| Vue core team, `v3-migration.vuejs.org` (official migration guide + migration-build docs) | Canonical source for every breaking change listed above; explicitly recommends the incremental `@vue/compat` burn-down approach for large/live apps over a rewrite | HIGH (official first-party docs) |
-| Vue core team, Vue 2 EOL announcement (`blog.vuejs.org/posts/vue-2-eol`, `v2.vuejs.org/eol`) | Vue 2 reached End of Life December 31, 2023 — no further security fixes outside paid extended support (HeroDevs NES); confirms this migration is materially overdue from a support-risk standpoint, strengthening the case for prioritizing it | HIGH (official) |
-| Community write-ups on large-app Vue 2→3 migrations (Crisp, Storyblok's Vue 2/Nuxt 2 SDK deprecation notice, various engineering blogs) | Consistent theme: dependency replacement (especially UI component libraries) dwarfs the pure-framework-API changes in effort for apps with heavy third-party UI-library usage — directly applicable given this app's BootstrapVue-heavy templates | MEDIUM (secondary sources, directionally consistent with official guidance but not independently verified line-by-line) |
+- P1: Required for v2.0 cutover — dropping breaks parity for existing subscribers
+- P2: Real value, acceptable as a fast-follow without breaking the cutover
+- P3: Needs an explicit product decision before it's roadmapped at all
 
 ## Sources
 
-- [Breaking Changes | Vue 3 Migration Guide](https://v3-migration.vuejs.org/breaking-changes/) — HIGH confidence, official
-- [Migration Build | Vue 3 Migration Guide](https://v3-migration.vuejs.org/migration-build) — HIGH confidence, official
-- [New Framework-level Recommendations | Vue 3 Migration Guide](https://v3-migration.vuejs.org/recommendations) — HIGH confidence, official
-- [Vue 2 Has Reached End of Life](https://v2.vuejs.org/eol/) — HIGH confidence, official
-- [Vue 2 is Approaching End Of Life | The Vue Point](https://blog.vuejs.org/posts/vue-2-eol) — HIGH confidence, official
-- [Vue 2 - Never-Ending Support (NES) | HeroDevs](https://www.herodevs.com/support/nes-vue) — MEDIUM confidence (vendor, but consistent with official EOL statement)
-- [Migrating from Vuex ≤4 - Pinia](https://pinia.vuejs.org/cookbook/migration-vuex.html) — HIGH confidence, official Vue-ecosystem docs
-- [bootstrap-vue-next (npm/GitHub)](https://www.npmjs.com/package/bootstrap-vue-next) and [Migration Guide | BootstrapVueNext](https://bootstrap-vue-next.github.io/bootstrap-vue-next/docs/migration-guide) — MEDIUM confidence (actively maintained project docs; not independently cross-checked against a second source)
-- General web search results on `vue-meta`/`vue-datetime`/`vue-showdown`/`vue-cookies` Vue-3 alternatives — LOW confidence per uncorroborated web search; **flag every small dependency in the sub-table above for a fresh compatibility check at implementation time**, since library maintenance status changes quickly and this research reflects a point-in-time snapshot
-- `.planning/PROJECT.md`, `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/STRUCTURE.md`, `package.json` — internal codebase facts (current dependency versions, architecture anti-patterns, explicit scope boundaries)
+- `src/components/charactersheet.vue`, `src/assets/js/commonService.js` — sheet registration + `getVal`/`setVal` (HIGH confidence, read directly)
+- `src/sheets/*.vue` (fate-core, fate-accelerated, fate-of-cthulhu read in full/partial; remaining 9 confirmed by directory listing + `charactersheet.vue` registration map) — HIGH confidence for read files, MEDIUM (structurally inferred, not individually read) for the remainder
+- `src/assets/js/dbService.js`, `userService.js`, `subService.js`, `models.js` — data access, auth, billing, VTT message shapes (HIGH confidence, read in full)
+- `src/assets/js/gameClient.js`, `gameServer.js`, `fcsVTT.js`, `fcsVTTClient.js`, `fateof20.js`, `peerService.js` — VTT/Roll20 integration (HIGH confidence, read in full)
+- `src/pages/CharacterDetail.vue`, `CharacterList.vue`, `CharacterSheetList.vue`, `CharacterSheetDetail.vue`, `CampaignDetail.vue`, `CampaignSummary.vue` (partial), `AdversaryList.vue`, `Account.vue`, `SceneDetail.vue` (partial), `Login.vue`, `Register.vue`, `Recover.vue`, `Confirm.vue` — page-level behavior (HIGH confidence, read directly)
+- `src/components/characterprops.vue`, `scene-zone.vue` (partial), `scene-object.vue` (partial), `input-skill-pyramid.vue`, `diceroller.vue` — widget-level behavior (HIGH confidence, read directly)
+- `src/router/index.js` — full route inventory (HIGH confidence, read in full)
+- `.planning/codebase/ARCHITECTURE.md`, `STRUCTURE.md`, `INTEGRATIONS.md`, `STACK.md`, `CONCERNS.md` — corroborating architecture/known-issues context (HIGH confidence, prior codebase-mapping phase)
+- `.planning/research/_m1-vue3-archive/FEATURES.md` — prior research; explicitly a Vue2→3 *migration-workstream* inventory (not a product-feature inventory) from the superseded incremental-migration milestone plan; reused only for cross-checking dependency/library facts already incorporated here, not as a source of product features
+- `.planning/PROJECT.md` — milestone scope, constraints, "Validated" requirements list (HIGH confidence)
 
 ---
-*Feature research for: Vue 2→3 migration workstreams (Fate Character Sheet Milestone 1)*
-*Researched: 2026-07-23*
+*Feature research for: Fate Character Sheet v2.0 greenfield rebuild (functionality parity inventory)*
+*Researched: 2026-08-31*
