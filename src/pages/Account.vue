@@ -31,6 +31,12 @@
 
             <div v-if="HasSubscription" class="card-body">
               <p>You are a subscriber, thank you!</p>
+              <div class="alert alert-info" role="alert">
+                <strong>Subscriptions are being discontinued.</strong> Your subscription will
+                no longer renew, and you won't be charged again. You'll keep your subscriber
+                features until the end of your current billing period. You can review or cancel
+                anytime using the <strong>[Manage]</strong> link above.
+              </div>
               <p>For information about Roll20 integration please visit the
                 <a href="https://github.com/sheibeck/fcs/wiki/Fate-of-20" target="_blank">Fate of 20 Page</a>.
               </p>
@@ -40,39 +46,12 @@
             </div>
 
             <div v-if="!HasSubscription" class="card-body">
-              <h5 class="card-title">
-                Subscribe to Fate Character Sheet<br/>
-                <small><em>Includes 30 day free trial.</em></small>
-              </h5>
+              <h5 class="card-title">Subscriptions Closed</h5>
               <p class="card-text">
-                Pay a low monthly fee or a get a discounted rate by subscribing yearly 
-                and you gain access to subscriber only benefits.
+                New subscriptions are no longer available. All of your characters,
+                campaigns, and adversaries remain free to create and manage.
               </p>
-              <p class="font-weight-bold py-3">
-                &mdash;Roll20 Integration<br /><span class="small">requires a browser that can run Chrome extensions (Chrome, Opera, Edge)</span>
-              </p>              
-              <p>
-                <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="Subscribe('monthly')"
-                  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
-                  id="checkout-button-plan_HJ5iyg7r8S6mN8"
-                  role="link"
-                >
-                  $1.99 per Month
-                </button>
-              </p>
-              <p> &mdash; OR &mdash;</p>
-              <p>
-                <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
-                <button v-on:click="Subscribe('yearly')"
-                  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
-                  id="checkout-button-plan_HJ5iyg7r8S6mN8"
-                  role="link"
-                >
-                  $14.99 per Year
-                </button>
-              </p>       
-            </div>            
+            </div>
           </div>
         </div>
         <div v-if="loaded && HasSubscription" class="pt-3">
@@ -138,23 +117,6 @@ export default {
     }, 
     GetEmail() {      
       return this.$store.state.userSession.getIdToken().payload['email'];
-    },
-    Subscribe(subLength) {
-
-      let planItem = "";
-      
-      if (subLength == "monthly") {
-        planItem = `${process.env.NODE_ENV}` !== "production" ? "price_HOMWmJWkyXR9TS" : "price_HOMa3VIaTQkjXg";
-      }
-      else if (subLength == "yearly") {
-        planItem = `${process.env.NODE_ENV}` !== "production" ? "price_HOMXjW196sGTUI" : "price_HOMadKCDuNeMKJ";
-      }
-
-      userSvc.GetUserAttribute("custom:stripe_customer").then( id => {        
-        
-            subSvc.Checkout(planItem, id);
-                
-      })      
     },
     GotoManagePortal(e) {
       e.preventDefault();

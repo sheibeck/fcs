@@ -11,15 +11,12 @@
     </div>
 
     <div class="row">
-          <div v-if="!isSubscriber" class="col-sm-6">
+          <div v-if="!isSubscriber && !isAuthenticated" class="col-sm-6">
             <div class="card card m-2">
               <div class="card-body">
-                <h5 class="card-title">Become a Subscriber</h5>
-                <p class="card-text">Register for free. Subscribe to get access to Scene builder, our Fate virtual table top (Players don't need a subscription to play.) and Roll20 integration.</p>
-                <a v-if="!isAuthenticated" href="register" class="btn btn-primary"><span class='dice'>C</span> Create a Free Account</a>
-                <a v-if="isAuthenticated" href="account" type="button" class="btn btn-primary">
-                    <span class='dice'>C</span> Become a Subscriber
-                </a>
+                <h5 class="card-title">Get Started for Free</h5>
+                <p class="card-text">Register for a free account to create and manage as many Fate characters and campaigns as you want.</p>
+                <a href="register" class="btn btn-primary"><span class='dice'>C</span> Create a Free Account</a>
               </div>
             </div>
           </div>
