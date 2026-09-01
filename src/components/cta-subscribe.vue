@@ -1,12 +1,9 @@
 <template>
   <div class="card card m-2">
     <div class="card-body">
-      <h5 class="card-title">Become a Subscriber</h5>
-      <p class="card-text">Subscribe to get access to enhanced features like Scene builder, our Fate virtual table top, and Roll20 integration.</p>
+      <h5 class="card-title">Subscriber Feature</h5>
+      <p class="card-text">This is a subscriber-only feature. New subscriptions are no longer available.</p>
       <a v-if="!isAuthenticated" href="register" class="btn btn-primary"><span class='dice'>C</span> Create a Free Account</a>
-      <a v-if="isAuthenticated" href="account" type="button" class="btn btn-primary">
-          <span class='dice'>C</span> Become a Subscriber
-      </a>
     </div>
   </div>
 </template>
