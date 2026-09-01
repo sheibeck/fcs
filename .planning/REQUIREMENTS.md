@@ -107,13 +107,63 @@ Deferred to a future release. Tracked but not in the v2.0 roadmap.
 
 ## Traceability
 
-Coverage is filled in by the roadmapper during ROADMAP.md creation.
+Coverage filled in by the roadmapper during ROADMAP.md creation (2026-08-31).
+
+> **Count correction:** the earlier coverage note stated "41 total". Counting the actual v1 requirement IDs across all ten categories (PLAT 5, MIGP 3, DATA 4, AUTH 5, SHEET 7, CAMP 5, BILL 4, VTT 7, DICE 1, CUT 4) yields **45**. All 45 are mapped to exactly one phase below; there are zero orphans and zero duplicates.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| MIGP-01 | Phase 1 | Pending |
+| MIGP-02 | Phase 1 | Pending |
+| MIGP-03 | Phase 1 | Pending |
+| PLAT-01 | Phase 2 | Pending |
+| PLAT-02 | Phase 2 | Pending |
+| PLAT-03 | Phase 2 | Pending |
+| PLAT-04 | Phase 2 | Pending |
+| PLAT-05 | Phase 2 | Pending |
+| DATA-01 | Phase 3 | Pending |
+| DATA-02 | Phase 3 | Pending |
+| DATA-03 | Phase 3 | Pending |
+| DATA-04 | Phase 3 | Pending |
+| AUTH-01 | Phase 4 | Pending |
+| AUTH-02 | Phase 4 | Pending |
+| AUTH-03 | Phase 4 | Pending |
+| AUTH-04 | Phase 4 | Pending |
+| AUTH-05 | Phase 4 | Pending |
+| SHEET-01 | Phase 5 | Pending |
+| SHEET-02 | Phase 5 | Pending |
+| SHEET-03 | Phase 5 | Pending |
+| SHEET-04 | Phase 5 | Pending |
+| SHEET-05 | Phase 5 | Pending |
+| SHEET-06 | Phase 5 | Pending |
+| SHEET-07 | Phase 5 | Pending |
+| CAMP-01 | Phase 6 | Pending |
+| CAMP-02 | Phase 6 | Pending |
+| CAMP-03 | Phase 6 | Pending |
+| CAMP-04 | Phase 6 | Pending |
+| CAMP-05 | Phase 6 | Pending |
+| BILL-01 | Phase 7 | Pending |
+| BILL-02 | Phase 7 | Pending |
+| BILL-03 | Phase 7 | Pending |
+| BILL-04 | Phase 7 | Pending |
+| VTT-01 | Phase 8 | Pending |
+| VTT-02 | Phase 8 | Pending |
+| VTT-03 | Phase 8 | Pending |
+| VTT-04 | Phase 8 | Pending |
+| VTT-05 | Phase 8 | Pending |
+| VTT-06 | Phase 8 | Pending |
+| VTT-07 | Phase 8 | Pending |
+| DICE-01 | Phase 8 | Pending |
+| CUT-01 | Phase 9 | Pending |
+| CUT-02 | Phase 10 | Pending |
+| CUT-03 | Phase 10 | Pending |
+| CUT-04 | Phase 10 | Pending |
 
 **Coverage:**
-- v1 requirements: 41 total
-- Mapped to phases: TBD (roadmap)
-- Unmapped: TBD
+- v1 requirements: 45 total (corrected from stale "41")
+- Mapped to phases: 45 / 45 (100%)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-08-31*
-*Last updated: 2026-08-31 after v2.0 requirements scoping*
+*Last updated: 2026-08-31 — traceability filled during v2.0 roadmap creation (45/45 mapped across 10 phases)*
