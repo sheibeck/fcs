@@ -97,7 +97,12 @@ Paying subscribers keep full, uninterrupted access to their existing characters,
 | **v2.0 pivot: greenfield rebuild on Firebase instead of incremental migration** | User chose to rebuild from scratch on a best-fit stack rather than migrate the aging Vue 2 app in place; supersedes the two-milestone incremental plan | — Active (v2.0) |
 | Framework left open (research & recommend) | Print-fidelity sheet rendering + Firebase fit + solo-maintainer DX should drive the choice, not concept-continuity with the old app | — Pending research |
 | Keep Stripe as the billing processor; integration approach open | Stripe is an accepted, working payment system and stays. HOW it's wired is open — evaluate the official Firebase "Run Subscriptions with Stripe" extension vs. porting the `FCSStripe` logic to a Cloud Function, chosen on which better preserves billing continuity for existing subscribers. Prefer the extension if it can adopt existing Stripe customers. | — Decided (integration TBD) |
-| Move PeerJS signaling off Heroku onto Firebase-family infra | Consolidate hosting under Firebase/GCP; Cloud Run is the likely fit (persistent WebSockets), pending research | — Pending research |
+| Move PeerJS signaling off Heroku onto Firebase-family infra | Consolidate hosting under Firebase/GCP; Cloud Run is the fit (persistent WebSockets), confirmed by research | — Decided (Cloud Run) |
+| Stack: Vue 3.5 + Vite, static SPA on Firebase Hosting; Pinia; VueFire | Research recommendation; print-fidelity lives in CSS (framework-agnostic), so Firebase fit + solo-maintainer DX + existing Vue investment decide it | — Decided |
+| Language: TypeScript | User chose full static typing end-to-end; safer for the schemaless→typed data-model redesign; retrofitting later is costly | — Decided |
+| VTT audio/video (WebRTC) IN v2.0 scope | User confirmed it's used/expected — rebuild for parity at launch, not deferred | — Decided |
+| One-click PDF export (Cloud Run + Puppeteer) IN v2.0 launch | User wants a Download-PDF button at launch on top of browser print | — Decided |
+| Roll20 "Fate of 20" integration deferred to fast-follow | No confirmed usage; separately-maintained. NOTE: the extension was removed from Chrome Web Store on 2026-08-31 for Manifest V2 deprecation and needs an independent MV2→MV3 migration to return — decoupled from the rebuild | — Deferred (+ MV3 migration tracked) |
 
 ## Evolution
 
