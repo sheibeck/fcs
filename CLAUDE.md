@@ -63,3 +63,9 @@ Business logic lives in plain ES6 classes instantiated with the root Vue instanc
 
 ## Testing
 Jest + `@vue/test-utils` (`mount`), with `vue-jest` for `.vue` and `jest-serializer-vue` for snapshots. Tests live in `test/unit/{components,pages}`. Tests build their own local Vuex store with mocked getters (`isAuthenticated`, `userId`, `vttEnabled`, `vueShowdownOpts`) and mock `$route` — follow the pattern in `test/unit/components/sheetinputs.spec.js` when adding sheet/component tests.
+
+## Deployment (CI/CD)
+GitHub Actions (`.github/workflows/`) deploy the built bundle to S3 (Node 12.x):
+- **`beta.yml`** — triggers automatically on **push to `develop`**: runs `npm run beta` and syncs `dist/` to the beta S3 bucket. Note it does **not** run `yarn lint` or `yarn test` first, so a green push does not mean tests passed — run them locally before pushing.
+- **`production.yml`** — **manual** `workflow_dispatch` only (takes a release tagname input): runs `npm run prod` and deploys to the production bucket.
+Both need repo secrets (`SENTRY_AUTH_TOKEN`, `AWS_*`, S3 bucket names).
